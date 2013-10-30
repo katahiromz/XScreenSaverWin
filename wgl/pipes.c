@@ -67,7 +67,7 @@ static const char sccsid[] = "@(#)pipes.c	4.07 97/11/24 xlockmore";
 	               	"*fpsSolid:     True    \n"		    \
 	               	"*wireframe:    False   \n"
 
-# define refresh_pipes NULL
+# define refresh_pipes 0
 
 #if 0
 	#ifdef STANDALONE
@@ -80,12 +80,14 @@ static const char sccsid[] = "@(#)pipes.c	4.07 97/11/24 xlockmore";
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
 #if 0
 	#ifdef HAVE_COCOA
@@ -188,17 +190,16 @@ typedef struct {
 	int         system_type;
 	int         system_length;
 	int         turncounter;
-	HWND        window;
+	Window      window;
 	const float *system_color;
 	GLfloat     initial_rotation;
 	GLuint      valve, bolts, betweenbolts, elbowbolts, elbowcoins;
 	GLuint      guagehead, guageface, guagedial, guageconnector, teapot;
     int         teapot_polys;
-	//GLXContext *glx_context;
-	HGLRC hglrc;
+	GLXContext *glx_context;
 
-    //Bool button_down_p;
-    //trackball_state *trackball;
+    Bool button_down_p;
+    trackball_state *trackball;
     GLuint *dlists, *poly_counts;
     int dlist_count, dlist_size;
     int system_index, system_size;
@@ -211,25 +212,25 @@ extern struct lwo LWO_BigValve, LWO_PipeBetweenBolts, LWO_Bolts3D;
 extern struct lwo LWO_GuageHead, LWO_GuageFace, LWO_GuageDial, LWO_GuageConnector;
 extern struct lwo LWO_ElbowBolts, LWO_ElbowCoins;
 
-static const float front_shininess[] = {60.0f};
-static const float front_specular[] = {0.7f, 0.7f, 0.7f, 1.0f};
-static const float ambient0[] = {0.4f, 0.4f, 0.4f, 1.0f};
-static const float diffuse0[] = {1.0f, 1.0f, 1.0f, 1.0f};
-static const float ambient1[] = {0.2f, 0.2f, 0.2f, 1.0f};
-static const float diffuse1[] = {0.5f, 0.5f, 0.5f, 1.0f};
-static const float position0[] = {1.0f, 1.0f, 1.0f, 0.0f};
-static const float position1[] = {-1.0f, -1.0f, 1.0f, 0.0f};
-static const float lmodel_ambient[] = {0.5f, 0.5f, 0.5f, 1.0f};
+static const float front_shininess[] = {60.0};
+static const float front_specular[] = {0.7, 0.7, 0.7, 1.0};
+static const float ambient0[] = {0.4, 0.4, 0.4, 1.0};
+static const float diffuse0[] = {1.0, 1.0, 1.0, 1.0};
+static const float ambient1[] = {0.2, 0.2, 0.2, 1.0};
+static const float diffuse1[] = {0.5, 0.5, 0.5, 1.0};
+static const float position0[] = {1.0, 1.0, 1.0, 0.0};
+static const float position1[] = {-1.0, -1.0, 1.0, 0.0};
+static const float lmodel_ambient[] = {0.5, 0.5, 0.5, 1.0};
 static const float lmodel_twoside[] = {GL_TRUE};
 
-static const float MaterialRed[] = {0.7f, 0.0f, 0.0f, 1.0f};
-static const float MaterialGreen[] = {0.1f, 0.5f, 0.2f, 1.0f};
-static const float MaterialBlue[] = {0.0f, 0.0f, 0.7f, 1.0f};
-static const float MaterialCyan[] = {0.2f, 0.5f, 0.7f, 1.0f};
-static const float MaterialYellow[] = {0.7f, 0.7f, 0.0f, 1.0f};
-static const float MaterialMagenta[] = {0.6f, 0.2f, 0.5f, 1.0f};
-static const float MaterialWhite[] = {0.7f, 0.7f, 0.7f, 1.0f};
-static const float MaterialGray[] = {0.2f, 0.2f, 0.2f, 1.0f};
+static const float MaterialRed[] = {0.7, 0.0, 0.0, 1.0};
+static const float MaterialGreen[] = {0.1, 0.5, 0.2, 1.0};
+static const float MaterialBlue[] = {0.0, 0.0, 0.7, 1.0};
+static const float MaterialCyan[] = {0.2, 0.5, 0.7, 1.0};
+static const float MaterialYellow[] = {0.7, 0.7, 0.0, 1.0};
+static const float MaterialMagenta[] = {0.6, 0.2, 0.5, 1.0};
+static const float MaterialWhite[] = {0.7, 0.7, 0.7, 1.0};
+static const float MaterialGray[] = {0.2, 0.2, 0.2, 1.0};
 
 static pipesstruct *pipes = NULL;
 
@@ -250,14 +251,14 @@ MakeTube(ModeInfo *mi, int direction)
 	/*dirFAR   = 00000101 */
 
 	if (!(direction & 4)) {
-		glRotatef(90.0f, (direction & 2) ? 0.0f : 1.0f,
-			  (direction & 2) ? 1.0f : 0.0f, 0.0f);
+		glRotatef(90.0, (direction & 2) ? 0.0 : 1.0,
+			  (direction & 2) ? 1.0 : 0.0, 0.0);
 	}
 	glBegin(wire ? GL_LINE_STRIP : GL_QUAD_STRIP);
-	for (an = 0.0f; an <= (float)(2.0 * M_PI); an += (float)(M_PI * 2 / facets)) {
-		glNormal3f((COSan_3 = COSF(an) / 3.0f), (SINan_3 = SINF(an) / 3.0f), 0.0f);
-		glVertex3f(COSan_3, SINan_3, (float)one_third);
-		glVertex3f(COSan_3, SINan_3, (float)-one_third);
+	for (an = 0.0; an <= 2.0 * M_PI; an += M_PI * 2 / facets) {
+		glNormal3f((COSan_3 = cos(an) / 3.0), (SINan_3 = sin(an) / 3.0), 0.0);
+		glVertex3f(COSan_3, SINan_3, one_third);
+		glVertex3f(COSan_3, SINan_3, -one_third);
         mi->polygon_count++;
 	}
 	glEnd();
@@ -302,27 +303,27 @@ myElbow(ModeInfo * mi, int bolted)
 	for (i = 0; i <= rings / 4; i++) {
 		GLfloat     theta, theta1;
 
-		theta = (float)((GLfloat) i *2.0f * M_PI / rings);
+		theta = (GLfloat) i *2.0 * M_PI / rings;
 
-		theta1 = (float)((GLfloat) (i + 1) * 2.0 * M_PI / rings);
+		theta1 = (GLfloat) (i + 1) * 2.0 * M_PI / rings;
 		for (j = 0; j < nsides; j++) {
 			GLfloat     phi, phi1;
 
-			phi = (float)((GLfloat) j *2.0 * M_PI / nsides);
+			phi = (GLfloat) j *2.0 * M_PI / nsides;
 
-			phi1 = (float)((GLfloat) (j + 1) * 2.0 * M_PI / nsides);
+			phi1 = (GLfloat) (j + 1) * 2.0 * M_PI / nsides;
 
-			p0[0] = (float)((COStheta = COSF(theta)) * (R + r * (COSphi = COSF(phi))));
-			p0[1] = (float)((_SINtheta = -SINF(theta)) * (R + r * COSphi));
+			p0[0] = (COStheta = cos(theta)) * (R + r * (COSphi = cos(phi)));
+			p0[1] = (_SINtheta = -sin(theta)) * (R + r * COSphi);
 
-			p1[0] = (float)((COStheta1 = COSF(theta1)) * (R + r * COSphi));
-			p1[1] = (float)((_SINtheta1 = -SINF(theta1)) * (R + r * COSphi));
+			p1[0] = (COStheta1 = cos(theta1)) * (R + r * COSphi);
+			p1[1] = (_SINtheta1 = -sin(theta1)) * (R + r * COSphi);
 
-			p2[0] = (float)(COStheta1 * (R + r * (COSphi1 = COSF(phi1))));
-			p2[1] = (float)(_SINtheta1 * (R + r * COSphi1));
+			p2[0] = COStheta1 * (R + r * (COSphi1 = cos(phi1)));
+			p2[1] = _SINtheta1 * (R + r * COSphi1);
 
-			p3[0] = (float)(COStheta * (R + r * COSphi1));
-			p3[1] = (float)(_SINtheta * (R + r * COSphi1));
+			p3[0] = COStheta * (R + r * COSphi1);
+			p3[1] = _SINtheta * (R + r * COSphi1);
 
 			n0[0] = COStheta * COSphi;
 			n0[1] = _SINtheta * COSphi;
@@ -336,8 +337,8 @@ myElbow(ModeInfo * mi, int bolted)
 			n3[0] = COStheta * COSphi1;
 			n3[1] = _SINtheta * COSphi1;
 
-			p0[2] = p1[2] = (float)(r * (n0[2] = n1[2] = SINF(phi)));
-			p2[2] = p3[2] = (float)(r * (n2[2] = n3[2] = SINF(phi1)));
+			p0[2] = p1[2] = r * (n0[2] = n1[2] = sin(phi));
+			p2[2] = p3[2] = r * (n2[2] = n3[2] = sin(phi1));
 
 			glBegin(wire ? GL_LINE_LOOP : GL_QUADS);
 			glNormal3fv(n3);
@@ -357,9 +358,9 @@ myElbow(ModeInfo * mi, int bolted)
 		/* Bolt the elbow onto the pipe system */
 		glFrontFace(GL_CW);
 		glPushMatrix();
-		glRotatef(90.0f, 0.0f, 0.0f, -1.0f);
-		glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-		glTranslatef(0.0f, (float)one_third, (float)one_third);
+		glRotatef(90.0, 0.0, 0.0, -1.0);
+		glRotatef(90.0, 0.0, 1.0, 0.0);
+		glTranslatef(0.0, one_third, one_third);
 		glCallList(pp->elbowcoins);
         mi->polygon_count += LWO_ElbowCoins.num_pnts/3;
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialGray);
@@ -421,17 +422,17 @@ MakeValve(ModeInfo * mi, int newdir)
 	switch (newdir) {
 		case dirUP:
 		case dirDOWN:
-			glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-			glRotatef((float)(NRAND(3) * 90.0f), 0.0f, 0.0f, 1.0f);
+			glRotatef(90.0, 1.0, 0.0, 0.0);
+			glRotatef(NRAND(3) * 90.0, 0.0, 0.0, 1.0);
 			break;
 		case dirLEFT:
 		case dirRIGHT:
-			glRotatef(90.0f, 0.0f, -1.0f, 0.0f);
-			glRotatef((float)((NRAND(3) * 90.0f) - 90.0f), 0.0f, 0.0f, 1.0f);
+			glRotatef(90.0, 0.0, -1.0, 0.0);
+			glRotatef((NRAND(3) * 90.0) - 90.0, 0.0, 0.0, 1.0);
 			break;
 		case dirNEAR:
 		case dirFAR:
-			glRotatef((float)(NRAND(4) * 90.0f), 0.0f, 0.0f, 1.0f);
+			glRotatef(NRAND(4) * 90.0, 0.0, 0.0, 1.0);
 			break;
 	}
 	glFrontFace(GL_CW);
@@ -497,10 +498,10 @@ MakeGuage(ModeInfo * mi, int newdir)
 	glCallList(pp->guageconnector);
     mi->polygon_count += LWO_GuageConnector.num_pnts/3;
 	glPushMatrix();
-	glTranslatef(0.0f, 1.33333f, 0.0f);
+	glTranslatef(0.0, 1.33333, 0.0);
 	/* Do not change the above to 1 + ONE_THIRD, because */
 	/* the object really is centered on 1.3333300000. */
-	glRotatef((float)(NRAND(270) + 45.0f), 0.0f, 0.0f, -1.0f);
+	glRotatef(NRAND(270) + 45.0, 0.0, 0.0, -1.0);
 	/* Random rotation for the dial.  I love it. */
 	glCallList(pp->guagedial);
     mi->polygon_count += LWO_GuageDial.num_pnts/3;
@@ -543,17 +544,17 @@ MakeTeapot(ModeInfo * mi, int newdir)
   switch (newdir) {
   case dirUP:
   case dirDOWN:
-    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-    glRotatef((float)(NRAND(3) * 90.0f), 0.0f, 0.0f, 1.0f);
+    glRotatef(90.0, 1.0, 0.0, 0.0);
+    glRotatef(NRAND(3) * 90.0, 0.0, 0.0, 1.0);
     break;
   case dirLEFT:
   case dirRIGHT:
-    glRotatef(90.0f, 0.0f, -1.0f, 0.0f);
-    glRotatef((float)((NRAND(3) * 90.0f) - 90.0f), 0.0f, 0.0f, 1.0f);
+    glRotatef(90.0, 0.0, -1.0, 0.0);
+    glRotatef((NRAND(3) * 90.0) - 90.0, 0.0, 0.0, 1.0);
     break;
   case dirNEAR:
   case dirFAR:
-    glRotatef((float)(NRAND(4) * 90.0f), 0.0f, 0.0f, 1.0f);
+    glRotatef(NRAND(4) * 90.0, 0.0, 0.0, 1.0);
     break;
   }
 
@@ -687,42 +688,43 @@ reshape_pipes(ModeInfo * mi, int width, int height)
 	  pipesstruct *pp = &pipes[MI_SCREEN(mi)];
 
 	  if (event->xany.type == ButtonPress &&
-		  event->xbutton.button == Button1)
-		{
-		  pp->button_down_p = True;
-		  gltrackball_start (pp->trackball,
-							 event->xbutton.x, event->xbutton.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	      event->xbutton.button == Button1)
+	    {
+	      pp->button_down_p = True;
+	      gltrackball_start (pp->trackball,
+	                         event->xbutton.x, event->xbutton.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonRelease &&
-			   event->xbutton.button == Button1)
-		{
-		  pp->button_down_p = False;
-		  return True;
-		}
+	           event->xbutton.button == Button1)
+	    {
+	      pp->button_down_p = False;
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonPress &&
-			   (event->xbutton.button == Button4 ||
-				event->xbutton.button == Button5 ||
-				event->xbutton.button == Button6 ||
-				event->xbutton.button == Button7))
-		{
-		  gltrackball_mousewheel (pp->trackball, event->xbutton.button, 10,
-								  !!event->xbutton.state);
-		  return True;
-		}
+	           (event->xbutton.button == Button4 ||
+	            event->xbutton.button == Button5 ||
+	            event->xbutton.button == Button6 ||
+	            event->xbutton.button == Button7))
+	    {
+	      gltrackball_mousewheel (pp->trackball, event->xbutton.button, 10,
+	                              !!event->xbutton.state);
+	      return True;
+	    }
 	  else if (event->xany.type == MotionNotify &&
-			   pp->button_down_p)
-		{
-		  gltrackball_track (pp->trackball,
-							 event->xmotion.x, event->xmotion.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	           pp->button_down_p)
+	    {
+	      gltrackball_track (pp->trackball,
+	                         event->xmotion.x, event->xmotion.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 
 	  return False;
 	}
 #endif
+
 
 static void generate_system (ModeInfo *);
 
@@ -741,13 +743,13 @@ init_pipes (ModeInfo * mi)
 	pp = &pipes[screen];
 
 	pp->window = MI_WINDOW(mi);
-	if ((pp->hglrc = init_GL(mi)) != NULL) {
+	if ((pp->glx_context = init_GL(mi)) != NULL) {
 
 		reshape_pipes(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 		if (rotatepipes)
-		  pp->initial_rotation = (float)NRAND(180); /* jwz */
+		  pp->initial_rotation = NRAND(180); /* jwz */
 		else
-		  pp->initial_rotation = -10.0f;
+		  pp->initial_rotation = -10.0;
 		pinit(mi, 1);
 
 		if (factory > 0) {
@@ -789,7 +791,7 @@ init_pipes (ModeInfo * mi)
 		MI_CLEARWINDOW(mi);
 	}
 
-    //pp->trackball = gltrackball_init ();
+    pp->trackball = gltrackball_init ();
     generate_system (mi);
 }
 
@@ -803,7 +805,7 @@ get_dlist (ModeInfo *mi, int i)
       pp->dlist_count++;
       if (pp->dlist_count >= pp->dlist_size)
         {
-          int s2 = (int)((pp->dlist_size + 100) * 1.2);
+          int s2 = (pp->dlist_size + 100) * 1.2;
           pp->dlists = (GLuint *)
             realloc (pp->dlists, s2 * sizeof(*pp->dlists));
           if (! pp->dlists) abort();
@@ -851,16 +853,16 @@ generate_system (ModeInfo * mi)
 	/* If it's the begining of a system, draw a sphere */
 	if (pp->olddir == dirNone) {
 		glPushMatrix();
-		glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f);
-		mySphere(0.6f, wire);
+		glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0);
+		mySphere(0.6, wire);
 		glPopMatrix();
 	}
 	/* Check for stop conditions */
 	if (pp->ndirections == 0 || pp->counter > pp->system_length) {
 		glPushMatrix();
-		glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f);
+		glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0);
 		/* Finish the system with another sphere */
-		mySphere(0.6f, wire);
+		mySphere(0.6, wire);
 
 		glPopMatrix();
 
@@ -900,7 +902,7 @@ generate_system (ModeInfo * mi)
 	if (newdir == pp->nowdir) {
 		/* If not, draw the cell's center pipe */
 		glPushMatrix();
-		glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f);
+		glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0);
 		/* Chance of factory shape here, if enabled. */
 		if ((pp->counter > 1) && (NRAND(100) < factory)) {
 			MakeShape(mi, newdir);
@@ -919,7 +921,7 @@ generate_system (ModeInfo * mi)
 
 		switch (sysT) {
 			case 1:
-				glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f);
+				glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0);
 				mySphere(elbowradius, wire);
 				break;
 			case 2:
@@ -928,128 +930,128 @@ generate_system (ModeInfo * mi)
 					case dirUP:
 						switch (newdir) {
 							case dirLEFT:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f - (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f - (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f);
-								glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 - (one_third), (pp->PY - 12) / 3.0 * 4.0 - (one_third), (pp->PZ - 16) / 3.0 * 4.0);
+								glRotatef(180.0, 1.0, 0.0, 0.0);
 								break;
 							case dirRIGHT:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f + (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f - (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f);
-								glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
-								glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 + (one_third), (pp->PY - 12) / 3.0 * 4.0 - (one_third), (pp->PZ - 16) / 3.0 * 4.0);
+								glRotatef(180.0, 1.0, 0.0, 0.0);
+								glRotatef(180.0, 0.0, 1.0, 0.0);
 								break;
 							case dirFAR:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f - (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f - (float)(one_third));
-								glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-								glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0 - (one_third), (pp->PZ - 16) / 3.0 * 4.0 - (one_third));
+								glRotatef(90.0, 0.0, 1.0, 0.0);
+								glRotatef(180.0, 0.0, 0.0, 1.0);
 								break;
 							case dirNEAR:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f - (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f + (float)(one_third));
-								glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-								glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0 - (one_third), (pp->PZ - 16) / 3.0 * 4.0 + (one_third));
+								glRotatef(90.0, 0.0, 1.0, 0.0);
+								glRotatef(180.0, 1.0, 0.0, 0.0);
 								break;
 						}
 						break;
 					case dirDOWN:
 						switch (newdir) {
 							case dirLEFT:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f - (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f + (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 - (one_third), (pp->PY - 12) / 3.0 * 4.0 + (one_third), (pp->PZ - 16) / 3.0 * 4.0);
 								break;
 							case dirRIGHT:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f + (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f + (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f);
-								glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 + (one_third), (pp->PY - 12) / 3.0 * 4.0 + (one_third), (pp->PZ - 16) / 3.0 * 4.0);
+								glRotatef(180.0, 0.0, 1.0, 0.0);
 								break;
 							case dirFAR:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f + (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f - (float)(one_third));
-								glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0 + (one_third), (pp->PZ - 16) / 3.0 * 4.0 - (one_third));
+								glRotatef(270.0, 0.0, 1.0, 0.0);
 								break;
 							case dirNEAR:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f + (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f + (float)(one_third));
-								glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0 + (one_third), (pp->PZ - 16) / 3.0 * 4.0 + (one_third));
+								glRotatef(90.0, 0.0, 1.0, 0.0);
 								break;
 						}
 						break;
 					case dirLEFT:
 						switch (newdir) {
 							case dirUP:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f + (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f + (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f);
-								glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 + (one_third), (pp->PY - 12) / 3.0 * 4.0 + (one_third), (pp->PZ - 16) / 3.0 * 4.0);
+								glRotatef(180.0, 0.0, 1.0, 0.0);
 								break;
 							case dirDOWN:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f + (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f - (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f);
-								glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
-								glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 + (one_third), (pp->PY - 12) / 3.0 * 4.0 - (one_third), (pp->PZ - 16) / 3.0 * 4.0);
+								glRotatef(180.0, 1.0, 0.0, 0.0);
+								glRotatef(180.0, 0.0, 1.0, 0.0);
 								break;
 							case dirFAR:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f + (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f - (float)(one_third));
-								glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
-								glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 + (one_third), (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0 - (one_third));
+								glRotatef(270.0, 1.0, 0.0, 0.0);
+								glRotatef(180.0, 0.0, 1.0, 0.0);
 								break;
 							case dirNEAR:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f + (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f + (float)(one_third));
-								glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
-								glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 + (one_third), (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0 + (one_third));
+								glRotatef(270.0, 1.0, 0.0, 0.0);
+								glRotatef(180.0, 0.0, 0.0, 1.0);
 								break;
 						}
 						break;
 					case dirRIGHT:
 						switch (newdir) {
 							case dirUP:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f - (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f + (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 - (one_third), (pp->PY - 12) / 3.0 * 4.0 + (one_third), (pp->PZ - 16) / 3.0 * 4.0);
 								break;
 							case dirDOWN:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f - (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f - (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f);
-								glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 - (one_third), (pp->PY - 12) / 3.0 * 4.0 - (one_third), (pp->PZ - 16) / 3.0 * 4.0);
+								glRotatef(180.0, 1.0, 0.0, 0.0);
 								break;
 							case dirFAR:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f - (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f - (float)(one_third));
-								glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 - (one_third), (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0 - (one_third));
+								glRotatef(270.0, 1.0, 0.0, 0.0);
 								break;
 							case dirNEAR:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f - (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f + (float)(one_third));
-								glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 - (one_third), (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0 + (one_third));
+								glRotatef(90.0, 1.0, 0.0, 0.0);
 								break;
 						}
 						break;
 					case dirNEAR:
 						switch (newdir) {
 							case dirLEFT:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f - (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f - (float)(one_third));
-								glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 - (one_third), (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0 - (one_third));
+								glRotatef(270.0, 1.0, 0.0, 0.0);
 								break;
 							case dirRIGHT:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f + (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f - (float)(one_third));
-								glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
-								glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 + (one_third), (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0 - (one_third));
+								glRotatef(270.0, 1.0, 0.0, 0.0);
+								glRotatef(180.0, 0.0, 1.0, 0.0);
 								break;
 							case dirUP:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f + (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f - (float)(one_third));
-								glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0 + (one_third), (pp->PZ - 16) / 3.0 * 4.0 - (one_third));
+								glRotatef(270.0, 0.0, 1.0, 0.0);
 								break;
 							case dirDOWN:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f - (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f - (float)(one_third));
-								glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-								glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0 - (one_third), (pp->PZ - 16) / 3.0 * 4.0 - (one_third));
+								glRotatef(90.0, 0.0, 1.0, 0.0);
+								glRotatef(180.0, 0.0, 0.0, 1.0);
 								break;
 						}
 						break;
 					case dirFAR:
 						switch (newdir) {
 							case dirUP:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f + (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f + (float)(one_third));
-								glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0 + (one_third), (pp->PZ - 16) / 3.0 * 4.0 + (one_third));
+								glRotatef(90.0, 0.0, 1.0, 0.0);
 								break;
 							case dirDOWN:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f, (pp->PY - 12) / 3.0f * 4.0f - (float)(one_third), (pp->PZ - 16) / 3.0f * 4.0f + (float)(one_third));
-								glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-								glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0 - (one_third), (pp->PZ - 16) / 3.0 * 4.0 + (one_third));
+								glRotatef(90.0, 0.0, 1.0, 0.0);
+								glRotatef(180.0, 1.0, 0.0, 0.0);
 								break;
 							case dirLEFT:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f - (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f + (float)(one_third));
-								glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 - (one_third), (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0 + (one_third));
+								glRotatef(90.0, 1.0, 0.0, 0.0);
 								break;
 							case dirRIGHT:
-								glTranslatef((pp->PX - 16) / 3.0f * 4.0f + (float)(one_third), (pp->PY - 12) / 3.0f * 4.0f, (pp->PZ - 16) / 3.0f * 4.0f + (float)(one_third));
-								glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
-								glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
+								glTranslatef((pp->PX - 16) / 3.0 * 4.0 + (one_third), (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0 + (one_third));
+								glRotatef(270.0, 1.0, 0.0, 0.0);
+								glRotatef(180.0, 0.0, 0.0, 1.0);
 								break;
 						}
 						break;
@@ -1088,7 +1090,7 @@ generate_system (ModeInfo * mi)
 	pp->Cells[pp->PX][pp->PY][pp->PZ] = 1;
 
 	/* Cells'face pipe */
-	glTranslatef(((pp->PX + OPX) / 2.0f - 16.0f) / 3.0f * 4.0f, ((pp->PY + OPY) / 2.0f - 12) / 3.0f * 4.0f, ((pp->PZ + OPZ) / 2.0f - 16) / 3.0f * 4.0f);
+	glTranslatef(((pp->PX + OPX) / 2.0 - 16) / 3.0 * 4.0, ((pp->PY + OPY) / 2.0 - 12) / 3.0 * 4.0, ((pp->PZ + OPZ) / 2.0 - 16) / 3.0 * 4.0);
 	MakeTube(mi, newdir);
 
     NEXT:
@@ -1106,15 +1108,15 @@ ENTRYPOINT void
 draw_pipes (ModeInfo * mi)
 {
 	pipesstruct *pp = &pipes[MI_SCREEN(mi)];
-	HDC display = MI_DISPLAY(mi);
-	HWND window = MI_WINDOW(mi);
+	Display *display = MI_DISPLAY(mi);
+	Window    window = MI_WINDOW(mi);
     Bool        wire = MI_IS_WIREFRAME(mi);
     int i = 0;
 
-	if (!pp->hglrc)
+	if (!pp->glx_context)
 		return;
 
-	wglMakeCurrent(MI_DISPLAY(mi), pp->hglrc);
+	glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(pp->glx_context));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glColor3f(1.0, 1.0, 1.0);
@@ -1147,29 +1149,27 @@ draw_pipes (ModeInfo * mi)
 
     glPushMatrix();
 
-    pp->initial_rotation += 0.02f;
+    pp->initial_rotation += 0.02;
 
-	glTranslatef(0.0f, 0.0f, fisheye ? -3.8f : -4.8f);
+	glTranslatef(0.0, 0.0, fisheye ? -3.8 : -4.8);
 
     /* Do it twice because we don't track the device's orientation. */
-    //glRotatef( current_device_rotation(), 0, 0, 1);
-    glRotatef( 0.0f, 0.0f, 0.0f, 1.0f);
-    //gltrackball_rotate (pp->trackball);
-    //glRotatef(-current_device_rotation(), 0, 0, 1);
-    glRotatef(-0.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef( current_device_rotation(), 0, 0, 1);
+    gltrackball_rotate (pp->trackball);
+    glRotatef(-current_device_rotation(), 0, 0, 1);
 
 	if (rotatepipes)
-      glRotatef(pp->initial_rotation, 0.0f, 1.0f, 0.0f);
+      glRotatef(pp->initial_rotation, 0.0, 1.0, 0.0);
 
-    glScalef((float)Scale4Window, (float)Scale4Window, (float)Scale4Window);
+    glScalef(Scale4Window, Scale4Window, Scale4Window);
 
     mi->polygon_count = 0;
 
     if (pp->fadeout)
       {
-        GLfloat s = (pp->fadeout * pp->fadeout) / 10000.0f;
+        GLfloat s = (pp->fadeout * pp->fadeout) / 10000.0;
         glScalef (s, s, s);
-        glRotatef (90 * (1 - (pp->fadeout/100.0f)), 1.0f, 0.0f, 0.1f);
+        glRotatef (90 * (1 - (pp->fadeout/100.0)), 1, 0, 0.1);
         pp->fadeout -= 4;
         if (pp->fadeout <= 0)
           {
@@ -1193,7 +1193,7 @@ draw_pipes (ModeInfo * mi)
     if (mi->fps_p) do_fps (mi);
     glFinish();
 
-    SwapBuffers(display);
+    glXSwapBuffers(display, window);
 }
 
 
@@ -1203,10 +1203,10 @@ change_pipes (ModeInfo * mi)
 {
 	pipesstruct *pp = &pipes[MI_SCREEN(mi)];
 
-	if (!pp->hglrc)
+	if (!pp->glx_context)
 		return;
 
-	wglMakeCurrent(MI_DISPLAY(mi), pp->hglrc);
+	glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(pp->glx_context));
 	pinit(mi, 1);
 }
 #endif /* !STANDALONE */
@@ -1221,10 +1221,10 @@ release_pipes (ModeInfo * mi)
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
 			pipesstruct *pp = &pipes[screen];
 
-			if (pp->hglrc) {
+			if (pp->glx_context) {
 
 				/* Display lists MUST be freed while their glXContext is current. */
-				wglMakeCurrent(MI_DISPLAY(mi), pp->hglrc);
+				glXMakeCurrent(MI_DISPLAY(mi), pp->window, *(pp->glx_context));
 
 				if (pp->valve)
 					glDeleteLists(pp->valve, 1);
@@ -1267,4 +1267,4 @@ release_pipes (ModeInfo * mi)
 
 XSCREENSAVER_MODULE ("Pipes", pipes)
 
-//#endif
+#endif

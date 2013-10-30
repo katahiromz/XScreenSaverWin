@@ -1,41 +1,45 @@
 /***************************
  ** crackberg; Matus Telgarsky [ catachresis@cmu.edu ] 2005 
  ** */
-//#ifndef HAVE_COCOA
-//# define XK_MISCELLANY
-//# include <X11/keysymdef.h>
-//#endif
+#if 0
+	#ifndef HAVE_COCOA
+	# define XK_MISCELLANY
+	# include <X11/keysymdef.h>
+	#endif
+#endif
 
 #define DELAY 20000
 #define DEFAULTS    "*delay:        20000       \n" \
                     "*showFPS:      False       \n" \
 		    "*wireframe:    False       \n" \
 
-#define refresh_crackberg NULL
-
+# define refresh_crackberg 0
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
+
+//#include "xlockmore.h"
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdio.h>
 
 #include "win32.h"
 
-//#include "xlockmore.h"
-//#ifdef USE_GL /* whole file */
+#ifdef USE_GL /* whole file */
 
-//#define DEF_NSUBDIVS   "4"
-//#define DEF_BORING     "False"
-//#define DEF_CRACK      "True"
-//#define DEF_WATER      "True"
-//#define DEF_FLAT       "True"
-//#define DEF_COLOR      "random"
-//#define DEF_LIT        "True"
-//#define DEF_VISIBILITY "0.6"
-//#define DEF_LETTERBOX  "False"
+#define DEF_NSUBDIVS   "4"
+#define DEF_BORING     "False"
+#define DEF_CRACK      "True"
+#define DEF_WATER      "True"
+#define DEF_FLAT       "True"
+#define DEF_COLOR      "random"
+#define DEF_LIT        "True"
+#define DEF_VISIBILITY "0.6"
+#define DEF_LETTERBOX  "False"
 
 
 /***************************
@@ -113,8 +117,7 @@ enum { MOTION_AUTO = 0, MOTION_MANUAL = 1, MOTION_LROT= 2,    MOTION_RROT = 4,
        MOTION_LEFT = 128, MOTION_RIGHT = 256 };
 
 struct _cberg_state {
-    //GLXContext *glx_context;
-	HGLRC hglrc;
+    GLXContext *glx_context;
     Trile *trile_head;
     
     double x,y,z, yaw,roll,pitch, dx,dy,dz, dyaw,droll,dpitch, elapsed;
@@ -143,10 +146,10 @@ struct _cberg_state {
     double vs0r,vs0g,vs0b, vs1r, vs1g, vs1b,
            vf0r,vf0g,vf0b, vf1r, vf1g, vf1b;
 
-    //Bool button_down_p;
-    //int mouse_x, mouse_y;
+    Bool button_down_p;
+    int mouse_x, mouse_y;
     //struct timeval paused;
-	DWORD dwTickCount;
+    double paused;
 };
 
 
@@ -156,9 +159,8 @@ struct _cberg_state {
  ** */
 
 static unsigned int nsubdivs = 4;
-static Bool crack = True, boring = False, do_water = True;
-static Bool flat = True, lit = True, letterbox = False;
-static float visibility = 0.6f;
+static Bool crack = True, boring = False, do_water = True, flat = True, lit = True, letterbox = False;
+static float visibility = 0.6;
 static char *color = "random";
 
 static cberg_state *cbergs = NULL;
@@ -194,7 +196,6 @@ static cberg_state *cbergs = NULL;
 
 	ENTRYPOINT ModeSpecOpt crackberg_opts = {countof(opts), opts, countof(vars), vars, NULL};
 #endif
-
 
 /***************************
  ** Trile functions. 
@@ -308,8 +309,8 @@ static void trile_calc_heights(cberg_state *cberg, Trile *new)
         TCOORD(0, cberg->epoints - 1 - i) = new->l[i];
     }
 
-    for (i = (unsigned)((1 << nsubdivs) >> 2), k =1; i; i >>= 1, ++k)
-        for (j = 1; j < (unsigned)(1 << k); ++j)
+    for (i = ((1 << nsubdivs) >> 2), k =1; i; i >>= 1, ++k)
+        for (j = 1; j < (1 << k); ++j)
             for (h = 1; h <= (1<<k) - j; ++h) {
                 TCOORD( i*(2*h - 1), i*(2*j - 1) ) = /*rights*/
                   DISPLACE(MEAN(TCOORD( i*(2*h - 2), i*(2*j + 0) ),
@@ -424,7 +425,7 @@ static void trile_calc_smooth_norms(cberg_state *cberg, Trile *new)
     }
 }
 
-static void trile_light(cberg_state *cberg, 
+static inline void trile_light(cberg_state *cberg, 
                                unsigned int x, unsigned int y, 
                                unsigned int which)
 {
@@ -445,7 +446,7 @@ static void trile_light(cberg_state *cberg,
     }
 }
 
-static void trile_draw_vertex(cberg_state *cberg, unsigned int ix,
+static inline void trile_draw_vertex(cberg_state *cberg, unsigned int ix,
     unsigned int iy, unsigned int which, double x,double y,
     double zcur, double z1, double z2)
 {
@@ -467,7 +468,7 @@ static void trile_render(cberg_state *cberg, Trile *new)
     double cornerx = 0.5 * new->x - 0.5, cornery;
     double dy = M_SQRT3_2 / (1 << nsubdivs);
     double z0,z1,z2;
-    unsigned int x,y;
+    int x,y;
 
     new->call_list = glGenLists(1);
     glNewList(new->call_list, GL_COMPILE);
@@ -544,8 +545,6 @@ static Trile *trile_new(cberg_state *cberg, int x,int y,Trile *parent,Trile *roo
     trile_render(cberg, new);
     return new;
 }
-
-static const char *progname = "Crackberg";
 
 static Trile *trile_alloc(cberg_state *cberg)
 {
@@ -956,9 +955,7 @@ static void calc_points(cberg_state *cberg, double *x1,double *y1,
 }
 
 /* this is pretty stupid.. */
-#undef min
-#undef max
-static void minmax4(double a, double b, double c, double d, 
+static inline void minmax4(double a, double b, double c, double d, 
   double *min, double *max)
 {
     *min = *max = a;
@@ -1065,37 +1062,37 @@ static void mark_visible(cberg_state *cberg)
  ** */
 
 static void plain_land(cberg_state *cberg, double z)
-{ glColor3f((float)pow((z/0.35),4),  (float)(z/0.35f), (float)(pow((z/0.35),4))); }
+{ glColor3f(pow((z/0.35),4),  z/0.35, pow((z/0.35),4)); }
 static void plain_water(cberg_state *cberg, double z)
-{ glColor3f(0.0f, (float)((z+0.35)*1.6), 0.8f); }
+{ glColor3f(0.0, (z+0.35)*1.6, 0.8); }
 
 static void ice_land(cberg_state *cberg, double z)
-{ glColor3f((float)((0.35f - z)/0.35f), (float)((0.35f - z)/0.35f), 1.0f); }
+{ glColor3f((0.35 - z)/0.35, (0.35 - z)/0.35, 1.0); }
 static void ice_water(cberg_state *cberg, double z)
-{ glColor3f(0.0f, (float)((z+0.35f)*1.6f), 0.8f); }
+{ glColor3f(0.0, (z+0.35)*1.6, 0.8); }
 
 
 static void magma_land(cberg_state *cberg, double z)
-{ glColor3f((float)(z/0.35f), (float)(z/0.2f),0.0f); }
+{ glColor3f(z/0.35, z/0.2,0); }
 static void magma_lava(cberg_state *cberg, double z)
-{ glColor3f((float)((z+0.35f)*1.6f), (float)(z+0.35f), 0.0f); }
+{ glColor3f((z+0.35)*1.6, (z+0.35), 0.0); }
 
 static void vomit_solid(cberg_state *cberg, double z)
 {
     double norm = fabs(z) / 0.35;
     glColor3f( 
-      (float)((1-norm) * cberg->vs0r + norm * cberg->vs1r), 
-      (float)((1-norm) * cberg->vs0g + norm * cberg->vs1g), 
-      (float)((1-norm) * cberg->vs0b + norm * cberg->vs1b) 
+      (1-norm) * cberg->vs0r + norm * cberg->vs1r, 
+      (1-norm) * cberg->vs0g + norm * cberg->vs1g, 
+      (1-norm) * cberg->vs0b + norm * cberg->vs1b 
     );
 }
 static void vomit_fluid(cberg_state *cberg, double z)
 {
     double norm = z / -0.35;
     glColor3f( 
-      (float)((1-norm) * cberg->vf0r + norm * cberg->vf1r), 
-      (float)((1-norm) * cberg->vf0g + norm * cberg->vf1g), 
-      (float)((1-norm) * cberg->vf0b + norm * cberg->vf1b) 
+      (1-norm) * cberg->vf0r + norm * cberg->vf1r, 
+      (1-norm) * cberg->vf0g + norm * cberg->vf1g, 
+      (1-norm) * cberg->vf0b + norm * cberg->vf1b 
     );
 }
 
@@ -1144,15 +1141,15 @@ static const Color *select_color(cberg_state *cberg)
         cberg->vf1g = random()/(double)RAND_MAX; 
         cberg->vf1b = random()/(double)RAND_MAX; 
  
-        glClearColor((float)(random()/(double)RAND_MAX),
-                     (float)(random()/(double)RAND_MAX),
-                     (float)(random()/(double)RAND_MAX),
-                     1.0f);
+        glClearColor(random()/(double)RAND_MAX,
+                     random()/(double)RAND_MAX,
+                     random()/(double)RAND_MAX,
+                     1.0);
     } else {
-        glClearColor((float)colors[idx].bg[0],
-                     (float)colors[idx].bg[1],
-                     (float)colors[idx].bg[2],
-                     (float)colors[idx].bg[3]);
+        glClearColor(colors[idx].bg[0],
+                     colors[idx].bg[1],
+                     colors[idx].bg[2],
+                     colors[idx].bg[3]);
     }
     return colors + idx;
 }
@@ -1164,7 +1161,7 @@ static const Color *select_color(cberg_state *cberg)
 
 
 /* simple one for now.. */
-static double drunken_rando(double cur_val, double max, double width)
+static inline double drunken_rando(double cur_val, double max, double width)
 {
     double r = random() / (double) RAND_MAX * 2;
     if (cur_val > 0)
@@ -1215,7 +1212,7 @@ ENTRYPOINT void init_crackberg (ModeInfo *mi)
     cberg->heights = malloc(cberg->tpoints * sizeof(double));
     cberg->norms = malloc(3 * cberg->tnorms * sizeof(double));
 
-    cberg->hglrc = init_GL(mi);
+    cberg->glx_context = init_GL(mi);
     cberg->motion_state = MOTION_AUTO;
     cberg->mspeed = 1.0;
     cberg->z = 0.5;
@@ -1240,6 +1237,7 @@ ENTRYPOINT void init_crackberg (ModeInfo *mi)
         glEnable(GL_COLOR_MATERIAL);
         glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+        glEnable(GL_AUTO_NORMAL);	// added by katahiromz
         glEnable(GL_NORMALIZE);
         //glEnable(GL_RESCALE_NORMAL); 
     }
@@ -1271,121 +1269,123 @@ ENTRYPOINT void reshape_crackberg (ModeInfo *mi, int w, int h)
 #if 0
 	ENTRYPOINT Bool crackberg_handle_event (ModeInfo *mi, XEvent *ev)
 	{
-		cberg_state *cberg = &cbergs[MI_SCREEN(mi)];
-		KeySym keysym = 0;
-		char c = 0;
-		if (ev->xany.type == KeyPress || ev->xany.type == KeyRelease)
-		  XLookupString (&ev->xkey, &c, 1, &keysym, 0);
+	    cberg_state *cberg = &cbergs[MI_SCREEN(mi)];
+	    KeySym keysym = 0;
+	    char c = 0;
+	    if (ev->xany.type == KeyPress || ev->xany.type == KeyRelease)
+	      XLookupString (&ev->xkey, &c, 1, &keysym, 0);
 
-		if (ev->xany.type == KeyPress) {
-			switch (keysym) {
-				case XK_Left:   cberg->motion_state |= MOTION_LROT;  break;
-				case XK_Right:  cberg->motion_state |= MOTION_RROT;  break;
-				case XK_Down:   cberg->motion_state |= MOTION_BACK;  break;
-				case XK_Up:     cberg->motion_state |= MOTION_FORW;  break;
-				case '1':       cberg->motion_state |= MOTION_DEC;   break; 
-				case '2':       cberg->motion_state |= MOTION_INC;   break;
-				case 'a':       cberg->motion_state |= MOTION_LEFT;  break;
-				case 'd':       cberg->motion_state |= MOTION_RIGHT; break;
-				case 's':       cberg->motion_state |= MOTION_BACK;  break;
-				case 'w':       cberg->motion_state |= MOTION_FORW;  break;
-				default:        return False;
-			}
-			cberg->motion_state |= MOTION_MANUAL;
-		} else if (ev->xany.type == KeyRelease) { 
+	    if (ev->xany.type == KeyPress) {
+	        switch (keysym) {
+	            case XK_Left:   cberg->motion_state |= MOTION_LROT;  break;
+	            case XK_Right:  cberg->motion_state |= MOTION_RROT;  break;
+	            case XK_Down:   cberg->motion_state |= MOTION_BACK;  break;
+	            case XK_Up:     cberg->motion_state |= MOTION_FORW;  break;
+	            case '1':       cberg->motion_state |= MOTION_DEC;   break; 
+	            case '2':       cberg->motion_state |= MOTION_INC;   break;
+	            case 'a':       cberg->motion_state |= MOTION_LEFT;  break;
+	            case 'd':       cberg->motion_state |= MOTION_RIGHT; break;
+	            case 's':       cberg->motion_state |= MOTION_BACK;  break;
+	            case 'w':       cberg->motion_state |= MOTION_FORW;  break;
+	            default:        return False;
+	        }
+	        cberg->motion_state |= MOTION_MANUAL;
+	    } else if (ev->xany.type == KeyRelease) { 
 	#if 0
-			XEvent peek_ev;
-			if (XPending(mi->dpy)) {
-				XPeekEvent(mi->dpy, &peek_ev);
-				if (peek_ev.type == KeyPress
-				 && peek_ev.xkey.keycode == ev->xkey.keycode       
-				 && peek_ev.xkey.time - ev->xkey.time < 2) {
-					XNextEvent(mi->dpy, &peek_ev); /* drop bullshit repeat events */
-					return False;
-				}
-			}
+	        XEvent peek_ev;
+	        if (XPending(mi->dpy)) {
+	            XPeekEvent(mi->dpy, &peek_ev);
+	            if (peek_ev.type == KeyPress
+	             && peek_ev.xkey.keycode == ev->xkey.keycode       
+	             && peek_ev.xkey.time - ev->xkey.time < 2) {
+	                XNextEvent(mi->dpy, &peek_ev); /* drop bullshit repeat events */
+	                return False;
+	            }
+	        }
 	#endif
 
-			switch (keysym) {
-				case XK_Left:   cberg->motion_state &= ~MOTION_LROT;  break;
-				case XK_Right:  cberg->motion_state &= ~MOTION_RROT;  break;
-				case XK_Down:   cberg->motion_state &= ~MOTION_BACK;  break;
-				case XK_Up:     cberg->motion_state &= ~MOTION_FORW;  break;
-				case '1':       cberg->motion_state &= ~MOTION_DEC;   break; 
-				case '2':       cberg->motion_state &= ~MOTION_INC;   break;
-				case 'a':       cberg->motion_state &= ~MOTION_LEFT;  break;
-				case 'd':       cberg->motion_state &= ~MOTION_RIGHT; break;
-				case 's':       cberg->motion_state &= ~MOTION_BACK;  break;
-				case 'w':       cberg->motion_state &= ~MOTION_FORW;  break;
-				case ' ':       
-					if (cberg->motion_state == MOTION_MANUAL)
-						cberg->motion_state = MOTION_AUTO;     
-					break;
-				default:            return False;
-			}
-		} else if (ev->xany.type == ButtonPress &&
-				   ev->xbutton.button == Button1) {
-		  cberg->button_down_p = True;
-		  cberg->mouse_x = ev->xbutton.x;
-		  cberg->mouse_y = ev->xbutton.y;
-		  cberg->motion_state = MOTION_MANUAL;
-		  //cberg->paused.tv_sec = 0;
-		  cberg->dwTickCount = 0;
-		} else if (ev->xany.type == ButtonRelease &&
-				   ev->xbutton.button == Button1) {
-		  cberg->button_down_p = False;
-		  cberg->motion_state = MOTION_AUTO;
-		  /* After mouse-up, don't go back into auto-motion mode for a second, so
-			 that repeated click-and-drag gestures don't fight with auto-motion. */
-		  //gettimeofday(&cberg->paused, NULL);
-		  cberg->dwTickCount = GetTickCount();
-		} else if (ev->xany.type == MotionNotify &&
-				   cberg->button_down_p) {
-		  int dx = ev->xmotion.x - cberg->mouse_x;
-		  int dy = ev->xmotion.y - cberg->mouse_y;
-		  cberg->mouse_x = ev->xmotion.x;
-		  cberg->mouse_y = ev->xmotion.y;
-		  cberg->motion_state = MOTION_MANUAL;
+	        switch (keysym) {
+	            case XK_Left:   cberg->motion_state &= ~MOTION_LROT;  break;
+	            case XK_Right:  cberg->motion_state &= ~MOTION_RROT;  break;
+	            case XK_Down:   cberg->motion_state &= ~MOTION_BACK;  break;
+	            case XK_Up:     cberg->motion_state &= ~MOTION_FORW;  break;
+	            case '1':       cberg->motion_state &= ~MOTION_DEC;   break; 
+	            case '2':       cberg->motion_state &= ~MOTION_INC;   break;
+	            case 'a':       cberg->motion_state &= ~MOTION_LEFT;  break;
+	            case 'd':       cberg->motion_state &= ~MOTION_RIGHT; break;
+	            case 's':       cberg->motion_state &= ~MOTION_BACK;  break;
+	            case 'w':       cberg->motion_state &= ~MOTION_FORW;  break;
+	            case ' ':       
+	                if (cberg->motion_state == MOTION_MANUAL)
+	                    cberg->motion_state = MOTION_AUTO;     
+	                break;
+	            default:            return False;
+	        }
+	    } else if (ev->xany.type == ButtonPress &&
+	               ev->xbutton.button == Button1) {
+	      cberg->button_down_p = True;
+	      cberg->mouse_x = ev->xbutton.x;
+	      cberg->mouse_y = ev->xbutton.y;
+	      cberg->motion_state = MOTION_MANUAL;
+	      //cberg->paused.tv_sec = 0;
+	      cberg->paused = 0;
+	    } else if (ev->xany.type == ButtonRelease &&
+	               ev->xbutton.button == Button1) {
+	      cberg->button_down_p = False;
+	      cberg->motion_state = MOTION_AUTO;
+	      /* After mouse-up, don't go back into auto-motion mode for a second, so
+	         that repeated click-and-drag gestures don't fight with auto-motion. */
+	      //gettimeofday(&cberg->paused, NULL);
+	      cberg->paused = GetTickCount() / 1000.0;
+	    } else if (ev->xany.type == MotionNotify &&
+	               cberg->button_down_p) {
+	      int dx = ev->xmotion.x - cberg->mouse_x;
+	      int dy = ev->xmotion.y - cberg->mouse_y;
+	      cberg->mouse_x = ev->xmotion.x;
+	      cberg->mouse_y = ev->xmotion.y;
+	      cberg->motion_state = MOTION_MANUAL;
 
-		  /* Take the larger dimension, since motion_state doesn't scale */
-		  if (dx > 0 && dx > dy) dy = 0;
-		  if (dx < 0 && dx < dy) dy = 0;
-		  if (dy > 0 && dy > dx) dx = 0;
-		  if (dy < 0 && dy < dx) dx = 0;
+	      /* Take the larger dimension, since motion_state doesn't scale */
+	      if (dx > 0 && dx > dy) dy = 0;
+	      if (dx < 0 && dx < dy) dy = 0;
+	      if (dy > 0 && dy > dx) dx = 0;
+	      if (dy < 0 && dy < dx) dx = 0;
 
-		  if      (dx > 0) cberg->motion_state |= MOTION_LEFT;
-		  else if (dx < 0) cberg->motion_state |= MOTION_RIGHT;
-		  else if (dy > 0) cberg->motion_state |= MOTION_FORW;
-		  else if (dy < 0) cberg->motion_state |= MOTION_BACK;
-		} else
-			return False;
-		return True;
+	      if      (dx > 0) cberg->motion_state |= MOTION_LEFT;
+	      else if (dx < 0) cberg->motion_state |= MOTION_RIGHT;
+	      else if (dy > 0) cberg->motion_state |= MOTION_FORW;
+	      else if (dy < 0) cberg->motion_state |= MOTION_BACK;
+	    } else
+	        return False;
+	    return True;
 	}   
 #endif
- 
+
 ENTRYPOINT void draw_crackberg (ModeInfo *mi)
 {
     cberg_state *cberg = &cbergs[MI_SCREEN(mi)];
     //struct timeval cur_frame_t;
-	DWORD dwTickCount;
+	double cur_frame_t;
     double cur_frame;
-    static const float lpos[] = {2.0f,0.0f,-0.3f,0.0f};
+    static const float lpos[] = {2.0,0.0,-0.3,0.0};
 
-    if (!cberg->hglrc) /*XXX does this get externally tweaked? it kinda*/
+    if (!cberg->glx_context) /*XXX does this get externally tweaked? it kinda*/
         return;               /*XXX can't.. check it in crackberg_init*/
 
-    wglMakeCurrent(MI_DISPLAY(mi), cberg->hglrc);
+    glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(cberg->glx_context));
 
     //gettimeofday(&cur_frame_t, NULL);
     //cur_frame = cur_frame_t.tv_sec + cur_frame_t.tv_usec / 1.0E6;
-	dwTickCount = GetTickCount();
-	cur_frame = (float)dwTickCount / 1000.0;
+    cur_frame_t = GetTickCount() / 1000.0;
+    cur_frame = GetTickCount() / 1000.0;
     if ( cberg->prev_frame ) { /*not first run */
 
         cberg->elapsed = cur_frame - cberg->prev_frame;
 
+        //if (cberg->motion_state == MOTION_AUTO &&
+        //    cberg->paused.tv_sec < cur_frame_t.tv_sec) {
         if (cberg->motion_state == MOTION_AUTO &&
-            cberg->dwTickCount < dwTickCount) {
+            cberg->paused < cur_frame_t) {
             cberg->x += cberg->dx * cberg->elapsed;
             cberg->y += cberg->dy * cberg->elapsed;
             /* cberg->z */
@@ -1442,8 +1442,7 @@ ENTRYPOINT void draw_crackberg (ModeInfo *mi)
         
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    //glRotatef(current_device_rotation(), 0, 0, 1);
-    glRotatef(0.0, 0.0f, 0.0f, 1.0f);
+    glRotatef(current_device_rotation(), 0, 0, 1);
     gluLookAt(0,0,0, 1,0,0, 0,0,1);
     glLightfv(GL_LIGHT0, GL_POSITION, lpos);
     /*glRotated(cberg->roll, 1,0,0); / * XXX blah broken and unused for now..* /
@@ -1466,7 +1465,7 @@ ENTRYPOINT void draw_crackberg (ModeInfo *mi)
 #endif
 
     glFinish();
-    SwapBuffers(MI_DISPLAY(mi));
+    glXSwapBuffers(MI_DISPLAY(mi), MI_WINDOW(mi));
 }
 
 /* uh */
@@ -1487,4 +1486,4 @@ ENTRYPOINT void release_crackberg (ModeInfo *mi)
 
 XSCREENSAVER_MODULE ("Crackberg", crackberg)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */

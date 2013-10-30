@@ -26,7 +26,7 @@ History
 19/06/2006 v1.2  fixed dropSpeed = 7 bug, added gltrackball support and some code neatening, thanks to Valdis Kletnieks and JWZ for their input.
 */
 
-#include <math.h>
+//#include <math.h>
 
 # define refresh_topBlock 0
 
@@ -42,6 +42,8 @@ History
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "win32.h"
@@ -53,18 +55,19 @@ History
 //#include "gltrackball.h"
 #include <ctype.h>
 
-//#ifdef USE_GL /* whole file */
+#ifdef USE_GL /* whole file */
 
-#ifndef HAVE_COCOA
-# include <GL/glu.h>
+#if 0
+	#ifndef HAVE_COCOA
+	# include <GL/glu.h>
+	#endif
 #endif
 
 typedef struct
 {
-  //GLXContext *glx_context;
-  HGLRC hglrc;
-  //trackball_state *trackball;
-  //Bool button_down_p;
+  GLXContext *glx_context;
+  trackball_state *trackball;
+  Bool button_down_p;
   int numFallingBlocks;
   GLfloat highest,highestFalling;
   GLfloat eyeLine,eyeX,eyeY,eyeZ;
@@ -87,11 +90,11 @@ static Bool follow = False;
 static Bool drawCarpet = True;
 static Bool drawBlob = False;
 static Bool drawNipples = True;
-static GLfloat rotateSpeed = 10.0f;
-static GLfloat camX = 1.0f;
-static GLfloat camY = 20.0f;
-static GLfloat camZ = 25.0f;
-static GLfloat dropSpeed = 4.0f;
+static GLfloat rotateSpeed = 10.0;
+static GLfloat camX = 1.0;
+static GLfloat camY = 20.0;
+static GLfloat camZ = 25.0;
+static GLfloat dropSpeed = 4.0;
 static int maxFalling = 500;
 static int maxColors = 7;
 static int size = 2;
@@ -118,24 +121,26 @@ static int resolution = 4;
 	  { "-dropSpeed",   ".dropSpeed",   XrmoptionSepArg, 0 },
 	  { "-override",    ".override",    XrmoptionNoArg, "True" },
 	};
+#endif
 
-	#define DEF_OVERRIDE      "False"
-	#define DEF_ROTATE        "True"
-	#define DEF_FOLLOW        "False"
-	#define DEF_CARPET   "True"
-	#define DEF_BLOB     "False"
-	#define DEF_NIPPLES  "True"
-	#define DEF_ROTATE_SPEED  "10"
-	#define DEF_MAX_FALLING   "500"
-	#define DEF_MAX_COLORS    "7"
-	#define DEF_SIZE          "2"
-	#define DEF_SPAWN         "50"
-	#define DEF_RESOLUTION    "4"
-	#define DEF_CAM_X         "1"
-	#define DEF_CAM_Y         "20"
-	#define DEF_CAM_Z         "25"
-	#define DEF_DROP_SPEED    "4"
+#define DEF_OVERRIDE      "False"
+#define DEF_ROTATE        "True"
+#define DEF_FOLLOW        "False"
+#define DEF_CARPET   "True"
+#define DEF_BLOB     "False"
+#define DEF_NIPPLES  "True"
+#define DEF_ROTATE_SPEED  "10"
+#define DEF_MAX_FALLING   "500"
+#define DEF_MAX_COLORS    "7"
+#define DEF_SIZE          "2"
+#define DEF_SPAWN         "50"
+#define DEF_RESOLUTION    "4"
+#define DEF_CAM_X         "1"
+#define DEF_CAM_Y         "20"
+#define DEF_CAM_Z         "25"
+#define DEF_DROP_SPEED    "4"
 
+#if 0
 	static argtype vars[] = {
 	  {&override,     "override",     "Override",     DEF_OVERRIDE,     t_Bool},
 	  {&rotate,       "rotate",       "Rotate",       DEF_ROTATE,       t_Bool},
@@ -205,7 +210,7 @@ init_topBlock (ModeInfo *mi)
 
   tb = &tbs[MI_SCREEN(mi)];
 
-  tb->hglrc = init_GL(mi);
+  tb->glx_context = init_GL(mi);
 
   reshape_topBlock (mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 
@@ -242,10 +247,10 @@ init_topBlock (ModeInfo *mi)
   reshape_topBlock (mi, MI_WIDTH(mi), MI_HEIGHT(mi));
   glClearDepth(1.0f);
   if (!wire) {
-    GLfloat pos[4] = {10.0f, 10.0f, 1.0f, 0.0f};
-    GLfloat amb[4] = {0.1f, 0.1f, 0.1f, 1.0f};
-    GLfloat dif[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat spc[4] = {0.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat pos[4] = {10.0, 10.0, 1.0, 0.0};
+    GLfloat amb[4] = {0.1, 0.1, 0.1, 1.0};
+    GLfloat dif[4] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat spc[4] = {0.0, 1.0, 1.0, 1.0};
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -276,7 +281,7 @@ init_topBlock (ModeInfo *mi)
     tb->plusheight=100;
     camZ=camZ-60;
   } else {
-    tb->rotation=(float)(random() % 360);
+    tb->rotation=random() % 360;
     tb->eyeY=10;
     tb->plusheight=30;
   }
@@ -292,15 +297,15 @@ init_topBlock (ModeInfo *mi)
     tb->eyeY=20;
     tb->eyeZ=0;
   }
-  //tb->trackball = gltrackball_init ();
+  tb->trackball = gltrackball_init ();
 }
 
 /* provides the per frame entertainment */
 ENTRYPOINT void
 draw_topBlock (ModeInfo *mi)
 {
-  	HDC dpy = MI_DISPLAY(mi);
-  	HWND window = MI_WINDOW(mi);
+  	Display *dpy = MI_DISPLAY(mi);
+  	Window window = MI_WINDOW(mi);
   	NODE *llCurrent;
   	NODE *llNode;
   	topBlockSTATE *tb = &tbs[MI_SCREEN(mi)];
@@ -309,21 +314,19 @@ draw_topBlock (ModeInfo *mi)
   	int wire = MI_IS_WIREFRAME(mi);
 	  GLfloat color[4];	
 
-  if (!tb->hglrc)
+  if (!tb->glx_context)
     return;
-  wglMakeCurrent(MI_DISPLAY(mi), tb->hglrc);
+  glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(tb->glx_context));
   mi->polygon_count = 0;
 
 	generateNewBlock(mi);
 
-	//if (rotate && (!tb->button_down_p)) { tb->rotation += rotateSpeed; } 
-	if (rotate && (!False)) { tb->rotation += rotateSpeed; } 
+	if (rotate && (!tb->button_down_p)) { tb->rotation += rotateSpeed; } 
 	if (tb->rotation>=360) { tb->rotation=tb->rotation-360; } 
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		/* clear current */
 	glLoadIdentity();	/* resets directions, do it every time ! */
-        //glRotatef(current_device_rotation(), 0, 0, 1);
-        glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
+        glRotatef(current_device_rotation(), 0, 0, 1);
 
 	if (!follow) {
 		if (tb->highest>tb->eyeLine) { tb->eyeLine+=((tb->highest-tb->eyeLine)/100);	} /* creates a smooth camera transition */
@@ -335,9 +338,9 @@ draw_topBlock (ModeInfo *mi)
 	}
 
         /* Rotate the scene around a point that's a little higher up. */
-        glTranslatef (0.0f, 0.0f, -5.0f);
-        //gltrackball_rotate (tb->trackball);
-        glTranslatef (0.0f, 0.0f, 5.0f);
+        glTranslatef (0, 0, -5);
+        gltrackball_rotate (tb->trackball);
+        glTranslatef (0, 0, 5);
 
 	/* rotate the world */
 	glRotatef(tb->rotation, 0.0, 0.0, 1.0);		
@@ -345,11 +348,11 @@ draw_topBlock (ModeInfo *mi)
 	llCurrent = tb->blockNodeRoot;
 	if (drawCarpet) {
 		/* center carpet */
-		glTranslatef((float)(0.0-(tb->carpetWidth/2)),(float)(0.0-(tb->carpetLength/2)),0.0f);
+		glTranslatef(0.0-(tb->carpetWidth/2),0.0-(tb->carpetLength/2),0.0);
 		glCallList(tb->carpet);
                 mi->polygon_count += tb->carpet_polys;
-		glTranslatef((float)(0.0+(tb->carpetWidth/2)),(float)(0.0+(tb->carpetLength/2)),0.0f);
-		glTranslatef(0.0f,0.0f,-0.55f);
+		glTranslatef(0.0+(tb->carpetWidth/2),0.0+(tb->carpetLength/2),0.0);
+		glTranslatef(0.0,0.0,-0.55);
 	}
 	tb->highestFalling=0;
 	while (llCurrent != NULL) {	/* for each block */
@@ -490,7 +493,7 @@ draw_topBlock (ModeInfo *mi)
   	/* set location in space */
 	  glTranslatef(llCurrent->x,llCurrent->y,-llCurrent->height);
 	  /* rotate */
-  	glRotatef((float)llCurrent->rotation, 0.0f, 0.0f, 1.0f);
+  	glRotatef(llCurrent->rotation, 0.0f, 0.0f, 1.0f);
   	if ((tb->followMode==0) && (llCurrent->next==NULL)) {
   		tb->blockNodeFollow = llCurrent;
   		tb->followMode=1;
@@ -505,7 +508,7 @@ draw_topBlock (ModeInfo *mi)
   glFinish();
 
 	if (tb->highest>(5*maxFalling)) { drawCarpet=False; }
-  SwapBuffers(dpy);
+  glXSwapBuffers(dpy, window);
 }
 
 
@@ -532,13 +535,13 @@ static void followBlock(ModeInfo *mi)
 		if (tb->followRadius==0) {		
 			xLen = tb->blockNodeFollow->x-cx;
 			yLen = tb->blockNodeFollow->y-cy;
-			tb->followRadius=(float)sqrt( (xLen*xLen) + (yLen*yLen) );	
-			tb->followAngle = (float)((180/M_PI) * asin(xLen/tb->followRadius)); 
-			tb->followAngle = (float)(quadrantCorrection(tb->followAngle,(int)cx,(int)cy,(int)tb->blockNodeFollow->x,(int)tb->blockNodeFollow->y));
+			tb->followRadius=sqrt( (xLen*xLen) + (yLen*yLen) );	
+			tb->followAngle = (180/M_PI) * asin(xLen/tb->followRadius); 
+			tb->followAngle = quadrantCorrection(tb->followAngle,(int)cx,(int)cy,(int)tb->blockNodeFollow->x,(int)tb->blockNodeFollow->y);
 		}
-		rangle = (float)((tb->followAngle+tb->rotation) * M_PI /180);
-		xTarget = (float)(cos(rangle) * tb->followRadius + cx);
-		yTarget = (float)(sin(rangle) * tb->followRadius + cy);
+		rangle = (tb->followAngle+tb->rotation) * M_PI /180;
+		xTarget = cos(rangle) * tb->followRadius + cx;
+		yTarget = sin(rangle) * tb->followRadius + cy;
 		if (tb->followAngle>360) { tb->followAngle=tb->followAngle-360; }
 
 		if (xTarget < tb->eyeX) { tb->eyeX-= ((tb->eyeX - xTarget)/100); }
@@ -661,41 +664,41 @@ static void buildCarpet(ModeInfo *mi)
 	/* draw carpet plane */
 	glBegin( wire ? GL_LINE_LOOP : GL_QUADS );
 		/* draw top */
-		glNormal3f( 0.0f, 0.0f, -1.0f );
-		glVertex3f(0.0f,0.0f,0.0f);
-		glVertex3f((float)x,0.0f,0.0f);
-		glVertex3f((float)x,(float)y,0.0f);
-		glVertex3f(0.0f,(float)y,0.0f);
+		glNormal3f( 0, 0, -1 );
+		glVertex3f(0.0,0.0,0.0);
+		glVertex3f(x,0.0,0.0);
+		glVertex3f(x,y,0.0);
+		glVertex3f(0.0,y,0.0);
                 tb->carpet_polys++;
 	    if (!wire) {
 		/* add edge pieces */
 		/* side 1 */
-		glNormal3f( 0.0f, -1.0f, 0.0f );
-		glVertex3f(0.0f,0.0f,0.0f);
-		glVertex3f((float)x,0.0f,0.0f);
-		glVertex3f((float)x,0.0f,(float)singleThick);
-		glVertex3f(0.0f,0.0f,(float)singleThick);
+		glNormal3f( 0, -1, 0 );
+		glVertex3f(0.0,0.0,0.0);
+		glVertex3f(x,0.0,0.0);
+		glVertex3f(x,0,singleThick);
+		glVertex3f(0.0,0,singleThick);
                 tb->carpet_polys++;
 		/* side 2 */
-		glNormal3f( -1.0f, 0.0f, 0.0f );
-		glVertex3f(0.0f,0.0f,0.0f);
-		glVertex3f(0.0f,(float)y,0.0f);
-		glVertex3f(0.0f,(float)y,(float)singleThick);
-		glVertex3f(0.0f,0.0f,(float)singleThick);
+		glNormal3f( -1, 0, 0 );
+		glVertex3f(0.0,0.0,0.0);
+		glVertex3f(0,y,0.0);
+		glVertex3f(0,y,singleThick);
+		glVertex3f(0.0,0,singleThick);
                 tb->carpet_polys++;
 		/* side 3 */
-		glNormal3f( 1.0f, 0.0f, 0.0f );
-		glVertex3f((float)x,0.0f,0.0f);
-		glVertex3f((float)x,(float)y,0.0f);
-		glVertex3f((float)x,(float)y,(float)singleThick);
-		glVertex3f((float)x,0.0f,(float)singleThick);
+		glNormal3f( 1, 0, 0 );
+		glVertex3f(x,0.0,0.0);
+		glVertex3f(x,y,0.0);
+		glVertex3f(x,y,singleThick);
+		glVertex3f(x,0,singleThick);
                 tb->carpet_polys++;
 		/* side 4 */
-		glNormal3f( 0.0f, 1.0f, 0.0f );
-		glVertex3f(0.0f,(float)y,0.0f);
-		glVertex3f((float)x,(float)y,0.0f);
-		glVertex3f((float)x,(float)y,(float)singleThick);
-		glVertex3f(0.0f,(float)y,(float)singleThick);
+		glNormal3f( 0, 1, 0 );
+		glVertex3f(0,y,0.0);
+		glVertex3f(x,y,0.0);
+		glVertex3f(x,y,singleThick);
+		glVertex3f(0,y,singleThick);
                 tb->carpet_polys++;
 		}
 	glEnd();
@@ -705,8 +708,8 @@ static void buildCarpet(ModeInfo *mi)
 		for (c=0;c<x;c++) {
 			glPushMatrix();	/* save state */
 			for (i=0;i<y;i++) {
-                          tb->carpet_polys += tube(0, 0, -0.1f,
-                                                   0, 0, 0.26f,
+                          tb->carpet_polys += tube(0, 0, -0.1,
+                                                   0, 0, 0.26,
                                                    cylSize, 0,
                                                    resolution, True, True,
                                                    wire);
@@ -725,8 +728,8 @@ static void buildCarpet(ModeInfo *mi)
 /* using the verticies arrays builds the plane, now with normals */
 static void polygonPlane(int wire, int a, int b, int c , int d, int i)
 {
-	GLfloat topBlockNormals[5][3] = { {0.0f,0.0f,-1.0f},	{0.0f,1.0f,0.0f}, {1.0f,0.0f,0.0f}, {0.0f,0.0f,1.0f}, {0.0f,-1.0f,0.0f} };
-	GLfloat topBlockVertices[8][3] = { {-0.49f,-2.97f,-0.99f}, {0.99f,-2.97f,-0.99f}, {0.99f,0.99f,-0.99f}  , {-0.49f,0.99f,-0.99f}, {-0.49f,-2.97f,0.99f} , {0.99f,-2.97f,0.99f}, {0.99f,0.99f,0.99f}   , {-0.49f,0.99f,0.99f} };
+	GLfloat topBlockNormals[5][3] = { {0,0,-1},	{0,1,0}, {1,0,0}, {0,0,1}, {0,-1,0} };
+	GLfloat topBlockVertices[8][3] = { {-0.49,-2.97,-0.99}, {0.99,-2.97,-0.99}, {0.99,0.99,-0.99}  , {-0.49,0.99,-0.99}, {-0.49,-2.97,0.99} , {0.99,-2.97,0.99}, {0.99,0.99,0.99}   , {-0.49,0.99,0.99} };
 	glBegin( wire ? GL_LINE_LOOP : GL_POLYGON);
 		glNormal3fv(topBlockNormals[i] );
 		glVertex3fv(topBlockVertices[a]);
@@ -781,8 +784,8 @@ static void buildBlock(ModeInfo *mi)
 		glTranslatef(1.5f,-2.5f,-1.5f);		/* move to the center, under the top of the brick	 */
                 if (! wire)
 		for (c=0;c<3;c++) {
-                  tb->block_polys += tube(0, 0, 0.1f,
-                                          0, 0, 1.4f,
+                  tb->block_polys += tube(0, 0, 0.1,
+                                          0, 0, 1.4,
                                           uddSize, 0,
                                           resolution, True, True, wire);
                   glTranslatef(0.0f,-1.0f,0.0f);		/* move to the center */	
@@ -803,15 +806,14 @@ static void buildBlobBlock(ModeInfo *mi)
 	tb->block=glGenLists(1);	/* only one */
 	glNewList(tb->block,GL_COMPILE);
 	glPushMatrix();
-  glScalef(1.4f,1.4f,1.4f);
+  glScalef(1.4,1.4,1.4);
   unit_sphere (resolution/2,resolution, wire);
   glPopMatrix();
   glTranslatef(0.0f,-2.0f,0.0f);
-  glScalef(1.4f,1.4f,1.4f);
+  glScalef(1.4,1.4,1.4);
   unit_sphere (resolution/2,resolution, wire);
 	glEndList();	
 }
-
 
 #if 0
 	/* handle input events or not if daemon running the show */
@@ -820,10 +822,10 @@ static void buildBlobBlock(ModeInfo *mi)
 	{
 	  topBlockSTATE *tb = &tbs[MI_SCREEN(mi)];
 		if (event->xany.type == KeyPress)    {
-		KeySym keysym;
-		char c = 0;
-		XLookupString (&event->xkey, &c, 1, &keysym, 0);
-		if (c == 'a') {
+	    KeySym keysym;
+	    char c = 0;
+	    XLookupString (&event->xkey, &c, 1, &keysym, 0);
+	    if (c == 'a') {
 				tb->eyeX++;
 				return True;
 			} else if (c == 'z') {
@@ -865,38 +867,38 @@ static void buildBlobBlock(ModeInfo *mi)
 			}
 		}
 	  if (event->xany.type == ButtonPress &&
-		  event->xbutton.button == Button1)
-		{
-		  tb->button_down_p = True;
-		  gltrackball_start (tb->trackball,
-							 event->xbutton.x, event->xbutton.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	      event->xbutton.button == Button1)
+	    {
+	      tb->button_down_p = True;
+	      gltrackball_start (tb->trackball,
+	                         event->xbutton.x, event->xbutton.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonRelease &&
-			   event->xbutton.button == Button1)
-		{
-		  tb->button_down_p = False;
-		  return True;
-		}
+	           event->xbutton.button == Button1)
+	    {
+	      tb->button_down_p = False;
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonPress &&
-			   (event->xbutton.button == Button4 ||
-				event->xbutton.button == Button5 ||
-				event->xbutton.button == Button6 ||
-				event->xbutton.button == Button7))
-		{
-		  gltrackball_mousewheel (tb->trackball, event->xbutton.button, 10,
-								  !!event->xbutton.state);
-		  return True;
-		}
+	           (event->xbutton.button == Button4 ||
+	            event->xbutton.button == Button5 ||
+	            event->xbutton.button == Button6 ||
+	            event->xbutton.button == Button7))
+	    {
+	      gltrackball_mousewheel (tb->trackball, event->xbutton.button, 10,
+	                              !!event->xbutton.state);
+	      return True;
+	    }
 	  else if (event->xany.type == MotionNotify &&
-			   tb->button_down_p)
-		{
-		  gltrackball_track (tb->trackball,
-							 event->xmotion.x, event->xmotion.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	           tb->button_down_p)
+	    {
+	      gltrackball_track (tb->trackball,
+	                         event->xmotion.x, event->xmotion.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 		return False;
 	}
 #endif
@@ -904,4 +906,4 @@ static void buildBlobBlock(ModeInfo *mi)
 /* this is tha main change for v5 compatability and acompanying ENTRYPOINTS */
 XSCREENSAVER_MODULE_2 ("TopBlock", topblock, topBlock)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */

@@ -12,20 +12,18 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdlib.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
-#include "win32.h"
 
 #if 0
 	#ifdef HAVE_CONFIG_H
 	# include "config.h"
 	#endif
-
-	#include <stdlib.h>
-	#include <stdio.h>
 #endif
 
+#include <stdlib.h>
+#include <stdio.h>
 #include "rotator.h"
 #include "yarandom.h"
 

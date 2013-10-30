@@ -13,9 +13,10 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdlib.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
-#include "win32.h"
+#include <stdlib.h>
 
 #if 0
 	#ifdef HAVE_CONFIG_H
@@ -42,7 +43,7 @@ unit_tube (int faces, int smooth, int caps_p, int wire_p)
 {
   int i;
   int polys = 0;
-  GLfloat step = (float)(M_PI * 2 / faces);
+  GLfloat step = M_PI * 2 / faces;
   GLfloat s2 = step/2;
   GLfloat th;
   GLfloat x, y, x0=0, y0=0;
@@ -68,8 +69,8 @@ unit_tube (int faces, int smooth, int caps_p, int wire_p)
 
   if (!smooth)
     {
-      x0 = COSF(s2);
-      y0 = SINF(s2);
+      x0 = cos (s2);
+      y0 = sin (s2);
     }
 
   if (smooth) faces++;
@@ -99,13 +100,13 @@ unit_tube (int faces, int smooth, int caps_p, int wire_p)
 
 
       th += step;
-      x  = COSF(th);
-      y  = SINF(th);
+      x  = cos (th);
+      y  = sin (th);
 
       if (!smooth)
         {
-          x0 = COSF(th + s2);
-          y0 = SINF(th + s2);
+          x0 = cos (th + s2);
+          y0 = sin (th + s2);
 
           array[out].p.x = x;			/* top point B */
           array[out].p.y = 1;
@@ -156,11 +157,11 @@ unit_tube (int faces, int smooth, int caps_p, int wire_p)
         if (! wire_p)
           {
             array[out].p.x = 0;
-            array[out].p.y = (float)z;
+            array[out].p.y = z;
             array[out].p.z = 0;
 
             array[out].n.x = 0;
-            array[out].n.y = (float)(z == 0 ? -1 : 1);
+            array[out].n.y = (z == 0 ? -1 : 1);
             array[out].n.z = 0;
             out++;
           }
@@ -169,12 +170,12 @@ unit_tube (int faces, int smooth, int caps_p, int wire_p)
         for (i = (z == 0 ? 0 : faces);
              (z == 0 ? i <= faces : i >= 0);
              i += (z == 0 ? 1 : -1)) {
-            GLfloat x = COSF(th);
-            GLfloat y = SINF(th);
+            GLfloat x = cos (th);
+            GLfloat y = sin (th);
 
             array[out] = array[0];  /* same normal and texture */
             array[out].p.x = x;
-            array[out].p.y = (float)z;
+            array[out].p.y = z;
             array[out].p.z = y;
             out++;
 
@@ -203,7 +204,7 @@ unit_cone (int faces, int smooth, int cap_p, int wire_p)
 {
   int i;
   int polys = 0;
-  GLfloat step = (float)(M_PI * 2 / faces);
+  GLfloat step = M_PI * 2 / faces;
   GLfloat s2 = step/2;
   GLfloat th;
   GLfloat x, y, x0, y0;
@@ -226,8 +227,8 @@ unit_cone (int faces, int smooth, int cap_p, int wire_p)
   th = 0;
   x = 1;
   y = 0;
-  x0 = COSF(s2);
-  y0 = SINF(s2);
+  x0 = cos (s2);
+  y0 = sin (s2);
 
   for (i = 0; i < faces; i++)
     {
@@ -257,10 +258,10 @@ unit_cone (int faces, int smooth, int cap_p, int wire_p)
 
 
       th += step;
-      x0 = COSF(th + s2);
-      y0 = SINF(th + s2);
-      x  = COSF(th);
-      y  = SINF(th);
+      x0 = cos (th + s2);
+      y0 = sin (th + s2);
+      x  = cos (th);
+      y  = sin (th);
 
       array[out].p.x = x;		/* bottom point B */
       array[out].p.y = 0;
@@ -309,8 +310,8 @@ unit_cone (int faces, int smooth, int cap_p, int wire_p)
 
       for (i = 0, th = 0; i <= faces; i++)
         {
-          GLfloat x = COSF(th);
-          GLfloat y = SINF(th);
+          GLfloat x = cos (th);
+          GLfloat y = sin (th);
 
           array[out] = array[0];  /* same normal and texture */
           array[out].p.x = x;
@@ -355,13 +356,13 @@ tube_1 (GLfloat x1, GLfloat y1, GLfloat z1,
   if (X == 0 && Y == 0 && Z == 0)
     return 0;
 
-  length = (float)sqrt (X*X + Y*Y + Z*Z);
+  length = sqrt (X*X + Y*Y + Z*Z);
 
   glPushMatrix();
 
   glTranslatef(x1, y1, z1);
-  glRotatef ((float)(-atan2 (X, Y)               * (180 / M_PI)), 0.0f, 0.0f, 1.0f);
-  glRotatef ((float)( atan2 (Z, sqrt(X*X + Y*Y)) * (180 / M_PI)), 1.0f, 0.0f, 0.0f);
+  glRotatef (-atan2 (X, Y)               * (180 / M_PI), 0, 0, 1);
+  glRotatef ( atan2 (Z, sqrt(X*X + Y*Y)) * (180 / M_PI), 1, 0, 0);
   glScalef (diameter, length, diameter);
 
   /* extend the endpoints of the tube by the cap size in both directions */

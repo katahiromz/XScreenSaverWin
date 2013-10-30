@@ -36,7 +36,17 @@ static const char sccsid[] = "@(#)sproingies.c	4.04 97/07/28 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-//#ifdef USE_GL
+#include <windows.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <stdio.h>
+
+#include "win32.h"
+
+#ifdef USE_GL
 
 #if 0
 	#ifndef HAVE_COCOA
@@ -115,9 +125,9 @@ build_TopsSides(int wireframe)
 
 	/* Surface: Tops */
 	glNewList(dl_num, GL_COMPILE);
-	mat_color[0] = 0.392157f;
-	mat_color[1] = 0.784314f;
-	mat_color[2] = 0.941176f;
+	mat_color[0] = 0.392157;
+	mat_color[1] = 0.784314;
+	mat_color[2] = 0.941176;
 	if (wireframe)
 		glColor3fv(mat_color);
 	else {
@@ -131,9 +141,9 @@ build_TopsSides(int wireframe)
 		glColor3fv(mat_color);
 	else {
       /* jwz: in wireframe mode, color tops and sides the same. */
-      mat_color[0] = 0.156863f;
-      mat_color[1] = 0.156863f;
-      mat_color[2] = 0.392157f;
+      mat_color[0] = 0.156863;
+      mat_color[1] = 0.156863;
+      mat_color[2] = 0.392157;
 		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_color);
 	}
 	glEndList();
@@ -272,12 +282,12 @@ AdvanceSproingie(int t, sp_instance * si)
 	if (thisSproingie->life > 0) {
 		if ((++(thisSproingie->frame)) > LAST_FRAME) {
 			if (thisSproingie->frame >= BOOM_FRAME) {
-				if ((thisSproingie->r -= 0.08f) < 0.0f)
-					thisSproingie->r = 0.0f;
-				if ((thisSproingie->g -= 0.08f) < 0.0f)
-					thisSproingie->g = 0.0f;
-				if ((thisSproingie->b -= 0.08f) < 0.0f)
-					thisSproingie->b = 0.0f;
+				if ((thisSproingie->r -= 0.08) < 0.0)
+					thisSproingie->r = 0.0;
+				if ((thisSproingie->g -= 0.08) < 0.0)
+					thisSproingie->g = 0.0;
+				if ((thisSproingie->b -= 0.08) < 0.0)
+					thisSproingie->b = 0.0;
 				if ((--(thisSproingie->life)) < 1) {
 					thisSproingie->life = RESET_SPROINGIE_LIFE;
 				}
@@ -339,9 +349,9 @@ AdvanceSproingie(int t, sp_instance * si)
 		thisSproingie->z     = (g_back - g_higher);
 		thisSproingie->life  = NEW_SPROINGIE_LIFE;
 		thisSproingie->frame = NO_FRAME;
-		thisSproingie->r     = (GLfloat) (40 + myrand(200)) / 255.0f;
-		thisSproingie->g     = (GLfloat) (40 + myrand(200)) / 255.0f;
-		thisSproingie->b     = (GLfloat) (40 + myrand(200)) / 255.0f;
+		thisSproingie->r     = (GLfloat) (40 + myrand(200)) / 255.0;
+		thisSproingie->g     = (GLfloat) (40 + myrand(200)) / 255.0;
+		thisSproingie->b     = (GLfloat) (40 + myrand(200)) / 255.0;
 
 		for (t2 = 0; t2 < si->maxsproingies; ++t2) {
 			if ((t2 != t) && (thisSproingie->x == S2->x) &&
@@ -538,7 +548,7 @@ RenderSproingie(int t, sp_instance * si)
 		glEnable(GL_CLIP_PLANE0);
 		glTranslatef((GLfloat) (thisSproingie->x),
 			     (GLfloat) (thisSproingie->y) +
-			     ((GLfloat) (thisSproingie->frame) / 9.0f),
+			     ((GLfloat) (thisSproingie->frame) / 9.0),
 			     (GLfloat) (thisSproingie->z));
 
 #ifndef HAVE_JWZGLES
@@ -552,9 +562,9 @@ RenderSproingie(int t, sp_instance * si)
 /**/	renderList(si->sproingies[0], si->wireframe);
 		glDisable(GL_CLIP_PLANE0);
 	} else if (thisSproingie->frame >= BOOM_FRAME) {
-		glTranslatef((GLfloat) (thisSproingie->x) + 0.5f,
-			     (GLfloat) (thisSproingie->y) + 0.5f,
-			     (GLfloat) (thisSproingie->z) - 0.5f);
+		glTranslatef((GLfloat) (thisSproingie->x) + 0.5,
+			     (GLfloat) (thisSproingie->y) + 0.5,
+			     (GLfloat) (thisSproingie->z) - 0.5);
 		scale = (GLfloat) (1 << (thisSproingie->frame - BOOM_FRAME));
 		glScalef(scale, scale, scale);
 		if (!si->wireframe) {
@@ -563,8 +573,8 @@ RenderSproingie(int t, sp_instance * si)
 			glDisable(GL_LIGHTING);
 		}
 		pointsize = (GLfloat) ((BOOM_FRAME + 8) - thisSproingie->frame) -
-			(si->dist / 64.0f);
-		glPointSize((pointsize < 1.0f) ? 1.0f : pointsize);
+			(si->dist / 64.0);
+		glPointSize((pointsize < 1.0) ? 1.0 : pointsize);
 /*-
  * PURIFY 4.0.1 reports an unitialized memory read on the next line when using
  * MesaGL 2.2.  This has been tracked to MesaGL 2.2 src/points.c line 313. */
@@ -694,7 +704,7 @@ DisplaySproingies(int screen,int pause)
 	sp_instance *si = &si_list[screen];
 	int         t;
 	GLfloat     position[] =
-	{8.0f, 5.0f, -2.0f, 0.1f};
+	{8.0, 5.0, -2.0, 0.1};
 
 	if (si->wireframe)
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -702,9 +712,9 @@ DisplaySproingies(int screen,int pause)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glPushMatrix();
-	glTranslatef(0.0f, 0.0f, -(GLfloat) (si->dist) / 16.0f);	/* viewing transform  */
-	glRotatef((GLfloat) si->rotx, 1.0f, 0.0f, 0.0f);
-	glRotatef((GLfloat) si->roty, 0.0f, 1.0f, 0.0f);
+	glTranslatef(0.0, 0.0, -(GLfloat) (si->dist) / 16.0);	/* viewing transform  */
+	glRotatef((GLfloat) si->rotx, 1.0, 0.0, 0.0);
+	glRotatef((GLfloat) si->roty, 0.0, 1.0, 0.0);
 
 	if (!si->wireframe)
 		glLightfv(GL_LIGHT0, GL_POSITION, position);
@@ -723,9 +733,9 @@ DisplaySproingies(int screen,int pause)
 	glPopMatrix();
 #endif
 
-	glTranslatef((float)((GLfloat) si->sframe * (-1.0 / 12.0) - 0.75),
-		     (float)((GLfloat) si->sframe * (2.0 / 12.0) - 0.5),
-		     (float)((GLfloat) si->sframe * (-1.0 / 12.0) + 0.75));
+	glTranslatef((GLfloat) si->sframe * (-1.0 / 12.0) - 0.75,
+		     (GLfloat) si->sframe * (2.0 / 12.0) - 0.5,
+		     (GLfloat) si->sframe * (-1.0 / 12.0) + 0.75);
 
 	if (si->wireframe)
 		ComputeGround(si);
@@ -795,15 +805,15 @@ InitSproingies(int wfmode, int grnd, int mspr, int smrtspr,
 			   int screen, int numscreens, int mono)
 {
 	GLfloat     ambient[] =
-	{0.2f, 0.2f, 0.2f, 1.0f};
+	{0.2, 0.2, 0.2, 1.0};
 	GLfloat     position[] =
-	{10.0f, 1.0f, 1.0f, 10.0f};
+	{10.0, 1.0, 1.0, 10.0};
 	GLfloat     mat_diffuse[] =
-	{0.6f, 0.6f, 0.6f, 1.0f};
+	{0.6, 0.6, 0.6, 1.0};
 	GLfloat     mat_specular[] =
-	{0.8f, 0.8f, 0.8f, 1.0f};
+	{0.8, 0.8, 0.8, 1.0};
 	GLfloat     mat_shininess[] =
-	{50.0f};
+	{50.0};
 
 	sp_instance *si;
 	int         t;
@@ -926,7 +936,7 @@ InitSproingies(int wfmode, int grnd, int mspr, int smrtspr,
 	}
 }
 
-//#endif /* USE_GL */
+#endif /* USE_GL */
 
 /* End of sproingies.c */
 

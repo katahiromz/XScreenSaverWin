@@ -19,7 +19,7 @@
 			    "*showFPS: False   \n" \
 			    "*wireframe: False \n"
 
-#define refresh_providence NULL
+# define refresh_providence 0
 
 #if 0
 	#ifdef STANDALONE
@@ -32,6 +32,8 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "win32.h"
@@ -97,10 +99,9 @@ static int eye = True;
 
 typedef struct {
   GLint       WindH, WindW;
-  //GLXContext *glx_context;
-  HGLRC hglrc;
-  //trackball_state *trackball;
-  //Bool        button_down_p;
+  GLXContext *glx_context;
+  trackball_state *trackball;
+  Bool        button_down_p;
   GLfloat position0[4];
   GLubyte checkImage[checkImageWidth][checkImageHeight][3];
   GLuint bricktexture;
@@ -122,29 +123,29 @@ typedef struct {
 } providencestruct;
 
 /* lighting variables */
-/*static const GLfloat front_shininess[] = {60.0f};*/
-/*static const GLfloat front_specular[] = {0.2f, 0.2f, 0.2f, 1.0f};*/
-/*static const GLfloat ambient[] = {0.8f, 0.8f, 0.8f, 1.0f};*/
-static const GLfloat ambient2[] = {0.25f, 0.25f, 0.25f, 1.0f};
-static const GLfloat diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
-static const GLfloat lmodel_ambient[] = {0.5f, 0.5f, 0.5f, 1.0f};
+/*static const GLfloat front_shininess[] = {60.0};*/
+/*static const GLfloat front_specular[] = {0.2, 0.2, 0.2, 1.0};*/
+/*static const GLfloat ambient[] = {0.8, 0.8, 0.8, 1.0};*/
+static const GLfloat ambient2[] = {0.25, 0.25, 0.25, 1.0};
+static const GLfloat diffuse[] = {1.0, 1.0, 1.0, 1.0};
+static const GLfloat lmodel_ambient[] = {0.5, 0.5, 0.5, 1.0};
 static const GLfloat lmodel_twoside[] = {GL_TRUE};
 
 /* gray-gray */
 
-static const GLfloat MaterialGlory[] = {0.04f, 0.30f, 0.22f, 0.7f};
-static const GLfloat MaterialGloryB[] = {0.07f, 0.50f, 0.36f, 0.6f};
+static const GLfloat MaterialGlory[] = {0.04, 0.30, 0.22, 0.7};
+static const GLfloat MaterialGloryB[] = {0.07, 0.50, 0.36, 0.6};
 
-static const GLfloat MaterialGloryF[] = {0.07f, 0.50f, 0.36f, 1.0f};
-/* static const GLfloat MaterialGloryF[] = {0.06f, 0.38f, 0.27f, 1.0f}; */
-/*static const GLfloat MaterialGloryE[] = {0.06f, 0.38f, 0.27f, 0.3f};*/
-static const GLfloat MaterialGloryM[] = {0.5f, 0.5f, 0.5f, 0.5f};
-static const GLfloat MaterialGloryMB[] = {0.36f, 0.36f, 0.36f, 0.4f};
-/*static const GLfloat MaterialGreenback[4] = {0.04f, 0.30f, 0.22f, 1.0f};*/
-/*static const GLfloat MaterialBlack[4] = {0.0f, 0.0f, 0.0f, 1.0f};*/
+static const GLfloat MaterialGloryF[] = {0.07, 0.50, 0.36, 1.0};
+/* static const GLfloat MaterialGloryF[] = {0.06, 0.38, 0.27, 1.0}; */
+/*static const GLfloat MaterialGloryE[] = {0.06, 0.38, 0.27, 0.3};*/
+static const GLfloat MaterialGloryM[] = {0.5, 0.5, 0.5, 0.5};
+static const GLfloat MaterialGloryMB[] = {0.36, 0.36, 0.36, 0.4};
+/*static const GLfloat MaterialGreenback[4] = {0.04, 0.30, 0.22, 1.0};*/
+/*static const GLfloat MaterialBlack[4] = {0.0, 0.0, 0.0, 1.0};*/
 
-static const GLfloat MaterialGray5[] = {0.5f, 0.5f, 0.5f, 1.0f};
-/*static const GLfloat MaterialGray6[] = {0.6f, 0.6f, 0.6f, 1.0f};*/
+static const GLfloat MaterialGray5[] = {0.5, 0.5, 0.5, 1.0};
+/*static const GLfloat MaterialGray6[] = {0.6, 0.6, 0.6, 1.0};*/
 
 static providencestruct *providence = (providencestruct *) NULL;
 
@@ -213,7 +214,6 @@ static void build_eye(providencestruct *mp)
     }
   }
 }
-
 
 #undef min
 static double min(double a, double b) 
@@ -329,48 +329,48 @@ static void draw_seal(providencestruct *mp)
 		 mp->mono ? MaterialGray5 : MaterialGloryF);
   }
 
-  glRotatef(45.0f, 0.0f, 1.0f, 0.0f);
-  glTranslatef(0.0f, -3.25f, 0.0f);
+  glRotatef(45.0, 0.0, 1.0, 0.0);
+  glTranslatef(0.0, -3.25, 0.0);
 
   for(i = 0; i < 4; ++i) {
-    glRotatef(i*90.0f, 0.0f, 1.0f, 0.0f);
+    glRotatef(i*90.0, 0.0, 1.0, 0.0);
 
     glBegin(GL_QUADS);
-    glNormal3f((float)(1 / sqrt(6.0f)), (float)(2 / sqrt(6.0)), (float)(1 / sqrt(6.0)));
-    glTexCoord2f((float)-base, 0.0f);
-    glVertex3f((float)-base, 0.0f, (float)base);
-    glTexCoord2f((float)base, 0.0f);
-    glVertex3f((float)base, 0.0f, (float)base);
-    glTexCoord2f((float)top, 13.0f/4.0f);
-    glVertex3f((float)top, 2.0f, (float)top);
-    glTexCoord2f((float)-top, 13.0f/4.0f);
-    glVertex3f((float)-top, 2.0f, (float)top);
+    glNormal3f(1 / sqrt(6.0), 2 / sqrt(6.0), 1 / sqrt(6.0));
+    glTexCoord2f(-base, 0.0);
+    glVertex3f(-base, 0.0, base);
+    glTexCoord2f(base, 0.0);
+    glVertex3f(base, 0.0, base);
+    glTexCoord2f(top, 13.0/4.0);
+    glVertex3f(top, 2.0, top);
+    glTexCoord2f(-top, 13.0/4.0);
+    glVertex3f(-top, 2.0, top);
     glEnd();
   }
 
   glBegin(GL_QUADS);
 
   /* top */
-  glNormal3f(0.0f, 1.0f, 0.0f);
-  glTexCoord2f(0.02f, 0.0f);
-  glVertex3f((float)-top, 2.0f, (float)top);
-  glTexCoord2f((float)(2.0f*top), 0.0f);
-  glVertex3f((float)top, 2.0f, (float)top);
-  glTexCoord2f((float)(2.0f*top), (float)(tmod*2.1f*top));
-  glVertex3f((float)top, 2.0f, (float)-top);
-  glTexCoord2f(0.02f, (float)(tmod*2.1f*top));
-  glVertex3f((float)-top, 2.0f, (float)-top);
+  glNormal3f(0.0, 1.0, 0.0);
+  glTexCoord2f(0.02, 0.0);
+  glVertex3f(-top, 2.0, top);
+  glTexCoord2f(2.0*top, 0.0);
+  glVertex3f(top, 2.0, top);
+  glTexCoord2f(2.0*top, tmod*2.1*top);
+  glVertex3f(top, 2.0, -top);
+  glTexCoord2f(0.02, tmod*2.1*top);
+  glVertex3f(-top, 2.0, -top);
 
   /* base */
-  glNormal3f(0.0f, -1.0f, 0.0f);
-  glTexCoord2f((float)-base, 0.0f);
-  glVertex3f((float)-base, 0.0f, (float)-base);
-  glTexCoord2f((float)top, 0.0f);
-  glVertex3f((float)base, 0.0f, (float)-base);
-  glTexCoord2f((float)top, (float)(top*13.0f/4.0f));
-  glVertex3f((float)base, 0.0f, (float)base);
-  glTexCoord2f((float)-top, (float)(top*13.0f/4.0f));
-  glVertex3f((float)-base, 0.0f, (float)base);
+  glNormal3f(0.0, -1.0, 0.0);
+  glTexCoord2f(-base, 0.0);
+  glVertex3f(-base, 0.0, -base);
+  glTexCoord2f(top, 0.0);
+  glVertex3f(base, 0.0, -base);
+  glTexCoord2f(top, top*13.0/4.0);
+  glVertex3f(base, 0.0, base);
+  glTexCoord2f(-top, top*13.0/4.0);
+  glVertex3f(-base, 0.0, base);
 
   glEnd();
 
@@ -413,10 +413,10 @@ static void draw_glory(providencestruct *mp)
     if(mp->particles[i][0] < 0.0)
       th += Pi;
 
-    glVertex3f((float)mp->particles[i][0], (float)mp->particles[i][1], (float)mp->particles[i][2]);
-    glVertex3f((float)(mp->particles[i][0] + 0.2*cos(th)*t),
-	       (float)(mp->particles[i][1] + 0.2*sin(th)*t),
-	       (float)mp->particles[i][2]);
+    glVertex3f(mp->particles[i][0], mp->particles[i][1], mp->particles[i][2]);
+    glVertex3f(mp->particles[i][0] + 0.2*cos(th)*t,
+	       mp->particles[i][1] + 0.2*sin(th)*t,
+	       mp->particles[i][2]);
   }
   glEnd();
   
@@ -431,10 +431,10 @@ static void draw_glory(providencestruct *mp)
     if(mp->particles[i][0] < 0.0)
       th += Pi;
 
-    glVertex3f((float)mp->particles[i][0], (float)mp->particles[i][1], (float)mp->particles[i][2]);
-    glVertex3f((float)(mp->particles[i][0] + 0.2*cos(th)*t),
-	       (float)(mp->particles[i][1] + 0.2*sin(th)*t),
-	       (float)mp->particles[i][2]);
+    glVertex3f(mp->particles[i][0], mp->particles[i][1], mp->particles[i][2]);
+    glVertex3f(mp->particles[i][0] + 0.2*cos(th)*t,
+	       mp->particles[i][1] + 0.2*sin(th)*t,
+	       mp->particles[i][2]);
   }
   glEnd();
 
@@ -470,9 +470,9 @@ static void draw_eye(providencestruct *mp)
   /* draw eye particles on z = 0 plane */
   glBegin(GL_POINTS);
   for(i = 0; i < EYE_PARTICLE_COUNT/2; ++i) {
-    glVertex3f((float)mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
-	       (float)mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
-	       0.0f);
+    glVertex3f(mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
+	       mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
+	       0.0);
   }
   glEnd();
 
@@ -484,16 +484,16 @@ static void draw_eye(providencestruct *mp)
   /* draw eye particles on z = 0 plane */
   glBegin(GL_POINTS);
   for(; i < EYE_PARTICLE_COUNT; ++i) {
-    glVertex3f((float)mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
-	       (float)mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
-	       0.0f);
+    glVertex3f(mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
+	       mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
+	       0.0);
   }
   glEnd();
 
 
   /* draw scaled particles */
   glPushMatrix();
-  glScalef(3.3f, 2.2f, 3.3f);
+  glScalef(3.3, 2.2, 3.3);
 
   /* eye */
   glColor4fv(mp->mono ? MaterialGloryMB : MaterialGloryB);
@@ -503,9 +503,9 @@ static void draw_eye(providencestruct *mp)
   /* draw eye particles on z = 0 plane */
   glBegin(GL_POINTS);
   for(i = 0; i < EYE_PARTICLE_COUNT/2; ++i) {
-    glVertex3f((float)mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
-	       (float)mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
-	       0.0f);
+    glVertex3f(mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
+	       mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
+	       0.0);
   }
   glEnd();
 
@@ -516,9 +516,9 @@ static void draw_eye(providencestruct *mp)
   /* draw eye particles on z = 0 plane */
   glBegin(GL_POINTS);
   for(; i < EYE_PARTICLE_COUNT; ++i) {
-    glVertex3f((float)mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
-	       (float)mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
-	       0.0f);
+    glVertex3f(mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
+	       mp->lookup[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
+	       0.0);
   }
   glEnd();
 
@@ -556,9 +556,9 @@ static void draw_eye2(providencestruct *mp)
   /* draw eye particles on z = 0 plane */
   glBegin(GL_POINTS);
   for(i = 0; i < EYE_PARTICLE_COUNT/2; ++i) {
-    glVertex3f((float)mp->lookup2[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
-	       (float)mp->lookup2[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
-	       0.0f);
+    glVertex3f(mp->lookup2[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
+	       mp->lookup2[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
+	       0.0);
   }
   glEnd();
 
@@ -570,9 +570,9 @@ static void draw_eye2(providencestruct *mp)
   /* draw eye particles on z = 0 plane */
   glBegin(GL_POINTS);
   for(; i < EYE_PARTICLE_COUNT; ++i) {
-    glVertex3f((float)mp->lookup2[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
-	       (float)mp->lookup2[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
-	       0.0f);
+    glVertex3f(mp->lookup2[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][0], 
+	       mp->lookup2[mp->eyeparticles[i][0]][mp->eyeparticles[i][1]][1],
+	       0.0);
   }
   glEnd();
 
@@ -584,12 +584,12 @@ static void draw_eye2(providencestruct *mp)
 static void draw_providence_strip(ModeInfo *mi) 
 {
   providencestruct *mp = &providence[MI_SCREEN(mi)];
-  glTranslatef(0.0f, 1.414f, 0.0f);
+  glTranslatef(0.0, 1.414, 0.0);
 
-  mp->position0[0] = 1.6f*SINF(mp->theta);
-  mp->position0[1] = 1.2f;
-  mp->position0[2] = 1.6f*COSF(mp->theta);
-  mp->position0[3] = 0.0f;
+  mp->position0[0] = 1.6*sin(mp->theta);
+  mp->position0[1] = 1.2;
+  mp->position0[2] = 1.6*cos(mp->theta);
+  mp->position0[3] = 0.0;
   glLightfv(GL_LIGHT0, GL_POSITION, mp->position0);
   glLightfv(GL_LIGHT0, GL_AMBIENT, ambient2);
   glEnable(GL_LIGHTING);
@@ -717,7 +717,7 @@ ENTRYPOINT void init_providence(ModeInfo *mi)
       return;
   }
   mp = &providence[MI_SCREEN(mi)];
-  //mp->trackball = gltrackball_init ();
+  mp->trackball = gltrackball_init ();
 
   mp->position0[0] = 1;
   mp->position0[1] = 5;
@@ -736,7 +736,7 @@ ENTRYPOINT void init_providence(ModeInfo *mi)
   /* make multiple screens rotate at slightly different rates. */
   mp->theta_scale = 0.7 + frand(0.6);
 
-  if((mp->hglrc = init_GL(mi)) != NULL) {
+  if((mp->glx_context = init_GL(mi)) != NULL) {
     reshape_providence(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
     /* glDrawBuffer(GL_BACK); */
     pinit(mp);
@@ -749,8 +749,8 @@ ENTRYPOINT void draw_providence(ModeInfo * mi)
 {
   providencestruct *mp;
   
-  HDC display = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display    *display = MI_DISPLAY(mi);
+  Window      window = MI_WINDOW(mi);
   
   if(!providence)
     return;
@@ -758,10 +758,10 @@ ENTRYPOINT void draw_providence(ModeInfo * mi)
   
   MI_IS_DRAWN(mi) = True;
   
-  if(!mp->hglrc)
+  if(!mp->glx_context)
     return;
   
-  wglMakeCurrent(display, mp->hglrc);
+  glXMakeCurrent(display, window, *(mp->glx_context));
   
   /* setup twoside lighting */
   glLightfv(GL_LIGHT0, GL_AMBIENT, ambient2);
@@ -793,8 +793,7 @@ ENTRYPOINT void draw_providence(ModeInfo * mi)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glPushMatrix();
-  //glRotatef(current_device_rotation(), 0.0f, 0.0f, 1.0f);
-  glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
+  glRotatef(current_device_rotation(), 0, 0, 1);
 
   /* modify camera */
   if(fabs(mp->camera_velocity) > EPSILON) {
@@ -803,10 +802,10 @@ ENTRYPOINT void draw_providence(ModeInfo * mi)
   }
   
   /* rotate providence */
-  glTranslatef(0.0f, 0.0f, (float)(mp->camera_z + sin(mp->theta/4.0)));
-  glRotatef((float)(10.0+20.0*sin(mp->theta/2.0)), 1.0f, 0.0f, 0.0f);
-  //gltrackball_rotate(mp->trackball);
-  glRotatef((float)(mp->theta * 180.0 / Pi), 0.0f, -1.0f, 0.0f);
+  glTranslatef(0.0, 0.0, mp->camera_z + sin(mp->theta/4.0));
+  glRotatef(10.0+20.0*sin(mp->theta/2.0), 1.0, 0.0, 0.0);
+  gltrackball_rotate(mp->trackball);
+  glRotatef(mp->theta * 180.0 / Pi, 0.0, -1.0, 0.0);
 
   /* draw providence */
   draw_providence_strip(mi);
@@ -815,7 +814,7 @@ ENTRYPOINT void draw_providence(ModeInfo * mi)
   if(MI_IS_FPS(mi)) do_fps (mi);
   glFlush();
   
-  SwapBuffers(display);
+  glXSwapBuffers(display, window);
 
   /* update */
   mp->currenttime += 1.0 / FPS;
@@ -828,10 +827,10 @@ ENTRYPOINT void change_providence(ModeInfo * mi)
 {
   providencestruct *mp = &providence[MI_SCREEN(mi)];
   
-  if (!mp->hglrc)
+  if (!mp->glx_context)
 	return;
   
-  wglMakeCurrent(MI_DISPLAY(mi), mp->hglrc);
+  glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(mp->glx_context));
   pinit(mp);
 }
 #endif /* !STANDALONE */

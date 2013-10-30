@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __GLCODE__
 #define __GLCODE__
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif /* HAVE_CONFIG_H */
-
 #if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif /* HAVE_CONFIG_H */
+
 	#ifndef HAVE_COCOA
 	# include <GL/gl.h>
 	# include <GL/glu.h>
@@ -54,11 +54,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 
 #include "win32.h"
+
 
 #include "yarandom.h"
 #include "rotator.h"
@@ -180,7 +183,7 @@ void DrawSpark(global_info_t *info, flurry_info_t *flurry, Spark *s);
 /* int fieldIncoherence = 0; */
 /* int ifieldSpeed = 120; */
 
-static float FastDistance2D(float x, float y)
+static inline float FastDistance2D(float x, float y)
 {
         /* this function computes the distance from 0,0 to x,y with ~3.5% error */
 	float mn;
@@ -285,9 +288,8 @@ struct _flurry_info_t {
 
 struct _global_info_t {
   /* system values */
-	//GLXContext *glx_context;
-	HGLRC hglrc;
-	HWND window;
+	GLXContext *glx_context;
+	Window window;
         int optMode;
 
 	float sys_glWidth;

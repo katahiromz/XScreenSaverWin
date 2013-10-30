@@ -85,10 +85,10 @@ static const char sccsid[] = "@(#)hypertorus.c  1.2 05/09/28 xlockmore";
 #define DEF_SPEEDYZ                "2.1"
 
 #define DELAY 25000
-#define DEFAULTS           "*delay:      25000 \n" \
+# define DEFAULTS           "*delay:      25000 \n" \
                             "*showFPS:    False \n" \
 
-#define refresh_hypertorus NULL
+# define refresh_hypertorus 0
 
 #if 0
 	#ifdef STANDALONE
@@ -101,11 +101,14 @@ static const char sccsid[] = "@(#)hypertorus.c  1.2 05/09/28 xlockmore";
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
+
 #if 0
 	#ifndef HAVE_COCOA
 	# include <X11/keysym.h>
@@ -121,7 +124,6 @@ static const char sccsid[] = "@(#)hypertorus.c  1.2 05/09/28 xlockmore";
 	 "draw_hypertorus", "change_hypertorus", NULL, &hypertorus_opts,
 	 25000, 1, 1, 1, 1.0, 4, "",
 	 "Shows a hypertorus rotating in 4d", 0, NULL};
-
 	#endif
 #endif
 
@@ -136,15 +138,15 @@ static char *proj_3d = "perspective";
 static int projection_3d;
 static char *proj_4d = "perspective";
 static int projection_4d;
-static float speed_wx = 1.1f;
-static float speed_wy = 1.3f;
-static float speed_wz = 1.5f;
-static float speed_xy = 1.7f;
-static float speed_xz = 1.9f;
-static float speed_yz = 2.1f;
+static float speed_wx = 1.1;
+static float speed_wy = 1.3;
+static float speed_wz = 1.5;
+static float speed_xy = 1.7;
+static float speed_xz = 1.9;
+static float speed_yz = 2.1;
 
-static const float offset4d[4] = {  0.0f,  0.0f,  0.0f,  2.0f };
-static const float offset3d[4] = {  0.0f,  0.0f, -2.0f,  0.0f };
+static const float offset4d[4] = {  0.0,  0.0,  0.0,  2.0 };
+static const float offset3d[4] = {  0.0,  0.0, -2.0,  0.0 };
 
 #if 0
 	static XrmOptionDescRec opts[] =
@@ -218,22 +220,22 @@ static const float offset3d[4] = {  0.0f,  0.0f, -2.0f,  0.0f };
 
 typedef struct {
   GLint      WindH, WindW;
-  //GLXContext *glx_context;
-  HGLRC hglrc;
+  GLXContext *glx_context;
   /* 4D rotation angles */
   float alpha, beta, delta, zeta, eta, theta;
   /* Aspect ratio of the current window */
   float aspect;
   /* Trackball states */
-  //trackball_state *trackballs[2];
-  //int current_trackball;
-  //Bool button_pressed;
+  trackball_state *trackballs[2];
+  int current_trackball;
+  Bool button_pressed;
 
   float speed_scale;
 
 } hypertorusstruct;
 
-static hypertorusstruct *hyper_ = NULL;
+#undef hyper
+static hypertorusstruct *hyper = (hypertorusstruct *) NULL;
 
 
 /* Add a rotation around the wx-plane to the matrix m. */
@@ -242,9 +244,9 @@ static void rotatewx(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][1];
@@ -261,9 +263,9 @@ static void rotatewy(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][0];
@@ -280,9 +282,9 @@ static void rotatewz(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][0];
@@ -299,9 +301,9 @@ static void rotatexy(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][2];
@@ -318,9 +320,9 @@ static void rotatexz(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][1];
@@ -337,9 +339,9 @@ static void rotateyz(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][0];
@@ -358,7 +360,7 @@ static void rotateall(float al, float be, float de, float ze, float et,
 
   for (i=0; i<4; i++)
     for (j=0; j<4; j++)
-      m[i][j] = (float)(i==j);
+      m[i][j] = (i==j);
   rotatewx(m,al);
   rotatewy(m,be);
   rotatewz(m,de);
@@ -411,7 +413,7 @@ static void quats_to_rotmat(float p[4], float q[4], float m[4][4])
   th = atan2(r02,sqrt(r00*r00+r01*r01))*180.0/M_PI;
   ze = atan2(-r01,r00)*180.0/M_PI;
 
-  rotateall((float)al,(float)be,(float)de,(float)ze,(float)et,(float)-th,m);
+  rotateall(al,be,de,ze,et,-th,m);
 }
 
 
@@ -429,47 +431,47 @@ static void color(double angle)
     angle = fmod(angle,2*M_PI);
   else
     angle = fmod(angle,-2*M_PI);
-  s = (int)floor(angle/(M_PI/3));
+  s = floor(angle/(M_PI/3));
   t = angle/(M_PI/3)-s;
   if (s >= 6)
     s = 0;
   switch (s)
   {
     case 0:
-      color[0] = 1.0f;
-      color[1] = (float)t;
-      color[2] = 0.0f;
+      color[0] = 1.0;
+      color[1] = t;
+      color[2] = 0.0;
       break;
     case 1:
-      color[0] = (float)(1.0f-t);
-      color[1] = 1.0f;
-      color[2] = 0.0f;
+      color[0] = 1.0-t;
+      color[1] = 1.0;
+      color[2] = 0.0;
       break;
     case 2:
-      color[0] = 0.0f;
-      color[1] = 1.0f;
-      color[2] = (float)t;
+      color[0] = 0.0;
+      color[1] = 1.0;
+      color[2] = t;
       break;
     case 3:
-      color[0] = 0.0f;
-      color[1] = (float)(1.0f-t);
-      color[2] = 1.0f;
+      color[0] = 0.0;
+      color[1] = 1.0-t;
+      color[2] = 1.0;
       break;
     case 4:
-      color[0] = (float)t;
-      color[1] = 0.0f;
-      color[2] = 1.0f;
+      color[0] = t;
+      color[1] = 0.0;
+      color[2] = 1.0;
       break;
     case 5:
-      color[0] = 1.0f;
-      color[1] = 0.0f;
-      color[2] = (float)(1.0f-t);
+      color[0] = 1.0;
+      color[1] = 0.0;
+      color[2] = 1.0-t;
       break;
   }
   if (display_mode == DISP_TRANSPARENT)
-    color[3] = 0.7f;
+    color[3] = 0.7;
   else
-    color[3] = 1.0f;
+    color[3] = 1.0;
   glColor3fv(color);
   glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE,color);
 }
@@ -483,10 +485,10 @@ static int hypertorus(ModeInfo *mi, double umin, double umax, double vmin,
                        double vmax, int numu, int numv)
 {
   int polys = 0;
-  static const GLfloat mat_diff_red[]         = { 1.0f, 0.0f, 0.0f, 1.0f };
-  static const GLfloat mat_diff_green[]       = { 0.0f, 1.0f, 0.0f, 1.0f };
-  static const GLfloat mat_diff_trans_red[]   = { 1.0f, 0.0f, 0.0f, 0.7f };
-  static const GLfloat mat_diff_trans_green[] = { 0.0f, 1.0f, 0.0f, 0.7f };
+  static const GLfloat mat_diff_red[]         = { 1.0, 0.0, 0.0, 1.0 };
+  static const GLfloat mat_diff_green[]       = { 0.0, 1.0, 0.0, 1.0 };
+  static const GLfloat mat_diff_trans_red[]   = { 1.0, 0.0, 0.0, 0.7 };
+  static const GLfloat mat_diff_trans_green[] = { 0.0, 1.0, 0.0, 0.7 };
   float p[3], pu[3], pv[3], n[3], mat[4][4];
   int i, j, k, l, m, b, skew;
   double u, v, ur, vr;
@@ -494,12 +496,12 @@ static int hypertorus(ModeInfo *mi, double umin, double umax, double vmin,
   double xx[4], xxu[4], xxv[4], x[4], xu[4], xv[4];
   double r, s, t;
   float q1[4], q2[4], r1[4][4], r2[4][4];
-  hypertorusstruct *hp = &hyper_[MI_SCREEN(mi)];
+  hypertorusstruct *hp = &hyper[MI_SCREEN(mi)];
 
   rotateall(hp->alpha,hp->beta,hp->delta,hp->zeta,hp->eta,hp->theta,r1);
 
-  //gltrackball_get_quaternion(hp->trackballs[0],q1);
-  //gltrackball_get_quaternion(hp->trackballs[1],q2);
+  gltrackball_get_quaternion(hp->trackballs[0],q1);
+  gltrackball_get_quaternion(hp->trackballs[1],q2);
   quats_to_rotmat(q1,q2,r2);
 
   mult_rotmat(r2,r1,mat);
@@ -584,9 +586,9 @@ static int hypertorus(ModeInfo *mi, double umin, double umax, double vmin,
         {
           for (l=0; l<3; l++)
           {
-            p[l] = (float)((x[l]+offset4d[l])/1.5f+offset3d[l]);
-            pu[l] = (float)xu[l];
-            pv[l] = (float)xv[l];
+            p[l] = (x[l]+offset4d[l])/1.5+offset3d[l];
+            pu[l] = xu[l];
+            pv[l] = xv[l];
           }
         }
         else
@@ -596,18 +598,18 @@ static int hypertorus(ModeInfo *mi, double umin, double umax, double vmin,
           for (l=0; l<3; l++)
           {
             r = x[l]+offset4d[l];
-            p[l] = (float)(r/s+offset3d[l]);
-            pu[l] = (float)((xu[l]*s-r*xu[3])/t);
-            pv[l] = (float)((xv[l]*s-r*xv[3])/t);
+            p[l] = r/s+offset3d[l];
+            pu[l] = (xu[l]*s-r*xu[3])/t;
+            pv[l] = (xv[l]*s-r*xv[3])/t;
           }
         }
         n[0] = pu[1]*pv[2]-pu[2]*pv[1];
         n[1] = pu[2]*pv[0]-pu[0]*pv[2];
         n[2] = pu[0]*pv[1]-pu[1]*pv[0];
         t = sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
-        n[0] /= (float)t;
-        n[1] /= (float)t;
-        n[2] /= (float)t;
+        n[0] /= t;
+        n[1] /= t;
+        n[2] /= t;
         glNormal3fv(n);
         glVertex3fv(p);
         polys++;
@@ -627,7 +629,7 @@ static void init(ModeInfo *mi)
   static const GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
   static const GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
   static const GLfloat mat_specular[]   = { 1.0, 1.0, 1.0, 1.0 };
-  hypertorusstruct *hp = &hyper_[MI_SCREEN(mi)];
+  hypertorusstruct *hp = &hyper[MI_SCREEN(mi)];
 
   hp->alpha = 0.0;
   hp->beta = 0.0;
@@ -701,10 +703,9 @@ static void init(ModeInfo *mi)
 /* Redisplay the hypertorus. */
 static void display_hypertorus(ModeInfo *mi)
 {
-  hypertorusstruct *hp = &hyper_[MI_SCREEN(mi)];
+  hypertorusstruct *hp = &hyper[MI_SCREEN(mi)];
 
-  //if (!hp->button_pressed)
-  if (!False)
+  if (!hp->button_pressed)
   {
     hp->alpha += speed_wx * hp->speed_scale;
     if (hp->alpha >= 360.0)
@@ -748,7 +749,7 @@ static void display_hypertorus(ModeInfo *mi)
 
 ENTRYPOINT void reshape_hypertorus(ModeInfo *mi, int width, int height)
 {
-  hypertorusstruct *hp = &hyper_[MI_SCREEN(mi)];
+  hypertorusstruct *hp = &hyper[MI_SCREEN(mi)];
 
   hp->WindW = (GLint)width;
   hp->WindH = (GLint)height;
@@ -759,58 +760,58 @@ ENTRYPOINT void reshape_hypertorus(ModeInfo *mi, int width, int height)
 #if 0
 	ENTRYPOINT Bool hypertorus_handle_event(ModeInfo *mi, XEvent *event)
 	{
-	  hypertorusstruct *hp = &hyper_[MI_SCREEN(mi)];
+	  hypertorusstruct *hp = &hyper[MI_SCREEN(mi)];
 	  KeySym  sym = 0;
 	  char c = 0;
 
 	  if (event->xany.type == KeyPress || event->xany.type == KeyRelease)
-		XLookupString (&event->xkey, &c, 1, &sym, 0);
+	    XLookupString (&event->xkey, &c, 1, &sym, 0);
 
 	  if (event->xany.type == ButtonPress &&
-		  event->xbutton.button == Button1)
+	      event->xbutton.button == Button1)
 	  {
-		hp->button_pressed = True;
-		gltrackball_start(hp->trackballs[hp->current_trackball],
-						  event->xbutton.x, event->xbutton.y,
-						  MI_WIDTH(mi), MI_HEIGHT(mi));
-		return True;
+	    hp->button_pressed = True;
+	    gltrackball_start(hp->trackballs[hp->current_trackball],
+	                      event->xbutton.x, event->xbutton.y,
+	                      MI_WIDTH(mi), MI_HEIGHT(mi));
+	    return True;
 	  }
 	  else if (event->xany.type == ButtonRelease &&
-			   event->xbutton.button == Button1)
+	           event->xbutton.button == Button1)
 	  {
-		hp->button_pressed = False;
-		return True;
+	    hp->button_pressed = False;
+	    return True;
 	  }
 	  else if (event->xany.type == KeyPress)
 	  {
-		if (sym == XK_Shift_L || sym == XK_Shift_R)
-		{
-		  hp->current_trackball = 1;
-		  if (hp->button_pressed)
-			gltrackball_start(hp->trackballs[hp->current_trackball],
-							  event->xbutton.x, event->xbutton.y,
-							  MI_WIDTH(mi), MI_HEIGHT(mi));
-		  return True;
-		}
+	    if (sym == XK_Shift_L || sym == XK_Shift_R)
+	    {
+	      hp->current_trackball = 1;
+	      if (hp->button_pressed)
+	        gltrackball_start(hp->trackballs[hp->current_trackball],
+	                          event->xbutton.x, event->xbutton.y,
+	                          MI_WIDTH(mi), MI_HEIGHT(mi));
+	      return True;
+	    }
 	  }
 	  else if (event->xany.type == KeyRelease)
 	  {
-		if (sym == XK_Shift_L || sym == XK_Shift_R)
-		{
-		  hp->current_trackball = 0;
-		  if (hp->button_pressed)
-			gltrackball_start(hp->trackballs[hp->current_trackball],
-							  event->xbutton.x, event->xbutton.y,
-							  MI_WIDTH(mi), MI_HEIGHT(mi));
-		  return True;
-		}
+	    if (sym == XK_Shift_L || sym == XK_Shift_R)
+	    {
+	      hp->current_trackball = 0;
+	      if (hp->button_pressed)
+	        gltrackball_start(hp->trackballs[hp->current_trackball],
+	                          event->xbutton.x, event->xbutton.y,
+	                          MI_WIDTH(mi), MI_HEIGHT(mi));
+	      return True;
+	    }
 	  }
 	  else if (event->xany.type == MotionNotify && hp->button_pressed)
 	  {
-		gltrackball_track(hp->trackballs[hp->current_trackball],
-						  event->xmotion.x, event->xmotion.y,
-						  MI_WIDTH(mi), MI_HEIGHT(mi));
-		return True;
+	    gltrackball_track(hp->trackballs[hp->current_trackball],
+	                      event->xmotion.x, event->xmotion.y,
+	                      MI_WIDTH(mi), MI_HEIGHT(mi));
+	    return True;
 	  }
 
 	  return False;
@@ -835,31 +836,31 @@ ENTRYPOINT void init_hypertorus(ModeInfo *mi)
 {
   hypertorusstruct *hp;
 
-  if (hyper_ == NULL)
+  if (hyper == NULL)
   {
-    hyper_ = (hypertorusstruct *)calloc(MI_NUM_SCREENS(mi),
+    hyper = (hypertorusstruct *)calloc(MI_NUM_SCREENS(mi),
                                        sizeof(hypertorusstruct));
-    if (hyper_ == NULL)
+    if (hyper == NULL)
       return;
   }
-  hp = &hyper_[MI_SCREEN(mi)];
+  hp = &hyper[MI_SCREEN(mi)];
 
   
-  //hp->trackballs[0] = gltrackball_init();
-  //hp->trackballs[1] = gltrackball_init();
-  //hp->current_trackball = 0;
-  //hp->button_pressed = False;
+  hp->trackballs[0] = gltrackball_init();
+  hp->trackballs[1] = gltrackball_init();
+  hp->current_trackball = 0;
+  hp->button_pressed = False;
 
   /* Set the display mode. */
-  if (!_stricmp(mode,"wireframe") || !_stricmp(mode,"0"))
+  if (!strcasecmp(mode,"wireframe") || !strcasecmp(mode,"0"))
   {
     display_mode = DISP_WIREFRAME;
   }
-  else if (!_stricmp(mode,"surface") || !_stricmp(mode,"1"))
+  else if (!strcasecmp(mode,"surface") || !strcasecmp(mode,"1"))
   {
     display_mode = DISP_SURFACE;
   }
-  else if (!_stricmp(mode,"transparent") || !_stricmp(mode,"2"))
+  else if (!strcasecmp(mode,"transparent") || !strcasecmp(mode,"2"))
   {
     display_mode = DISP_TRANSPARENT;
   }
@@ -869,36 +870,36 @@ ENTRYPOINT void init_hypertorus(ModeInfo *mi)
   }
 
   /* Set the appearance. */
-  if (!_stricmp(appear,"solid") || !_stricmp(appear,"0"))
+  if (!strcasecmp(appear,"solid") || !strcasecmp(appear,"0"))
   {
     appearance = APPEARANCE_SOLID;
   }
-  else if (!_stricmp(appear,"bands") || !_stricmp(appear,"1"))
+  else if (!strcasecmp(appear,"bands") || !strcasecmp(appear,"1"))
   {
     appearance = APPEARANCE_BANDS;
     num_spirals = 0;
   }
-  else if (!_stricmp(appear,"spirals-1") || !_stricmp(appear,"3"))
+  else if (!strcasecmp(appear,"spirals-1") || !strcasecmp(appear,"3"))
   {
     appearance = APPEARANCE_SPIRALS;
     num_spirals = 1;
   }
-  else if (!_stricmp(appear,"spirals-2") || !_stricmp(appear,"4"))
+  else if (!strcasecmp(appear,"spirals-2") || !strcasecmp(appear,"4"))
   {
     appearance = APPEARANCE_SPIRALS;
     num_spirals = 2;
   }
-  else if (!_stricmp(appear,"spirals-4") || !_stricmp(appear,"5"))
+  else if (!strcasecmp(appear,"spirals-4") || !strcasecmp(appear,"5"))
   {
     appearance = APPEARANCE_SPIRALS;
     num_spirals = 4;
   }
-  else if (!_stricmp(appear,"spirals-8") || !_stricmp(appear,"6"))
+  else if (!strcasecmp(appear,"spirals-8") || !strcasecmp(appear,"6"))
   {
     appearance = APPEARANCE_SPIRALS;
     num_spirals = 8;
   }
-  else if (!_stricmp(appear,"spirals-16") || !_stricmp(appear,"7"))
+  else if (!strcasecmp(appear,"spirals-16") || !strcasecmp(appear,"7"))
   {
     appearance = APPEARANCE_SPIRALS;
     num_spirals = 16;
@@ -910,11 +911,11 @@ ENTRYPOINT void init_hypertorus(ModeInfo *mi)
   }
 
   /* Set the color mode. */
-  if (!_stricmp(color_mode,"twosided"))
+  if (!strcasecmp(color_mode,"twosided"))
   {
     colors = COLORS_TWOSIDED;
   }
-  else if (!_stricmp(color_mode,"colorwheel"))
+  else if (!strcasecmp(color_mode,"colorwheel"))
   {
     colors = COLORS_COLORWHEEL;
   }
@@ -924,11 +925,11 @@ ENTRYPOINT void init_hypertorus(ModeInfo *mi)
   }
 
   /* Set the 3d projection mode. */
-  if (!_stricmp(proj_3d,"perspective") || !_stricmp(proj_3d,"0"))
+  if (!strcasecmp(proj_3d,"perspective") || !strcasecmp(proj_3d,"0"))
   {
     projection_3d = DISP_3D_PERSPECTIVE;
   }
-  else if (!_stricmp(proj_3d,"orthographic") || !_stricmp(proj_3d,"1"))
+  else if (!strcasecmp(proj_3d,"orthographic") || !strcasecmp(proj_3d,"1"))
   {
     projection_3d = DISP_3D_ORTHOGRAPHIC;
   }
@@ -938,11 +939,11 @@ ENTRYPOINT void init_hypertorus(ModeInfo *mi)
   }
 
   /* Set the 4d projection mode. */
-  if (!_stricmp(proj_4d,"perspective") || !_stricmp(proj_4d,"0"))
+  if (!strcasecmp(proj_4d,"perspective") || !strcasecmp(proj_4d,"0"))
   {
     projection_4d = DISP_4D_PERSPECTIVE;
   }
-  else if (!_stricmp(proj_4d,"orthographic") || !_stricmp(proj_4d,"1"))
+  else if (!strcasecmp(proj_4d,"orthographic") || !strcasecmp(proj_4d,"1"))
   {
     projection_4d = DISP_4D_ORTHOGRAPHIC;
   }
@@ -952,9 +953,9 @@ ENTRYPOINT void init_hypertorus(ModeInfo *mi)
   }
 
   /* make multiple screens rotate at slightly different rates. */
-  hp->speed_scale = (float)(0.9f + frand(0.3));
+  hp->speed_scale = 0.9 + frand(0.3);
 
-  if ((hp->hglrc = init_GL(mi)) != NULL)
+  if ((hp->glx_context = init_GL(mi)) != NULL)
   {
     reshape_hypertorus(mi,MI_WIDTH(mi),MI_HEIGHT(mi));
     glDrawBuffer(GL_BACK);
@@ -973,19 +974,19 @@ ENTRYPOINT void init_hypertorus(ModeInfo *mi)
  */
 ENTRYPOINT void draw_hypertorus(ModeInfo *mi)
 {
-  HDC display = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display          *display = MI_DISPLAY(mi);
+  Window           window = MI_WINDOW(mi);
   hypertorusstruct *hp;
 
-  if (hyper_ == NULL)
+  if (hyper == NULL)
     return;
-  hp = &hyper_[MI_SCREEN(mi)];
+  hp = &hyper[MI_SCREEN(mi)];
 
   MI_IS_DRAWN(mi) = True;
-  if (!hp->hglrc)
+  if (!hp->glx_context)
     return;
 
-  wglMakeCurrent(display,hp->hglrc);
+  glXMakeCurrent(display,window,*(hp->glx_context));
 
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
@@ -997,7 +998,7 @@ ENTRYPOINT void draw_hypertorus(ModeInfo *mi)
 
   glFlush();
 
-  SwapBuffers(display);
+  glXSwapBuffers(display,window);
 }
 
 
@@ -1011,19 +1012,19 @@ ENTRYPOINT void draw_hypertorus(ModeInfo *mi)
 
 ENTRYPOINT void release_hypertorus(ModeInfo *mi)
 {
-  if (hyper_ != NULL)
+  if (hyper != NULL)
   {
     int screen;
 
     for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
     {
-      hypertorusstruct *hp = &hyper_[screen];
+      hypertorusstruct *hp = &hyper[screen];
 
-      if (hp->hglrc)
-        hp->hglrc = NULL;
+      if (hp->glx_context)
+        hp->glx_context = (GLXContext *)NULL;
     }
-    (void) free((void *)hyper_);
-    hyper_ = (hypertorusstruct *)NULL;
+    (void) free((void *)hyper);
+    hyper = (hypertorusstruct *)NULL;
   }
   FreeAllGL(mi);
 }
@@ -1031,16 +1032,16 @@ ENTRYPOINT void release_hypertorus(ModeInfo *mi)
 #ifndef STANDALONE
 ENTRYPOINT void change_hypertorus(ModeInfo *mi)
 {
-  hypertorusstruct *hp = &hyper_[MI_SCREEN(mi)];
+  hypertorusstruct *hp = &hyper[MI_SCREEN(mi)];
 
-  if (!hp->hglrc)
+  if (!hp->glx_context)
     return;
 
-  wglMakeCurrent(MI_DISPLAY(mi), hp->hglrc);
+  glXMakeCurrent(MI_DISPLAY(mi),MI_WINDOW(mi),*(hp->glx_context));
   init(mi);
 }
 #endif /* !STANDALONE */
 
 XSCREENSAVER_MODULE ("Hypertorus", hypertorus)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */

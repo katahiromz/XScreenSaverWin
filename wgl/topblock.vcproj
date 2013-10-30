@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="topblock"
-	ProjectGUID="{75B0D87C-5FB2-499A-9D94-AA5AC4DAE5B2}"
+	ProjectGUID="{A78F0090-A211-4D4C-AC9F-1E9120D0E2E8}"
 	RootNamespace="topblock"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
@@ -48,6 +48,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -122,6 +123,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

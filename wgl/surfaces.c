@@ -39,14 +39,13 @@
 #define RENDER_POINTS             0
 #define RENDER_LINES              1
 #define RENDER_LINE_LOOP          2
-
 #define NUM_RENDER                3
 
 #define DELAY 20000
-#define DEFAULTS                   "*delay:        20000   \n" \
+# define DEFAULTS                   "*delay:        20000   \n" \
                                     "*showFPS:      False   \n"
 
-#define refresh_surface NULL
+# define refresh_surface 0
 
 #if 0
 	#ifdef STANDALONE
@@ -59,11 +58,13 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
 #define DEF_SURFACE      "random"
 #define DEF_MODE         "random"
@@ -81,9 +82,9 @@
 static char *surface_type = "random";
 static char *render_mode = "random";
 static int render;
-static int speed = 300;
+static int speed = 3000;
 static Bool do_spin = True;
-static Bool do_wander = False;
+static Bool do_wander = True;
 
 #if 0
 	static XrmOptionDescRec opts[] = {
@@ -121,6 +122,7 @@ static Bool do_wander = False;
 	  {&speed,        "speed",   "Speed",   DEF_SPEED,   t_Int },
 	};
 
+
 	ENTRYPOINT ModeSpecOpt surface_opts =
 	{countof(opts), opts, countof(vars), vars, NULL};
 #endif
@@ -133,12 +135,11 @@ typedef struct {
 } GL_VECTOR;
 
 typedef struct {
-  //GLXContext *glx_context;
-  HGLRC hglrc;
-  HWND window;
+  GLXContext *glx_context;
+  Window      window;
   rotator    *rot;
-  //trackball_state *trackball;
-  //Bool        button_down_p;
+  trackball_state *trackball;
+  Bool        button_down_p;
 
   int  render;
   Bool random_render;
@@ -173,22 +174,18 @@ static void draw(ModeInfo *mi)
 
   {
     double x, y, z;
-    //get_position(sp->rot, &x, &y, &z, !sp->button_down_p);
-    get_position(sp->rot, &x, &y, &z, !False);
-    glTranslatef((float)((x-0.5)*10), (float)((y-0.5)*10), (float)((z-0.5)*20));
+    get_position(sp->rot, &x, &y, &z, !sp->button_down_p);
+    glTranslatef((x-0.5)*10, (y-0.5)*10, (z-0.5)*20);
 
     /* Do it twice because we don't track the device's orientation. */
-    //glRotatef( current_device_rotation(), 0, 0, 1);
-    glRotatef( 0.0f, 0.0f, 0.0f, 1.0f);
-    //gltrackball_rotate(sp->trackball);
-    //glRotatef(-current_device_rotation(), 0, 0, 1);
-    glRotatef(-0.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef( current_device_rotation(), 0, 0, 1);
+    gltrackball_rotate(sp->trackball);
+    glRotatef(-current_device_rotation(), 0, 0, 1);
 
-    //get_rotation(sp->rot, &x, &y, &z, !sp->button_down_p);
-    get_rotation(sp->rot, &x, &y, &z, !False);
-    glRotatef((float)(x*360), 1.0f, 0.0f, 0.0f);
-    glRotatef((float)(y*360), 0.0f, 1.0f, 0.0f);
-    glRotatef((float)(z*360), 0.0f, 0.0f, 1.0f);
+    get_rotation(sp->rot, &x, &y, &z, !sp->button_down_p);
+    glRotatef(x*360, 1.0, 0.0, 0.0);
+    glRotatef(y*360, 0.0, 1.0, 0.0);
+    glRotatef(z*360, 0.0, 0.0, 1.0);
   }
 
   glScalef(4.0, 4.0, 4.0);
@@ -201,10 +198,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (u=0; u<=6.0*M_PI; u+=sp->du)
         {
-          coord[0] = (float)(sp->a*cos(u)*sin(v));
-          coord[1] = (float)(sp->a*sin(u)*sin(v));
-          coord[2] = (float)(sp->a*(cos(v)+log(tan(0.5*v)))+0.2*sp->b*u);
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = sp->a*cos(u)*sin(v);
+          coord[1] = sp->a*sin(u)*sin(v);
+          coord[2] = sp->a*(cos(v)+log(tan(0.5*v)))+0.2*sp->b*u;
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -217,10 +214,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (v=-M_PI; v<M_PI; v+=sp->dv)
         {
-          coord[0] = (float)(sp->a*(u-(1.0/3.0*u*u*u)+u*v*v));
-          coord[1] = (float)(sp->b*(v-(1.0/3.0*v*v*v)+u*u*v));
-          coord[2] = (float)(u*u-v*v);
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = sp->a*(u-(1.0/3.0*u*u*u)+u*v*v);
+          coord[1] = sp->b*(v-(1.0/3.0*v*v*v)+u*u*v);
+          coord[2] = u*u-v*v;
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -233,10 +230,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (v=M_PI/51; v<M_PI; v+=sp->dv)
         {
-          coord[0] = (float)(2*(cos(u)+u*sin(u))*sin(v)/(1+u*u*sin(v)*sin(v)));
-          coord[1] = (float)(2*(sin(u)-u*cos(u))*sin(v)/(1+u*u*sin(v)*sin(v)));
-          coord[2] = (float)(log(tan(0.5*v))+2*cos(v)/(1+u*u*sin(v)*sin(v)));
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = 2*(cos(u)+u*sin(u))*sin(v)/(1+u*u*sin(v)*sin(v));
+          coord[1] = 2*(sin(u)-u*cos(u))*sin(v)/(1+u*u*sin(v)*sin(v));
+          coord[2] = log(tan(0.5*v))+2*cos(v)/(1+u*u*sin(v)*sin(v));
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -249,10 +246,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (v=-0.735; v<0.74; v+=sp->dv)
         {
-          coord[0] = (float)(cos(u)+v*cos(u/2)*cos(u));
-          coord[1] = (float)(sin(u)+v*cos(u/2)*sin(u));
-          coord[2] = (float)(v*sin(u/2));
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = cos(u)+v*cos(u/2)*cos(u);
+          coord[1] = sin(u)+v*cos(u/2)*sin(u);
+          coord[2] = v*sin(u/2);
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -265,10 +262,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (v=0; v<2*M_PI; v+=sp->dv)
         {
-          coord[0] = (float)(sp->a*(1-v/(2*M_PI))*cos(2*v)*(1+cos(u))+sp->c*cos(2*v));
-          coord[1] = (float)(sp->a*(1-v/(2*M_PI))*sin(2*v)*(1+cos(u))+sp->c*sin(2*v));
-          coord[2] = (float)(2*sp->b*v/(2*M_PI)+sp->a*(1-v/(2*M_PI))*sin(u));
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = sp->a*(1-v/(2*M_PI))*cos(2*v)*(1+cos(u))+sp->c*cos(2*v);
+          coord[1] = sp->a*(1-v/(2*M_PI))*sin(2*v)*(1+cos(u))+sp->c*sin(2*v);
+          coord[2] = 2*sp->b*v/(2*M_PI)+sp->a*(1-v/(2*M_PI))*sin(u);
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -281,10 +278,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (v=-1.085; v<1.09; v+=sp->dv)
         {
-          coord[0] = (float)(u*v*v+3*v*v*v*v);
-          coord[1] = (float)(-2*u*v-4*v*v*v);
-          coord[2] = (float)u;
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = u*v*v+3*v*v*v*v;
+          coord[1] = -2*u*v-4*v*v*v;
+          coord[2] = u;
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -297,10 +294,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (v=-M_PI; v<M_PI; v+=sp->dv)
         {
-          coord[0] = (float)(sp->a*cos(u));
-          coord[1] = (float)(sp->b*cos(v)+sp->a*sin(u));
-          coord[2] = (float)sin(v);
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = sp->a*cos(u);
+          coord[1] = sp->b*cos(v)+sp->a*sin(u);
+          coord[2] = sin(v);
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -313,10 +310,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (u=-1.995; u<2.0; u+=sp->du)
         {
-          coord[0] = (float)(u*v);
-          coord[1] = (float)u;
-          coord[2] = (float)(v*v-2);
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = u*v;
+          coord[1] = u;
+          coord[2] = v*v-2;
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -329,10 +326,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (v=-M_PI; v<M_PI; v+=sp->du)
         {
-          coord[0] = (float)(u*cos(v));
-          coord[1] = (float)(u*sin(v));
-          coord[2] = (float)(2*cos(v)*sin(v));
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = u*cos(v);
+          coord[1] = u*sin(v);
+          coord[2] = 2*cos(v)*sin(v);
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -345,10 +342,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (v=-M_PI; v<M_PI; v+=sp->du)
         {
-          coord[0] = (float)(sinh(1.0/3.0*u)*cos(v)-1.0/3.0*sinh(u)*cos(3.0*v));
-          coord[1] = (float)(sinh(1.0/3.0*u)*sin(v)+1.0/3.0*sinh(u)*sin(3.0*v));
-          coord[2] = (float)(cosh(2.0/3.0*u)*cos(2.0*v));
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = sinh(1.0/3.0*u)*cos(v)-1.0/3.0*sinh(u)*cos(3.0*v);
+          coord[1] = sinh(1.0/3.0*u)*sin(v)+1.0/3.0*sinh(u)*sin(3.0*v);
+          coord[2] = cosh(2.0/3.0*u)*cos(2.0*v);
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -361,10 +358,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (u=-2*M_PI; u<2*M_PI+0.05; u+=sp->dv)
         {
-          coord[0] = (float)(0.33*(u-sin(u)*cosh(v)));
-          coord[1] = (float)(0.33*(1.0-cos(u)*cosh(v)));
-          coord[2] = (float)(0.33*4.0*sin(0.5*u)*sinh(0.5*v));
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = 0.33*(u-sin(u)*cosh(v));
+          coord[1] = 0.33*(1.0-cos(u)*cosh(v));
+          coord[2] = 0.33*4.0*sin(0.5*u)*sinh(0.5*v);
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -377,10 +374,10 @@ static void draw(ModeInfo *mi)
         glBegin(sp->render);
         for (u=-M_PI; u<M_PI; u+=sp->dv)
         {
-          coord[0] = (float)(0.5*(sp->a+2.0)*cos(u)*cos(v));
-          coord[1] = (float)(0.5*(sp->a+2.0)*sin(u)*cos(v));
-          coord[2] = (float)(0.5*(sp->a+2.0)*sin(v)+u);
-          glColor3f((float)(coord[0]+0.7), (float)(coord[1]+0.7), (float)(coord[2]+0.7));
+          coord[0] = 0.5*(sp->a+2.0)*cos(u)*cos(v);
+          coord[1] = 0.5*(sp->a+2.0)*sin(u)*cos(v);
+          coord[2] = 0.5*(sp->a+2.0)*sin(v)+u;
+          glColor3f(coord[0]+0.7, coord[1]+0.7, coord[2]+0.7);
           glVertex3fv(coord);
           mi->polygon_count++;
         }
@@ -393,9 +390,9 @@ static void draw(ModeInfo *mi)
   if (sp->render == GL_LINES)
     mi->polygon_count /= 2;
 
-  sp->a = (float)sin(sp->draw_step+=0.01f);
-  sp->b = (float)cos(sp->draw_step+=0.01f);
-  sp->c = (float)sin(sp->draw_step+0.25*M_PI);
+  sp->a = sin(sp->draw_step+=0.01);
+  sp->b = cos(sp->draw_step+=0.01);
+  sp->c = sin(sp->draw_step+0.25*M_PI);
 
   if (sp->random_surface || sp->random_render)
   {
@@ -450,7 +447,6 @@ ENTRYPOINT void reshape_surface(ModeInfo *mi, int width, int height)
     
   glClear(GL_COLOR_BUFFER_BIT);
 }
-
 
 #if 0
 	ENTRYPOINT Bool surface_handle_event(ModeInfo *mi, XEvent *event)
@@ -514,70 +510,70 @@ ENTRYPOINT void init_surface(ModeInfo *mi)
                            1.0,
                            do_wander ? wander_speed : 0,
                            True);
-    //sp->trackball = gltrackball_init ();
+    sp->trackball = gltrackball_init ();
   }
 
-  if (!_stricmp(surface_type,"random"))
+  if (!strcasecmp(surface_type,"random"))
   {
     sp->random_surface = True;
     sp->surface = random() % NUM_SURFACES;
   }
-  else if (!_stricmp(surface_type,"dini"))
+  else if (!strcasecmp(surface_type,"dini"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_DINI;
   }
-  else if (!_stricmp(surface_type,"enneper"))
+  else if (!strcasecmp(surface_type,"enneper"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_ENNEPER;
   }
-  else if (!_stricmp(surface_type,"kuen"))
+  else if (!strcasecmp(surface_type,"kuen"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_KUEN;
   }
-  else if (!_stricmp(surface_type,"moebius"))
+  else if (!strcasecmp(surface_type,"moebius"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_MOEBIUS;
   }
-  else if (!_stricmp(surface_type,"seashell"))
+  else if (!strcasecmp(surface_type,"seashell"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_SEASHELL;
   }
-  else if (!_stricmp(surface_type,"swallowtail"))
+  else if (!strcasecmp(surface_type,"swallowtail"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_SWALLOWTAIL;
   }
-  else if (!_stricmp(surface_type,"bohemian"))
+  else if (!strcasecmp(surface_type,"bohemian"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_BOHEMIAN;
   }
-  else if (!_stricmp(surface_type,"whitney"))
+  else if (!strcasecmp(surface_type,"whitney"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_WHITNEY;
   }
-  else if (!_stricmp(surface_type,"pluecker"))
+  else if (!strcasecmp(surface_type,"pluecker"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_PLUECKER;
   }
-  else if (!_stricmp(surface_type,"henneberg"))
+  else if (!strcasecmp(surface_type,"henneberg"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_HENNEBERG;
   }
-  else if (!_stricmp(surface_type,"catalan"))
+  else if (!strcasecmp(surface_type,"catalan"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_CATALAN;
   }
-  else if (!_stricmp(surface_type,"corkscrew"))
+  else if (!strcasecmp(surface_type,"corkscrew"))
   {
     sp->random_surface = False;
     sp->surface = SURFACE_CORKSCREW;
@@ -588,22 +584,22 @@ ENTRYPOINT void init_surface(ModeInfo *mi)
     sp->surface = random() % NUM_SURFACES;
   }
 
-  if (!_stricmp(render_mode,"random"))
+  if (!strcasecmp(render_mode,"random"))
   {
     sp->random_render = True;
     render = random() % NUM_RENDER;
   }
-  else if (!_stricmp(render_mode,"points"))
+  else if (!strcasecmp(render_mode,"points"))
   {
     sp->random_render = False;
     render = RENDER_POINTS;
   }
-  else if (!_stricmp(render_mode,"lines"))
+  else if (!strcasecmp(render_mode,"lines"))
   {
     sp->random_render = False;
     render = RENDER_LINES;
   }
-  else if (!_stricmp(render_mode,"line-loops"))
+  else if (!strcasecmp(render_mode,"line-loops"))
   {
     sp->random_render = False;
     render = RENDER_LINE_LOOP;
@@ -637,12 +633,12 @@ ENTRYPOINT void init_surface(ModeInfo *mi)
 
   sp->frame = 0;
 
-  sp->du = 0.07f;
-  sp->dv = 0.07f;
+  sp->du = 0.07;
+  sp->dv = 0.07;
   sp->a = sp->b = 1;
-  sp->c = 0.1f;
+  sp->c = 0.1;
 
-  if ((sp->hglrc = init_GL(mi)) != NULL)
+  if ((sp->glx_context = init_GL(mi)) != NULL)
   {
     reshape_surface(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
   }
@@ -656,20 +652,20 @@ ENTRYPOINT void init_surface(ModeInfo *mi)
 ENTRYPOINT void draw_surface(ModeInfo * mi)
 {
   surfacestruct *sp = &surface[MI_SCREEN(mi)];
-  HDC display = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display *display = MI_DISPLAY(mi);
+  Window window = MI_WINDOW(mi);
 
-  if (!sp->hglrc)
+  if (!sp->glx_context)
     return;
 
   glDrawBuffer(GL_BACK);
 
-  wglMakeCurrent(display, sp->hglrc);
+  glXMakeCurrent(display, window, *(sp->glx_context));
   draw(mi);
   if (mi->fps_p)
     do_fps(mi);
   glFinish();
-  SwapBuffers(display);
+  glXSwapBuffers(display, window);
 }
 
 
@@ -683,10 +679,10 @@ ENTRYPOINT void release_surface(ModeInfo * mi)
     {
       surfacestruct *sp = &surface[screen];
 
-      if (sp->hglrc)
+      if (sp->glx_context)
       {
         /* Display lists MUST be freed while their glXContext is current. */
-        wglMakeCurrent(MI_DISPLAY(mi), sp->hglrc);
+        glXMakeCurrent(MI_DISPLAY(mi), sp->window, *(sp->glx_context));
       }
     }
     (void) free((void *)surface);
@@ -698,4 +694,4 @@ ENTRYPOINT void release_surface(ModeInfo * mi)
 
 XSCREENSAVER_MODULE_2("Surfaces", surfaces, surface)
 
-//#endif
+#endif

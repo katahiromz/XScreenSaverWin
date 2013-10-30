@@ -22,21 +22,24 @@
                    "*showFPS:       False         \n" \
                    "*wireframe:     False         \n"
 
-#define refresh_rubikblocks NULL
+# define refresh_rubikblocks 0
 
 //#include "xlockmore.h"
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
 
 #include "rotator.h"
 //#include "gltrackball.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
 #define DEF_SPIN        "True"
 #define DEF_WANDER      "True"
@@ -63,7 +66,7 @@
 /*************************************************************************/
 
 static Bool spin = True, wander = True, rndstart = False, tex = True;
-static float spinspeed = 0.1f, tspeed = 3.0f, wspeed = 0.005f, twait = 40.0f, size = 1.0f;
+static float spinspeed = 0.1, tspeed = 3.0, wspeed = 0.005, twait = 40.0, size = 1.0;
 
 #if 0
 	static argtype vars[] = {
@@ -113,12 +116,11 @@ typedef struct {
 } piece_t;
 
 typedef struct {
-  //GLXContext    *glx_context;
-  HGLRC hglrc;
+  GLXContext    *glx_context;
   rotator       *rot;
-  //trackball_state *trackball;
+  trackball_state *trackball;
   GLfloat       ratio;
-  //Bool          button_down;
+  Bool          button_down;
 
   Bool          pause;          /* pause between two rotations */
   float         qfram[4];       /* quaternion describing the rotation in one anim. frame */
@@ -132,16 +134,16 @@ typedef struct {
 
 static rubikblocks_conf *rubikblocks = NULL;
 
-static const GLfloat shininess = 20.0f;
-static const GLfloat ambient[] = {0.0f, 0.0f, 0.0f, 1.0f};
-static const GLfloat diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
-static const GLfloat position0[] = {1.0f, 1.0f, 1.0f, 0.0f};
-static const GLfloat position1[] = {-1.0f, -1.0f, 1.0f, 0.0f};
-static const GLfloat lmodel_ambient[] = {0.1f, 0.1f, 0.1f, 1.0f};
-static const GLfloat material_ambient[] = {0.7f, 0.7f, 0.7f, 1.0f};
-static const GLfloat material_diffuse[] = {0.7f, 0.7f, 0.7f, 1.0f};
-static const GLfloat material_specular[] = {0.2f, 0.2f, 0.2f, 1.0f};
-static const GLfloat zpos = -18.0f;
+static const GLfloat shininess = 20.0;
+static const GLfloat ambient[] = {0.0, 0.0, 0.0, 1.0};
+static const GLfloat diffuse[] = {1.0, 1.0, 1.0, 1.0};
+static const GLfloat position0[] = {1.0, 1.0, 1.0, 0.0};
+static const GLfloat position1[] = {-1.0, -1.0, 1.0, 0.0};
+static const GLfloat lmodel_ambient[] = {0.1, 0.1, 0.1, 1.0};
+static const GLfloat material_ambient[] = {0.7, 0.7, 0.7, 1.0};
+static const GLfloat material_diffuse[] = {0.7, 0.7, 0.7, 1.0};
+static const GLfloat material_specular[] = {0.2, 0.2, 0.2, 1.0};
+static const GLfloat zpos = -18.0;
 
 /*************************************************************************/
 
@@ -185,22 +187,18 @@ flag_pieces(piece_t pieces[27], int axis, int side)
   }
 }
 
-#ifndef M_SQRT1_2
-#define M_SQRT1_2	0.70710678118654752440
-#endif
-
 /* "Rounds" the value to the nearest from the set {0, +-1/2, +-1/sqrt(2), +-1}.
  * It is guaranteed to be pretty close to one when this function is called. */
 static float 
 settle_value(float v) 
 {
-  if(v > 0.9) return 1.0f;
-  else if(v < -0.9) return -1.0f;
-  else if(v > 0.6) return (float)M_SQRT1_2;
-  else if(v < -0.6) return (float)-M_SQRT1_2;
-  else if(v > 0.4) return 0.5f;
-  else if(v < -0.4) return -0.5f;
-  else return 0.0f;
+  if(v > 0.9) return 1;
+  else if(v < -0.9) return -1;
+  else if(v > 0.6) return M_SQRT1_2;
+  else if(v < -0.6) return -M_SQRT1_2;
+  else if(v > 0.4) return 0.5;
+  else if(v < -0.4) return -0.5;
+  else return 0;
 }
 
 static void 
@@ -215,8 +213,8 @@ randomize(rubikblocks_conf *cp)
     flag_pieces(cp->pieces, axis, side);
     for(j = 1; j < 4; j++)
       cp->qfram[j] = 0;
-    cp->qfram[0] = (float)M_SQRT1_2;
-    cp->qfram[axis] = (float)M_SQRT1_2;
+    cp->qfram[0] = M_SQRT1_2;
+    cp->qfram[axis] = M_SQRT1_2;
     for(j = 0; j < 27; j++)
     {
       if(cp->pieces[j].act)
@@ -248,11 +246,11 @@ finish(rubikblocks_conf *cp)
     angle = rnd01()+1;
     flag_pieces(cp->pieces, axis, side);
     cp->pause = False;
-    cp->tmax = (float)(90.0*angle);
+    cp->tmax = 90.0*angle;
     for(i = 1; i < 4; i++)
       cp->qfram[i] = 0;
-    cp->qfram[0] = (float)cos(tspeed*M_PI/360);
-    cp->qfram[axis] = (float)(sin((rnd01()*2-1)*tspeed*M_PI/360));
+    cp->qfram[0] = cos(tspeed*M_PI/360);
+    cp->qfram[axis] = sin((rnd01()*2-1)*tspeed*M_PI/360);
   }
   else
   {
@@ -277,25 +275,21 @@ draw_main(ModeInfo *mi, rubikblocks_conf *cp)
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
-  //get_position(cp->rot, &x, &y, &z, !cp->button_down);
-  get_position(cp->rot, &x, &y, &z, !False);
-  glTranslatef((float)((x-0.5)*6), (float)((y-0.5)*6), -20.0f);
+  get_position(cp->rot, &x, &y, &z, !cp->button_down);
+  glTranslatef((x-0.5)*6, (y-0.5)*6, -20);
 
   /* Do it twice because we don't track the device's orientation. */
-  //glRotatef( current_device_rotation(), 0, 0, 1);
-  glRotatef( 0.0f, 0.0f, 0.0f, 1.0f);
-  //gltrackball_rotate(cp->trackball);
-  //glRotatef(-current_device_rotation(), 0, 0, 1);
-  glRotatef(-0.0f, 0.0f, 0.0f, 1.0f);
+  glRotatef( current_device_rotation(), 0, 0, 1);
+  gltrackball_rotate(cp->trackball);
+  glRotatef(-current_device_rotation(), 0, 0, 1);
 
-  //get_rotation(cp->rot, &x, &y, &z, !cp->button_down);
-  get_rotation(cp->rot, &x, &y, &z, !False);
-  glRotatef((float)(x*360.0f), 1.0f, 0.0f, 0.0f);
-  glRotatef((float)(y*360.0f), 0.0f, 1.0f, 0.0f);
-  glRotatef((float)(z*360.0f), 0.0f, 0.0f, 1.0f);
+  get_rotation(cp->rot, &x, &y, &z, !cp->button_down);
+  glRotatef(x*360, 1, 0, 0);
+  glRotatef(y*360, 0, 1, 0);
+  glRotatef(z*360, 0, 0, 1);
   glScalef(size, size, size);
 
-  if(cp->wire) glColor3f(0.7f, 0.7f, 0.7f);
+  if(cp->wire) glColor3f(0.7, 0.7, 0.7);
   if(!cp->pause)
     for(i = 0; i < 27; i++)
       if(cp->pieces[i].act)
@@ -304,8 +298,8 @@ draw_main(ModeInfo *mi, rubikblocks_conf *cp)
   {
     glPushMatrix();
     if(fabs(cp->pieces[i].qr[0]) < 1)
-      glRotatef((float)(360/M_PI*acos(cp->pieces[i].qr[0])),
-          (float)cp->pieces[i].qr[1], (float)cp->pieces[i].qr[2], (float)cp->pieces[i].qr[3]);
+      glRotatef(360/M_PI*acos(cp->pieces[i].qr[0]),
+          cp->pieces[i].qr[1], cp->pieces[i].qr[2], cp->pieces[i].qr[3]);
     glCallList(cp->list_base + i);
     glPopMatrix();
   }
@@ -359,27 +353,27 @@ make_texture(rubikblocks_conf *cp)
 static float 
 fx(float x)
 {
-  const float A = 0.5f;
-  if(x > 1.4) return 1.5f - A;
-  else if(x < -1.4f) return -1.5f - A;
+  const float A = 0.5;
+  if(x > 1.4) return 1.5 - A;
+  else if(x < -1.4) return -1.5 - A;
   else return x;
 }
 
 static float 
 fy(float y)
 {
-  const float B = 0.25f;
-  if(y > 1.4f) return 1.5f - B;
-  else if(y < -1.4f) return -1.5f - B;
+  const float B = 0.25;
+  if(y > 1.4) return 1.5 - B;
+  else if(y < -1.4) return -1.5 - B;
   else return y;
 }
 
 static float 
 fz(float z)
 {
-  const float C = 0.0f;
-  if(z > 1.4f) return 1.5f - C;
-  else if(z < -1.4f) return -1.5f - C;
+  const float C = 0.0;
+  if(z > 1.4) return 1.5 - C;
+  else if(z < -1.4) return -1.5 - C;
   else return z;
 }
 
@@ -397,50 +391,50 @@ init_lists(rubikblocks_conf *cp)
     z = cp->pieces[i].pos[2];
     glNewList(base+i, GL_COMPILE);
     glBegin(GL_QUAD_STRIP);
-    glNormal3f(1.0f, 0.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(fx((float)(x+0.5)), fy((float)(y-0.5)), fz((float)(z-0.5)));
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(fx((float)(x+0.5)), fy((float)(y+0.5)), fz((float)(z-0.5)));
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(fx((float)(x+0.5)), fy((float)(y-0.5)), fz((float)(z+0.5)));
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(fx((float)(x+0.5)), fy((float)(y+0.5)), fz((float)(z+0.5)));
-    glNormal3f(0.0f, 0.0f, 1.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(fx((float)(x-0.5)), fy((float)(y-0.5)), fz((float)(z+0.5)));
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(fx((float)(x-0.5)), fy((float)(y+0.5)), fz((float)(z+0.5)));
-    glNormal3f(-1.0f, 0.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(fx((float)(x-0.5)), fy((float)(y-0.5)), fz((float)(z-0.5)));
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(fx((float)(x-0.5)), fy((float)(y+0.5)), fz((float)(z-0.5)));
-    glNormal3f(0.0f, 0.0f, -1.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(fx((float)(x+0.5)), fy((float)(y-0.5)), fz((float)(z-0.5)));
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(fx((float)(x+0.5)), fy((float)(y+0.5)), fz((float)(z-0.5)));
+    glNormal3f(1, 0, 0);
+    glTexCoord2f(0, 0);
+    glVertex3f(fx(x+0.5), fy(y-0.5), fz(z-0.5));
+    glTexCoord2f(0, 1);
+    glVertex3f(fx(x+0.5), fy(y+0.5), fz(z-0.5));
+    glTexCoord2f(1, 0);
+    glVertex3f(fx(x+0.5), fy(y-0.5), fz(z+0.5));
+    glTexCoord2f(1, 1);
+    glVertex3f(fx(x+0.5), fy(y+0.5), fz(z+0.5));
+    glNormal3f(0, 0, 1);
+    glTexCoord2f(0, 0);
+    glVertex3f(fx(x-0.5), fy(y-0.5), fz(z+0.5));
+    glTexCoord2f(0, 1);
+    glVertex3f(fx(x-0.5), fy(y+0.5), fz(z+0.5));
+    glNormal3f(-1, 0, 0);
+    glTexCoord2f(1, 0);
+    glVertex3f(fx(x-0.5), fy(y-0.5), fz(z-0.5));
+    glTexCoord2f(1, 1);
+    glVertex3f(fx(x-0.5), fy(y+0.5), fz(z-0.5));
+    glNormal3f(0, 0, -1);
+    glTexCoord2f(0, 0);
+    glVertex3f(fx(x+0.5), fy(y-0.5), fz(z-0.5));
+    glTexCoord2f(0, 1);
+    glVertex3f(fx(x+0.5), fy(y+0.5), fz(z-0.5));
     glEnd();
     glBegin(GL_QUADS);
-    glNormal3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(fx((float)(x+0.5)), fy((float)(y+0.5)), fz((float)(z+0.5)));
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(fx((float)(x+0.5)), fy((float)(y+0.5)), fz((float)(z-0.5)));
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(fx((float)(x-0.5)), fy((float)(y+0.5)), fz((float)(z-0.5)));
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(fx((float)(x-0.5)), fy((float)(y+0.5)), fz((float)(z+0.5)));
-    glNormal3f(0.0f, -1.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(fx((float)(x+0.5)), fy((float)(y-0.5)), fz((float)(z-0.5)));
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(fx((float)(x+0.5)), fy((float)(y-0.5)), fz((float)(z+0.5)));
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(fx((float)(x-0.5)), fy((float)(y-0.5)), fz((float)(z+0.5)));
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(fx((float)(x-0.5)), fy((float)(y-0.5)), fz((float)(z-0.5)));
+    glNormal3f(0, 1, 0);
+    glTexCoord2f(0, 0);
+    glVertex3f(fx(x+0.5), fy(y+0.5), fz(z+0.5));
+    glTexCoord2f(0, 1);
+    glVertex3f(fx(x+0.5), fy(y+0.5), fz(z-0.5));
+    glTexCoord2f(1, 1);
+    glVertex3f(fx(x-0.5), fy(y+0.5), fz(z-0.5));
+    glTexCoord2f(1, 0);
+    glVertex3f(fx(x-0.5), fy(y+0.5), fz(z+0.5));
+    glNormal3f(0, -1, 0);
+    glTexCoord2f(0, 0);
+    glVertex3f(fx(x+0.5), fy(y-0.5), fz(z-0.5));
+    glTexCoord2f(0, 1);
+    glVertex3f(fx(x+0.5), fy(y-0.5), fz(z+0.5));
+    glTexCoord2f(1, 1);
+    glVertex3f(fx(x-0.5), fy(y-0.5), fz(z+0.5));
+    glTexCoord2f(1, 0);
+    glVertex3f(fx(x-0.5), fy(y-0.5), fz(z-0.5));
     glEnd();
     glEndList();
   }
@@ -532,9 +526,9 @@ init_cp(rubikblocks_conf *cp)
     for(j = -1; j <= 1; j++)
       for(k = -1; k <= 1; k++)
       {
-        cp->pieces[m].pos[0] = (float)k;
-        cp->pieces[m].pos[1] = (float)j;
-        cp->pieces[m].pos[2] = (float)i;
+        cp->pieces[m].pos[0] = k;
+        cp->pieces[m].pos[1] = j;
+        cp->pieces[m].pos[2] = i;
         cp->pieces[m].qr[0] = 1;
         cp->pieces[m].qr[1] = 0;
         cp->pieces[m].qr[2] = 0;
@@ -544,7 +538,7 @@ init_cp(rubikblocks_conf *cp)
 
   cp->rot = make_rotator(spin?spinspeed:0, spin?spinspeed:0, spin?spinspeed:0,
       0.1, wander?wspeed:0, True);
-  //cp->trackball = gltrackball_init();
+  cp->trackball = gltrackball_init();
 
   if(rndstart) randomize(cp);
 }
@@ -574,8 +568,8 @@ release_rubikblocks(ModeInfo *mi)
     for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) 
     {
       rubikblocks_conf *cp = &rubikblocks[screen];
-      if (cp->hglrc) {
-        cp->hglrc = NULL;
+      if (cp->glx_context) {
+        cp->glx_context = NULL;
       }
     }
     free((void *)rubikblocks);
@@ -598,7 +592,7 @@ init_rubikblocks(ModeInfo *mi)
   if(tex)
     make_texture(cp);
 
-  if ((cp->hglrc = init_GL(mi)) != NULL) 
+  if ((cp->glx_context = init_GL(mi)) != NULL) 
   {
     init_gl(mi);
     init_cp(cp);
@@ -614,15 +608,15 @@ init_rubikblocks(ModeInfo *mi)
 ENTRYPOINT void 
 draw_rubikblocks(ModeInfo * mi) 
 {
-  HDC display = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display *display = MI_DISPLAY(mi);
+  Window window = MI_WINDOW(mi);
   rubikblocks_conf *cp;
   if (!rubikblocks) return;
   cp = &rubikblocks[MI_SCREEN(mi)];
   MI_IS_DRAWN(mi) = True;
-  if (!cp->hglrc) return;
+  if (!cp->glx_context) return;
   mi->polygon_count = 0;
-  wglMakeCurrent(display, cp->hglrc);
+  glXMakeCurrent(display, window, *(cp->glx_context));
   if (!draw_main(mi, cp)) 
   {
     release_rubikblocks(mi);
@@ -630,7 +624,7 @@ draw_rubikblocks(ModeInfo * mi)
   }
   if (MI_IS_FPS(mi)) do_fps (mi);
   glFlush();
-  SwapBuffers(display);
+  glXSwapBuffers(display, window);
 }
 
 #ifndef STANDALONE
@@ -638,8 +632,8 @@ ENTRYPOINT void
 change_rubikblocks(ModeInfo * mi) 
 {
   rubikblocks_conf *cp = &rubikblocks[MI_SCREEN(mi)];
-  if (!cp->hglrc) return;
-  wglMakeCurrent(MI_DISPLAY(mi), cp->hglrc);
+  if (!cp->glx_context) return;
+  glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(cp->glx_context));
   init_gl(mi);
 }
 #endif /* !STANDALONE */
@@ -681,4 +675,4 @@ change_rubikblocks(ModeInfo * mi)
 
 XSCREENSAVER_MODULE ("RubikBlocks", rubikblocks)
 
-//#endif
+#endif

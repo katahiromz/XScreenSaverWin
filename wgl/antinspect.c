@@ -19,7 +19,7 @@
 #define DEFAULTS	    "*delay:   20000   \n" \
 			    "*showFPS: False   \n"
 
-#define refresh_antinspect NULL
+# define refresh_antinspect 0
 
 #if 0
 	#ifdef STANDALONE
@@ -44,6 +44,8 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "win32.h"
@@ -52,7 +54,7 @@
 
 #define DEF_SHADOWS  "True"
 
-static int shadows;
+static int shadows = True;
 
 #if 0
 	static XrmOptionDescRec opts[] = {
@@ -102,30 +104,30 @@ typedef struct {
   GLint       WindH, WindW;
   GLfloat     step;
   GLfloat     ant_position;
-  HGLRC       hglrc;
-  //GLXContext *glx_context;
-  //trackball_state *trackball;
-  //Bool        button_down_p;
+  GLXContext *glx_context;
+  trackball_state *trackball;
+  Bool        button_down_p;
   int linewidth;
   float ant_step;
+
 } antinspectstruct;
 
-static const float front_shininess[] = {60.0f};
-static const float front_specular[] =  {0.7f, 0.7f, 0.7f, 1.0f};
-static const float ambient[] = {0.0f, 0.0f, 0.0f, 1.0f};
-static const float diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
-static float position0[] = {0.0f, 3.0f, 0.0f, 1.0f};
-static const float position1[] = {-1.0f, -3.0f, 1.0f, 0.0f};
-static const float lmodel_ambient[] = {0.5f, 0.5f, 0.5f, 1.0f};
+static const float front_shininess[] = {60.0};
+static const float front_specular[] =  {0.7, 0.7, 0.7, 1.0};
+static const float ambient[] = {0.0, 0.0, 0.0, 1.0};
+static const float diffuse[] = {1.0, 1.0, 1.0, 1.0};
+static float position0[] = {0.0, 3.0, 0.0, 1.0};
+static const float position1[] = {-1.0, -3.0, 1.0, 0.0};
+static const float lmodel_ambient[] = {0.5, 0.5, 0.5, 1.0};
 static const float lmodel_twoside[] = {GL_TRUE};
 
-static const float MaterialRed[] =     {0.6f, 0.0f, 0.0f, 1.0f};
-static const float MaterialOrange[] =  {1.0f, 0.69f, 0.00f, 1.0f};
-static const float MaterialGray[] =    {0.2f, 0.2f, 0.2f, 1.0f};
-static const float MaterialBlack[] =   {0.1f, 0.1f, 0.1f, 0.4f};
-static const float MaterialShadow[] =   {0.3f, 0.3f, 0.3f, 0.3f};
-static const float MaterialGray5[] =   {0.5f, 0.5f, 0.5f, 0.3f};
-static const float MaterialGray6[] =   {0.6f, 0.6f, 0.6f, 1.0f};
+static const float MaterialRed[] =     {0.6, 0.0, 0.0, 1.0};
+static const float MaterialOrange[] =  {1.0, 0.69, 0.00, 1.0};
+static const float MaterialGray[] =    {0.2, 0.2, 0.2, 1.0};
+static const float MaterialBlack[] =   {0.1, 0.1, 0.1, 0.4};
+static const float MaterialShadow[] =   {0.3, 0.3, 0.3, 0.3};
+static const float MaterialGray5[] =   {0.5, 0.5, 0.5, 0.3};
+static const float MaterialGray6[] =   {0.6, 0.6, 0.6, 1.0};
 
 static antinspectstruct *antinspect = (antinspectstruct *) NULL;
 
@@ -168,7 +170,7 @@ static void shadowmatrix(GLfloat shadowMat[4][4],
   shadowMat[3][3] = dot - lightpos[W] * groundplane[W];
 }
 
-static const GLfloat ground[4] = {0.0f, 1.0f, 0.0f, -0.00001f};
+static const GLfloat ground[4] = {0.0, 1.0, 0.0, -0.00001};
 
 /* simple filled sphere */
 static Bool mySphere(float radius) 
@@ -224,12 +226,12 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
                                 const float *Material, int mono,
                                 Bool (*sphere)(float), Bool (*cone)(float)) 
 {
-  float       cos1 = COSF(mp->ant_step);
-  float       cos2 = COSF(mp->ant_step + 2 * Pi / 3);
-  float       cos3 = COSF(mp->ant_step + 4 * Pi / 3);
-  float       sin1 = SINF(mp->ant_step);
-  float       sin2 = SINF(mp->ant_step + 2 * Pi / 3);
-  float       sin3 = SINF(mp->ant_step + 4 * Pi / 3);
+  float       cos1 = cos(mp->ant_step);
+  float       cos2 = cos(mp->ant_step + 2 * Pi / 3);
+  float       cos3 = cos(mp->ant_step + 4 * Pi / 3);
+  float       sin1 = sin(mp->ant_step);
+  float       sin2 = sin(mp->ant_step + 2 * Pi / 3);
+  float       sin3 = sin(mp->ant_step + 4 * Pi / 3);
   
   if (mono)
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialGray5);
@@ -237,30 +239,30 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Material);
   glEnable(GL_CULL_FACE);
   glPushMatrix();
-  glScalef(1.f, 1.3f, 1.f);
-  if (!((*sphere)(0.18f)))
+  glScalef(1, 1.3, 1);
+  if (!((*sphere)(0.18)))
     return False;
-  glScalef(1.0f, 1.0f / 1.3f, 1.0f);
-  glTranslatef(0.00f, 0.30f, 0.00f);
-  if (!((*sphere)(0.2f)))
+  glScalef(1, 1 / 1.3, 1);
+  glTranslatef(0.00, 0.30, 0.00);
+  if (!((*sphere)(0.2)))
     return False;
   
-  glTranslatef(-0.05f, 0.17f, 0.05f);
-  glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-  glRotatef(-25.0f, 0.0f, 1.0f, 0.0f);
-  if (!((*cone)(0.05f)))
+  glTranslatef(-0.05, 0.17, 0.05);
+  glRotatef(-90, 1, 0, 0);
+  glRotatef(-25, 0, 1, 0);
+  if (!((*cone)(0.05)))
     return False;
-  glTranslatef(0.00f, 0.10f, 0.00f);
-  if (!((*cone)(0.05f)))
+  glTranslatef(0.00, 0.10, 0.00);
+  if (!((*cone)(0.05)))
     return False;
-  glRotatef(25.0f, 0.0f, 1.0f, 0.0f);
-  glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+  glRotatef(25, 0, 1, 0);
+  glRotatef(90, 1, 0, 0);
   
-  glScalef(1.0f, 1.3f, 1.0f);
-  glTranslatef(0.15f, -0.65f, 0.05f);
+  glScalef(1, 1.3, 1);
+  glTranslatef(0.15, -0.65, 0.05);
   if (!((*sphere)(0.25)))
     return False;
-  glScalef(1.0f, 1.0f / 1.3f, 1.0f);
+  glScalef(1, 1 / 1.3, 1);
   glPopMatrix();
   glDisable(GL_CULL_FACE);
   
@@ -272,17 +274,17 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
     glColor3fv(MaterialGray5);
   else
     glColor3fv(Material);
-  glVertex3f(0.00f, 0.30f, 0.00f);
+  glVertex3f(0.00, 0.30, 0.00);
   glColor3fv(MaterialGray);
-  glVertex3f(0.40f, 0.70f, 0.40f);
+  glVertex3f(0.40, 0.70, 0.40);
   mi->polygon_count++;
   if (mono)
     glColor3fv(MaterialGray5);
   else
     glColor3fv(Material);
-  glVertex3f(0.00f, 0.30f, 0.00f);
+  glVertex3f(0.00, 0.30, 0.00);
   glColor3fv(MaterialGray);
-  glVertex3f(0.40f, 0.70f, -0.40f);
+  glVertex3f(0.40, 0.70, -0.40);
   mi->polygon_count++;
   glEnd();
   glBegin(GL_POINTS);
@@ -290,9 +292,9 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
     glColor3fv(MaterialGray6);
   else
     glColor3fv(Material);
-  glVertex3f(0.40f, 0.70f, 0.40f);
+  glVertex3f(0.40, 0.70, 0.40);
   mi->polygon_count++;
-  glVertex3f(0.40f, 0.70f, -0.40f);
+  glVertex3f(0.40, 0.70, -0.40);
   mi->polygon_count++;
   glEnd();
   
@@ -302,11 +304,11 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
     glColor3fv(MaterialGray5);
   else
     glColor3fv(Material);
-  glVertex3f(0.00f, 0.05f, 0.18f);
-  glVertex3f(0.35f + 0.05f * cos1, 0.15f, 0.25f);
+  glVertex3f(0.00, 0.05, 0.18);
+  glVertex3f(0.35 + 0.05 * cos1, 0.15, 0.25);
   mi->polygon_count++;
   glColor3fv(MaterialGray);
-  glVertex3f(-0.20f + 0.05f * cos1, 0.25f + 0.1f * sin1, 0.45f);
+  glVertex3f(-0.20 + 0.05 * cos1, 0.25 + 0.1 * sin1, 0.45);
   mi->polygon_count++;
   glEnd();
   
@@ -316,11 +318,11 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
     glColor3fv(MaterialGray5);
   else
     glColor3fv(Material);
-  glVertex3f(0.00f, 0.00f, 0.18f);
-  glVertex3f(0.35f + 0.05f * cos2, 0.00f, 0.25f);
+  glVertex3f(0.00, 0.00, 0.18);
+  glVertex3f(0.35 + 0.05 * cos2, 0.00, 0.25);
   mi->polygon_count++;
   glColor3fv(MaterialGray);
-  glVertex3f(-0.20f + 0.05f * cos2, 0.00f + 0.1f * sin2, 0.45f);
+  glVertex3f(-0.20 + 0.05 * cos2, 0.00 + 0.1 * sin2, 0.45);
   mi->polygon_count++;
   glEnd();
   mi->polygon_count++;
@@ -331,11 +333,11 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
     glColor3fv(MaterialGray5);
   else
     glColor3fv(Material);
-  glVertex3f(0.00f, -0.05f, 0.18f);
-  glVertex3f(0.35f + 0.05f * cos3, -0.15f, 0.25f);
+  glVertex3f(0.00, -0.05, 0.18);
+  glVertex3f(0.35 + 0.05 * cos3, -0.15, 0.25);
   mi->polygon_count++;
   glColor3fv(MaterialGray);
-  glVertex3f(-0.20f + 0.05f * cos3, -0.25f + 0.1f * sin3, 0.45f);
+  glVertex3f(-0.20 + 0.05 * cos3, -0.25 + 0.1 * sin3, 0.45);
   mi->polygon_count++;
   glEnd();
   
@@ -345,11 +347,11 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
     glColor3fv(MaterialGray5);
   else
     glColor3fv(Material);
-  glVertex3f(0.00f, 0.05f, -0.18f);
-  glVertex3f(0.35f - 0.05f * sin1, 0.15f, -0.25f);
+  glVertex3f(0.00, 0.05, -0.18);
+  glVertex3f(0.35 - 0.05 * sin1, 0.15, -0.25);
   mi->polygon_count++;
   glColor3fv(MaterialGray);
-  glVertex3f(-0.20f - 0.05f * sin1, 0.25f + 0.1f * cos1, -0.45f);
+  glVertex3f(-0.20 - 0.05 * sin1, 0.25 + 0.1 * cos1, -0.45);
   mi->polygon_count++;
   glEnd();
   
@@ -359,11 +361,11 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
     glColor3fv(MaterialGray5);
   else
     glColor3fv(Material);
-  glVertex3f(0.00f, 0.00f, -0.18f);
-  glVertex3f(0.35f - 0.05f * sin2, 0.00f, -0.25f);
+  glVertex3f(0.00, 0.00, -0.18);
+  glVertex3f(0.35 - 0.05 * sin2, 0.00, -0.25);
   mi->polygon_count++;
   glColor3fv(MaterialGray);
-  glVertex3f(-0.20f - 0.05f * sin2, 0.00f + 0.1f * cos2, -0.45f);
+  glVertex3f(-0.20 - 0.05 * sin2, 0.00 + 0.1 * cos2, -0.45);
   mi->polygon_count++;
   glEnd();
   
@@ -373,11 +375,11 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
     glColor3fv(MaterialGray5);
   else
     glColor3fv(Material);
-  glVertex3f(0.00f, -0.05f, -0.18f);
-  glVertex3f(0.35f - 0.05f * sin3, -0.15f, -0.25f);
+  glVertex3f(0.00, -0.05, -0.18);
+  glVertex3f(0.35 - 0.05 * sin3, -0.15, -0.25);
   mi->polygon_count++;
   glColor3fv(MaterialGray);
-  glVertex3f(-0.20f - 0.05f * sin3, -0.25f + 0.1f * cos3, -0.45f);
+  glVertex3f(-0.20 - 0.05 * sin3, -0.25 + 0.1 * cos3, -0.45);
   mi->polygon_count++;
   glEnd();
     
@@ -389,7 +391,7 @@ static Bool draw_antinspect_ant(ModeInfo *mi, antinspectstruct * mp,
 /* only works with 3 right now */
 #define ANTCOUNT 3
 
-static const float MaterialBen[4] = {0.25f, 0.30f, 0.46f, 1.0f};
+static const float MaterialBen[4] = {0.25, 0.30, 0.46, 1.0};
 
 static const float* antmaterial[ANTCOUNT] = 
   {MaterialRed, MaterialBen, MaterialOrange};
@@ -415,7 +417,7 @@ static Bool draw_antinspect_strip(ModeInfo * mi)
   int ro = (((int)antposition[1])/(360/(2*ANTCOUNT))) % (2*ANTCOUNT);
 
   glEnable(GL_TEXTURE_2D);
-  position0[1] = 9.6f;
+  position0[1] = 9.6;
   glLightfv(GL_LIGHT0, GL_POSITION, position0);
 
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialGray5);
@@ -431,19 +433,19 @@ static Bool draw_antinspect_strip(ModeInfo * mi)
   glNormal3f(0.0, 1.0, 0.0);
 
   /* middle tri */
-  glVertex3f(0.0f, 0.0f, -1.0f);
-  glVertex3f((float)(-sqrt(3.0)/2.0), 0.0f, 0.5f);
-  glVertex3f((float)(sqrt(3.0)/2.0), 0.0f, 0.5f);
+  glVertex3f(0.0, 0.0, -1.0);
+  glVertex3f(-sqrt(3.0)/2.0, 0.0, 0.5);
+  glVertex3f(sqrt(3.0)/2.0, 0.0, 0.5);
   mi->polygon_count++;
   glEnd();
 
   /* rotate */
   for(i = 0; i < 3; ++i) {
-    glRotatef(120.0f, 0.0f, 1.0f, 0.0f);
+    glRotatef(120.0, 0.0, 1.0, 0.0);
     glBegin(GL_TRIANGLES);
-    glVertex3f(0.0f, 0.0f, 1.0f + 3.0f);
-    glVertex3f((float)(sqrt(3.0)/2.0), 0.0f, -0.5f + 3.0f);
-    glVertex3f((float)(-sqrt(3.0)/2.0), 0.0f, -0.5f + 3.0f);
+    glVertex3f(0.0, 0.0, 1.0 + 3.0);
+    glVertex3f(sqrt(3.0)/2.0, 0.0, -0.5 + 3.0);
+    glVertex3f(-sqrt(3.0)/2.0, 0.0, -0.5 + 3.0);
     mi->polygon_count++;
     glEnd();
   }
@@ -461,7 +463,7 @@ static Bool draw_antinspect_strip(ModeInfo * mi)
     
     /* display ant shadow */
     glPushMatrix();
-    glTranslatef(0.0f, 0.001f, 0.0f);
+    glTranslatef(0.0, 0.001, 0.0);
     glMultMatrixf(m[0]);
 
     for(i = 0; i < ANTCOUNT; ++i) {
@@ -470,17 +472,17 @@ static Bool draw_antinspect_strip(ModeInfo * mi)
       glPushMatrix();
 
       /* center */
-      glRotatef((float)antposition[i], 0.0f, 1.0f, 0.0f);
-      glTranslatef(2.4f, 0.0f, 0.0f);
-      glTranslatef(0.0f, (float)antsphere[i], 0.0f);
-      glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+      glRotatef(antposition[i], 0.0, 1.0, 0.0);
+      glTranslatef(2.4, 0.0, 0.0);
+      glTranslatef(0.0, antsphere[i], 0.0);
+      glRotatef(90.0, 0.0, 1.0, 0.0);
 
       /* orient ant */
-      glRotatef(10.0f, 0.0f, 1.0f, 0.0f);
-      glRotatef(40.0f, 0.0f, 0.0f, 1.0f);
-      glTranslatef(0.0f, -0.8f, 0.0f);
-      glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
-      glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+      glRotatef(10.0, 0.0, 1.0, 0.0);
+      glRotatef(40.0, 0.0, 0.0, 1.0);
+      glTranslatef(0.0, -0.8, 0.0);
+      glRotatef(180.0, 0.0, 1.0, 0.0);
+      glRotatef(90.0, 0.0, 0.0, 1.0);
 
       /* set colour */
       glColor4fv(MaterialShadow);
@@ -494,10 +496,10 @@ static Bool draw_antinspect_strip(ModeInfo * mi)
       glDisable(GL_LIGHTING);
 
       /* draw sphere */
-      glRotatef(-20.0f, 1.0f, 0.0f, 0.0f);
-      glRotatef(-mp->ant_step*2, 0.0f, 0.0f, 1.0f);
+      glRotatef(-20.0, 1.0, 0.0, 0.0);
+      glRotatef(-mp->ant_step*2, 0.0, 0.0, 1.0);
       glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialShadow);
-      mySphere2(1.2f);
+      mySphere2(1.2);
 
       glPopMatrix();
     }
@@ -510,38 +512,38 @@ static Bool draw_antinspect_strip(ModeInfo * mi)
   /* truants */
   for(j = 0; j < ANTCOUNT; ++j) {
     /* determine rendering order */
-    i = (int)antorder[ro][j];
+    i = antorder[ro][j];
 
     glPushMatrix();
     
     /* center */
-    glRotatef((float)antposition[i], 0.0f, 1.0f, 0.0f);
-    glTranslatef(2.4f, 0.0f, 0.0f);
-    glTranslatef(0.0f, (float)antsphere[i], 0.0f);    
-    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+    glRotatef(antposition[i], 0.0, 1.0, 0.0);
+    glTranslatef(2.4, 0.0, 0.0);
+    glTranslatef(0.0, antsphere[i], 0.0);    
+    glRotatef(90.0, 0.0, 1.0, 0.0);
 
     /* draw ant */
     glPushMatrix();
-    glRotatef(10.0f, 0.0f, 1.0f, 0.0f);
-    glRotatef(40.0f, 0.0f, 0.0f, 1.0f);
-    glTranslatef(0.0f, -0.8f, 0.0f);
-    glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
-    glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
-    if(antposition[i] > 360.0f)
-      antposition[i] = 0.0f;
+    glRotatef(10.0, 0.0, 1.0, 0.0);
+    glRotatef(40.0, 0.0, 0.0, 1.0);
+    glTranslatef(0.0, -0.8, 0.0);
+    glRotatef(180.0, 0.0, 1.0, 0.0);
+    glRotatef(90.0, 0.0, 0.0, 1.0);
+    if(antposition[i] > 360.0)
+      antposition[i] = 0.0;
     glEnable(GL_BLEND);
     draw_antinspect_ant(mi, mp, antmaterial[i], mono, mySphere2, myCone2);
     glDisable(GL_BLEND);
     glPopMatrix();
 
     /* draw sphere */
-    glRotatef(-20.0f, 1.0f, 0.0f, 0.0f);
-    glRotatef(-mp->ant_step*2, 0.0f, 0.0f, 1.0f);
+    glRotatef(-20.0, 1.0, 0.0, 0.0);
+    glRotatef(-mp->ant_step*2, 0.0, 0.0, 1.0);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mono ? MaterialGray5 : antmaterial[i]);
-    mySphere2(1.2f);
+    mySphere2(1.2);
     glEnable(GL_BLEND);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialBlack);
-    mySphere(1.16f);
+    mySphere(1.16);
     glDisable(GL_BLEND);
         
     glPopMatrix();
@@ -551,7 +553,7 @@ static Bool draw_antinspect_strip(ModeInfo * mi)
   }
 
   /* but the step size is the same! */
-  mp->ant_step += 0.2f;
+  mp->ant_step += 0.2;
   
   mp->ant_position += 1;
   return True;
@@ -570,8 +572,8 @@ ENTRYPOINT void reshape_antinspect(ModeInfo * mi, int width, int height)
   gluPerspective(45, 1/h, 7.0, 20.0);
 
   glMatrixMode(GL_MODELVIEW);
-  glLineWidth((float)mp->linewidth);
-  glPointSize((float)mp->linewidth);
+  glLineWidth(mp->linewidth);
+  glPointSize(mp->linewidth);
 }
 
 static void pinit(void) 
@@ -627,15 +629,15 @@ ENTRYPOINT void release_antinspect(ModeInfo * mi)
 		return True;
 	  }
 	  else if (event->xany.type == ButtonPress &&
-	           (event->xbutton.button == Button4 ||
-	            event->xbutton.button == Button5 ||
-	            event->xbutton.button == Button6 ||
-	            event->xbutton.button == Button7))
-	    {
-	      gltrackball_mousewheel (mp->trackball, event->xbutton.button, 5,
-	                              !event->xbutton.state);
-	      return True;
-	    }
+			   (event->xbutton.button == Button4 ||
+				event->xbutton.button == Button5 ||
+				event->xbutton.button == Button6 ||
+				event->xbutton.button == Button7))
+		{
+		  gltrackball_mousewheel (mp->trackball, event->xbutton.button, 5,
+								  !event->xbutton.state);
+		  return True;
+		}
 	  else if(event->xany.type == MotionNotify && mp->button_down_p) {
 		gltrackball_track (mp->trackball,
 						   event->xmotion.x, event->xmotion.y,
@@ -657,11 +659,11 @@ ENTRYPOINT void init_antinspect(ModeInfo * mi)
       return;
   }
   mp = &antinspect[MI_SCREEN(mi)];
-  mp->step = (float)NRAND(90);
-  mp->ant_position = (float)NRAND(90);
-  //mp->trackball = gltrackball_init ();
+  mp->step = NRAND(90);
+  mp->ant_position = NRAND(90);
+  mp->trackball = gltrackball_init ();
   
-  if ((mp->hglrc = init_GL(mi)) != NULL) {
+  if ((mp->glx_context = init_GL(mi)) != NULL) {
     reshape_antinspect(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
     glDrawBuffer(GL_BACK);
     pinit();
@@ -676,8 +678,8 @@ ENTRYPOINT void draw_antinspect(ModeInfo * mi)
 {
   antinspectstruct *mp;
   
-  HDC display = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display    *display = MI_DISPLAY(mi);
+  Window      window = MI_WINDOW(mi);
   
   if(!antinspect)
     return;
@@ -685,25 +687,25 @@ ENTRYPOINT void draw_antinspect(ModeInfo * mi)
   
   MI_IS_DRAWN(mi) = True;
   
-  if(!mp->hglrc)
+  if(!mp->glx_context)
 	return;
   
-  wglMakeCurrent(display, mp->hglrc);
+  glXMakeCurrent(display, window, *(mp->glx_context));
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glPushMatrix();
-  //glRotatef(current_device_rotation(), 0, 0, 1);
+  glRotatef(current_device_rotation(), 0, 0, 1);
 
   mi->polygon_count = 0;
 
   /* position camera --- this works well, we can peer inside 
      the antbubble */
   glTranslatef(0.0, 0.0, -10.0);
-  //gltrackball_rotate(mp->trackball);
-  glRotatef((float)(15.0/2.0 + 15.0*sin(mp->ant_step/100.0)), 1.0f, 0.0f, 0.0f);
-  glRotatef(30.0f, 1.0f, 0.0f, 0.0f);
-  glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+  gltrackball_rotate(mp->trackball);
+  glRotatef((15.0/2.0 + 15.0*sin(mp->ant_step/100.0)), 1.0, 0.0, 0.0);
+  glRotatef(30.0, 1.0, 0.0, 0.0);
+  glRotatef(180.0, 0.0, 1.0, 0.0);
   
   if (!draw_antinspect_strip(mi)) {
 	release_antinspect(mi);
@@ -715,24 +717,23 @@ ENTRYPOINT void draw_antinspect(ModeInfo * mi)
   if (MI_IS_FPS(mi)) do_fps (mi);
   glFlush();
   
-  SwapBuffers(display);
+  glXSwapBuffers(display, window);
   
-  mp->step += 0.025f;
+  mp->step += 0.025;
 }
 
-#if 0
-	#ifndef STANDALONE
-	ENTRYPOINT void change_antinspect(ModeInfo * mi) 
-	{
-	  antinspectstruct *mp = &antinspect[MI_SCREEN(mi)];
-	  
-	  if (!mp->glx_context)
-		return;
-	  
-	  glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(mp->glx_context));
-	  pinit();
-	}
-	#endif /* !STANDALONE */
-#endif
+#ifndef STANDALONE
+ENTRYPOINT void change_antinspect(ModeInfo * mi) 
+{
+  antinspectstruct *mp = &antinspect[MI_SCREEN(mi)];
+  
+  if (!mp->glx_context)
+	return;
+  
+  glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(mp->glx_context));
+  pinit();
+}
+#endif /* !STANDALONE */
+
 
 XSCREENSAVER_MODULE ("AntInspect", antinspect)

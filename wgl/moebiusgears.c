@@ -15,28 +15,29 @@
 			"*showFPS:      False       \n" \
 			"*wireframe:    False       \n" \
 
-# define refresh_mgears NULL
-# define release_mgears NULL
+# define refresh_mgears 0
+# define release_mgears 0
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
-
-//#include "xlockmore.h"
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
 
+//#include "xlockmore.h"
 #include "involute.h"
 #include "normals.h"
 #include "rotator.h"
 //#include "gltrackball.h"
 #include <ctype.h>
 
-//#ifdef USE_GL /* whole file */
+#ifdef USE_GL /* whole file */
 
 
 #define DEF_SPIN        "True"
@@ -46,17 +47,17 @@
 #define DEF_TEETH       "15"
 
 typedef struct {
+
   gear g;
   GLfloat pos_th;  /* position on ring of gear system */
   GLfloat pos_thz; /* rotation out of plane of gear system */
 } mogear;
 
 typedef struct {
-  //GLXContext *glx_context;
-  HGLRC hglrc;
+  GLXContext *glx_context;
   rotator *rot;
-  //trackball_state *trackball;
-  //Bool button_down_p;
+  trackball_state *trackball;
+  Bool button_down_p;
 
   int ngears;
   mogear *gears;
@@ -68,7 +69,7 @@ typedef struct {
 static mgears_configuration *bps = NULL;
 
 static Bool do_spin = True;
-static GLfloat speed = 1.0f;
+static GLfloat speed = 1.0;
 static Bool do_wander = True;
 static Bool do_roll = True;
 static int teeth_arg = 15;
@@ -125,44 +126,43 @@ reshape_mgears (ModeInfo *mi, int width, int height)
 	  mgears_configuration *bp = &bps[MI_SCREEN(mi)];
 
 	  if (event->xany.type == ButtonPress &&
-		  event->xbutton.button == Button1)
-		{
-		  bp->button_down_p = True;
-		  gltrackball_start (bp->trackball,
-							 event->xbutton.x, event->xbutton.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	      event->xbutton.button == Button1)
+	    {
+	      bp->button_down_p = True;
+	      gltrackball_start (bp->trackball,
+	                         event->xbutton.x, event->xbutton.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonRelease &&
-			   event->xbutton.button == Button1)
-		{
-		  bp->button_down_p = False;
-		  return True;
-		}
+	           event->xbutton.button == Button1)
+	    {
+	      bp->button_down_p = False;
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonPress &&
-			   (event->xbutton.button == Button4 ||
-				event->xbutton.button == Button5 ||
-				event->xbutton.button == Button6 ||
-				event->xbutton.button == Button7))
-		{
-		  gltrackball_mousewheel (bp->trackball, event->xbutton.button, 10,
-								  !!event->xbutton.state);
-		  return True;
-		}
+	           (event->xbutton.button == Button4 ||
+	            event->xbutton.button == Button5 ||
+	            event->xbutton.button == Button6 ||
+	            event->xbutton.button == Button7))
+	    {
+	      gltrackball_mousewheel (bp->trackball, event->xbutton.button, 10,
+	                              !!event->xbutton.state);
+	      return True;
+	    }
 	  else if (event->xany.type == MotionNotify &&
-			   bp->button_down_p)
-		{
-		  gltrackball_track (bp->trackball,
-							 event->xmotion.x, event->xmotion.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	           bp->button_down_p)
+	    {
+	      gltrackball_track (bp->trackball,
+	                         event->xmotion.x, event->xmotion.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 
 	  return False;
 	}
 #endif
 
-const char *progname = "MoebiusGears";
 
 ENTRYPOINT void 
 init_mgears (ModeInfo *mi)
@@ -182,7 +182,7 @@ init_mgears (ModeInfo *mi)
 
   bp = &bps[MI_SCREEN(mi)];
 
-  bp->hglrc = init_GL(mi);
+  bp->glx_context = init_GL(mi);
 
   reshape_mgears (mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 
@@ -216,7 +216,7 @@ init_mgears (ModeInfo *mi)
                             do_wander ? wander_speed : 0,
                             False /* don't randomize */
                             );
-    //bp->trackball = gltrackball_init ();
+    bp->trackball = gltrackball_init ();
   }
 
   {
@@ -283,8 +283,8 @@ init_mgears (ModeInfo *mi)
         g->inner_r2    = g->r * 0.60;
         g->inner_r3    = g->r * 0.55;
         g->nubs        = nubs;
-        mg->pos_th     = (float)((M_PI * 2 / gears_per_turn) * i);
-        mg->pos_thz    = (float)((M_PI / 2 / gears_per_turn) * i);
+        mg->pos_th     = (M_PI * 2 / gears_per_turn) * i;
+        mg->pos_thz    = (M_PI / 2 / gears_per_turn) * i;
 
         g->th = ((i & 1)
                  ? (M_PI * 2 / g->nteeth)
@@ -292,22 +292,22 @@ init_mgears (ModeInfo *mi)
 
         /* Colorize
          */
-        g->color[0] = (float)(0.7f + frand(0.3));
-        g->color[1] = (float)(0.7f + frand(0.3));
-        g->color[2] = (float)(0.7f + frand(0.3));
-        g->color[3] = 1.0f;
+        g->color[0] = 0.7 + frand(0.3);
+        g->color[1] = 0.7 + frand(0.3);
+        g->color[2] = 0.7 + frand(0.3);
+        g->color[3] = 1.0;
 
-        g->color2[0] = (float)(g->color[0] * 0.85f);
-        g->color2[1] = (float)(g->color[1] * 0.85f);
-        g->color2[2] = (float)(g->color[2] * 0.85f);
-        g->color2[3] = (float)g->color[3];
+        g->color2[0] = g->color[0] * 0.85;
+        g->color2[1] = g->color[1] * 0.85;
+        g->color2[2] = g->color[2] * 0.85;
+        g->color2[3] = g->color[3];
 
         /* Now render the gear into its display list.
          */
         g->dlist = glGenLists (1);
         if (! g->dlist)
           {
-            //check_gl_error ("glGenLists");
+            check_gl_error ("glGenLists");
             abort();
           }
 
@@ -323,14 +323,14 @@ ENTRYPOINT void
 draw_mgears (ModeInfo *mi)
 {
   mgears_configuration *bp = &bps[MI_SCREEN(mi)];
-  HDC dpy = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display *dpy = MI_DISPLAY(mi);
+  Window window = MI_WINDOW(mi);
   int i;
 
-  if (!bp->hglrc)
+  if (!bp->glx_context)
     return;
 
-  wglMakeCurrent(MI_DISPLAY(mi), bp->hglrc);
+  glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(bp->glx_context));
 
   glShadeModel(GL_SMOOTH);
 
@@ -342,33 +342,29 @@ draw_mgears (ModeInfo *mi)
 
   glPushMatrix ();
 
-  glScalef(1.1f, 1.1f, 1.1f);
+  glScalef(1.1, 1.1, 1.1);
 
   {
     double x, y, z;
-    //get_position (bp->rot, &x, &y, &z, !bp->button_down_p);
-    get_position (bp->rot, &x, &y, &z, !False);
-    glTranslatef ((float)((x - 0.5f) * 4),
-                  (float)((y - 0.5f) * 4),
-                  (float)((z - 0.5f) * 7));
+    get_position (bp->rot, &x, &y, &z, !bp->button_down_p);
+    glTranslatef ((x - 0.5) * 4,
+                  (y - 0.5) * 4,
+                  (z - 0.5) * 7);
 
     /* Do it twice because we don't track the device's orientation. */
-    //glRotatef( current_device_rotation(), 0, 0, 1);
-    glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
-    //gltrackball_rotate (bp->trackball);
-    //glRotatef(-current_device_rotation(), 0, 0, 1);
-    glRotatef(-0.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef( current_device_rotation(), 0, 0, 1);
+    gltrackball_rotate (bp->trackball);
+    glRotatef(-current_device_rotation(), 0, 0, 1);
 
-    //get_rotation (bp->rot, &x, &y, &z, !bp->button_down_p);
-    get_rotation (bp->rot, &x, &y, &z, !False);
+    get_rotation (bp->rot, &x, &y, &z, !bp->button_down_p);
 
     /* add a little rotation for -no-spin mode */
     x -= 0.14;
     y -= 0.06;
 
-    glRotatef((float)(x * 360.0f), 1.0f, 0.0f, 0.0f);
-    glRotatef((float)(y * 360.0f), 0.0f, 1.0f, 0.0f);
-    glRotatef((float)(z * 360.0f), 0.0f, 0.0f, 1.0f);
+    glRotatef (x * 360, 1.0, 0.0, 0.0);
+    glRotatef (y * 360, 0.0, 1.0, 0.0);
+    glRotatef (z * 360, 0.0, 0.0, 1.0);
   }
 
   mi->polygon_count = 0;
@@ -389,19 +385,19 @@ draw_mgears (ModeInfo *mi)
 
       glPushMatrix();
 #ifndef DEBUG
-      glRotatef((float)(mg->pos_th  * 180 / M_PI), 0.0f, 0.0f, 1.0f);  /* rotation on ring */
-      glTranslatef((float)bp->ring_r, 0.0f, 0.0f);                /* position on ring */
-      glRotatef((float)(mg->pos_thz * 180 / M_PI), 0.0f, 1.0f, 0.0f);  /* twist a bit */
+      glRotatef (mg->pos_th  * 180 / M_PI, 0, 0, 1);  /* rotation on ring */
+      glTranslatef (bp->ring_r, 0, 0);                /* position on ring */
+      glRotatef (mg->pos_thz * 180 / M_PI, 0, 1, 0);  /* twist a bit */
 
       if (do_roll)
         {
-          glRotatef((float)(bp->roll_th * 180 / M_PI), 0.0f, 1.0f, 0.0f);
-          bp->roll_th += speed * 0.0005f;
+          glRotatef (bp->roll_th * 180 / M_PI, 0, 1, 0);
+          bp->roll_th += speed * 0.0005;
         }
 #else
       glTranslatef (0, i * 2 * g->r, 0);
 #endif
-      glRotatef((float)(g->th * 180 / M_PI), 0.0f, 0.0f, 1.0f);
+      glRotatef (g->th * 180 / M_PI, 0, 0, 1);
 
       glCallList (g->dlist);
       mi->polygon_count += g->polygons;
@@ -422,9 +418,9 @@ draw_mgears (ModeInfo *mi)
   if (mi->fps_p) do_fps (mi);
   glFinish();
 
-  SwapBuffers(dpy);
+  glXSwapBuffers(dpy, window);
 }
 
 XSCREENSAVER_MODULE_2 ("MoebiusGears", moebiusgears, mgears)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */

@@ -13,17 +13,22 @@
 #ifndef __STONERVIEW_H__
 # define __STONERVIEW_H__
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif /* HAVE_CONFIG_H */
+#if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif /* HAVE_CONFIG_H */
 
-#ifndef HAVE_COCOA
-# include <GL/gl.h>
+	#ifndef HAVE_COCOA
+	# include <GL/gl.h>
+	#endif
+
+	#ifdef HAVE_JWZGLES
+	# include "jwzgles.h"
+	#endif /* HAVE_JWZGLES */
 #endif
 
-#ifdef HAVE_JWZGLES
-# include "jwzgles.h"
-#endif /* HAVE_JWZGLES */
+#include <windows.h>
+#include <GL/gl.h>
 
 typedef struct stonerview_state stonerview_state;
 

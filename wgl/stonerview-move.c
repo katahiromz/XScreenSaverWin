@@ -10,19 +10,14 @@
    implied warranty.
 */
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
+#if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif
 #endif
-
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <stdio.h>
-#include <math.h>
-
-#include "win32.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,6 +31,9 @@
 	# include "jwzgles.h"
 	#endif /* HAVE_JWZGLES */
 #endif
+
+#include <windows.h>
+#include <GL/gl.h>
 
 #include "yarandom.h"
 #include "stonerview.h"
@@ -123,41 +121,41 @@ stonerview_move_increment(stonerview_state *st)
         
     /* Grab r and theta... */
     val = osc_get(st, st->theta, ix);
-    pttheta = (float)(val * (0.01 * M_PI / 180.0)); 
-    ptrad = (float)((GLfloat)osc_get(st, st->rad, ix) * 0.001);
+    pttheta = val * (0.01 * M_PI / 180.0); 
+    ptrad = (GLfloat)osc_get(st, st->rad, ix) * 0.001;
     /* And convert them to x,y coordinates. */
-    pt[0] = (float)(ptrad * cos(pttheta));
-    pt[1] = (float)(ptrad * sin(pttheta));
+    pt[0] = ptrad * cos(pttheta);
+    pt[1] = ptrad * sin(pttheta);
         
     /* Set x,y,z. */
     el->pos[0] = pt[0];
     el->pos[1] = pt[1];
-    el->pos[2] = (float)((GLfloat)osc_get(st, st->alti, ix) * 0.001);
+    el->pos[2] = (GLfloat)osc_get(st, st->alti, ix) * 0.001;
         
     /* Set which way the square is rotated. This is fixed for now, although
        it would be trivial to make the squares spin as they revolve. */
-    el->vervec[0] = 0.11f;
-    el->vervec[1] = 0.0f;
+    el->vervec[0] = 0.11;
+    el->vervec[1] = 0.0;
         
     /* Grab the color, and convert it to RGB values. Technically, we're
        converting an HSV value to RGB, where S and V are always 1. */
     val = osc_get(st, st->color, ix);
     if (val < 1200) {
-      el->col[0] = (float)(((GLfloat)val / 1200.0));
-      el->col[1] = 0.0f;
-      el->col[2] = (float)((GLfloat)(1200 - val) / 1200.0);
+      el->col[0] = ((GLfloat)val / 1200.0);
+      el->col[1] = 0;
+      el->col[2] = (GLfloat)(1200 - val) / 1200.0;
     } 
     else if (val < 2400) {
-      el->col[0] = (GLfloat)(2400 - val) / 1200.0f;
-      el->col[1] = (float)(((GLfloat)(val - 1200) / 1200.0));
-      el->col[2] = 0.0f;
+      el->col[0] = (GLfloat)(2400 - val) / 1200.0;
+      el->col[1] = ((GLfloat)(val - 1200) / 1200.0);
+      el->col[2] = 0;
     }
     else {
-      el->col[0] = 0.0f;
-      el->col[1] = (GLfloat)(3600 - val) / 1200.0f;
-      el->col[2] = (float)(((GLfloat)(val - 2400) / 1200.0));
+      el->col[0] = 0;
+      el->col[1] = (GLfloat)(3600 - val) / 1200.0;
+      el->col[2] = ((GLfloat)(val - 2400) / 1200.0);
     }
-    el->col[3] = 1.0f;
+    el->col[3] = 1.0;
   }
     
   osc_increment(st);

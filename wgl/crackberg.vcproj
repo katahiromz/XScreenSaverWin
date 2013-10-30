@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="crackberg"
-	ProjectGUID="{2783730C-69F7-4ED6-A256-2AA981F6B203}"
+	ProjectGUID="{4A910266-79C4-4507-B518-5D2826580849}"
 	RootNamespace="crackberg"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
@@ -48,6 +48,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -122,6 +123,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

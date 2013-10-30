@@ -16,20 +16,23 @@ static const char sccsid[] = "@(#)buildlwo.c	4.02 97/04/20 xlockmore";
  *
  */
 
+#include <windows.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <stdio.h>
+
+#include "win32.h"
+
 #if 0
 	#ifndef STANDALONE
 	#include "xlock.h"
 	#endif
 #endif
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <math.h>
-
-#include "win32.h"
-
-//#ifdef USE_GL
+#ifdef USE_GL
 
 #include "buildlwo.h"
 
@@ -100,6 +103,6 @@ BuildLWO(int wireframe, const struct lwo *object)
 	return (dl_num);
 }
 
-//#endif /* USE_GL */
+#endif /* USE_GL */
 
 /* End of buildlwo.c */

@@ -17,13 +17,13 @@
  * 21-Aug-10  jwz@jwz.org  Converted to use glDrawArrays, for OpenGL ES.
  */
 
-#include <math.h>
-#include <stdlib.h>
-
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "win32.h"
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <stdlib.h>
 
 #if 0
 	#ifdef HAVE_CONFIG_H
@@ -39,8 +39,6 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include <windows.h>
-#include <GL/gl.h>
 #include "sphere.h"
 
 typedef struct { GLfloat x, y, z; } XYZ;
@@ -94,12 +92,12 @@ unit_sphere (int stacks, int slices, int wire_p)
               array[out++].p = la;				/* vertex */
             }
 
-          n.x = COSF(theta2) * COSF(theta3);
-          n.y = SINF(theta2);
-          n.z = COSF(theta2) * SINF(theta3);
-          p.x = (float)(c.x + r * n.x);
-          p.y = (float)(c.y + r * n.y);
-          p.z = (float)(c.z + r * n.z);
+          n.x = cos (theta2) * cos(theta3);
+          n.y = sin (theta2);
+          n.z = cos (theta2) * sin(theta3);
+          p.x = c.x + r * n.x;
+          p.y = c.y + r * n.y;
+          p.z = c.z + r * n.z;
 
           array[out].p = p;					/* vertex */
           array[out].n = n;					/* normal */
@@ -109,12 +107,12 @@ unit_sphere (int stacks, int slices, int wire_p)
 
           if (wire_p) la = p;
 
-          n.x = COSF(theta1) * COSF(theta3);
-          n.y = SINF(theta1);
-          n.z = COSF(theta1) * SINF(theta3);
-          p.x = (float)(c.x + r * n.x);
-          p.y = (float)(c.y + r * n.y);
-          p.z = (float)(c.z + r * n.z);
+          n.x = cos(theta1) * cos(theta3);
+          n.y = sin(theta1);
+          n.z = cos(theta1) * sin(theta3);
+          p.x = c.x + r * n.x;
+          p.y = c.y + r * n.y;
+          p.z = c.z + r * n.z;
 
           array[out].p = p;					/* vertex */
           array[out].n = n;					/* normal */

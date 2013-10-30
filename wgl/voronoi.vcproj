@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="voronoi"
-	ProjectGUID="{A9601FFA-04CB-4C2D-B063-D7983FDA6963}"
+	ProjectGUID="{95070B8F-0164-438F-8D89-CCE2452A72DA}"
 	RootNamespace="voronoi"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
@@ -48,6 +48,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -117,11 +118,12 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -175,6 +177,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\colors.c"
+				>
+			</File>
+			<File
+				RelativePath=".\hsv.c"
+				>
+			</File>
+			<File
 				RelativePath=".\voronoi.c"
 				>
 			</File>
@@ -192,6 +202,14 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\colors.h"
+				>
+			</File>
+			<File
+				RelativePath=".\hsv.h"
+				>
+			</File>
 			<File
 				RelativePath=".\resource.h"
 				>

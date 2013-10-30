@@ -11,11 +11,11 @@
 #ifndef __GLSCHOOL_GL_H__
 #define __GLSCHOOL_GL_H__
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif /* HAVE_CONFIG_H */
-
 #if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif /* HAVE_CONFIG_H */
+
 	#ifdef HAVE_COCOA
 	# include "jwxyz.h"
 	# ifndef HAVE_JWZGLES
@@ -31,6 +31,16 @@
 	# include "jwzgles.h"
 	#endif /* HAVE_JWZGLES */
 #endif
+
+#include <windows.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <stdio.h>
+
+#include "win32.h"
 
 #include "glschool_alg.h"
 

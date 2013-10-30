@@ -24,16 +24,17 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
-
 
 //#include "xlockmore.h"
 #include <ctype.h>
 
-//#ifdef USE_GL /* whole file */
+#ifdef USE_GL /* whole file */
 
 #define DEF_POINTS      "25"
 #define DEF_POINT_SIZE  "9"
@@ -52,8 +53,7 @@ typedef struct node {
 } node;
 
 typedef struct {
-  //GLXContext *glx_context;
-  HGLRC hglrc;
+  GLXContext *glx_context;
   node *nodes;
   int nnodes;
   node *dragging;
@@ -73,8 +73,8 @@ static voronoi_configuration *vps = NULL;
 
 /* command line arguments */
 static int npoints = 25;
-static GLfloat point_size = 9.0f, point_speed = 1.0f, point_delay = 0.05f;
-static GLfloat zoom_speed = 1.0f, zoom_delay = 15.0f;
+static GLfloat point_size = 9.0, point_speed = 1.0, point_delay = 0.05;
+static GLfloat zoom_speed = 1.0, zoom_delay = 15.0;
 
 #if 0
 	static XrmOptionDescRec opts[] = {
@@ -104,6 +104,7 @@ static GLfloat zoom_speed = 1.0f, zoom_delay = 15.0f;
 static double
 double_time (void)
 {
+  return GetTickCount() / 1000.0;
 #if 0
   struct timeval now;
 # ifdef GETTIMEOFDAY_TWO_ARGS
@@ -115,7 +116,6 @@ double_time (void)
 
   return (now.tv_sec + ((double) now.tv_usec * 0.000001));
 #endif
-	return GetTickCount() / 1000.0;
 }
 
 
@@ -128,18 +128,18 @@ add_node (voronoi_configuration *vp, GLfloat x, GLfloat y)
   nn->y = y;
 
   i = random() % vp->ncolors;
-  nn->color[0] = vp->colors[i].red   / 65536.0f;
-  nn->color[1] = vp->colors[i].green / 65536.0f;
-  nn->color[2] = vp->colors[i].blue  / 65536.0f;
-  nn->color[3] = 1.0f;
+  nn->color[0] = vp->colors[i].red   / 65536.0;
+  nn->color[1] = vp->colors[i].green / 65536.0;
+  nn->color[2] = vp->colors[i].blue  / 65536.0;
+  nn->color[3] = 1.0;
 
-  nn->color2[0] = nn->color[0] * 0.7f;
-  nn->color2[1] = nn->color[1] * 0.7f;
-  nn->color2[2] = nn->color[2] * 0.7f;
-  nn->color2[3] = 1.0f;
+  nn->color2[0] = nn->color[0] * 0.7;
+  nn->color2[1] = nn->color[1] * 0.7;
+  nn->color2[2] = nn->color[2] * 0.7;
+  nn->color2[3] = 1.0;
 
-  nn->ddx = (float)(frand (0.000001 * point_speed) * (random() & 1 ? 1 : -1));
-  nn->ddy = (float)(frand (0.000001 * point_speed) * (random() & 1 ? 1 : -1));
+  nn->ddx = frand (0.000001 * point_speed) * (random() & 1 ? 1 : -1);
+  nn->ddy = frand (0.000001 * point_speed) * (random() & 1 ? 1 : -1);
 
   nn->rot = (random() % 360) * (random() & 1 ? 1 : -1);
 
@@ -155,10 +155,10 @@ cone (void)
 {
   int i;
   int faces = 64;
-  GLfloat step = (float)(M_PI * 2 / faces);
-  GLfloat th = 0.0f;
-  GLfloat x = 1.0f;
-  GLfloat y = 0.0f;
+  GLfloat step = M_PI * 2 / faces;
+  GLfloat th = 0;
+  GLfloat x = 1;
+  GLfloat y = 0;
 
   glBegin(GL_TRIANGLE_FAN);
   glVertex3f (0, 0, 1);
@@ -166,8 +166,8 @@ cone (void)
     {
       glVertex3f (x, y, 0);
       th += step;
-      x = COSF(th);
-      y = SINF(th);
+      x = cos (th);
+      y = sin (th);
     }
   glVertex3f (1, 0, 0);
   glEnd();
@@ -221,10 +221,10 @@ zoom_points (voronoi_configuration *vp)
 {
   node *nn;
 
-  GLfloat tick = SINF(vp->zooming * M_PI);
-  GLfloat scale = (float)(1 + (tick * 0.02 * zoom_speed));
+  GLfloat tick = sin (vp->zooming * M_PI);
+  GLfloat scale = 1 + (tick * 0.02 * zoom_speed);
 
-  vp->zooming -= (float)(0.01 * zoom_speed);
+  vp->zooming -= (0.01 * zoom_speed);
   if (vp->zooming < 0) vp->zooming = 0;
 
   if (vp->zooming <= 0) return;
@@ -259,7 +259,7 @@ draw_cells (ModeInfo *mi)
 
       glPushMatrix();
       glTranslatef (nn->x, nn->y, 0);
-      glScalef ((float)(lim*2), (float)(lim*2), (float)1);
+      glScalef (lim*2, lim*2, 1);
       glColor4fv (nn->color);
       mi->polygon_count += cone ();
       glPopMatrix();
@@ -287,27 +287,27 @@ draw_cells (ModeInfo *mi)
         {
           int w = MI_WIDTH (mi);
           int h = MI_HEIGHT (mi);
-          int s = (int)point_size;
+          int s = point_size;
           int i;
 
           glColor4fv (nn->color2);
           glPushMatrix();
           glTranslatef (nn->x, nn->y, 0);
-          glScalef ((float)(1.0 / w * s), (float)(1.0 / h * s), (float)1);
+          glScalef (1.0 / w * s, 1.0 / h * s, 1);
 
           glLineWidth (point_size / 10);
           nn->rot += (nn->rot < 0 ? -1 : 1);
-          glRotatef((float)nn->rot, 0.0f, 0.0f, 1.0f);
+          glRotatef (nn->rot, 0, 0, 1);
 
           glRotatef (180, 0, 0, 1);
           for (i = 0; i < 5; i++)
             {
               glBegin (GL_TRIANGLES);
-              glVertex2f (0.0f, 1.0f);
-              glVertex2f (-0.2f, 0.0f);
-              glVertex2f ( 0.2f, 0.0f);
+              glVertex2f (0, 1);
+              glVertex2f (-0.2, 0);
+              glVertex2f ( 0.2, 0);
               glEnd ();
-              glRotatef (360.0f/5.0f, 0.0f, 0.0f, 1.0f);
+              glRotatef (360.0/5, 0, 0, 1);
               mi->polygon_count++;
             }
           glPopMatrix();
@@ -340,8 +340,8 @@ static node *
 find_node (ModeInfo *mi, GLfloat x, GLfloat y)
 {
   voronoi_configuration *vp = &vps[MI_SCREEN(mi)];
-  int ps = (int)(point_size < 5 ? 5 : point_size);
-  GLfloat hysteresis = (float)((1.0 / MI_WIDTH (mi)) * ps);
+  int ps = (point_size < 5 ? 5 : point_size);
+  GLfloat hysteresis = (1.0 / MI_WIDTH (mi)) * ps;
   node *nn;
   for (nn = vp->nodes; nn; nn = nn->next)
     if (nn->x > x - hysteresis && nn->x < x + hysteresis &&
@@ -357,27 +357,27 @@ find_node (ModeInfo *mi, GLfloat x, GLfloat y)
 	  voronoi_configuration *vp = &vps[MI_SCREEN(mi)];
 
 	  if (event->xany.type == ButtonPress)
-		{
-		  GLfloat x = (GLfloat) event->xbutton.x / MI_WIDTH (mi);
-		  GLfloat y = (GLfloat) event->xbutton.y / MI_HEIGHT (mi);
-		  node *nn = find_node (mi, x, y);
-		  if (!nn)
-			nn = add_node (vp, x, y);
-		  vp->dragging = nn;
+	    {
+	      GLfloat x = (GLfloat) event->xbutton.x / MI_WIDTH (mi);
+	      GLfloat y = (GLfloat) event->xbutton.y / MI_HEIGHT (mi);
+	      node *nn = find_node (mi, x, y);
+	      if (!nn)
+	        nn = add_node (vp, x, y);
+	      vp->dragging = nn;
 
-		  return True;
-		}
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonRelease && vp->dragging)
-		{
-		  vp->dragging = 0;
-		  return True;
-		}
+	    {
+	      vp->dragging = 0;
+	      return True;
+	    }
 	  else if (event->xany.type == MotionNotify && vp->dragging)
-		{
-		  vp->dragging->x = (GLfloat) event->xmotion.x / MI_WIDTH (mi);
-		  vp->dragging->y = (GLfloat) event->xmotion.y / MI_HEIGHT (mi);
-		  return True;
-		}
+	    {
+	      vp->dragging->x = (GLfloat) event->xmotion.x / MI_WIDTH (mi);
+	      vp->dragging->y = (GLfloat) event->xmotion.y / MI_HEIGHT (mi);
+	      return True;
+	    }
 
 	  return False;
 	}
@@ -403,8 +403,8 @@ state_change (ModeInfo *mi)
       if (vp->last_time + zoom_delay <= now)
         {
           node *tn = vp->nodes;
-          vp->zoom_toward[0] = (float)(tn ? tn->x : 0.5);
-          vp->zoom_toward[1] = (float)(tn ? tn->y : 0.5);
+          vp->zoom_toward[0] = (tn ? tn->x : 0.5);
+          vp->zoom_toward[1] = (tn ? tn->y : 0.5);
 
           vp->mode = MODE_ZOOMING;
           vp->zooming = 1;
@@ -417,8 +417,8 @@ state_change (ModeInfo *mi)
       if (vp->last_time + point_delay <= now)
         {
           add_node (vp, 
-                    (float)(BELLRAND(0.5) + 0.25), 
-                    (float)(BELLRAND(0.5) + 0.25));
+                    BELLRAND(0.5) + 0.25, 
+                    BELLRAND(0.5) + 0.25);
           vp->last_time = now;
           vp->adding--;
           if (vp->adding <= 0)
@@ -447,7 +447,6 @@ state_change (ModeInfo *mi)
     }
 }
 
-const char *progname = "Voronoi";
 
 ENTRYPOINT void 
 init_voronoi (ModeInfo *mi)
@@ -465,7 +464,7 @@ init_voronoi (ModeInfo *mi)
 
   vp = &vps[MI_SCREEN(mi)];
 
-  vp->hglrc = init_GL(mi);
+  vp->glx_context = init_GL(mi);
 
   if (point_size < 0) point_size = 10;
 
@@ -487,13 +486,13 @@ ENTRYPOINT void
 draw_voronoi (ModeInfo *mi)
 {
   voronoi_configuration *vp = &vps[MI_SCREEN(mi)];
-  HDC dpy = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display *dpy = MI_DISPLAY(mi);
+  Window window = MI_WINDOW(mi);
 
-  if (!vp->hglrc)
+  if (!vp->glx_context)
     return;
 
-  wglMakeCurrent(MI_DISPLAY(mi), vp->hglrc);
+  glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(vp->glx_context));
 
   glShadeModel(GL_FLAT);
   glEnable(GL_POINT_SMOOTH);
@@ -514,9 +513,9 @@ draw_voronoi (ModeInfo *mi)
   if (mi->fps_p) do_fps (mi);
   glFinish();
 
-  SwapBuffers(dpy);
+  glXSwapBuffers(dpy, window);
 }
 
 XSCREENSAVER_MODULE ("Voronoi", voronoi)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */

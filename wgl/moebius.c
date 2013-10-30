@@ -77,10 +77,10 @@ static const char sccsid[] = "@(#)moebius.c	5.01 2001/03/01 xlockmore";
  * In real OpenGL, PseudoColor DO NOT support texture map (as far as I know).
  */
 
-#define MODE_moebius
-#define refresh_moebius NULL
+# define MODE_moebius
+# define refresh_moebius 0
 #define DELAY 20000
-#define DEFAULTS			"*delay:		20000   \n"			\
+# define DEFAULTS			"*delay:		20000   \n"			\
 							"*showFPS:      False   \n"
 
 #if 0
@@ -89,16 +89,7 @@ static const char sccsid[] = "@(#)moebius.c	5.01 2001/03/01 xlockmore";
 	#else /* !STANDALONE */
 	# include "xlock.h"		/* from the xlockmore distribution */
 	#endif /* !STANDALONE */
-#endif
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <math.h>
-
-#include "win32.h"
-
-#if 0
 	#ifdef HAVE_COCOA
 	# include "jwxyz.h"
 	#else
@@ -111,6 +102,15 @@ static const char sccsid[] = "@(#)moebius.c	5.01 2001/03/01 xlockmore";
 	# include "jwzgles.h"
 	#endif /* HAVE_JWZGLES */
 #endif
+
+#include <windows.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#include "win32.h"
 
 #ifdef MODE_moebius
 
@@ -157,9 +157,7 @@ static int  drawants = True;
 
 	ENTRYPOINT ModeSpecOpt moebius_opts =
 	{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
-#endif
 
-#if 0
 	#ifdef USE_MODULES
 	ModStruct   moebius_description =
 	{"moebius", "init_moebius", "draw_moebius", "release_moebius",
@@ -189,33 +187,32 @@ typedef struct {
 	GLfloat     step;
 	GLfloat     ant_position;
 	float       ant_step;
-	//GLXContext *glx_context;
-	HGLRC hglrc;
+	GLXContext *glx_context;
     rotator    *rot;
-    //trackball_state *trackball;
-    //Bool        button_down_p;
+    trackball_state *trackball;
+    Bool        button_down_p;
 } moebiusstruct;
 
-static const float front_shininess[] = {60.0f};
-static const float front_specular[] = {0.7f, 0.7f, 0.7f, 1.0f};
-static const float ambient[] = {0.0f, 0.0f, 0.0f, 1.0f};
-static const float diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
-static const float position0[] = {1.0f, 1.0f, 1.0f, 0.0f};
-static const float position1[] = {-1.0f, -1.0f, 1.0f, 0.0f};
-static const float lmodel_ambient[] = {0.5f, 0.5f, 0.5f, 1.0f};
+static const float front_shininess[] = {60.0};
+static const float front_specular[] = {0.7, 0.7, 0.7, 1.0};
+static const float ambient[] = {0.0, 0.0, 0.0, 1.0};
+static const float diffuse[] = {1.0, 1.0, 1.0, 1.0};
+static const float position0[] = {1.0, 1.0, 1.0, 0.0};
+static const float position1[] = {-1.0, -1.0, 1.0, 0.0};
+static const float lmodel_ambient[] = {0.5, 0.5, 0.5, 1.0};
 static const float lmodel_twoside[] = {GL_TRUE};
 
-static const float MaterialRed[] = {0.7f, 0.0f, 0.0f, 1.0f};
-static const float MaterialGreen[] = {0.1f, 0.5f, 0.2f, 1.0f};
-static const float MaterialBlue[] = {0.0f, 0.0f, 0.7f, 1.0f};
-static const float MaterialCyan[] = {0.2f, 0.5f, 0.7f, 1.0f};
-static const float MaterialYellow[] = {0.7f, 0.7f, 0.0f, 1.0f};
-static const float MaterialMagenta[] = {0.6f, 0.2f, 0.5f, 1.0f};
-static const float MaterialWhite[] = {0.7f, 0.7f, 0.7f, 1.0f};
-static const float MaterialGray[] = {0.2f, 0.2f, 0.2f, 1.0f};
-static const float MaterialGray5[] = {0.5f, 0.5f, 0.5f, 1.0f};
-static const float MaterialGray6[] = {0.6f, 0.6f, 0.6f, 1.0f};
-static const float MaterialGray8[] = {0.8f, 0.8f, 0.8f, 1.0f};
+static const float MaterialRed[] = {0.7, 0.0, 0.0, 1.0};
+static const float MaterialGreen[] = {0.1, 0.5, 0.2, 1.0};
+static const float MaterialBlue[] = {0.0, 0.0, 0.7, 1.0};
+static const float MaterialCyan[] = {0.2, 0.5, 0.7, 1.0};
+static const float MaterialYellow[] = {0.7, 0.7, 0.0, 1.0};
+static const float MaterialMagenta[] = {0.6, 0.2, 0.5, 1.0};
+static const float MaterialWhite[] = {0.7, 0.7, 0.7, 1.0};
+static const float MaterialGray[] = {0.2, 0.2, 0.2, 1.0};
+static const float MaterialGray5[] = {0.5, 0.5, 0.5, 1.0};
+static const float MaterialGray6[] = {0.6, 0.6, 0.6, 1.0};
+static const float MaterialGray8[] = {0.8, 0.8, 0.8, 1.0};
 
 static moebiusstruct *moebius = (moebiusstruct *) NULL;
 
@@ -264,12 +261,12 @@ myCone(float radius)
 static Bool
 draw_moebius_ant(moebiusstruct * mp, const float *Material, int mono)
 {
-	float       cos1 = COSF(mp->ant_step);
-	float       cos2 = COSF(mp->ant_step + 2 * Pi / 3);
-	float       cos3 = COSF(mp->ant_step + 4 * Pi / 3);
-	float       sin1 = SINF(mp->ant_step);
-	float       sin2 = SINF(mp->ant_step + 2 * Pi / 3);
-	float       sin3 = SINF(mp->ant_step + 4 * Pi / 3);
+	float       cos1 = cos(mp->ant_step);
+	float       cos2 = cos(mp->ant_step + 2 * Pi / 3);
+	float       cos3 = cos(mp->ant_step + 4 * Pi / 3);
+	float       sin1 = sin(mp->ant_step);
+	float       sin2 = sin(mp->ant_step + 2 * Pi / 3);
+	float       sin3 = sin(mp->ant_step + 4 * Pi / 3);
 
 	if (mono)
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialGray5);
@@ -277,30 +274,30 @@ draw_moebius_ant(moebiusstruct * mp, const float *Material, int mono)
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Material);
 	glEnable(GL_CULL_FACE);
 	glPushMatrix();
-	glScalef(1.0f, 1.3f, 1.0f);
-	if (!mySphere(0.18f))
+	glScalef(1, 1.3, 1);
+	if (!mySphere(0.18))
 		return False;
-	glScalef(1.0f, 1.0f / 1.3f, 1.0f);
-	glTranslatef(0.00f, 0.30f, 0.00f);
-	if (!mySphere(0.2f))
+	glScalef(1, 1 / 1.3, 1);
+	glTranslatef(0.00, 0.30, 0.00);
+	if (!mySphere(0.2))
 		return False;
 
-	glTranslatef(-0.05f, 0.17f, 0.05f);
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-	glRotatef(-25.0f, 0.0f, 1.0f, 0.0f);
-	if (!myCone(0.05f))
+	glTranslatef(-0.05, 0.17, 0.05);
+	glRotatef(-90, 1, 0, 0);
+	glRotatef(-25, 0, 1, 0);
+	if (!myCone(0.05))
 		return False;
-	glTranslatef(0.00f, 0.10f, 0.00f);
-	if (!myCone(0.05f))
+	glTranslatef(0.00, 0.10, 0.00);
+	if (!myCone(0.05))
 		return False;
-	glRotatef(25.0f, 0.0f, 1.0f, 0.0f);
-	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+	glRotatef(25, 0, 1, 0);
+	glRotatef(90, 1, 0, 0);
 
-	glScalef(1.0f, 1.3f, 1.0f);
-	glTranslatef(0.15f, -0.65f, 0.05f);
-	if (!mySphere(0.25f))
+	glScalef(1, 1.3, 1);
+	glTranslatef(0.15, -0.65, 0.05);
+	if (!mySphere(0.25))
 		return False;
-	glScalef(1.0f, 1.0f / 1.3f, 1.0f);
+	glScalef(1, 1 / 1.3, 1);
 	glPopMatrix();
 	glDisable(GL_CULL_FACE);
 
@@ -311,24 +308,24 @@ draw_moebius_ant(moebiusstruct * mp, const float *Material, int mono)
 		glColor3fv(MaterialGray5);
 	else
 		glColor3fv(Material);
-	glVertex3f(0.00f, 0.30f, 0.00f);
+	glVertex3f(0.00, 0.30, 0.00);
 	glColor3fv(MaterialGray);
-	glVertex3f(0.40f, 0.70f, 0.40f);
+	glVertex3f(0.40, 0.70, 0.40);
 	if (mono)
 		glColor3fv(MaterialGray5);
 	else
 		glColor3fv(Material);
-	glVertex3f(0.00f, 0.30f, 0.00f);
+	glVertex3f(0.00, 0.30, 0.00);
 	glColor3fv(MaterialGray);
-	glVertex3f(0.40f, 0.70f, -0.40f);
+	glVertex3f(0.40, 0.70, -0.40);
 	glEnd();
 	glBegin(GL_POINTS);
 	if (mono)
 		glColor3fv(MaterialGray6);
 	else
 		glColor3fv(MaterialRed);
-	glVertex3f(0.40f, 0.70f, 0.40f);
-	glVertex3f(0.40f, 0.70f, -0.40f);
+	glVertex3f(0.40, 0.70, 0.40);
+	glVertex3f(0.40, 0.70, -0.40);
 	glEnd();
 
 	/* LEFT-FRONT ARM */
@@ -337,10 +334,10 @@ draw_moebius_ant(moebiusstruct * mp, const float *Material, int mono)
 		glColor3fv(MaterialGray5);
 	else
 		glColor3fv(Material);
-	glVertex3f(0.00f, 0.05f, 0.18f);
-	glVertex3f(0.35f + 0.05f * cos1, 0.15f, 0.25f);
+	glVertex3f(0.00, 0.05, 0.18);
+	glVertex3f(0.35 + 0.05 * cos1, 0.15, 0.25);
 	glColor3fv(MaterialGray);
-	glVertex3f(-0.20f + 0.05f * cos1, 0.25f + 0.1f * sin1, 0.45f);
+	glVertex3f(-0.20 + 0.05 * cos1, 0.25 + 0.1 * sin1, 0.45);
 	glEnd();
 
 	/* LEFT-CENTER ARM */
@@ -349,10 +346,10 @@ draw_moebius_ant(moebiusstruct * mp, const float *Material, int mono)
 		glColor3fv(MaterialGray5);
 	else
 		glColor3fv(Material);
-	glVertex3f(0.00f, 0.00f, 0.18f);
-	glVertex3f(0.35f + 0.05f * cos2, 0.00f, 0.25f);
+	glVertex3f(0.00, 0.00, 0.18);
+	glVertex3f(0.35 + 0.05 * cos2, 0.00, 0.25);
 	glColor3fv(MaterialGray);
-	glVertex3f(-0.20f + 0.05f * cos2, 0.00f + 0.1f * sin2, 0.45f);
+	glVertex3f(-0.20 + 0.05 * cos2, 0.00 + 0.1 * sin2, 0.45);
 	glEnd();
 
 	/* LEFT-BACK ARM */
@@ -361,10 +358,10 @@ draw_moebius_ant(moebiusstruct * mp, const float *Material, int mono)
 		glColor3fv(MaterialGray5);
 	else
 		glColor3fv(Material);
-	glVertex3f(0.00f, -0.05f, 0.18f);
-	glVertex3f(0.35f + 0.05f * cos3, -0.15f, 0.25f);
+	glVertex3f(0.00, -0.05, 0.18);
+	glVertex3f(0.35 + 0.05 * cos3, -0.15, 0.25);
 	glColor3fv(MaterialGray);
-	glVertex3f(-0.20f + 0.05f * cos3, -0.25f + 0.1f * sin3, 0.45f);
+	glVertex3f(-0.20 + 0.05 * cos3, -0.25 + 0.1 * sin3, 0.45);
 	glEnd();
 
 	/* RIGHT-FRONT ARM */
@@ -373,10 +370,10 @@ draw_moebius_ant(moebiusstruct * mp, const float *Material, int mono)
 		glColor3fv(MaterialGray5);
 	else
 		glColor3fv(Material);
-	glVertex3f(0.00f, 0.05f, -0.18f);
-	glVertex3f(0.35f - 0.05f * sin1, 0.15f, -0.25f);
+	glVertex3f(0.00, 0.05, -0.18);
+	glVertex3f(0.35 - 0.05 * sin1, 0.15, -0.25);
 	glColor3fv(MaterialGray);
-	glVertex3f(-0.20f - 0.05f * sin1, 0.25f + 0.1f * cos1, -0.45f);
+	glVertex3f(-0.20 - 0.05 * sin1, 0.25 + 0.1 * cos1, -0.45);
 	glEnd();
 
 	/* RIGHT-CENTER ARM */
@@ -385,10 +382,10 @@ draw_moebius_ant(moebiusstruct * mp, const float *Material, int mono)
 		glColor3fv(MaterialGray5);
 	else
 		glColor3fv(Material);
-	glVertex3f(0.00f, 0.00f, -0.18f);
-	glVertex3f(0.35f - 0.05f * sin2, 0.00f, -0.25f);
+	glVertex3f(0.00, 0.00, -0.18);
+	glVertex3f(0.35 - 0.05 * sin2, 0.00, -0.25);
 	glColor3fv(MaterialGray);
-	glVertex3f(-0.20f - 0.05f * sin2, 0.00f + 0.1f * cos2, -0.45f);
+	glVertex3f(-0.20 - 0.05 * sin2, 0.00 + 0.1 * cos2, -0.45);
 	glEnd();
 
 	/* RIGHT-BACK ARM */
@@ -397,10 +394,10 @@ draw_moebius_ant(moebiusstruct * mp, const float *Material, int mono)
 		glColor3fv(MaterialGray5);
 	else
 		glColor3fv(Material);
-	glVertex3f(0.00f, -0.05f, -0.18f);
-	glVertex3f(0.35f - 0.05f * sin3, -0.15f, -0.25f);
+	glVertex3f(0.00, -0.05, -0.18);
+	glVertex3f(0.35 - 0.05 * sin3, -0.15, -0.25);
 	glColor3fv(MaterialGray);
-	glVertex3f(-0.20f - 0.05f * sin3, -0.25f + 0.1f * cos3, -0.45f);
+	glVertex3f(-0.20 - 0.05 * sin3, -0.25 + 0.1 * cos3, -0.45);
 	glEnd();
 
 	glBegin(GL_POINTS);
@@ -408,17 +405,17 @@ draw_moebius_ant(moebiusstruct * mp, const float *Material, int mono)
 		glColor3fv(MaterialGray8);
 	else
 		glColor3fv(MaterialMagenta);
-	glVertex3f(-0.20f + 0.05f * cos1, 0.25f + 0.1f * sin1, 0.45f);
-	glVertex3f(-0.20f + 0.05f * cos2, 0.00f + 0.1f * sin2, 0.45f);
-	glVertex3f(-0.20f + 0.05f * cos3, -0.25f + 0.1f * sin3, 0.45f);
-	glVertex3f(-0.20f - 0.05f * sin1, 0.25f + 0.1f * cos1, -0.45f);
-	glVertex3f(-0.20f - 0.05f * sin2, 0.00f + 0.1f * cos2, -0.45f);
-	glVertex3f(-0.20f - 0.05f * sin3, -0.25f + 0.1f * cos3, -0.45f);
+	glVertex3f(-0.20 + 0.05 * cos1, 0.25 + 0.1 * sin1, 0.45);
+	glVertex3f(-0.20 + 0.05 * cos2, 0.00 + 0.1 * sin2, 0.45);
+	glVertex3f(-0.20 + 0.05 * cos3, -0.25 + 0.1 * sin3, 0.45);
+	glVertex3f(-0.20 - 0.05 * sin1, 0.25 + 0.1 * cos1, -0.45);
+	glVertex3f(-0.20 - 0.05 * sin2, 0.00 + 0.1 * cos2, -0.45);
+	glVertex3f(-0.20 - 0.05 * sin3, -0.25 + 0.1 * cos3, -0.45);
 	glEnd();
 
 	glEnable(GL_LIGHTING);
 
-	mp->ant_step += 0.3f;
+	mp->ant_step += 0.3;
 	return True;
 }
 
@@ -428,8 +425,8 @@ RotateAaroundU(float Ax, float Ay, float Az,
 	       float *Cx, float *Cy, float *Cz,
 	       float Theta)
 {
-	float       cosO = COSF(Theta);
-	float       sinO = SINF(Theta);
+	float       cosO = cos(Theta);
+	float       sinO = sin(Theta);
 	float       one_cosO = 1 - cosO;
 	float       Ux2 = sqr(Ux);
 	float       Uy2 = sqr(Uy);
@@ -466,8 +463,8 @@ draw_moebius_strip(ModeInfo * mi)
 		i = 0;
 		while (i < (MoebiusDivisions * 2 + 1)) {
 			Theta = Phi / 2;
-			cPhi = COSF(Phi);
-			sPhi = SINF(Phi);
+			cPhi = cos(Phi);
+			sPhi = sin(Phi);
 
 			i++;
 			if (mono)
@@ -483,7 +480,7 @@ draw_moebius_strip(ModeInfo * mi)
 			glVertex3f(cPhi * 3 + Cx, sPhi * 3 + Cy, +Cz);
 			glVertex3f(cPhi * 3 - Cx, sPhi * 3 - Cy, -Cz);
 
-			Phi += (float)(Pi / MoebiusDivisions);
+			Phi += Pi / MoebiusDivisions;
 		}
 		glEnd();
 	} else {
@@ -494,8 +491,8 @@ draw_moebius_strip(ModeInfo * mi)
 			i = 0;
 			while (i < (MoebiusDivisions * 2 + 1)) {
 				Theta = Phi / 2;
-				cPhi = COSF(Phi);
-				sPhi = SINF(Phi);
+				cPhi = cos(Phi);
+				sPhi = sin(Phi);
 
 				RotateAaroundU(cPhi, sPhi, 0, -sPhi, cPhi, 0, &Cx, &Cy, &Cz, Theta);
 				glNormal3f(Cx, Cy, Cz);
@@ -517,7 +514,7 @@ draw_moebius_strip(ModeInfo * mi)
 					glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialGray);
 				glVertex3f(cPhi * 3 + Cx / MoebiusTransversals * j, sPhi * 3 + Cy / MoebiusTransversals * j, +Cz / MoebiusTransversals * j);
 
-				Phi += (float)(Pi / MoebiusDivisions);
+				Phi += Pi / MoebiusDivisions;
 				i++;
 			}
 			glEnd();
@@ -528,41 +525,41 @@ draw_moebius_strip(ModeInfo * mi)
 	if (drawants) {
 		/* DRAW BLUE ANT */
 		glPushMatrix();
-		glRotatef(mp->ant_position + 180.0f, 0.0f, 0.0f, 1.0f);
-		glTranslatef(3.0f, 0.0f, 0.0f);
-		glRotatef(mp->ant_position / 2 + 90, 0.0f, 1.0f, 0.0f);
-		glTranslatef(0.28f, 0.0f, -0.45f);
+		glRotatef(mp->ant_position + 180, 0, 0, 1);
+		glTranslatef(3, 0, 0);
+		glRotatef(mp->ant_position / 2 + 90, 0, 1, 0);
+		glTranslatef(0.28, 0, -0.45);
 		if (!draw_moebius_ant(mp, MaterialYellow, mono))
 			return False;
 		glPopMatrix();
 
 		/* DRAW YELLOW ANT */
 		glPushMatrix();
-		glRotatef(mp->ant_position, 0.0f, 0.0f, 1.0f);
+		glRotatef(mp->ant_position, 0, 0, 1);
 		glTranslatef(3, 0, 0);
-		glRotatef(mp->ant_position / 2.0f, 0.0f, 1.0f, 0.0f);
-		glTranslatef(0.28f, 0.0f, -0.45f);
+		glRotatef(mp->ant_position / 2, 0, 1, 0);
+		glTranslatef(0.28, 0, -0.45);
 		if (!draw_moebius_ant(mp, MaterialBlue, mono))
 			return False;
 		glPopMatrix();
 
 		/* DRAW GREEN ANT */
 		glPushMatrix();
-		glRotatef(-mp->ant_position, 0.0f, 0.0f, 1.0f);
+		glRotatef(-mp->ant_position, 0, 0, 1);
 		glTranslatef(3, 0, 0);
-		glRotatef(-mp->ant_position / 2.0f, 0.0f, 1.0f, 0.0f);
-		glTranslatef(0.28f, 0.0f, 0.45f);
-		glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+		glRotatef(-mp->ant_position / 2, 0, 1, 0);
+		glTranslatef(0.28, 0, 0.45);
+		glRotatef(180, 1, 0, 0);
 		if (!draw_moebius_ant(mp, MaterialGreen, mono))
 			return False;
 		glPopMatrix();
 
 		/* DRAW CYAN ANT */
 		glPushMatrix();
-		glRotatef(-mp->ant_position + 180.0f, 0.0f, 0.0f, 1.0f);
-		glTranslatef(3.0f, 0.0f, 0.0f);
-		glRotatef(-mp->ant_position / 2.0f + 90.0f, 0.0f, 1.0f, 0.0f);
-		glTranslatef(0.28f, 0.0f, 0.45f);
+		glRotatef(-mp->ant_position + 180, 0, 0, 1);
+		glTranslatef(3, 0, 0);
+		glRotatef(-mp->ant_position / 2 + 90, 0, 1, 0);
+		glTranslatef(0.28, 0, 0.45);
 		glRotatef(180, 1, 0, 0);
 		if (!draw_moebius_ant(mp, MaterialCyan, mono))
 			return False;
@@ -686,38 +683,38 @@ release_moebius (ModeInfo * mi)
 	  moebiusstruct *mp = &moebius[MI_SCREEN(mi)];
 
 	  if (event->xany.type == ButtonPress &&
-		  event->xbutton.button == Button1)
-		{
-		  mp->button_down_p = True;
-		  gltrackball_start (mp->trackball,
-							 event->xbutton.x, event->xbutton.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	      event->xbutton.button == Button1)
+	    {
+	      mp->button_down_p = True;
+	      gltrackball_start (mp->trackball,
+	                         event->xbutton.x, event->xbutton.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonRelease &&
-			   event->xbutton.button == Button1)
-		{
-		  mp->button_down_p = False;
-		  return True;
-		}
+	           event->xbutton.button == Button1)
+	    {
+	      mp->button_down_p = False;
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonPress &&
-			   (event->xbutton.button == Button4 ||
-				event->xbutton.button == Button5 ||
-				event->xbutton.button == Button6 ||
-				event->xbutton.button == Button7))
-		{
-		  gltrackball_mousewheel (mp->trackball, event->xbutton.button, 10,
-								  !!event->xbutton.state);
-		  return True;
-		}
+	           (event->xbutton.button == Button4 ||
+	            event->xbutton.button == Button5 ||
+	            event->xbutton.button == Button6 ||
+	            event->xbutton.button == Button7))
+	    {
+	      gltrackball_mousewheel (mp->trackball, event->xbutton.button, 10,
+	                              !!event->xbutton.state);
+	      return True;
+	    }
 	  else if (event->xany.type == MotionNotify &&
-			   mp->button_down_p)
-		{
-		  gltrackball_track (mp->trackball,
-							 event->xmotion.x, event->xmotion.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	           mp->button_down_p)
+	    {
+	      gltrackball_track (mp->trackball,
+	                         event->xmotion.x, event->xmotion.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 
 	  return False;
 	}
@@ -734,16 +731,16 @@ init_moebius (ModeInfo * mi)
 			return;
 	}
 	mp = &moebius[MI_SCREEN(mi)];
-	mp->step = (float)NRAND(90);
-	mp->ant_position = (float)NRAND(90);
+	mp->step = NRAND(90);
+	mp->ant_position = NRAND(90);
 
     {
       double rot_speed = 0.3;
       mp->rot = make_rotator (rot_speed, rot_speed, rot_speed, 1, 0, True);
-      //mp->trackball = gltrackball_init ();
+      mp->trackball = gltrackball_init ();
     }
 
-	if ((mp->hglrc = init_GL(mi)) != NULL) {
+	if ((mp->glx_context = init_GL(mi)) != NULL) {
 
 		reshape_moebius(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 		glDrawBuffer(GL_BACK);
@@ -758,8 +755,8 @@ draw_moebius (ModeInfo * mi)
 {
 	moebiusstruct *mp;
 
-	HDC display = MI_DISPLAY(mi);
-	HWND window = MI_WINDOW(mi);
+	Display    *display = MI_DISPLAY(mi);
+	Window      window = MI_WINDOW(mi);
 
         if (moebius == NULL)
 	    return;
@@ -767,37 +764,34 @@ draw_moebius (ModeInfo * mi)
 
 	MI_IS_DRAWN(mi) = True;
 
-	if (!mp->hglrc)
+	if (!mp->glx_context)
 		return;
 
-	wglMakeCurrent(display, mp->hglrc);
+	glXMakeCurrent(display, window, *(mp->glx_context));
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glPushMatrix();
 
-	glTranslatef(0.0f, 0.0f, -10.0f);
+	glTranslatef(0.0, 0.0, -10.0);
 
     /* Do it twice because we don't track the device's orientation. */
-    //glRotatef( current_device_rotation(), 0, 0, 1);
-    glRotatef( 0.0f, 0.0f, 0.0f, 1.0f);
-    //gltrackball_rotate (mp->trackball);
-    //glRotatef(-current_device_rotation(), 0, 0, 1);
-    glRotatef(-0.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef( current_device_rotation(), 0, 0, 1);
+    gltrackball_rotate (mp->trackball);
+    glRotatef(-current_device_rotation(), 0, 0, 1);
 
 	if (!MI_IS_ICONIC(mi)) {
-		glScalef((float)(Scale4Window * mp->WindH / mp->WindW), (float)Scale4Window, (float)Scale4Window);
+		glScalef(Scale4Window * mp->WindH / mp->WindW, Scale4Window, Scale4Window);
 	} else {
-		glScalef((float)(Scale4Iconic * mp->WindH / mp->WindW), (float)Scale4Iconic, (float)Scale4Iconic);
+		glScalef(Scale4Iconic * mp->WindH / mp->WindW, Scale4Iconic, Scale4Iconic);
 	}
 
     {
       double x, y, z;
-      //get_rotation (mp->rot, &x, &y, &z, !mp->button_down_p);
-      get_rotation (mp->rot, &x, &y, &z, !False);
-      glRotatef((float)(x * 360.0f), 1.0f, 0.0f, 0.0f);
-      glRotatef((float)(y * 360.0f), 0.0f, 1.0f, 0.0f);
-      glRotatef((float)(z * 360.0f), 0.0f, 0.0f, 1.0f);
+      get_rotation (mp->rot, &x, &y, &z, !mp->button_down_p);
+      glRotatef (x * 360, 1.0, 0.0, 0.0);
+      glRotatef (y * 360, 0.0, 1.0, 0.0);
+      glRotatef (z * 360, 0.0, 0.0, 1.0);
     }
 
 	/* moebius */
@@ -811,9 +805,9 @@ draw_moebius (ModeInfo * mi)
     if (MI_IS_FPS(mi)) do_fps (mi);
 	glFlush();
 
-	SwapBuffers(display);
+	glXSwapBuffers(display, window);
 
-	mp->step += (float)0.025;
+	mp->step += 0.025;
 }
 
 #ifndef STANDALONE
@@ -822,10 +816,10 @@ change_moebius (ModeInfo * mi)
 {
 	moebiusstruct *mp = &moebius[MI_SCREEN(mi)];
 
-	if (!mp->hglrc)
+	if (!mp->glx_context)
 		return;
 
-	wglMakeCurrent(MI_DISPLAY(mi), mp->hglrc);
+	glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(mp->glx_context));
 	pinit(mi);
 }
 #endif /* !STANDALONE */

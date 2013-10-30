@@ -8,21 +8,23 @@
  * software for any purpose.  It is provided "as is" without express or 
  * implied warranty.
  */
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "win32.h"
+
+#if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif
+#endif
 
 #include "yarandom.h"
 #include "glschool_alg.h"
@@ -34,14 +36,14 @@
 #define RAD2DEG		(180.0/3.1415926535)
 
 
-static double
+static inline double
 norm(double *dv)
 {
 	return sqrt(dv[0]*dv[0] + dv[1]*dv[1] + dv[2]*dv[2]);
 }
 
 
-static void
+static inline void
 addVector(double *v, double *d)
 {
 	v[0] += d[0];
@@ -50,14 +52,14 @@ addVector(double *v, double *d)
 }
 
 
-static void
+static inline void
 clearVector(double *v)
 {
 	v[0] = v[1] = v[2] = 0.0;
 }
 
 
-static void
+static inline void
 scaleVector(double *v, double s)
 {
 	v[0] *= s;
@@ -66,7 +68,7 @@ scaleVector(double *v, double s)
 }
 
 
-static void
+static inline void
 addScaledVector(double *v, double *d, double s)
 {
 	v[0] += d[0]*s;
@@ -75,7 +77,7 @@ addScaledVector(double *v, double *d, double s)
 }
 
 
-static void
+static inline void
 getDifferenceVector(double *v0, double *v1, double *diff)
 {
 	diff[0] = v0[0] - v1[0];

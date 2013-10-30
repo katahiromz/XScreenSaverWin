@@ -20,22 +20,26 @@
                        "*showFPS:   False \n" \
 		       "*wireframe: False \n" \
 
-#define refresh_chess NULL
+# define refresh_chess 0
 
-//#ifdef STANDALONE
-//# include "xlockmore.h"
-//#else
-//# include "xlock.h"
-//#endif
+#if 0
+	#ifdef STANDALONE
+	# include "xlockmore.h"
+	#else
+	# include "xlock.h"
+	#endif
+#endif
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
 #define BOARDSIZE 8
 #define WHITES 5
@@ -53,9 +57,6 @@
 #define DEF_SMOOTH      "True"
 #define DEF_CLASSIC     "False"
 
-static int rotate = True, reflections = True, smooth = True;
-static int shadows = True, classic = False;
-
 #if 0
 	static XrmOptionDescRec opts[] = {
 	  {"+rotate", ".chess.rotate", XrmoptionNoArg, "false" },
@@ -69,8 +70,11 @@ static int shadows = True, classic = False;
 	  {"+classic", ".chess.classic", XrmoptionNoArg, "false" },
 	  {"-classic", ".chess.classic", XrmoptionNoArg, "true" },
 	};
+#endif
 
+static int rotate = True, reflections = True, smooth = True, shadows = True, classic = False;
 
+#if 0
 	static argtype vars[] = {
 	  {&rotate,      "rotate",      "Rotate",      DEF_ROTATE, t_Bool},
 	  {&reflections, "reflections", "Reflections", DEF_REFLECTIONS, t_Bool},
@@ -87,6 +91,7 @@ static int shadows = True, classic = False;
 	 "draw_chess", "init_chess", NULL, &chess_opts,
 	 1000, 1, 2, 1, 4, 1.0, "",
 	 "Chess", 0, NULL};
+
 	#endif
 #endif
 
@@ -94,10 +99,9 @@ static int shadows = True, classic = False;
 #define checkImageHeight 16
 
 typedef struct {
-  //GLXContext *glx_context;
-  HGLRC hglrc;
-  HWND window;
-  //trackball_state *trackball;
+  GLXContext *glx_context;
+  Window window;
+  trackball_state *trackball;
   Bool button_down_p;
 
   ChessGame game;
@@ -125,21 +129,23 @@ typedef struct {
   int oldgame;
 
   int poly_counts[PIECES];  /* polygon count of each type of piece */
+
+
 } Chesscreen;
 
 static Chesscreen *qs = NULL;
 
-static const GLfloat MaterialShadow[] =   {0.0f, 0.0f, 0.0f, 0.3f};
+static const GLfloat MaterialShadow[] =   {0.0, 0.0, 0.0, 0.3};
 
 
 /* i prefer silvertip */
 static const GLfloat whites[WHITES][3] = 
   {
-    {1.0f, 0.55f, 0.1f},
-    {0.8f, 0.52f, 0.8f},
-    {0.43f, 0.54f, 0.76f},
-    {0.2f, 0.2f, 0.2f},
-    {0.35f, 0.60f, 0.35f},
+    {1.0, 0.55, 0.1},
+    {0.8, 0.52, 0.8},
+    {0.43, 0.54, 0.76},
+    {0.2, 0.2, 0.2},
+    {0.35, 0.60, 0.35},
   };
 
 static void build_colors(Chesscreen *cs) 
@@ -215,42 +221,42 @@ static void make_board_texture(Chesscreen *cs)
 	  Chesscreen *cs = &qs[MI_SCREEN(mi)];
 
 	  if(event->xany.type == ButtonPress && event->xbutton.button == Button1) {
-		cs->button_down_p = True;
-		gltrackball_start (cs->trackball,
-				   event->xbutton.x, event->xbutton.y,
-				   MI_WIDTH (mi), MI_HEIGHT (mi));
-		return True;
+	    cs->button_down_p = True;
+	    gltrackball_start (cs->trackball,
+			       event->xbutton.x, event->xbutton.y,
+			       MI_WIDTH (mi), MI_HEIGHT (mi));
+	    return True;
 	  }
 	  else if(event->xany.type == ButtonRelease 
 		  && event->xbutton.button == Button1) {
-		cs->button_down_p = False;
-		return True;
+	    cs->button_down_p = False;
+	    return True;
 	  }
 	  else if (event->xany.type == ButtonPress &&
-			   (event->xbutton.button == Button4 ||
-				event->xbutton.button == Button5 ||
-				event->xbutton.button == Button6 ||
-				event->xbutton.button == Button7))
-		{
-		  gltrackball_mousewheel (cs->trackball, event->xbutton.button, 5,
-								  !event->xbutton.state);
-		  return True;
-		}
+	           (event->xbutton.button == Button4 ||
+	            event->xbutton.button == Button5 ||
+	            event->xbutton.button == Button6 ||
+	            event->xbutton.button == Button7))
+	    {
+	      gltrackball_mousewheel (cs->trackball, event->xbutton.button, 5,
+	                              !event->xbutton.state);
+	      return True;
+	    }
 	  else if(event->xany.type == MotionNotify && cs->button_down_p) {
-		gltrackball_track (cs->trackball,
-				   event->xmotion.x, event->xmotion.y,
-				   MI_WIDTH (mi), MI_HEIGHT (mi));
-		return True;
+	    gltrackball_track (cs->trackball,
+			       event->xmotion.x, event->xmotion.y,
+			       MI_WIDTH (mi), MI_HEIGHT (mi));
+	    return True;
 	  }
 	  
 	  return False;
 	}
 #endif
 
-static const GLfloat diffuse2[] = {1.0f, 1.0f, 1.0f, 1.0f};
+static const GLfloat diffuse2[] = {1.0, 1.0, 1.0, 1.0};
 /*static const GLfloat ambient2[] = {0.7, 0.7, 0.7, 1.0};*/
-static const GLfloat shininess[] = {60.0f};
-static const GLfloat specular[] = {0.4f, 0.4f, 0.4f, 1.0f};
+static const GLfloat shininess[] = {60.0};
+static const GLfloat specular[] = {0.4, 0.4, 0.4, 1.0};
 
 /* configure lighting */
 static void setup_lights(Chesscreen *cs) 
@@ -301,7 +307,7 @@ static void drawPiecesShadow(ModeInfo *mi, Chesscreen *cs)
   for(i = 0; i < BOARDSIZE; ++i) {
     for(j = 0; j < BOARDSIZE; ++j) {
       if(cs->game.board[i][j]) {	
-	glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
+	glColor4f(0.0, 0.0, 0.0, 0.4);
 	glCallList(cs->game.board[i][j]%PIECES);
         mi->polygon_count += cs->poly_counts[cs->game.board[i][j]%PIECES];
       }
@@ -330,12 +336,12 @@ static void drawMovingPiece(ModeInfo *mi, Chesscreen *cs, int shadow)
   /** assume a queening.  should be more general */
   if((cs->mpiece == PAWN  && fabs(cs->to[0]) < 0.01) || 
      (cs->mpiece == BPAWN && fabs(cs->to[0]-7.0) < 0.01)) {
-    glTranslatef((float)(cs->from[1]+cs->steps*cs->dx), 0.0f, (float)(cs->from[0]+cs->steps*cs->dz));
+    glTranslatef(cs->from[1]+cs->steps*cs->dx, 0.0, cs->from[0]+cs->steps*cs->dz);
 
     glColor4f(shadow ? MaterialShadow[0] : cs->colors[cs->mpiece/7][0], 
 	      shadow ? MaterialShadow[1] : cs->colors[cs->mpiece/7][1], 
 	      shadow ? MaterialShadow[2] : cs->colors[cs->mpiece/7][2],
-	      (float)((fabs(50.0-cs->steps))/50.0f));
+	      (fabs(50.0-cs->steps))/50.0);
 
     piece = cs->steps < 50 ? PAWN : QUEEN;
 
@@ -351,10 +357,10 @@ static void drawMovingPiece(ModeInfo *mi, Chesscreen *cs, int shadow)
     GLfloat y;
     int i, j;
     Bool blocked_p = False;
-    int fromx = (int)MIN(cs->from[1], cs->to[1]);
-    int fromy = (int)MIN(cs->from[0], cs->to[0]);
-    int tox   = (int)MAX(cs->from[1], cs->to[1]);
-    int toy   = (int)MAX(cs->from[0], cs->to[0]);
+    int fromx = MIN(cs->from[1], cs->to[1]);
+    int fromy = MIN(cs->from[0], cs->to[0]);
+    int tox   = MAX(cs->from[1], cs->to[1]);
+    int toy   = MAX(cs->from[0], cs->to[0]);
     if (fromx == tox-2) fromx = tox = fromx+1;
     if (fromy == toy-2) fromy = toy = fromy+1;
     for (i = fromy; i <= toy; i++) {
@@ -370,16 +376,14 @@ static void drawMovingPiece(ModeInfo *mi, Chesscreen *cs, int shadow)
       goto SLIDE;
 
     /* Move by hopping. */
-    y = 1.5f * SINF(M_PI * cs->steps / 100.0);
-    glTranslatef((float)(cs->from[1]+cs->steps*cs->dx), (float)y,
-                 (float)(cs->from[0]+cs->steps*cs->dz));
+    y = 1.5 * sin (M_PI * cs->steps / 100.0);
+    glTranslatef(cs->from[1]+cs->steps*cs->dx, y,
+                 cs->from[0]+cs->steps*cs->dz);
 
   } else {
   SLIDE:
     /* Move by sliding. */
-    glTranslatef(
-		(float)(cs->from[1]+cs->steps*cs->dx), 0.0f, 
-		(float)(cs->from[0]+cs->steps*cs->dz));
+    glTranslatef(cs->from[1]+cs->steps*cs->dx, 0.0, cs->from[0]+cs->steps*cs->dz);
   }
 
 
@@ -407,14 +411,14 @@ static void drawTakePiece(ModeInfo *mi, Chesscreen *cs, int shadow)
   glColor4f(shadow ? MaterialShadow[0] : cs->colors[cs->tpiece/7][0], 
 	    shadow ? MaterialShadow[1] : cs->colors[cs->tpiece/7][1], 
 	    shadow ? MaterialShadow[2] : cs->colors[cs->tpiece/7][2],
-            (float)((100.0f-1.6f*cs->steps)/100.0f));
+            (100-1.6*cs->steps)/100.0);
 
-  glTranslatef((float)cs->to[1], 0.0f, (float)cs->to[0]);
+  glTranslatef(cs->to[1], 0.0, cs->to[0]);
   
   if(cs->mpiece % PIECES == KNIGHT)
-    glScalef((float)(1.0+cs->steps/100.0), 1.0f, (float)(1.0+cs->steps/100.0));
+    glScalef(1.0+cs->steps/100.0, 1.0, 1.0+cs->steps/100.0);
   else
-    glScalef(1.0f, (float)(1.0f - cs->steps/50.0 > 0.01 ? 1 - cs->steps/50.0 : 0.01), 1.0f);
+    glScalef(1.0, 1 - cs->steps/50.0 > 0.01 ? 1 - cs->steps/50.0 : 0.01, 1.0);
   glCallList(cs->tpiece % 7);
   mi->polygon_count += cs->poly_counts[cs->tpiece % PIECES];
   
@@ -438,35 +442,35 @@ static void drawBoard(ModeInfo *mi, Chesscreen *cs)
 
       /*glColor3fv(colors[(i+j)%2]);*/
       glColor4f(cs->colors[(i+j)%2][0], cs->colors[(i+j)%2][1],
-		cs->colors[(i+j)%2][2], 0.65f);
+		cs->colors[(i+j)%2][2], 0.65);
       
-      glNormal3f(0.0f, 1.0f, 0.0f);
+      glNormal3f(0.0, 1.0, 0.0);
 /*       glTexCoord2f(mod*i, mod*(j+1.0)); */
-      glTexCoord2f((float)ma1, (float)mb2);
-      glVertex3f((float)i, 0.0f, (float)(j + 1.0f));
+      glTexCoord2f(ma1, mb2);
+      glVertex3f(i, 0.0, j + 1.0);
 /*       glTexCoord2f(mod*(i+1.0), mod*(j+1.0)); */
-      glTexCoord2f((float)ma2, (float)mb2);
-      glVertex3f(i + 1.0f, 0.0f, j + 1.0f);
-      glTexCoord2f((float)ma2, (float)mb1);
+      glTexCoord2f(ma2, mb2);
+      glVertex3f(i + 1.0, 0.0, j + 1.0);
+      glTexCoord2f(ma2, mb1);
 /*       glTexCoord2f(mod*(i+1.0), mod*j); */
-      glVertex3f((float)i + 1.0f, 0.0f, (float)j);
-      glTexCoord2f((float)ma1, (float)mb1);
+      glVertex3f(i + 1.0, 0.0, j);
+      glTexCoord2f(ma1, mb1);
 /*       glTexCoord2f(mod*i, mod*j); */
-      glVertex3f((float)i, 0.0f, (float)j);
+      glVertex3f(i, 0.0, j);
 
       mi->polygon_count++;
     }
   glEnd();
 
   {
-    GLfloat off = 0.01f;
-    GLfloat w = (float)BOARDSIZE;
-    GLfloat h = 0.1f;
+    GLfloat off = 0.01;
+    GLfloat w = BOARDSIZE;
+    GLfloat h = 0.1;
 
     /* Give the board a slight lip. */
     /* #### oops, normals are wrong here, but you can't tell */
 
-    glColor3f(0.3f, 0.3f, 0.3f);
+    glColor3f(0.3, 0.3, 0.3);
     glBegin (GL_QUADS);
     glVertex3f (0,  0, 0);
     glVertex3f (0, -h, 0);
@@ -580,7 +584,7 @@ static void draw_shadow_pieces(ModeInfo *mi, Chesscreen *cs, int wire)
   
 
   glPushMatrix();
-  glTranslatef(0.0f, 0.001f, 0.0f);
+  glTranslatef(0.0, 0.001, 0.0);
 
   /* draw the pieces */
   drawPiecesShadow(mi, cs);
@@ -689,10 +693,10 @@ static void draw_reflections(ModeInfo *mi, Chesscreen *cs)
   /* only draw white squares */
   for(i = 0; i < BOARDSIZE; ++i) {
     for(j = (BOARDSIZE+i) % 2; j < BOARDSIZE; j += 2) {
-      glVertex3f((float)i, 0.0f, j + 1.0f);
-      glVertex3f(i + 1.0f, 0.0f, j + 1.0f);
-      glVertex3f(i + 1.0f, 0.0f, (float)j);
-      glVertex3f((float)i, 0.0f, (float)j);
+      glVertex3f(i, 0.0, j + 1.0);
+      glVertex3f(i + 1.0, 0.0, j + 1.0);
+      glVertex3f(i + 1.0, 0.0, j);
+      glVertex3f(i, 0.0, j);
       mi->polygon_count++;
     }
   }
@@ -728,17 +732,16 @@ static void display(ModeInfo *mi, Chesscreen *cs)
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  //glRotatef(current_device_rotation(), 0, 0, 1);
-  glRotatef(0.0, 0.0f, 0.0f, 1.0f);
+  glRotatef(current_device_rotation(), 0, 0, 1);
 
   /** setup perspectiv */
-  glTranslatef(0.0f, 0.0f, -1.5f*BOARDSIZE);
-  glRotatef(30.0f, 1.0f, 0.0f, 0.0f);
-  //gltrackball_rotate (cs->trackball);
+  glTranslatef(0.0, 0.0, -1.5*BOARDSIZE);
+  glRotatef(30.0, 1.0, 0.0, 0.0);
+  gltrackball_rotate (cs->trackball);
 
   if (rotate)
-    glRotatef((float)(cs->theta*100.0f), 0.0f, 1.0f, 0.0f);
-  glTranslatef(-0.5f*BOARDSIZE, 0.0f, -0.5f*BOARDSIZE);
+    glRotatef(cs->theta*100, 0.0, 1.0, 0.0);
+  glTranslatef(-0.5*BOARDSIZE, 0.0, -0.5*BOARDSIZE);
 
 /*   cs->position[0] = 4.0 + 1.0*-sin(cs->theta*100*M_PI/180.0); */
 /*   cs->position[2] = 4.0 + 1.0* cos(cs->theta*100*M_PI/180.0); */
@@ -749,8 +752,8 @@ static void display(ModeInfo *mi, Chesscreen *cs)
   cs->position[2] = 1.0;
   cs->position[1] = 16.0;
 
-  cs->position2[0] = 4.0f + 8.0f*-SINF(cs->theta*100*M_PI/180.0);
-  cs->position2[2] = 4.0f + 8.0f* COSF(cs->theta*100*M_PI/180.0);
+  cs->position2[0] = 4.0 + 8.0*-sin(cs->theta*100*M_PI/180.0);
+  cs->position2[2] = 4.0 + 8.0* cos(cs->theta*100*M_PI/180.0);
 
   if (!cs->wire) {
     glEnable(GL_LIGHTING);
@@ -786,9 +789,9 @@ static void display(ModeInfo *mi, Chesscreen *cs)
       
       /* display ant shadow */
       glPushMatrix();
-      glTranslatef(0.0f, 0.001f, 0.0f);
+      glTranslatef(0.0, 0.001, 0.0);
       glMultMatrixf(m[0]);
-      glTranslatef(0.5f, 0.01f, 0.5f);
+      glTranslatef(0.5, 0.01, 0.5);
       draw_shadow_pieces(mi, cs, cs->wire);
       glPopMatrix();      
 
@@ -839,47 +842,47 @@ ENTRYPOINT void init_chess(ModeInfo *mi)
   cs = &qs[screen];
   cs->window = MI_WINDOW(mi);
   cs->wire = MI_IS_WIREFRAME(mi);
-  //cs->trackball = gltrackball_init ();
+  cs->trackball = gltrackball_init ();
   
   cs->oldwhite = -1;
 
-  cs->colors[0][0] = 1.0f;
-  cs->colors[0][1] = 0.5f;
-  cs->colors[0][2] = 0.0f;
+  cs->colors[0][0] = 1.0;
+  cs->colors[0][1] = 0.5;
+  cs->colors[0][2] = 0.0;
 
-  cs->colors[1][0] = 0.6f;
-  cs->colors[1][1] = 0.6f;
-  cs->colors[1][2] = 0.6f;
+  cs->colors[1][0] = 0.6;
+  cs->colors[1][1] = 0.6;
+  cs->colors[1][2] = 0.6;
 
   cs->done = 1;
   cs->count = 99;
-  cs->mod = 1.4f;
+  cs->mod = 1.4;
 
-/*   cs->position[0] = 0.0f; */
-/*   cs->position[1] = 5.0f; */
-/*   cs->position[2] = 5.0f; */
-/*   cs->position[3] = 1.0f; */
+/*   cs->position[0] = 0.0; */
+/*   cs->position[1] = 5.0; */
+/*   cs->position[2] = 5.0; */
+/*   cs->position[3] = 1.0; */
 
-  cs->position[0] = 0.0f;
-  cs->position[1] = 24.0f;
-  cs->position[2] = 2.0f;
-  cs->position[3] = 1.0f;
+  cs->position[0] = 0.0;
+  cs->position[1] = 24.0;
+  cs->position[2] = 2.0;
+  cs->position[3] = 1.0;
 
 
-  cs->position2[0] = 5.0f;
-  cs->position2[1] = 5.0f;
-  cs->position2[2] = 5.0f;
-  cs->position2[3] = 1.0f;
+  cs->position2[0] = 5.0;
+  cs->position2[1] = 5.0;
+  cs->position2[2] = 5.0;
+  cs->position2[3] = 1.0;
 
-  cs->ground[0] = 0.0f;
-  cs->ground[1] = 1.0f;
-  cs->ground[2] = 0.0f;
-  cs->ground[3] = -0.00001f;
+  cs->ground[0] = 0.0;
+  cs->ground[1] = 1.0;
+  cs->ground[2] = 0.0;
+  cs->ground[3] = -0.00001;
 
   cs->oldgame = -1;
 
 
-  if((cs->hglrc = init_GL(mi)))
+  if((cs->glx_context = init_GL(mi)))
     reshape_chess(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
   else
     MI_CLEARWINDOW(mi);
@@ -914,13 +917,13 @@ ENTRYPOINT void init_chess(ModeInfo *mi)
 ENTRYPOINT void draw_chess(ModeInfo *mi) 
 {
   Chesscreen *cs = &qs[MI_SCREEN(mi)];
-  HWND w = MI_WINDOW(mi);
-  HDC disp = MI_DISPLAY(mi);
+  Window w = MI_WINDOW(mi);
+  Display *disp = MI_DISPLAY(mi);
 
-  if(!cs->hglrc)
+  if(!cs->glx_context)
     return;
 
-  wglMakeCurrent(disp, cs->hglrc);
+  glXMakeCurrent(disp, w, *(cs->glx_context));
 
   /** code for moving a piece */
   if(cs->moving && ++cs->steps == 100) {
@@ -960,7 +963,7 @@ ENTRYPOINT void draw_chess(ModeInfo *mi)
 	newgame = random()%GAMES;
 
       /* mod the mod */
-      cs->mod = 0.6f + (random()%20)/10.0f;
+      cs->mod = 0.6 + (random()%20)/10.0;
 
       /* same old game */
       cs->oldgame = newgame;
@@ -978,18 +981,18 @@ ENTRYPOINT void draw_chess(ModeInfo *mi)
   /* set lighting */
   if(cs->done) {
     glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 
-	     (float)(cs->done == 1 ? 1.0+0.1*cs->count : 100.0/cs->count));
+	     cs->done == 1 ? 1.0+0.1*cs->count : 100.0/cs->count);
     glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 
-	     (float)(cs->done == 1 ? 1.0+0.1*cs->count : 100.0/cs->count));
-    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.14f);
-    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.14f);
+	     cs->done == 1 ? 1.0+0.1*cs->count : 100.0/cs->count);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.14);
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.14);
   }
 
   display(mi, cs);
 
   if(mi->fps_p) do_fps(mi);
   glFinish(); 
-  SwapBuffers(disp);
+  glXSwapBuffers(disp, w);
 }
 
 /** bust it */
@@ -1004,4 +1007,4 @@ ENTRYPOINT void release_chess(ModeInfo *mi)
 
 XSCREENSAVER_MODULE_2 ("Endgame", endgame, chess)
 
-//#endif
+#endif

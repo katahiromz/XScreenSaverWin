@@ -26,17 +26,14 @@
 
 /* chessmodels.c: Contains the code for piece model creation */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif /* HAVE_CONFIG_H */
-
-#include <windows.h>
-#include <math.h>
-#include <stdlib.h>
-#include <GL/gl.h>
-#include "win32.h"
-
 #if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif /* HAVE_CONFIG_H */
+
+	#include <math.h>
+	#include <stdlib.h>
+
 	#ifndef HAVE_COCOA
 	# include <GL/glx.h>
 	# include <GL/gl.h>
@@ -46,6 +43,15 @@
 	# include "jwzgles.h"
 	#endif /* HAVE_JWZGLES */
 #endif
+
+#include <windows.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#include "win32.h"
 
 #include "chessmodels.h"
 
@@ -1557,7 +1563,7 @@ enumerate_faces( unsigned short *data, void *h, int *count_ret,
 
 static void
 normalize( float v[3]) {
-  float d = (float)sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+  float d = sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
 
   if( d == 0.0) {
 	/* The direction is undefined - normalize it anyway */
@@ -1636,9 +1642,9 @@ add_normal( void *dummy, int v1, int v2, int v3, int v4)
 static void
 collect_vertex( void *curvert, double x, double y, double z)
 {
-  (*(float**)curvert)[0] = (float)x;
-  (*(float**)curvert)[1] = (float)y;
-  (*(float**)curvert)[2] = (float)z;
+  (*(float**)curvert)[0] = x;
+  (*(float**)curvert)[1] = y;
+  (*(float**)curvert)[2] = z;
   (*(float**)curvert) += 3;
 }
 

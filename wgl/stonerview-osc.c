@@ -10,18 +10,18 @@
    implied warranty.
 */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
+#if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif
 #endif
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
-
-#include "win32.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 

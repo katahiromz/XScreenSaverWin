@@ -23,16 +23,18 @@
  * 0.2 Bugfixes (threading) and code cleanup by Jamie Zawinski
  *     Window scaling bug + performance bug in tick()
  */
+ 
+//#include <sys/time.h> /* gettimeofday */
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
-
-//#include <sys/time.h> /* gettimeofday */
 
 //#include "xlockmore.h"
 
@@ -43,8 +45,8 @@
 #define INDEX_OFFSET 100000
 #define NUM_CELL_SHAPES 10
 
-#define refresh_glcells NULL
-#define glcells_handle_event NULL
+#define refresh_glcells 0
+#define glcells_handle_event 0
 
 #define DEF_DELAY     "20000"
 #define DEF_MAXCELLS  "800"
@@ -66,9 +68,9 @@
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-//#ifndef HAVE_JWZGLES /* glDrawElements unimplemented... */
-//# define USE_VERTEX_ARRAY
-//#endif
+#ifndef HAVE_JWZGLES /* glDrawElements unimplemented... */
+# define USE_VERTEX_ARRAY
+#endif
 
 #define TEX_SIZE 64
 
@@ -127,8 +129,7 @@ typedef struct    /* Cell */
 
 typedef struct    /* hacks state */
 {
-  //GLXContext *glx_context;
-  HGLRC hglrc;
+  GLXContext *glx_context;
   int width, height;    /* current size of viewport */
   double screen_scale;  /* we scale content with window size */
   int num_cells;        /* current number of cell in list */
@@ -185,8 +186,8 @@ static int  s_minfood = 5;
 static int  s_maxfood = 20;
 static int  s_divideage = 20;
 static int  s_pause = 50;
-static float s_min_dist = 1.4f;
-static Bool s_keepold = True;
+static float s_min_dist = 1.4;
+static Bool s_keepold = False;
 
 #if 0
 	static argtype vars[] = {
@@ -263,23 +264,23 @@ static VertexArray *array_from_ObjectSmooth( ObjectSmooth * );
 static void create_nucleus_texture( State *st );
 
 #if 0
-ENTRYPOINT ModeSpecOpt glcells_opts = { countof(opts), opts,                                                   countof(vars), vars, 
-                                        NULL };
-#endif
+	ENTRYPOINT ModeSpecOpt glcells_opts = { countof(opts), opts,                                                   countof(vars), vars, 
+											NULL };
+#endif                                        
 
 /**********************************
-  FUNCTIONS
+  INLINE FUNCTIONS
  **********************************/
 /* create random numbers
 */
-static int random_interval( int min, int max )
+static inline int random_interval( int min, int max )
 {
   int n = max - min;
   if (n == 0) n = 1;
   return min+(random()%n);
 }
 
-static int random_max( int max )
+static inline int random_max( int max )
 {
   return random()%max;
 }
@@ -288,7 +289,7 @@ static int random_max( int max )
 */
 
 /* a += b */
-static void vector_add( Vector *a, Vector *b )
+static inline void vector_add( Vector *a, Vector *b )
 {
   a->x += b->x;
   a->y += b->y;
@@ -296,7 +297,7 @@ static void vector_add( Vector *a, Vector *b )
 }
 
 /* a -= b */
-static void vector_sub( Vector *a, Vector *b )
+static inline void vector_sub( Vector *a, Vector *b )
 {
   a->x -= b->x;
   a->y -= b->y;
@@ -304,7 +305,7 @@ static void vector_sub( Vector *a, Vector *b )
 }
 
 /* a *= v */
-static void vector_mul( Vector *a, double v )
+static inline void vector_mul( Vector *a, double v )
 {
   a->x *= v;
   a->y *= v;
@@ -312,19 +313,19 @@ static void vector_mul( Vector *a, double v )
 }
 
 /* set to 0 */
-static void vector_clear( Vector *vec )
+static inline void vector_clear( Vector *vec )
 {
   vec->x = vec->y = vec->z = 0;
 }
 
 /* return vector length */
-static double vector_length( Vector *vec )
+static inline double vector_length( Vector *vec )
 {
   return sqrt( vec->x*vec->x + vec->y*vec->y + vec->z*vec->z );
 }
 
 /* normalize vector */
-static void vector_normalize( Vector *vec )
+static inline void vector_normalize( Vector *vec )
 {
   double len = vector_length( vec );
   
@@ -334,7 +335,7 @@ static void vector_normalize( Vector *vec )
 }
 
 /* crossproduct */
-static void vector_crossprod( Vector *a, Vector *b, Vector *out )
+static inline void vector_crossprod( Vector *a, Vector *b, Vector *out )
 {
   out->x = a->y*b->z - a->z*b->y;
   out->y = a->z*b->x - a->x*b->z;
@@ -342,7 +343,7 @@ static void vector_crossprod( Vector *a, Vector *b, Vector *out )
 }
 
 /* epsilon compare of two vectors */
-static int vector_compare( Vector *a, Vector *b )
+static inline int vector_compare( Vector *a, Vector *b )
 {
   const double epsilon = 0.0000001;
   Vector delta = *a;
@@ -360,7 +361,7 @@ static int vector_compare( Vector *a, Vector *b )
 /* check if given cell is capable of dividing 
    needs space, must be old enough, grown up and healthy
 */
-static int can_divide( State *st, Cell *cell )
+static inline int can_divide( State *st, Cell *cell )
 {
   if (cell->min_dist > st->move_dist &&
       cell->age >= st->divide_age &&
@@ -741,9 +742,9 @@ static int render( State *st )
       if (st->cell[b].energy <= 0) {
         num_paint++;
         glPushMatrix();
-        glTranslatef( (float)st->cell[b].x, (float)st->cell[b].y, 0.0f );
-        glRotatef( (float)st->cell[b].rotation, 0.0f, 0.0f, 1.0f );
-        glScalef( (float)st->cell[b].radius, (float)st->cell[b].radius, (float)st->cell[b].radius );
+        glTranslatef( st->cell[b].x, st->cell[b].y, 0.0 );
+        glRotatef( st->cell[b].rotation, 0.0, 0.0, 1.0 );
+        glScalef( st->cell[b].radius, st->cell[b].radius, st->cell[b].radius );
         draw_cell( st, 9 );
         glPopMatrix();
       }
@@ -763,9 +764,9 @@ static int render( State *st )
       /*glColor3f( fac, fac, fac );*/
       
       glPushMatrix();
-      glTranslatef( (float)st->cell[b].x, (float)st->cell[b].y, 0.0f );
-      glRotatef( (float)st->cell[b].rotation, 0.0f, 0.0f, 1.0f );
-      glScalef( (float)st->cell[b].radius, (float)st->cell[b].radius, (float)st->cell[b].radius );
+      glTranslatef( st->cell[b].x, st->cell[b].y, 0.0 );
+      glRotatef( st->cell[b].rotation, 0.0, 0.0, 1.0 );
+      glScalef( st->cell[b].radius, st->cell[b].radius, st->cell[b].radius );
       draw_cell( st, 9-shape );
       glPopMatrix();
     }
@@ -787,8 +788,8 @@ static int render( State *st )
     for (b=0; b<st->num_cells; ++b) {
       if (st->cell[b].energy>0 || st->keep_old_cells) {
         glPushMatrix();
-        glTranslatef( (float)st->cell[b].x, (float)st->cell[b].y, 0.0f );
-        glScalef( (float)st->cell[b].radius, (float)st->cell[b].radius, (float)st->cell[b].radius );
+        glTranslatef( st->cell[b].x, st->cell[b].y, 0.0 );
+        glScalef( st->cell[b].radius, st->cell[b].radius, st->cell[b].radius );
         draw_nucleus( st );
         glPopMatrix();
       }
@@ -900,12 +901,12 @@ static int create_list( State *st, double fac )
   
   for (t=0; t<smooth->num_triangle; ++t) {
     for (i=0; i<3; ++i) {
-      glNormal3f( (float)smooth->normal[smooth->triangle[t].i[i]].x, 
-                  (float)smooth->normal[smooth->triangle[t].i[i]].y, 
-                  (float)smooth->normal[smooth->triangle[t].i[i]].z );
-      glVertex3f( (float)smooth->vertex[smooth->triangle[t].i[i]].x, 
-                  (float)smooth->vertex[smooth->triangle[t].i[i]].y, 
-                  (float)smooth->vertex[smooth->triangle[t].i[i]].z );
+      glNormal3f( smooth->normal[smooth->triangle[t].i[i]].x, 
+                  smooth->normal[smooth->triangle[t].i[i]].y, 
+                  smooth->normal[smooth->triangle[t].i[i]].z );
+      glVertex3f( smooth->vertex[smooth->triangle[t].i[i]].x, 
+                  smooth->vertex[smooth->triangle[t].i[i]].y, 
+                  smooth->vertex[smooth->triangle[t].i[i]].z );
     }
   }    
   
@@ -931,14 +932,14 @@ static void create_nucleus_texture( State *st )
 {
   int x, y;
   int w2 = TEX_SIZE/2;
-  float s = (float)(w2*w2/4.0f);
+  float s = w2*w2/4.0;
   
   st->texture = (GLubyte *) malloc( 4*TEX_SIZE*TEX_SIZE );
   
   for (y=0; y<TEX_SIZE; ++y) {
     for (x=0; x<TEX_SIZE; ++x) {
-      float r2 = (float)((x-w2)*(x-w2)+(y-w2)*(y-w2));
-      float v = (float)(120.0f * expf( -(r2) / s ));
+      float r2 = ((x-w2)*(x-w2)+(y-w2)*(y-w2));
+      float v = 120.0 * expf( -(r2) / s );
       st->texture[4*(x+y*TEX_SIZE)]   = (GLubyte)0;
       st->texture[4*(x+y*TEX_SIZE)+1] = (GLubyte)0;
       st->texture[4*(x+y*TEX_SIZE)+2] = (GLubyte)0;
@@ -984,9 +985,9 @@ static void create_cells( State *st )
   int w = st->width-2*border;
   int h = st->height-2*border;
   
-  st->color[0] = (float)(0.5f + random_max( 1000 ) * 0.0005f);
-  st->color[1] = (float)(0.5f + random_max( 1000 ) * 0.0005f);
-  st->color[2] = (float)(0.5f + random_max( 1000 ) * 0.0005f);
+  st->color[0] = 0.5 + random_max( 1000 ) * 0.0005;
+  st->color[1] = 0.5 + random_max( 1000 ) * 0.0005;
+  st->color[2] = 0.5 + random_max( 1000 ) * 0.0005;
   st->color[3] = 1.0f;
   
   /* allocate if startup */
@@ -1196,10 +1197,10 @@ reshape_glcells( ModeInfo *mi, int width, int height )
   if (st->radius > 200) st->radius = 200;
   st->radius *= st->screen_scale;
        
-  st->move_dist = (int)s_min_dist;
-  if (st->move_dist < 1.0) st->move_dist = 1;
-  if (st->move_dist > 3.0) st->move_dist = 3;
-  st->move_dist *= (int)st->radius;
+  st->move_dist = s_min_dist;
+  if (st->move_dist < 1.0) st->move_dist = 1.0;
+  if (st->move_dist > 3.0) st->move_dist = 3.0;
+  st->move_dist *= st->radius;
 
   glViewport (0, 0, (GLint) width, (GLint) height);
 
@@ -1213,8 +1214,6 @@ reshape_glcells( ModeInfo *mi, int width, int height )
   st->food = (int *)malloc( ((width*height)/16)*sizeof(int) );
   /* create_cells( st );*/
 }
-
-const char *progname = "GLCells";
 
 ENTRYPOINT void 
 init_glcells( ModeInfo *mi )
@@ -1232,7 +1231,7 @@ init_glcells( ModeInfo *mi )
   }
   st = &sstate[MI_SCREEN(mi)];
   
-  st->hglrc = init_GL(mi);
+  st->glx_context = init_GL(mi);
   st->cell = 0;
   st->num_cells = 0;
   st->wire = MI_IS_WIREFRAME(mi);
@@ -1279,10 +1278,10 @@ init_glcells( ModeInfo *mi )
   if (st->divide_age < 1) st->divide_age = 1;
   if (st->divide_age > 1000) st->divide_age = 1000;
      
-  st->move_dist = (int)s_min_dist;
-  if (st->move_dist < 1.0) st->move_dist = 1;
-  if (st->move_dist > 3.0) st->move_dist = 3;
-  st->move_dist *= (int)st->radius;
+  st->move_dist = s_min_dist;
+  if (st->move_dist < 1.0) st->move_dist = 1.0;
+  if (st->move_dist > 3.0) st->move_dist = 3.0;
+  st->move_dist *= st->radius;
   
   for (i=0; i<NUM_CELL_SHAPES; ++i) st->cell_list[i] = -1;
   st->nucleus_list = -1;
@@ -1305,19 +1304,20 @@ ENTRYPOINT void
 draw_glcells( ModeInfo *mi )
 {
   State *st = &sstate[MI_SCREEN(mi)];
-  HDC dpy = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display *dpy = MI_DISPLAY(mi);
+  Window window = MI_WINDOW(mi);
   
-  if (!st->hglrc) return;
+  if (!st->glx_context) return;
 
-  wglMakeCurrent(MI_DISPLAY(mi), st->hglrc);
+  glXMakeCurrent( MI_DISPLAY(mi), MI_WINDOW(mi), 
+                  *(st->glx_context) );
   
   mi->polygon_count = render( st );
   
   if (mi->fps_p) do_fps (mi);
   
   glFinish();
-  SwapBuffers( dpy );
+  glXSwapBuffers( dpy, window );
 }
 
 ENTRYPOINT void 

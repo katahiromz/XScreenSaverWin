@@ -19,21 +19,22 @@
 			"*fpsSolid:     True        \n" \
 			"*doubleBuffer: False       \n" \
 
-#define refresh_noof NULL
-#define release_noof NULL
-#define noof_handle_event NULL
-
+# define refresh_noof 0
+# define release_noof 0
+# define noof_handle_event 0
 //#include "xlockmore.h"
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL /* whole file */
+#ifdef USE_GL /* whole file */
 
 #define N_SHAPES 7
 
@@ -41,11 +42,12 @@
    It looks fine single-buffered, so let's just do that. */
 static int dbuf_p = 0;
 
-//ENTRYPOINT ModeSpecOpt noof_opts = {0, NULL, 0, NULL, NULL};
+#if 0
+	ENTRYPOINT ModeSpecOpt noof_opts = {0, NULL, 0, NULL, NULL};
+#endif
 
 typedef struct {
-  //GLXContext *glx_context;
-  HGLRC hglrc;
+  GLXContext *glx_context;
 
   float pos[N_SHAPES * 3];
   float dir[N_SHAPES * 3];
@@ -78,59 +80,59 @@ initshapes(noof_configuration *bp, int i)
 
   /* random init of pos, dir, color */
   for (k = i * 3; k <= i * 3 + 2; k++) {
-    f = (float)(random() / (double) RAND_MAX);
+    f = random() / (double) RAND_MAX;
     bp->pos[k] = f;
-    f = (float)(random() / (double) RAND_MAX);
-    f = (float)((f - 0.5f) * 0.05f);
+    f = random() / (double) RAND_MAX;
+    f = (f - 0.5) * 0.05;
     bp->dir[k] = f;
-    f = (float)(random() / (double) RAND_MAX);
-    f = (float)((f - 0.5f) * 0.0002f);
+    f = random() / (double) RAND_MAX;
+    f = (f - 0.5) * 0.0002;
     bp->acc[k] = f;
-    f = (float)(random() / (double) RAND_MAX);
+    f = random() / (double) RAND_MAX;
     bp->col[k] = f;
   }
 
   bp->speedsq[i] = bp->dir[i * 3] * bp->dir[i * 3] + bp->dir[i * 3 + 1] * bp->dir[i * 3 + 1];
-  f = (float)(random() / (double) RAND_MAX);
+  f = random() / (double) RAND_MAX;
   bp->blad[i] = 2 + (int) (f * 17.0);
-  f = (float)(random() / (double) RAND_MAX);
+  f = random() / (double) RAND_MAX;
   bp->ang[i] = f;
-  f = (float)(random() / (double) RAND_MAX);
-  bp->spn[i] = (float)((f - 0.5f) * 40.0f / (10 + bp->blad[i]));
-  f = (float)(random() / (double) RAND_MAX);
-  bp->sca[i] = (float)(f * 0.1f + 0.08f);
+  f = random() / (double) RAND_MAX;
+  bp->spn[i] = (f - 0.5) * 40.0 / (10 + bp->blad[i]);
+  f = random() / (double) RAND_MAX;
+  bp->sca[i] = (f * 0.1 + 0.08);
   bp->dir[i * 3] *= bp->sca[i];
   bp->dir[i * 3 + 1] *= bp->sca[i];
 
-  f = (float)(random() / (double) RAND_MAX);
-  bp->hsv[i * 3] = f * 360.0f;
+  f = random() / (double) RAND_MAX;
+  bp->hsv[i * 3] = f * 360.0;
 
-  f = (float)(random() / (double) RAND_MAX);
-  bp->hsv[i * 3 + 1] = f * 0.6f + 0.4f;
+  f = random() / (double) RAND_MAX;
+  bp->hsv[i * 3 + 1] = f * 0.6 + 0.4;
 
-  f = (float)(random() / (double) RAND_MAX);
-  bp->hsv[i * 3 + 2] = f * 0.7f + 0.3f;
+  f = random() / (double) RAND_MAX;
+  bp->hsv[i * 3 + 2] = f * 0.7 + 0.3;
 
-  f = (float)(random() / (double) RAND_MAX);
-  bp->hpr[i * 3] = f * 0.005f * 360.0f;
-  f = (float)(random() / (double) RAND_MAX);
-  bp->hpr[i * 3 + 1] = f * 0.03f;
-  f = (float)(random() / (double) RAND_MAX);
-  bp->hpr[i * 3 + 2] = f * 0.02f;
+  f = random() / (double) RAND_MAX;
+  bp->hpr[i * 3] = f * 0.005 * 360.0;
+  f = random() / (double) RAND_MAX;
+  bp->hpr[i * 3 + 1] = f * 0.03;
+  f = random() / (double) RAND_MAX;
+  bp->hpr[i * 3 + 2] = f * 0.02;
 
   bp->geep[i] = 0;
-  f = (float)(random() / (double) RAND_MAX);
-  bp->peep[i] = 0.01f + f * 0.2f;
+  f = random() / (double) RAND_MAX;
+  bp->peep[i] = 0.01 + f * 0.2;
 }
 
 static const float bladeratio[] =
 {
   /* nblades = 2..7 */
-  0.0f, 0.0f, 3.00000f, 1.73205f, 1.00000f, 0.72654f, 0.57735f, 0.48157f,
+  0.0, 0.0, 3.00000, 1.73205, 1.00000, 0.72654, 0.57735, 0.48157,
   /* 8..13 */
-  0.41421f, 0.36397f, 0.19076f, 0.29363f, 0.26795f, 0.24648f,
+  0.41421, 0.36397, 0.19076, 0.29363, 0.26795, 0.24648,
   /* 14..19 */
-  0.22824f, 0.21256f, 0.19891f, 0.18693f, 0.17633f, 0.16687f,
+  0.22824, 0.21256, 0.19891, 0.18693, 0.17633, 0.16687,
 };
 
 static int
@@ -143,20 +145,20 @@ drawleaf(noof_configuration *bp, int l)
 
   blades = bp->blad[l];
 
-  y = 0.10f * SINF(bp->geep[l] * M_PI / 180.0) + 0.099f * SINF(bp->geep[l] * 5.12 * M_PI / 180.0);
+  y = 0.10 * sin(bp->geep[l] * M_PI / 180.0) + 0.099 * sin(bp->geep[l] * 5.12 * M_PI / 180.0);
   if (y < 0)
     y = -y;
-  x = 0.15f * COSF(bp->geep[l] * M_PI / 180.0) + 0.149f * COSF(bp->geep[l] * 5.12 * M_PI / 180.0);
-  if (x < 0.0f)
-    x = 0.0f - x;
+  x = 0.15 * cos(bp->geep[l] * M_PI / 180.0) + 0.149 * cos(bp->geep[l] * 5.12 * M_PI / 180.0);
+  if (x < 0.0)
+    x = 0.0 - x;
   if (y < 0.001 && x > 0.000002 && ((bp->tko & 0x1) == 0)) {
     initshapes(bp, l);      /* let it become reborn as something
                            else */
     bp->tko++;
     return polys;
   } {
-    float w1 = SINF(bp->geep[l] * 15.3 * M_PI / 180.0);
-    wobble = 3.0f + 2.00f * SINF(bp->geep[l] * 0.4 * M_PI / 180.0) + 3.94261f * w1;
+    float w1 = sin(bp->geep[l] * 15.3 * M_PI / 180.0);
+    wobble = 3.0 + 2.00 * sin(bp->geep[l] * 0.4 * M_PI / 180.0) + 3.94261 * w1;
   }
 
   /**
@@ -174,7 +176,7 @@ drawleaf(noof_configuration *bp, int l)
   for (b = 0; b < blades; b++) {
     glPushMatrix();
     glTranslatef(bp->pos[l * 3], bp->pos[l * 3 + 1], bp->pos[l * 3 + 2]);
-    glRotatef((float)(bp->ang[l] + b * (360.0 / blades)), 0.0f, 0.0f, 1.0f);
+    glRotatef(bp->ang[l] + b * (360.0 / blades), 0.0, 0.0, 1.0);
     glScalef(wobble * bp->sca[l], wobble * bp->sca[l], wobble * bp->sca[l]);
     /**
     if(tko & 0x40000) glColor3f(col[l*3], col[l*3+1], col[l*3+2]); 
@@ -189,7 +191,7 @@ drawleaf(noof_configuration *bp, int l)
     glVertex2f(x * bp->sca[l], 0.0);
     glVertex2f(x, y);
     glVertex2f(x, -y);  /* C */
-    glVertex2f(0.3f, 0.0f);  /* D */
+    glVertex2f(0.3, 0.0);  /* D */
     polys += 2;
     glEnd();
 
@@ -201,7 +203,7 @@ drawleaf(noof_configuration *bp, int l)
     glBegin(GL_LINE_LOOP);
     glVertex2f(x * bp->sca[l], 0.0);
     glVertex2f(x, y);
-    glVertex2f(0.3f, 0.0f);  /* D */
+    glVertex2f(0.3, 0.0);  /* D */
     glVertex2f(x, -y);  /* C */
     polys += 3;
     glEnd();
@@ -306,7 +308,7 @@ colorUpdate(noof_configuration *bp, int i)
     if (S(bp->hsv) > 1.0)
       S(bp->hsv) = 1.0;
 
-    h = H(bp->hsv) / 60.0f;
+    h = H(bp->hsv) / 60.0;
     hi = (int) (h);
     f = h - hi;
     v = V(bp->hsv);
@@ -356,14 +358,14 @@ gravity(noof_configuration *bp, float fx)
       t = bp->pos[b * 3 + 1] - bp->pos[a * 3 + 1];
       d2 += t * t;
       if (d2 < 0.000001)
-        d2 = 0.00001f;
+        d2 = 0.00001;
       if (d2 < 0.1) {
 
         float v0, v1, z;
         v0 = bp->pos[b * 3] - bp->pos[a * 3];
         v1 = bp->pos[b * 3 + 1] - bp->pos[a * 3 + 1];
 
-        z = 0.00000001f * fx / (d2);
+        z = 0.00000001 * fx / (d2);
 
         bp->dir[a * 3] += v0 * z * bp->sca[b];
         bp->dir[b * 3] += -v0 * z * bp->sca[a];
@@ -388,9 +390,9 @@ draw_noof (ModeInfo *mi)
   int i;
   noof_configuration *bp = &bps[MI_SCREEN(mi)];
 
-  if (!bp->hglrc)
+  if (!bp->glx_context)
     return;
-  wglMakeCurrent(MI_DISPLAY(mi), bp->hglrc);
+  glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(bp->glx_context));
   mi->polygon_count = 0;
 
   /**
@@ -420,7 +422,7 @@ draw_noof (ModeInfo *mi)
   glFinish();
 
   if (dbuf_p)
-    SwapBuffers(MI_DISPLAY(mi));
+    glXSwapBuffers(MI_DISPLAY(mi), MI_WINDOW(mi));
 }
 
 
@@ -450,8 +452,6 @@ reshape_noof(ModeInfo *mi, int w, int h)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-const char *progname = "Noof";
-
 ENTRYPOINT void 
 init_noof (ModeInfo *mi)
 {
@@ -473,7 +473,7 @@ init_noof (ModeInfo *mi)
 
   bp = &bps[MI_SCREEN(mi)];
 
-  bp->hglrc = init_GL(mi);
+  bp->glx_context = init_GL(mi);
 
   glDrawBuffer(dbuf_p ? GL_BACK : GL_FRONT);
   glEnable(GL_LINE_SMOOTH);
@@ -487,4 +487,4 @@ init_noof (ModeInfo *mi)
 
 XSCREENSAVER_MODULE ("Noof", noof)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */

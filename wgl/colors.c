@@ -13,13 +13,21 @@
    to hack the screen with.
  */
 
-#include "utils.h"
+#include <windows.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <stdio.h>
+
+#include "win32.h"
+
+//#include "utils.h"
 #include "hsv.h"
 #include "yarandom.h"
-#include "visual.h"
+//#include "visual.h"
 #include "colors.h"
-
-extern char *progname;
 
 void
 free_colors (Screen *screen, Colormap cmap, XColor *colors, int ncolors)

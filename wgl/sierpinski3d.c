@@ -31,7 +31,7 @@ static const char sccsid[] = "@(#)sierpinski3D.c	00.01 99/11/04 xlockmore";
 									"*showFPS:      False   \n"			\
 									"*wireframe:	False	\n"			\
 
-#define refresh_gasket NULL
+# define refresh_gasket 0
 
 #if 0
 	#ifdef STANDALONE
@@ -44,11 +44,14 @@ static const char sccsid[] = "@(#)sierpinski3D.c	00.01 99/11/04 xlockmore";
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
 #define DEF_SPIN			        "True"
 #define DEF_WANDER			        "True"
@@ -83,7 +86,6 @@ static Bool do_wander = True;
 	  {&max_depth, "maxDepth", "MaxDepth", DEF_MAX_DEPTH, t_Int},
 	};
 
-
 	ENTRYPOINT ModeSpecOpt gasket_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 	#ifdef USE_MODULES
@@ -92,6 +94,7 @@ static Bool do_wander = True;
 	 "draw_gasket", "init_gasket", NULL, &gasket_opts,
 	 1000, 1, 2, 1, 4, 1.0, "",
 	 "Shows GL's Sierpinski gasket", 0, NULL};
+
 	#endif
 #endif
 
@@ -101,12 +104,11 @@ typedef struct {
 
 typedef struct {
   GLuint      gasket0, gasket1, gasket2, gasket3;
-  //GLXContext *glx_context;
-  HGLRC hglrc;
-  HWND window;
+  GLXContext *glx_context;
+  Window      window;
   rotator    *rot;
-  //trackball_state *trackball;
-  //Bool		  button_down_p;
+  trackball_state *trackball;
+  Bool		  button_down_p;
 
   int current_depth;
 
@@ -151,34 +153,34 @@ four_tetras (gasketstruct *gp,
       (*countP)++;
       if (which == 0)
         {
-          glNormal3f ((float)normals[0].x, (float)normals[0].y, (float)normals[0].z);
-          triangle ((float)outer[0].x, (float)outer[0].y, (float)outer[0].z,
-                    (float)outer[1].x, (float)outer[1].y, (float)outer[1].z,
-                    (float)outer[2].x, (float)outer[2].y, (float)outer[2].z,
+          glNormal3f (normals[0].x, normals[0].y, normals[0].z);
+          triangle (outer[0].x, outer[0].y, outer[0].z,
+                    outer[1].x, outer[1].y, outer[1].z,
+                    outer[2].x, outer[2].y, outer[2].z,
                     wireframe_p);
         }
       else if (which == 1)
         {
-          glNormal3f ((float)normals[1].x, (float)normals[1].y, (float)normals[1].z);
-          triangle ((float)outer[0].x, (float)outer[0].y, (float)outer[0].z,
-                    (float)outer[3].x, (float)outer[3].y, (float)outer[3].z,
-                    (float)outer[1].x, (float)outer[1].y, (float)outer[1].z,
+          glNormal3f (normals[1].x, normals[1].y, normals[1].z);
+          triangle (outer[0].x, outer[0].y, outer[0].z,
+                    outer[3].x, outer[3].y, outer[3].z,
+                    outer[1].x, outer[1].y, outer[1].z,
                     wireframe_p);
         }
       else if (which == 2)
         {
-          glNormal3f ((float)normals[2].x, (float)normals[2].y, (float)normals[2].z);
-          triangle ((float)outer[0].x, (float)outer[0].y, (float)outer[0].z,
-                    (float)outer[2].x, (float)outer[2].y, (float)outer[2].z,
-                    (float)outer[3].x, (float)outer[3].y, (float)outer[3].z,
+          glNormal3f (normals[2].x, normals[2].y, normals[2].z);
+          triangle (outer[0].x, outer[0].y, outer[0].z,
+                    outer[2].x, outer[2].y, outer[2].z,
+                    outer[3].x, outer[3].y, outer[3].z,
                     wireframe_p);
         }
       else
         {
-          glNormal3f ((float)normals[3].x, (float)normals[3].y, (float)normals[3].z);
-          triangle ((float)outer[1].x, (float)outer[1].y, (float)outer[1].z,
-                    (float)outer[3].x, (float)outer[3].y, (float)outer[3].z,
-                    (float)outer[2].x, (float)outer[2].y, (float)outer[2].z,
+          glNormal3f (normals[3].x, normals[3].y, normals[3].z);
+          triangle (outer[1].x, outer[1].y, outer[1].z,
+                    outer[3].x, outer[3].y, outer[3].z,
+                    outer[2].x, outer[2].y, outer[2].z,
                     wireframe_p);
         }
     }
@@ -280,13 +282,13 @@ draw(ModeInfo *mi)
   Bool wireframe_p = MI_IS_WIREFRAME(mi);
   gasketstruct *gp = &gasket[MI_SCREEN(mi)];
   
-  static const GLfloat pos[]    = {-4.0f, 3.0f, 10.0f, 1.0f};
-  static const GLfloat white[]  = {1.0f, 1.0f, 1.0f, 1.0f};
+  static const GLfloat pos[]    = {-4.0, 3.0, 10.0, 1.0};
+  static const GLfloat white[]  = {1.0, 1.0, 1.0, 1.0};
 
-  GLfloat color0[] = {0.0f, 0.0f, 0.0f, 1.0f};
-  GLfloat color1[] = {0.0f, 0.0f, 0.0f, 1.0f};
-  GLfloat color2[] = {0.0f, 0.0f, 0.0f, 1.0f};
-  GLfloat color3[] = {0.0f, 0.0f, 0.0f, 1.0f};
+  GLfloat color0[] = {0.0, 0.0, 0.0, 1.0};
+  GLfloat color1[] = {0.0, 0.0, 0.0, 1.0};
+  GLfloat color2[] = {0.0, 0.0, 0.0, 1.0};
+  GLfloat color3[] = {0.0, 0.0, 0.0, 1.0};
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -296,21 +298,21 @@ draw(ModeInfo *mi)
 
       glLightfv(GL_LIGHT0, GL_POSITION,  pos);
 
-      color0[0] = gp->colors[gp->ccolor0].red   / 65536.0f;
-      color0[1] = gp->colors[gp->ccolor0].green / 65536.0f;
-      color0[2] = gp->colors[gp->ccolor0].blue  / 65536.0f;
+      color0[0] = gp->colors[gp->ccolor0].red   / 65536.0;
+      color0[1] = gp->colors[gp->ccolor0].green / 65536.0;
+      color0[2] = gp->colors[gp->ccolor0].blue  / 65536.0;
 
-      color1[0] = gp->colors[gp->ccolor1].red   / 65536.0f;
-      color1[1] = gp->colors[gp->ccolor1].green / 65536.0f;
-      color1[2] = gp->colors[gp->ccolor1].blue  / 65536.0f;
+      color1[0] = gp->colors[gp->ccolor1].red   / 65536.0;
+      color1[1] = gp->colors[gp->ccolor1].green / 65536.0;
+      color1[2] = gp->colors[gp->ccolor1].blue  / 65536.0;
 
-      color2[0] = gp->colors[gp->ccolor2].red   / 65536.0f;
-      color2[1] = gp->colors[gp->ccolor2].green / 65536.0f;
-      color2[2] = gp->colors[gp->ccolor2].blue  / 65536.0f;
+      color2[0] = gp->colors[gp->ccolor2].red   / 65536.0;
+      color2[1] = gp->colors[gp->ccolor2].green / 65536.0;
+      color2[2] = gp->colors[gp->ccolor2].blue  / 65536.0;
 
-      color3[0] = gp->colors[gp->ccolor3].red   / 65536.0f;
-      color3[1] = gp->colors[gp->ccolor3].green / 65536.0f;
-      color3[2] = gp->colors[gp->ccolor3].blue  / 65536.0f;
+      color3[0] = gp->colors[gp->ccolor3].red   / 65536.0;
+      color3[1] = gp->colors[gp->ccolor3].green / 65536.0;
+      color3[2] = gp->colors[gp->ccolor3].blue  / 65536.0;
 
       gp->ccolor0++;
       gp->ccolor1++;
@@ -335,27 +337,23 @@ draw(ModeInfo *mi)
 
   {
     double x, y, z;
-    //get_position (gp->rot, &x, &y, &z, !gp->button_down_p);
-    get_position (gp->rot, &x, &y, &z, !False);
-    glTranslatef((float)((x - 0.5f) * 10),
-                 (float)((y - 0.5f) * 10),
-                 (float)((z - 0.5f) * 20));
+    get_position (gp->rot, &x, &y, &z, !gp->button_down_p);
+    glTranslatef((x - 0.5) * 10,
+                 (y - 0.5) * 10,
+                 (z - 0.5) * 20);
 
     /* Do it twice because we don't track the device's orientation. */
-    //glRotatef( current_device_rotation(), 0, 0, 1);
-    glRotatef( 0.0f, 0.0f, 0.0f, 1.0f);
-    //gltrackball_rotate (gp->trackball);
-    //glRotatef(-current_device_rotation(), 0, 0, 1);
-    glRotatef(-0.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef( current_device_rotation(), 0, 0, 1);
+    gltrackball_rotate (gp->trackball);
+    glRotatef(-current_device_rotation(), 0, 0, 1);
 
-    //get_rotation (gp->rot, &x, &y, &z, !gp->button_down_p);
-    get_rotation (gp->rot, &x, &y, &z, !False);
-    glRotatef((float)(x * 360.0f), 1.0f, 0.0f, 0.0f);
-    glRotatef((float)(y * 360.0f), 0.0f, 1.0f, 0.0f);
-    glRotatef((float)(z * 360.0f), 0.0f, 0.0f, 1.0f);
+    get_rotation (gp->rot, &x, &y, &z, !gp->button_down_p);
+    glRotatef (x * 360, 1.0, 0.0, 0.0);
+    glRotatef (y * 360, 0.0, 1.0, 0.0);
+    glRotatef (z * 360, 0.0, 0.0, 1.0);
   }
 
-  glScalef(4.0f, 4.0f, 4.0f);
+  glScalef (4, 4, 4);
 
   glMaterialfv (GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color0);
   glCallList(gp->gasket0);
@@ -439,38 +437,38 @@ pinit(ModeInfo *mi)
 	  gasketstruct *gp = &gasket[MI_SCREEN(mi)];
 
 	  if (event->xany.type == ButtonPress &&
-		  event->xbutton.button == Button1)
-		{
-		  gp->button_down_p = True;
-		  gltrackball_start (gp->trackball,
-							 event->xbutton.x, event->xbutton.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	      event->xbutton.button == Button1)
+	    {
+	      gp->button_down_p = True;
+	      gltrackball_start (gp->trackball,
+	                         event->xbutton.x, event->xbutton.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonRelease &&
-			   event->xbutton.button == Button1)
-		{
-		  gp->button_down_p = False;
-		  return True;
-		}
+	           event->xbutton.button == Button1)
+	    {
+	      gp->button_down_p = False;
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonPress &&
-			   (event->xbutton.button == Button4 ||
-				event->xbutton.button == Button5 ||
-				event->xbutton.button == Button6 ||
-				event->xbutton.button == Button7))
-		{
-		  gltrackball_mousewheel (gp->trackball, event->xbutton.button, 10,
-								  !!event->xbutton.state);
-		  return True;
-		}
+	           (event->xbutton.button == Button4 ||
+	            event->xbutton.button == Button5 ||
+	            event->xbutton.button == Button6 ||
+	            event->xbutton.button == Button7))
+	    {
+	      gltrackball_mousewheel (gp->trackball, event->xbutton.button, 10,
+	                              !!event->xbutton.state);
+	      return True;
+	    }
 	  else if (event->xany.type == MotionNotify &&
-			   gp->button_down_p)
-		{
-		  gltrackball_track (gp->trackball,
-							 event->xmotion.x, event->xmotion.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	           gp->button_down_p)
+	    {
+	      gltrackball_track (gp->trackball,
+	                         event->xmotion.x, event->xmotion.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 
 	  return False;
 	}
@@ -501,7 +499,7 @@ init_gasket(ModeInfo *mi)
                             1.0,
                             do_wander ? wander_speed : 0,
                             True);
-    //gp->trackball = gltrackball_init ();
+    gp->trackball = gltrackball_init ();
   }
 
   gp->ncolors = 255;
@@ -510,12 +508,12 @@ init_gasket(ModeInfo *mi)
                         gp->colors, &gp->ncolors,
                         False, 0, False);
   gp->ccolor0 = 0;
-  gp->ccolor1 = (int)(gp->ncolors * 0.25);
-  gp->ccolor2 = (int)(gp->ncolors * 0.5);
-  gp->ccolor3 = (int)(gp->ncolors * 0.75);
+  gp->ccolor1 = gp->ncolors * 0.25;
+  gp->ccolor2 = gp->ncolors * 0.5;
+  gp->ccolor3 = gp->ncolors * 0.75;
   gp->tick = 999999;
 
-  if ((gp->hglrc = init_GL(mi)) != NULL)
+  if ((gp->glx_context = init_GL(mi)) != NULL)
   {
     reshape_gasket(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
     pinit(mi);
@@ -530,10 +528,10 @@ ENTRYPOINT void
 draw_gasket(ModeInfo * mi)
 {
   gasketstruct *gp = &gasket[MI_SCREEN(mi)];
-  HDC display = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display      *display = MI_DISPLAY(mi);
+  Window        window = MI_WINDOW(mi);
 
-  if (!gp->hglrc) return;
+  if (!gp->glx_context) return;
 
   glDrawBuffer(GL_BACK);
 
@@ -558,11 +556,11 @@ draw_gasket(ModeInfo * mi)
   if (max_depth > 10)
     max_depth = 10;
 
-  wglMakeCurrent(display, gp->hglrc);
+  glXMakeCurrent(display, window, *(gp->glx_context));
   draw(mi);
   if (mi->fps_p) do_fps (mi);
   glFinish();
-  SwapBuffers(display);
+  glXSwapBuffers(display, window);
 }
 
 ENTRYPOINT void
@@ -576,10 +574,10 @@ release_gasket(ModeInfo * mi)
     {
       gasketstruct *gp = &gasket[screen];
 
-      if (gp->hglrc)
+      if (gp->glx_context)
       {
 	/* Display lists MUST be freed while their glXContext is current. */
-        wglMakeCurrent(MI_DISPLAY(mi), gp->hglrc);
+        glXMakeCurrent(MI_DISPLAY(mi), gp->window, *(gp->glx_context));
 
         if (glIsList(gp->gasket0)) glDeleteLists(gp->gasket0, 1);
         if (glIsList(gp->gasket1)) glDeleteLists(gp->gasket1, 1);
@@ -597,4 +595,4 @@ XSCREENSAVER_MODULE_2 ("Sierpinski3D", sierpinski3d, gasket)
 
 /*********************************************************/
 
-//#endif
+#endif

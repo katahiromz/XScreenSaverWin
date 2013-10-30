@@ -44,17 +44,21 @@ Graphics, Inc., 2011 N.  Shoreline Blvd., Mountain View, CA
 OpenGL(TM) is a trademark of Silicon Graphics, Inc.
 */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
+#if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif
 #endif
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
-
 #include "teapot.h"
 
 #if 0
@@ -238,7 +242,7 @@ unit_teapot (int grid, int wire_p)
   int polys = sizeof (teapot_triangles) / sizeof (*teapot_triangles) / 9;
   int i;
   const GLfloat *p = teapot_triangles;
-  GLfloat scale = 1.0f / 2.3f;
+  GLfloat scale = 1 / 2.3;
 
   glPushMatrix();
   glScalef (scale, scale, scale);
@@ -253,10 +257,10 @@ unit_teapot (int grid, int wire_p)
           p1.x = *p++; p1.y = *p++; p1.z = *p++;
           p2.x = *p++; p2.y = *p++; p2.z = *p++;
           p3.x = *p++; p3.y = *p++; p3.z = *p++;
-          glVertex3f ((float)p1.x, (float)p1.y, (float)p1.z);   /* Draw 2 edges of each triangle */
-          glVertex3f ((float)p2.x, (float)p2.y, (float)p2.z);
-          glVertex3f ((float)p1.x, (float)p1.y, (float)p1.z);
-          glVertex3f ((float)p3.x, (float)p3.y, (float)p3.z);
+          glVertex3f (p1.x, p1.y, p1.z);   /* Draw 2 edges of each triangle */
+          glVertex3f (p2.x, p2.y, p2.z);
+          glVertex3f (p1.x, p1.y, p1.z);
+          glVertex3f (p3.x, p3.y, p3.z);
           i++;				   /* Skip every other triangle */
           p += 9;
         }
@@ -273,12 +277,12 @@ unit_teapot (int grid, int wire_p)
           p1.x = *p++; p1.y = *p++; p1.z = *p++;
           p2.x = *p++; p2.y = *p++; p2.z = *p++;
           p3.x = *p++; p3.y = *p++; p3.z = *p++;
-          do_normal ((float)p1.x, (float)p1.y, (float)p1.z,
-                     (float)p2.x, (float)p2.y, (float)p2.z,
-                     (float)p3.x, (float)p3.y, (float)p3.z);
-          glVertex3f ((float)p1.x, (float)p1.y, (float)p1.z);
-          glVertex3f ((float)p2.x, (float)p2.y, (float)p2.z);
-          glVertex3f ((float)p3.x, (float)p3.y, (float)p3.z);
+          do_normal (p1.x, p1.y, p1.z,
+                     p2.x, p2.y, p2.z,
+                     p3.x, p3.y, p3.z);
+          glVertex3f (p1.x, p1.y, p1.z);
+          glVertex3f (p2.x, p2.y, p2.z);
+          glVertex3f (p3.x, p3.y, p3.z);
         }
       glEnd();
     }

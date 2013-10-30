@@ -25,7 +25,7 @@
 			"*showFPS:      False       \n" \
 			"*wireframe:    False       \n"
 
-# define refresh_stonerview NULL
+# define refresh_stonerview 0
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
@@ -34,12 +34,14 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL /* whole file */
+#ifdef USE_GL /* whole file */
 
 #include "stonerview.h"
 //#include "gltrackball.h"
@@ -47,11 +49,10 @@
 #define DEF_TRANSPARENT "True"
 
 typedef struct {
-  //GLXContext *glx_context;
-  HGLRC hglrc;
+  GLXContext *glx_context;
   stonerview_state *st;
-  //trackball_state *trackball;
-  //Bool button_down_p;
+  trackball_state *trackball;
+  Bool button_down_p;
 } stonerview_configuration;
 
 static stonerview_configuration *bps = NULL;
@@ -85,7 +86,6 @@ reshape_stonerview (ModeInfo *mi, int width, int height)
   glTranslatef(0.0, 0.0, -40.0);
 }
 
-const char *progname = "StonerView";
 
 ENTRYPOINT void 
 init_stonerview (ModeInfo *mi)
@@ -103,14 +103,14 @@ init_stonerview (ModeInfo *mi)
 
   bp = &bps[MI_SCREEN(mi)];
 
-  bp->hglrc = init_GL(mi);
+  bp->glx_context = init_GL(mi);
 
-  //bp->trackball = gltrackball_init ();
+  bp->trackball = gltrackball_init ();
   bp->st = stonerview_init_view(MI_IS_WIREFRAME(mi), transparent_p);
   stonerview_init_move(bp->st);
 
   reshape_stonerview (mi, MI_WIDTH(mi), MI_HEIGHT(mi));
-  //clear_gl_error(); /* WTF? sometimes "invalid op" from glViewport! */
+  clear_gl_error(); /* WTF? sometimes "invalid op" from glViewport! */
 }
 
 
@@ -119,16 +119,14 @@ draw_stonerview (ModeInfo *mi)
 {
   stonerview_configuration *bp = &bps[MI_SCREEN(mi)];
 
-  wglMakeCurrent(MI_DISPLAY(mi), bp->hglrc);
+  glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(bp->glx_context));
 
   glPushMatrix ();
-  //glRotatef( current_device_rotation(), 0, 0, 1);
-  glRotatef( 0.0f, 0.0f, 0.0f, 1.0f);
-  //gltrackball_rotate (bp->trackball);
+  glRotatef( current_device_rotation(), 0, 0, 1);
+  gltrackball_rotate (bp->trackball);
 
   stonerview_win_draw(bp->st);
-  //if (! bp->button_down_p)
-  if (! False)
+  if (! bp->button_down_p)
     stonerview_move_increment(bp->st);
   glPopMatrix ();
 
@@ -136,7 +134,7 @@ draw_stonerview (ModeInfo *mi)
   if (mi->fps_p) do_fps (mi);
   glFinish();
 
-  SwapBuffers(MI_DISPLAY (mi));
+  glXSwapBuffers(MI_DISPLAY (mi), MI_WINDOW(mi));
 }
 
 ENTRYPOINT void
@@ -201,4 +199,4 @@ release_stonerview (ModeInfo *mi)
 
 XSCREENSAVER_MODULE ("StonerView", stonerview)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */

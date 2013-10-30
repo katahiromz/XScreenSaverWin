@@ -128,7 +128,7 @@ static const char sccsid[] = "@(#)klein.c  1.1 08/10/04 xlockmore";
 # define DEFAULTS           "*delay:      10000 \n" \
                             "*showFPS:    False \n" \
 
-# define refresh_klein NULL
+# define refresh_klein 0
 
 #if 0
 	#ifdef STANDALONE
@@ -141,11 +141,13 @@ static const char sccsid[] = "@(#)klein.c  1.1 08/10/04 xlockmore";
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
 #if 0
 	#ifndef HAVE_COCOA
@@ -162,6 +164,7 @@ static const char sccsid[] = "@(#)klein.c  1.1 08/10/04 xlockmore";
 	 "draw_klein", "change_klein", NULL, &klein_opts,
 	 25000, 1, 1, 1, 1.0, 4, "",
 	 "Rotate a Klein bottle in 4d or walk on it", 0, NULL};
+
 	#endif
 #endif
 
@@ -180,14 +183,14 @@ static char *proj_3d = "random";
 static int projection_3d;
 static char *proj_4d = "random";
 static int projection_4d;
-static float speed_wx = 1.1f;
-static float speed_wy = 1.3f;
-static float speed_wz = 1.5f;
-static float speed_xy = 1.7f;
-static float speed_xz = 1.9f;
-static float speed_yz = 2.1f;
-static float walk_direction = 7.0f;
-static float walk_speed = 20.0f;
+static float speed_wx = 1.1;
+static float speed_wy = 1.3;
+static float speed_wz = 1.5;
+static float speed_xy = 1.7;
+static float speed_xz = 1.9;
+static float speed_yz = 2.1;
+static float walk_direction = 7.0;
+static float walk_speed = 20.0;
 
 #if 0
 	static XrmOptionDescRec opts[] =
@@ -268,8 +271,7 @@ static float walk_speed = 20.0f;
 
 typedef struct {
   GLint      WindH, WindW;
-  //GLXContext *glx_context;
-  HGLRC hglrc;
+  GLXContext *glx_context;
   /* 4D rotation angles */
   float alpha, beta, delta, zeta, eta, theta;
   /* Movement parameters */
@@ -294,9 +296,9 @@ typedef struct {
   /* Aspect ratio of the current window */
   float aspect;
   /* Trackball states */
-  //trackball_state *trackballs[2];
-  //int current_trackball;
-  //Bool button_pressed;
+  trackball_state *trackballs[2];
+  int current_trackball;
+  Bool button_pressed;
   /* A random factor to modify the rotation speeds */
   float speed_scale;
 } kleinstruct;
@@ -572,9 +574,9 @@ static void rotatewx(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][1];
@@ -591,9 +593,9 @@ static void rotatewy(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][0];
@@ -610,9 +612,9 @@ static void rotatewz(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][0];
@@ -629,9 +631,9 @@ static void rotatexy(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][2];
@@ -648,9 +650,9 @@ static void rotatexz(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][1];
@@ -667,9 +669,9 @@ static void rotateyz(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][0];
@@ -688,7 +690,7 @@ static void rotateall(float al, float be, float de, float ze, float et,
 
   for (i=0; i<4; i++)
     for (j=0; j<4; j++)
-      m[i][j] = (float)(i==j);
+      m[i][j] = (i==j);
   rotatewx(m,al);
   rotatewy(m,be);
   rotatewz(m,de);
@@ -705,7 +707,7 @@ static void rotateall4d(float ze, float et, float th, float m[4][4])
 
   for (i=0; i<4; i++)
     for (j=0; j<4; j++)
-      m[i][j] = (float)(i==j);
+      m[i][j] = (i==j);
   rotatexy(m,ze);
   rotatexz(m,et);
   rotateyz(m,th);
@@ -755,7 +757,7 @@ static void quats_to_rotmat(float p[4], float q[4], float m[4][4])
   th = atan2(r02,sqrt(r00*r00+r01*r01))*180.0/M_PI;
   ze = atan2(-r01,r00)*180.0/M_PI;
 
-  rotateall((float)al,(float)be,(float)de,(float)ze,(float)et,(float)-th,m);
+  rotateall(al,be,de,ze,et,-th,m);
 }
 
 
@@ -772,47 +774,47 @@ static void color(double angle, float col[4])
     angle = fmod(angle,2.0*M_PI);
   else
     angle = fmod(angle,-2.0*M_PI);
-  s = (int)floor(angle/(M_PI/3));
+  s = floor(angle/(M_PI/3));
   t = angle/(M_PI/3)-s;
   if (s >= 6)
     s = 0;
   switch (s)
   {
     case 0:
-      col[0] = 1.0f;
-      col[1] = (float)t;
-      col[2] = 0.0f;
+      col[0] = 1.0;
+      col[1] = t;
+      col[2] = 0.0;
       break;
     case 1:
-      col[0] = (float)(1.0f-t);
-      col[1] = 1.0f;
-      col[2] = 0.0f;
+      col[0] = 1.0-t;
+      col[1] = 1.0;
+      col[2] = 0.0;
       break;
     case 2:
-      col[0] = 0.0f;
-      col[1] = 1.0f;
-      col[2] = (float)t;
+      col[0] = 0.0;
+      col[1] = 1.0;
+      col[2] = t;
       break;
     case 3:
-      col[0] = 0.0f;
-      col[1] = (float)(1.0f-t);
-      col[2] = 1.0f;
+      col[0] = 0.0;
+      col[1] = 1.0-t;
+      col[2] = 1.0;
       break;
     case 4:
-      col[0] = (float)t;
-      col[1] = 0.0f;
-      col[2] = 1.0f;
+      col[0] = t;
+      col[1] = 0.0;
+      col[2] = 1.0;
       break;
     case 5:
-      col[0] = 1.0f;
-      col[1] = 0.0f;
-      col[2] = (float)(1.0f-t);
+      col[0] = 1.0;
+      col[1] = 0.0;
+      col[2] = 1.0-t;
       break;
   }
   if (display_mode == DISP_TRANSPARENT)
-    col[3] = 0.7f;
+    col[3] = 0.7;
   else
-    col[3] = 1.0f;
+    col[3] = 1.0;
 }
 
 
@@ -838,8 +840,8 @@ static void setup_figure8(ModeInfo *mi, double umin, double umax, double vmin,
         color((cos(u)+1.0)*M_PI*2.0/3.0,kb->col[k]);
       else
         color(v,kb->col[k]);
-      kb->tex[k][0] = (float)(-32*u/(2.0*M_PI));
-      kb->tex[k][1] = (float)(32*v/(2.0*M_PI));
+      kb->tex[k][0] = -32*u/(2.0*M_PI);
+      kb->tex[k][1] = 32*v/(2.0*M_PI);
       cu = cos(u);
       su = sin(u);
       cv = cos(v);
@@ -848,19 +850,19 @@ static void setup_figure8(ModeInfo *mi, double umin, double umax, double vmin,
       sv2 = sin(0.5*v);
       c2u = cos(2.0*u);
       s2u = sin(2.0*u);
-      kb->x[k][0] = (float)((su*cv2-s2u*sv2+FIGURE_8_RADIUS)*cv);
-      kb->x[k][1] = (float)((su*cv2-s2u*sv2+FIGURE_8_RADIUS)*sv);
-      kb->x[k][2] = (float)(su*sv2+s2u*cv2);
-      kb->x[k][3] = (float)cu;
-      kb->xu[k][0] = (float)((cu*cv2-2.0*c2u*sv2)*cv);
-      kb->xu[k][1] = (float)((cu*cv2-2.0*c2u*sv2)*sv);
-      kb->xu[k][2] = (float)(cu*sv2+2.0*c2u*cv2);
-      kb->xu[k][3] = (float)-su;
-      kb->xv[k][0] = (float)(((-0.5*su*sv2-0.5*s2u*cv2)*cv-
-                      (su*cv2-s2u*sv2+FIGURE_8_RADIUS)*sv));
-      kb->xv[k][1] = (float)(((-0.5*su*sv2-0.5*s2u*cv2)*sv+
-                      (su*cv2-s2u*sv2+FIGURE_8_RADIUS)*cv));
-      kb->xv[k][2] = (float)(0.5*su*cv2-0.5*s2u*sv2);
+      kb->x[k][0] = (su*cv2-s2u*sv2+FIGURE_8_RADIUS)*cv;
+      kb->x[k][1] = (su*cv2-s2u*sv2+FIGURE_8_RADIUS)*sv;
+      kb->x[k][2] = su*sv2+s2u*cv2;
+      kb->x[k][3] = cu;
+      kb->xu[k][0] = (cu*cv2-2.0*c2u*sv2)*cv;
+      kb->xu[k][1] = (cu*cv2-2.0*c2u*sv2)*sv;
+      kb->xu[k][2] = cu*sv2+2.0*c2u*cv2;
+      kb->xu[k][3] = -su;
+      kb->xv[k][0] = ((-0.5*su*sv2-0.5*s2u*cv2)*cv-
+                      (su*cv2-s2u*sv2+FIGURE_8_RADIUS)*sv);
+      kb->xv[k][1] = ((-0.5*su*sv2-0.5*s2u*cv2)*sv+
+                      (su*cv2-s2u*sv2+FIGURE_8_RADIUS)*cv);
+      kb->xv[k][2] = 0.5*su*cv2-0.5*s2u*sv2;
       kb->xv[k][3] = 0.0;
       for (l=0; l<4; l++)
       {
@@ -895,26 +897,26 @@ static void setup_lawson(ModeInfo *mi, double umin, double umax, double vmin,
         color((sin(u)*cos(0.5*v)+1.0)*M_PI*2.0/3.0,kb->col[k]);
       else
         color(v,kb->col[k]);
-      kb->tex[k][0] = (float)(-32*u/(2.0*M_PI));
-      kb->tex[k][1] = (float)(32*v/(2.0*M_PI));
+      kb->tex[k][0] = -32*u/(2.0*M_PI);
+      kb->tex[k][1] = 32*v/(2.0*M_PI);
       cu = cos(u);
       su = sin(u);
       cv = cos(v);
       sv = sin(v);
       cv2 = cos(0.5*v);
       sv2 = sin(0.5*v);
-      kb->x[k][0] = (float)(cu*cv);
-      kb->x[k][1] = (float)(cu*sv);
-      kb->x[k][2] = (float)(su*sv2);
-      kb->x[k][3] = (float)(su*cv2);
-      kb->xu[k][0] = (float)(-su*cv);
-      kb->xu[k][1] = (float)(-su*sv);
-      kb->xu[k][2] = (float)(cu*sv2);
-      kb->xu[k][3] = (float)(cu*cv2);
-      kb->xv[k][0] = (float)(-cu*sv);
-      kb->xv[k][1] = (float)(cu*cv);
-      kb->xv[k][2] = (float)(su*cv2*0.5);
-      kb->xv[k][3] = (float)(-su*sv2*0.5);
+      kb->x[k][0] = cu*cv;
+      kb->x[k][1] = cu*sv;
+      kb->x[k][2] = su*sv2;
+      kb->x[k][3] = su*cv2;
+      kb->xu[k][0] = -su*cv;
+      kb->xu[k][1] = -su*sv;
+      kb->xu[k][2] = cu*sv2;
+      kb->xu[k][3] = cu*cv2;
+      kb->xv[k][0] = -cu*sv;
+      kb->xv[k][1] = cu*cv;
+      kb->xv[k][2] = su*cv2*0.5;
+      kb->xv[k][3] = -su*sv2*0.5;
     }
   }
 }
@@ -925,10 +927,10 @@ static int figure8(ModeInfo *mi, double umin, double umax, double vmin,
                    double vmax)
 {
   int polys = 0;
-  static const GLfloat mat_diff_red[]         = { 1.0f, 0.0f, 0.0f, 1.0f };
-  static const GLfloat mat_diff_green[]       = { 0.0f, 1.0f, 0.0f, 1.0f };
-  static const GLfloat mat_diff_trans_red[]   = { 1.0f, 0.0f, 0.0f, 0.7f };
-  static const GLfloat mat_diff_trans_green[] = { 0.0f, 1.0f, 0.0f, 0.7f };
+  static const GLfloat mat_diff_red[]         = { 1.0, 0.0, 0.0, 1.0 };
+  static const GLfloat mat_diff_green[]       = { 0.0, 1.0, 0.0, 1.0 };
+  static const GLfloat mat_diff_trans_red[]   = { 1.0, 0.0, 0.0, 0.7 };
+  static const GLfloat mat_diff_trans_green[] = { 0.0, 1.0, 0.0, 0.7 };
   float p[3], pu[3], pv[3], pm[3], n[3], b[3], mat[4][4];
   int i, j, k, l, m, o;
   double u, v;
@@ -987,9 +989,9 @@ static int figure8(ModeInfo *mi, double umin, double umax, double vmin,
     {
       for (l=0; l<3; l++)
       {
-        p[l] = (float)(y[l]+kb->offset4d[l]);
-        pu[l] = (float)yu[l];
-        pv[l] = (float)yv[l];
+        p[l] = y[l]+kb->offset4d[l];
+        pu[l] = yu[l];
+        pv[l] = yv[l];
       }
     }
     else
@@ -1000,41 +1002,41 @@ static int figure8(ModeInfo *mi, double umin, double umax, double vmin,
       for (l=0; l<3; l++)
       {
         r = y[l]+kb->offset4d[l];
-        p[l] = (float)(r*q);
-        pu[l] = (float)((yu[l]*s-r*yu[3])*t);
-        pv[l] = (float)((yv[l]*s-r*yv[3])*t);
+        p[l] = r*q;
+        pu[l] = (yu[l]*s-r*yu[3])*t;
+        pv[l] = (yv[l]*s-r*yv[3])*t;
       }
     }
     n[0] = pu[1]*pv[2]-pu[2]*pv[1];
     n[1] = pu[2]*pv[0]-pu[0]*pv[2];
     n[2] = pu[0]*pv[1]-pu[1]*pv[0];
     t = 1.0/(kb->side*4.0*sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]));
-    n[0] *= (float)t;
-    n[1] *= (float)t;
-    n[2] *= (float)t;
+    n[0] *= t;
+    n[1] *= t;
+    n[2] *= t;
     pm[0] = pu[0]*kb->dumove+pv[0]*kb->dvmove;
     pm[1] = pu[1]*kb->dumove+pv[1]*kb->dvmove;
     pm[2] = pu[2]*kb->dumove+pv[2]*kb->dvmove;
     t = 1.0/(4.0*sqrt(pm[0]*pm[0]+pm[1]*pm[1]+pm[2]*pm[2]));
-    pm[0] *= (float)t;
-    pm[1] *= (float)t;
-    pm[2] *= (float)t;
+    pm[0] *= t;
+    pm[1] *= t;
+    pm[2] *= t;
     b[0] = n[1]*pm[2]-n[2]*pm[1];
     b[1] = n[2]*pm[0]-n[0]*pm[2];
     b[2] = n[0]*pm[1]-n[1]*pm[0];
     t = 1.0/(4.0*sqrt(b[0]*b[0]+b[1]*b[1]+b[2]*b[2]));
-    b[0] *= (float)t;
-    b[1] *= (float)t;
-    b[2] *= (float)t;
+    b[0] *= t;
+    b[1] *= t;
+    b[2] *= t;
 
     /* Compute alpha, beta, delta from the three basis vectors.
            |  -b[0]  -b[1]  -b[2] |
        m = |   n[0]   n[1]   n[2] |
            | -pm[0] -pm[1] -pm[2] |
     */
-    kb->alpha = (float)(atan2(-n[2],-pm[2])*180/M_PI);
-    kb->beta = (float)(atan2( -b[2],sqrt(b[0]*b[0]+b[1]*b[1]))*180/M_PI);
-    kb->delta = (float)(atan2(b[1],-b[0])*180/M_PI);
+    kb->alpha = atan2(-n[2],-pm[2])*180/M_PI;
+    kb->beta = atan2( -b[2],sqrt(b[0]*b[0]+b[1]*b[1]))*180/M_PI;
+    kb->delta = atan2(b[1],-b[0])*180/M_PI;
 
     /* Compute the rotation that rotates the Klein bottle in 4D. */
     rotateall(kb->alpha,kb->beta,kb->delta,kb->zeta,kb->eta,kb->theta,mat);
@@ -1065,17 +1067,17 @@ static int figure8(ModeInfo *mi, double umin, double umax, double vmin,
     if (projection_4d == DISP_4D_ORTHOGRAPHIC)
     {
       for (l=0; l<3; l++)
-        p[l] = (float)(y[l]+kb->offset4d[l]);
+        p[l] = y[l]+kb->offset4d[l];
     }
     else
     {
       s = y[3]+kb->offset4d[3];
       for (l=0; l<3; l++)
-        p[l] = (float)((y[l]+kb->offset4d[l])/s);
+        p[l] = (y[l]+kb->offset4d[l])/s;
     }
 
     kb->offset3d[0] = -p[0];
-    kb->offset3d[1] = (float)(-p[1]-DELTAY);
+    kb->offset3d[1] = -p[1]-DELTAY;
     kb->offset3d[2] = -p[2];
   }
   else
@@ -1084,12 +1086,11 @@ static int figure8(ModeInfo *mi, double umin, double umax, double vmin,
        the trackball rotations. */
     rotateall(kb->alpha,kb->beta,kb->delta,kb->zeta,kb->eta,kb->theta,r1);
 
-    //gltrackball_get_quaternion(kb->trackballs[0],q1);
-    //gltrackball_get_quaternion(kb->trackballs[1],q2);
-    //quats_to_rotmat(q1,q2,r2);
+    gltrackball_get_quaternion(kb->trackballs[0],q1);
+    gltrackball_get_quaternion(kb->trackballs[1],q2);
+    quats_to_rotmat(q1,q2,r2);
 
-    //mult_rotmat(r2,r1,mat);
-	memcpy(&mat, &r1, sizeof(mat));
+    mult_rotmat(r2,r1,mat);
   }
 
   /* Project the points from 4D to 3D. */
@@ -1111,9 +1112,9 @@ static int figure8(ModeInfo *mi, double umin, double umax, double vmin,
       {
         for (l=0; l<3; l++)
         {
-          kb->pp[o][l] = (float)((y[l]+kb->offset4d[l])+kb->offset3d[l]);
-          pu[l] = (float)yu[l];
-          pv[l] = (float)yv[l];
+          kb->pp[o][l] = (y[l]+kb->offset4d[l])+kb->offset3d[l];
+          pu[l] = yu[l];
+          pv[l] = yv[l];
         }
       }
       else
@@ -1124,9 +1125,9 @@ static int figure8(ModeInfo *mi, double umin, double umax, double vmin,
         for (l=0; l<3; l++)
         {
           r = y[l]+kb->offset4d[l];
-          kb->pp[o][l] = (float)(r*q+kb->offset3d[l]);
-          pu[l] = (float)((yu[l]*s-r*yu[3])*t);
-          pv[l] = (float)((yv[l]*s-r*yv[3])*t);
+          kb->pp[o][l] = r*q+kb->offset3d[l];
+          pu[l] = (yu[l]*s-r*yu[3])*t;
+          pv[l] = (yv[l]*s-r*yv[3])*t;
         }
       }
       kb->pn[o][0] = pu[1]*pv[2]-pu[2]*pv[1];
@@ -1134,9 +1135,9 @@ static int figure8(ModeInfo *mi, double umin, double umax, double vmin,
       kb->pn[o][2] = pu[0]*pv[1]-pu[1]*pv[0];
       t = 1.0/sqrt(kb->pn[o][0]*kb->pn[o][0]+kb->pn[o][1]*kb->pn[o][1]+
                    kb->pn[o][2]*kb->pn[o][2]);
-      kb->pn[o][0] *= (float)t;
-      kb->pn[o][1] *= (float)t;
-      kb->pn[o][2] *= (float)t;
+      kb->pn[o][0] *= t;
+      kb->pn[o][1] *= t;
+      kb->pn[o][2] *= t;
     }
   }
 
@@ -1194,10 +1195,10 @@ static int lawson(ModeInfo *mi, double umin, double umax, double vmin,
                   double vmax)
 {
   int polys = 0;
-  static const GLfloat mat_diff_red[]         = { 1.0f, 0.0f, 0.0f, 1.0f };
-  static const GLfloat mat_diff_green[]       = { 0.0f, 1.0f, 0.0f, 1.0f };
-  static const GLfloat mat_diff_trans_red[]   = { 1.0f, 0.0f, 0.0f, 0.7f };
-  static const GLfloat mat_diff_trans_green[] = { 0.0f, 1.0f, 0.0f, 0.7f };
+  static const GLfloat mat_diff_red[]         = { 1.0, 0.0, 0.0, 1.0 };
+  static const GLfloat mat_diff_green[]       = { 0.0, 1.0, 0.0, 1.0 };
+  static const GLfloat mat_diff_trans_red[]   = { 1.0, 0.0, 0.0, 0.7 };
+  static const GLfloat mat_diff_trans_green[] = { 0.0, 1.0, 0.0, 0.7 };
   float p[3], pu[3], pv[3], pm[3], n[3], b[3], mat[4][4];
   int i, j, k, l, m, o;
   double u, v;
@@ -1246,9 +1247,9 @@ static int lawson(ModeInfo *mi, double umin, double umax, double vmin,
     {
       for (l=0; l<3; l++)
       {
-        p[l] = (float)(y[l]+kb->offset4d[l]);
-        pu[l] = (float)yu[l];
-        pv[l] = (float)yv[l];
+        p[l] = y[l]+kb->offset4d[l];
+        pu[l] = yu[l];
+        pv[l] = yv[l];
       }
     }
     else
@@ -1259,41 +1260,41 @@ static int lawson(ModeInfo *mi, double umin, double umax, double vmin,
       for (l=0; l<3; l++)
       {
         r = y[l]+kb->offset4d[l];
-        p[l] = (float)(r*q);
-        pu[l] = (float)((yu[l]*s-r*yu[3])*t);
-        pv[l] = (float)((yv[l]*s-r*yv[3])*t);
+        p[l] = r*q;
+        pu[l] = (yu[l]*s-r*yu[3])*t;
+        pv[l] = (yv[l]*s-r*yv[3])*t;
       }
     }
     n[0] = pu[1]*pv[2]-pu[2]*pv[1];
     n[1] = pu[2]*pv[0]-pu[0]*pv[2];
     n[2] = pu[0]*pv[1]-pu[1]*pv[0];
     t = 1.0/(kb->side*4.0*sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]));
-    n[0] *= (float)t;
-    n[1] *= (float)t;
-    n[2] *= (float)t;
+    n[0] *= t;
+    n[1] *= t;
+    n[2] *= t;
     pm[0] = pu[0]*kb->dumove+pv[0]*kb->dvmove;
     pm[1] = pu[1]*kb->dumove+pv[1]*kb->dvmove;
     pm[2] = pu[2]*kb->dumove+pv[2]*kb->dvmove;
     t = 1.0/(4.0*sqrt(pm[0]*pm[0]+pm[1]*pm[1]+pm[2]*pm[2]));
-    pm[0] *= (float)t;
-    pm[1] *= (float)t;
-    pm[2] *= (float)t;
+    pm[0] *= t;
+    pm[1] *= t;
+    pm[2] *= t;
     b[0] = n[1]*pm[2]-n[2]*pm[1];
     b[1] = n[2]*pm[0]-n[0]*pm[2];
     b[2] = n[0]*pm[1]-n[1]*pm[0];
     t = 1.0/(4.0*sqrt(b[0]*b[0]+b[1]*b[1]+b[2]*b[2]));
-    b[0] *= (float)t;
-    b[1] *= (float)t;
-    b[2] *= (float)t;
+    b[0] *= t;
+    b[1] *= t;
+    b[2] *= t;
 
     /* Compute alpha, beta, delta from the three basis vectors.
            |  -b[0]  -b[1]  -b[2] |
        m = |   n[0]   n[1]   n[2] |
            | -pm[0] -pm[1] -pm[2] |
     */
-    kb->alpha = (float)(atan2(-n[2],-pm[2])*180/M_PI);
-    kb->beta = (float)(atan2( -b[2],sqrt(b[0]*b[0]+b[1]*b[1]))*180/M_PI);
-    kb->delta = (float)(atan2(b[1],-b[0])*180/M_PI);
+    kb->alpha = atan2(-n[2],-pm[2])*180/M_PI;
+    kb->beta = atan2( -b[2],sqrt(b[0]*b[0]+b[1]*b[1]))*180/M_PI;
+    kb->delta = atan2(b[1],-b[0])*180/M_PI;
 
     /* Compute the rotation that rotates the Klein bottle in 4D. */
     rotateall(kb->alpha,kb->beta,kb->delta,kb->zeta,kb->eta,kb->theta,mat);
@@ -1320,17 +1321,17 @@ static int lawson(ModeInfo *mi, double umin, double umax, double vmin,
     if (projection_4d == DISP_4D_ORTHOGRAPHIC)
     {
       for (l=0; l<3; l++)
-        p[l] = (float)(y[l]+kb->offset4d[l]);
+        p[l] = y[l]+kb->offset4d[l];
     }
     else
     {
       s = y[3]+kb->offset4d[3];
       for (l=0; l<3; l++)
-        p[l] = (float)((y[l]+kb->offset4d[l])/s);
+        p[l] = (y[l]+kb->offset4d[l])/s;
     }
 
     kb->offset3d[0] = -p[0];
-    kb->offset3d[1] = (float)(-p[1]-DELTAY);
+    kb->offset3d[1] = -p[1]-DELTAY;
     kb->offset3d[2] = -p[2];
   }
   else
@@ -1339,12 +1340,11 @@ static int lawson(ModeInfo *mi, double umin, double umax, double vmin,
        the trackball rotations. */
     rotateall(kb->alpha,kb->beta,kb->delta,kb->zeta,kb->eta,kb->theta,r1);
 
-    //gltrackball_get_quaternion(kb->trackballs[0],q1);
-    //gltrackball_get_quaternion(kb->trackballs[1],q2);
-    //quats_to_rotmat(q1,q2,r2);
+    gltrackball_get_quaternion(kb->trackballs[0],q1);
+    gltrackball_get_quaternion(kb->trackballs[1],q2);
+    quats_to_rotmat(q1,q2,r2);
 
-    //mult_rotmat(r2,r1,mat);
-	memcpy(&mat, r1, sizeof(mat));
+    mult_rotmat(r2,r1,mat);
   }
 
   /* Project the points from 4D to 3D. */
@@ -1366,9 +1366,9 @@ static int lawson(ModeInfo *mi, double umin, double umax, double vmin,
       {
         for (l=0; l<3; l++)
         {
-          kb->pp[o][l] = (float)((y[l]+kb->offset4d[l])+kb->offset3d[l]);
-          pu[l] = (float)yu[l];
-          pv[l] = (float)yv[l];
+          kb->pp[o][l] = (y[l]+kb->offset4d[l])+kb->offset3d[l];
+          pu[l] = yu[l];
+          pv[l] = yv[l];
         }
       }
       else
@@ -1379,9 +1379,9 @@ static int lawson(ModeInfo *mi, double umin, double umax, double vmin,
         for (l=0; l<3; l++)
         {
           r = y[l]+kb->offset4d[l];
-          kb->pp[o][l] = (float)(r*q+kb->offset3d[l]);
-          pu[l] = (float)((yu[l]*s-r*yu[3])*t);
-          pv[l] = (float)((yv[l]*s-r*yv[3])*t);
+          kb->pp[o][l] = r*q+kb->offset3d[l];
+          pu[l] = (yu[l]*s-r*yu[3])*t;
+          pv[l] = (yv[l]*s-r*yv[3])*t;
         }
       }
       kb->pn[o][0] = pu[1]*pv[2]-pu[2]*pv[1];
@@ -1389,9 +1389,9 @@ static int lawson(ModeInfo *mi, double umin, double umax, double vmin,
       kb->pn[o][2] = pu[0]*pv[1]-pu[1]*pv[0];
       t = 1.0/sqrt(kb->pn[o][0]*kb->pn[o][0]+kb->pn[o][1]*kb->pn[o][1]+
                    kb->pn[o][2]*kb->pn[o][2]);
-      kb->pn[o][0] *= (float)t;
-      kb->pn[o][1] *= (float)t;
-      kb->pn[o][2] *= (float)t;
+      kb->pn[o][0] *= t;
+      kb->pn[o][1] *= t;
+      kb->pn[o][2] *= t;
     }
   }
 
@@ -1476,59 +1476,59 @@ static void init(ModeInfo *mi)
 
   if (view == VIEW_TURN)
   {
-    kb->alpha = (float)frand(360.0);
-    kb->beta = (float)frand(360.0);
-    kb->delta = (float)frand(360.0);
+    kb->alpha = frand(360.0);
+    kb->beta = frand(360.0);
+    kb->delta = frand(360.0);
   }
   else
   {
-    kb->alpha = 0.0f;
-    kb->beta = 0.0f;
-    kb->delta = 0.0f;
+    kb->alpha = 0.0;
+    kb->beta = 0.0;
+    kb->delta = 0.0;
   }
-  kb->zeta = 0.0f;
+  kb->zeta = 0.0;
   if (bottle_type == KLEIN_BOTTLE_FIGURE_8)
     kb->eta = 0.0;
   else
-    kb->eta = 45.0f;
-  kb->theta = 0.0f;
-  kb->umove = (float)frand(2.0*M_PI);
-  kb->vmove = (float)frand(2.0*M_PI);
-  kb->dumove = 0.0f;
-  kb->dvmove = 0.0f;
+    kb->eta = 45.0;
+  kb->theta = 0.0;
+  kb->umove = frand(2.0*M_PI);
+  kb->vmove = frand(2.0*M_PI);
+  kb->dumove = 0.0;
+  kb->dvmove = 0.0;
   kb->side = 1;
 
   if (bottle_type == KLEIN_BOTTLE_FIGURE_8)
   {
-    kb->offset4d[0] = 0.0f;
-    kb->offset4d[1] = 0.0f;
-    kb->offset4d[2] = 0.0f;
-    kb->offset4d[3] = 1.5f;
-    kb->offset3d[0] = 0.0f;
-    kb->offset3d[1] = 0.0f;
+    kb->offset4d[0] = 0.0;
+    kb->offset4d[1] = 0.0;
+    kb->offset4d[2] = 0.0;
+    kb->offset4d[3] = 1.5;
+    kb->offset3d[0] = 0.0;
+    kb->offset3d[1] = 0.0;
     if (projection_4d == DISP_4D_ORTHOGRAPHIC)
-      kb->offset3d[2] = -2.1f;
+      kb->offset3d[2] = -2.1;
     else
-      kb->offset3d[2] = -1.9f;
-    kb->offset3d[3] = 0.0f;
+      kb->offset3d[2] = -1.9;
+    kb->offset3d[3] = 0.0;
   }
   else
   {
-    kb->offset4d[0] = 0.0f;
-    kb->offset4d[1] = 0.0f;
-    kb->offset4d[2] = 0.0f;
+    kb->offset4d[0] = 0.0;
+    kb->offset4d[1] = 0.0;
+    kb->offset4d[2] = 0.0;
     if (projection_4d == DISP_4D_PERSPECTIVE &&
         projection_3d == DISP_3D_ORTHOGRAPHIC)
-      kb->offset4d[3] = 1.5f;
+      kb->offset4d[3] = 1.5;
     else
-      kb->offset4d[3] = 1.1f;
-    kb->offset3d[0] = 0.0f;
-    kb->offset3d[1] = 0.0f;
+      kb->offset4d[3] = 1.1;
+    kb->offset3d[0] = 0.0;
+    kb->offset3d[1] = 0.0;
     if (projection_4d == DISP_4D_ORTHOGRAPHIC)
-      kb->offset3d[2] = -2.0f;
+      kb->offset3d[2] = -2.0;
     else
-      kb->offset3d[2] = -5.0f;
-    kb->offset3d[3] = 0.0f;
+      kb->offset3d[2] = -5.0;
+    kb->offset3d[3] = 0.0;
   }
 
   gen_texture(mi);
@@ -1617,8 +1617,7 @@ static void display_klein(ModeInfo *mi)
 {
   kleinstruct *kb = &klein[MI_SCREEN(mi)];
 
-  //if (!kb->button_pressed)
-  if (!False)
+  if (!kb->button_pressed)
   {
     if (view == VIEW_TURN)
     {
@@ -1655,21 +1654,21 @@ static void display_klein(ModeInfo *mi)
     }
     if (view == VIEW_WALK || view == VIEW_WALKTURN)
     {
-      kb->dvmove = (float)(COSF(walk_direction*M_PI/180.0)*walk_speed*M_PI/4096.0);
+      kb->dvmove = cos(walk_direction*M_PI/180.0)*walk_speed*M_PI/4096.0;
       kb->vmove += kb->dvmove;
       if (kb->vmove >= 2.0*M_PI)
       {
-        kb->vmove -= (float)(2.0f*M_PI);
-        kb->umove = (float)(2.0*M_PI-kb->umove);
+        kb->vmove -= 2.0*M_PI;
+        kb->umove = 2.0*M_PI-kb->umove;
         kb->side = -kb->side;
       }
-      kb->dumove = (float)((kb->side*sin(walk_direction*M_PI/180.0)*
-                    walk_speed*M_PI/4096.0));
+      kb->dumove = (kb->side*sin(walk_direction*M_PI/180.0)*
+                    walk_speed*M_PI/4096.0);
       kb->umove += kb->dumove;
       if (kb->umove >= 2.0*M_PI)
-        kb->umove -= (float)(2.0*M_PI);
+        kb->umove -= 2.0*M_PI;
       if (kb->umove < 0.0)
-        kb->umove += (float)(2.0*M_PI);
+        kb->umove += 2.0*M_PI;
     }
   }
 
@@ -1799,21 +1798,21 @@ ENTRYPOINT void init_klein(ModeInfo *mi)
   kb = &klein[MI_SCREEN(mi)];
 
   
-  //kb->trackballs[0] = gltrackball_init();
-  //kb->trackballs[1] = gltrackball_init();
-  //kb->current_trackball = 0;
-  //kb->button_pressed = False;
+  kb->trackballs[0] = gltrackball_init();
+  kb->trackballs[1] = gltrackball_init();
+  kb->current_trackball = 0;
+  kb->button_pressed = False;
 
   /* Set the Klein bottle. */
-  if (!_stricmp(klein_bottle,"random"))
+  if (!strcasecmp(klein_bottle,"random"))
   {
     bottle_type = random() % NUM_KLEIN_BOTTLES;
   }
-  else if (!_stricmp(klein_bottle,"figure-8"))
+  else if (!strcasecmp(klein_bottle,"figure-8"))
   {
     bottle_type = KLEIN_BOTTLE_FIGURE_8;
   }
-  else if (!_stricmp(klein_bottle,"lawson"))
+  else if (!strcasecmp(klein_bottle,"lawson"))
   {
     bottle_type = KLEIN_BOTTLE_LAWSON;
   }
@@ -1823,19 +1822,19 @@ ENTRYPOINT void init_klein(ModeInfo *mi)
   }
 
   /* Set the display mode. */
-  if (!_stricmp(mode,"random"))
+  if (!strcasecmp(mode,"random"))
   {
     display_mode = random() % NUM_DISPLAY_MODES;
   }
-  else if (!_stricmp(mode,"wireframe"))
+  else if (!strcasecmp(mode,"wireframe"))
   {
     display_mode = DISP_WIREFRAME;
   }
-  else if (!_stricmp(mode,"surface"))
+  else if (!strcasecmp(mode,"surface"))
   {
     display_mode = DISP_SURFACE;
   }
-  else if (!_stricmp(mode,"transparent"))
+  else if (!strcasecmp(mode,"transparent"))
   {
     display_mode = DISP_TRANSPARENT;
   }
@@ -1849,15 +1848,15 @@ ENTRYPOINT void init_klein(ModeInfo *mi)
     marks = False;
 
   /* Set the appearance. */
-  if (!_stricmp(appear,"random"))
+  if (!strcasecmp(appear,"random"))
   {
     appearance = random() % NUM_APPEARANCES;
   }
-  else if (!_stricmp(appear,"solid"))
+  else if (!strcasecmp(appear,"solid"))
   {
     appearance = APPEARANCE_SOLID;
   }
-  else if (!_stricmp(appear,"bands"))
+  else if (!strcasecmp(appear,"bands"))
   {
     appearance = APPEARANCE_BANDS;
   }
@@ -1867,19 +1866,19 @@ ENTRYPOINT void init_klein(ModeInfo *mi)
   }
 
   /* Set the color mode. */
-  if (!_stricmp(color_mode,"random"))
+  if (!strcasecmp(color_mode,"random"))
   {
     colors = random() % NUM_COLORS;
   }
-  else if (!_stricmp(color_mode,"two-sided"))
+  else if (!strcasecmp(color_mode,"two-sided"))
   {
     colors = COLORS_TWOSIDED;
   }
-  else if (!_stricmp(color_mode,"rainbow"))
+  else if (!strcasecmp(color_mode,"rainbow"))
   {
     colors = COLORS_RAINBOW;
   }
-  else if (!_stricmp(color_mode,"depth"))
+  else if (!strcasecmp(color_mode,"depth"))
   {
     colors = COLORS_DEPTH;
   }
@@ -1889,19 +1888,19 @@ ENTRYPOINT void init_klein(ModeInfo *mi)
   }
 
   /* Set the view mode. */
-  if (!_stricmp(view_mode,"random"))
+  if (!strcasecmp(view_mode,"random"))
   {
     view = random() % NUM_VIEW_MODES;
   }
-  else if (!_stricmp(view_mode,"walk"))
+  else if (!strcasecmp(view_mode,"walk"))
   {
     view = VIEW_WALK;
   }
-  else if (!_stricmp(view_mode,"turn"))
+  else if (!strcasecmp(view_mode,"turn"))
   {
     view = VIEW_TURN;
   }
-  else if (!_stricmp(view_mode,"walk-turn"))
+  else if (!strcasecmp(view_mode,"walk-turn"))
   {
     view = VIEW_WALKTURN;
   }
@@ -1911,7 +1910,7 @@ ENTRYPOINT void init_klein(ModeInfo *mi)
   }
 
   /* Set the 3d projection mode. */
-  if (!_stricmp(proj_3d,"random"))
+  if (!strcasecmp(proj_3d,"random"))
   {
     /* Orthographic projection only makes sense in turn mode. */
     if (view == VIEW_TURN)
@@ -1919,11 +1918,11 @@ ENTRYPOINT void init_klein(ModeInfo *mi)
     else
       projection_3d = DISP_3D_PERSPECTIVE;
   }
-  else if (!_stricmp(proj_3d,"perspective"))
+  else if (!strcasecmp(proj_3d,"perspective"))
   {
     projection_3d = DISP_3D_PERSPECTIVE;
   }
-  else if (!_stricmp(proj_3d,"orthographic"))
+  else if (!strcasecmp(proj_3d,"orthographic"))
   {
     projection_3d = DISP_3D_ORTHOGRAPHIC;
   }
@@ -1937,15 +1936,15 @@ ENTRYPOINT void init_klein(ModeInfo *mi)
   }
 
   /* Set the 4d projection mode. */
-  if (!_stricmp(proj_4d,"random"))
+  if (!strcasecmp(proj_4d,"random"))
   {
     projection_4d = random() % NUM_DISP_4D_MODES;
   }
-  else if (!_stricmp(proj_4d,"perspective"))
+  else if (!strcasecmp(proj_4d,"perspective"))
   {
     projection_4d = DISP_4D_PERSPECTIVE;
   }
-  else if (!_stricmp(proj_4d,"orthographic"))
+  else if (!strcasecmp(proj_4d,"orthographic"))
   {
     projection_4d = DISP_4D_ORTHOGRAPHIC;
   }
@@ -1957,18 +1956,18 @@ ENTRYPOINT void init_klein(ModeInfo *mi)
   /* Modify the speeds to a useful range in walk-and-turn mode. */
   if (view == VIEW_WALKTURN)
   {
-    speed_wx *= 0.2f;
-    speed_wy *= 0.2f;
-    speed_wz *= 0.2f;
-    speed_xy *= 0.2f;
-    speed_xz *= 0.2f;
-    speed_yz *= 0.2f;
+    speed_wx *= 0.2;
+    speed_wy *= 0.2;
+    speed_wz *= 0.2;
+    speed_xy *= 0.2;
+    speed_xz *= 0.2;
+    speed_yz *= 0.2;
   }
 
   /* make multiple screens rotate at slightly different rates. */
-  kb->speed_scale = (float)(0.9f + frand(0.3));
+  kb->speed_scale = 0.9 + frand(0.3);
 
-  if ((kb->hglrc = init_GL(mi)) != NULL)
+  if ((kb->glx_context = init_GL(mi)) != NULL)
   {
     reshape_klein(mi,MI_WIDTH(mi),MI_HEIGHT(mi));
     glDrawBuffer(GL_BACK);
@@ -1987,8 +1986,8 @@ ENTRYPOINT void init_klein(ModeInfo *mi)
  */
 ENTRYPOINT void draw_klein(ModeInfo *mi)
 {
-  HDC display = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display          *display = MI_DISPLAY(mi);
+  Window           window = MI_WINDOW(mi);
   kleinstruct *kb;
 
   if (klein == NULL)
@@ -1996,10 +1995,10 @@ ENTRYPOINT void draw_klein(ModeInfo *mi)
   kb = &klein[MI_SCREEN(mi)];
 
   MI_IS_DRAWN(mi) = True;
-  if (!kb->hglrc)
+  if (!kb->glx_context)
     return;
 
-  wglMakeCurrent(display, kb->hglrc);
+  glXMakeCurrent(display,window,*(kb->glx_context));
 
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
@@ -2011,7 +2010,7 @@ ENTRYPOINT void draw_klein(ModeInfo *mi)
 
   glFlush();
 
-  SwapBuffers(display);
+  glXSwapBuffers(display,window);
 }
 
 
@@ -2033,8 +2032,8 @@ ENTRYPOINT void release_klein(ModeInfo *mi)
     {
       kleinstruct *kb = &klein[screen];
 
-      if (kb->hglrc)
-        kb->hglrc = NULL;
+      if (kb->glx_context)
+        kb->glx_context = (GLXContext *)NULL;
     }
     (void) free((void *)klein);
     klein = (kleinstruct *)NULL;
@@ -2047,14 +2046,14 @@ ENTRYPOINT void change_klein(ModeInfo *mi)
 {
   kleinstruct *kb = &klein[MI_SCREEN(mi)];
 
-  if (!kb->hglrc)
+  if (!kb->glx_context)
     return;
 
-  wglMakeCurrent(MI_DISPLAY(mi), kb->hglrc);
+  glXMakeCurrent(MI_DISPLAY(mi),MI_WINDOW(mi),*(kb->glx_context));
   init(mi);
 }
 #endif /* !STANDALONE */
 
 XSCREENSAVER_MODULE ("Klein", klein)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */

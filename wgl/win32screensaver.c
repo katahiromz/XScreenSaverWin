@@ -2,11 +2,15 @@
 #include <scrnsave.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "resource.h"
 
 #include "win32.h"
+#include "resource.h"
 
+#ifdef UNICODE
+#pragma comment(lib, "scrnsavw.lib")
+#else
 #pragma comment(lib, "scrnsave.lib")
+#endif
 
 PIXELFORMATDESCRIPTOR pfd =
 {
@@ -69,6 +73,8 @@ BOOL ss_init(HWND hwnd)
     ss.modeinfo.fps_p = False;
     ss.modeinfo.is_drawn = True;
 
+#undef ya_rand_init
+    ya_rand_init(0);
     hack_init(&ss.modeinfo);
 
     return TRUE;
@@ -137,11 +143,53 @@ LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     return 0;
 }
 
-HGLRC init_GL(ModeInfo *mi)
+HGLRC *init_GL(ModeInfo *mi)
 {
-    return ss.hglrc;
+    return &ss.hglrc;
 }
 
 void do_fps(ModeInfo *mi)
 {
+}
+
+void glXMakeCurrent(Display *d, Window w, GLXContext context)
+{
+    wglMakeCurrent((HDC)d, context);
+}
+
+void glXSwapBuffers(Display *d, Window w)
+{
+    SwapBuffers(d);
+}
+
+trackball_state *gltrackball_init(void)
+{
+    return NULL;
+}
+
+void gltrackball_rotate(trackball_state *trackball)
+{
+}
+
+float current_device_rotation(void)
+{
+    return 0.0;
+}
+
+void check_gl_error(const char *name)
+{
+}
+
+void clear_gl_error(void)
+{
+}
+
+void gltrackball_get_quaternion(char **ppch, float q[4])
+{
+    q[0] = q[1] = q[2] = q[3] = 0.0;
+}
+
+Display *DisplayOfScreen(Screen *s)
+{
+	return GetWindowDC(s);
 }

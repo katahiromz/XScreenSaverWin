@@ -15,18 +15,18 @@
    by Jamie Zawinski <jwz@jwz.org>, 22-Jan-2001.
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
+#if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif
 #endif
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
-
-#include "win32.h"
-
 #include <stdlib.h>
 #include "stonerview.h"
 
@@ -71,8 +71,8 @@ void
 stonerview_win_draw(stonerview_state *st)
 {
   int ix;
-  static const GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-  static const GLfloat gray[]  = { 0.6f, 0.6f, 0.6f, 1.0f };
+  static const GLfloat white[] = { 1.0, 1.0, 1.0, 1.0 };
+  static const GLfloat gray[]  = { 0.6, 0.6, 0.6, 1.0 };
 
   glDrawBuffer(GL_BACK);
 
@@ -80,9 +80,9 @@ stonerview_win_draw(stonerview_state *st)
 
   glPushMatrix();
   glScalef(view_scale, view_scale, view_scale);
-  glRotatef(view_rotx, 1.0f, 0.0f, 0.0f);
-  glRotatef(view_roty, 0.0f, 1.0f, 0.0f);
-  glRotatef(view_rotz, 0.0f, 0.0f, 1.0f);
+  glRotatef(view_rotx, 1.0, 0.0, 0.0);
+  glRotatef(view_roty, 0.0, 1.0, 0.0);
+  glRotatef(view_rotz, 0.0, 0.0, 1.0);
 
   glShadeModel(GL_FLAT);
 

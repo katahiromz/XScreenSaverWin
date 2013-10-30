@@ -71,13 +71,13 @@ static const char sccsid[] = "@(#)superquadrics.c	4.07 97/11/24 xlockmore";
  */
 
 #define DELAY 40000
-#define DEFAULTS	"*delay:		40000   \n"			\
+# define DEFAULTS	"*delay:		40000   \n"			\
 					"*count:		25      \n"			\
 					"*cycles:		40      \n"			\
 					"*showFPS:      False   \n"			\
 					"*wireframe:	False	\n"
 
-#define superquadrics_handle_event NULL
+# define superquadrics_handle_event 0
 
 #if 0
 	#ifdef STANDALONE
@@ -90,12 +90,13 @@ static const char sccsid[] = "@(#)superquadrics.c	4.07 97/11/24 xlockmore";
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
 /*-
  * Note for low-CPU-speed machines:  If your frame rate is so low that
@@ -106,7 +107,7 @@ static const char sccsid[] = "@(#)superquadrics.c	4.07 97/11/24 xlockmore";
 
 #define DEF_SPINSPEED  "5.0"
 
-static float spinspeed = 5.0f;
+static float spinspeed = 5.0;
 
 #if 0
 	static XrmOptionDescRec opts[] =
@@ -147,8 +148,7 @@ typedef struct {
 } state;
 
 typedef struct {
-	//GLXContext *glx_context;
-	HGLRC hglrc;
+	GLXContext *glx_context;
 	int         dist, wireframe, flatshade, shownorms, maxcount, maxwait;
 	int         counter, viewcount, viewwait, mono;
 	GLfloat     curmat[4][4], rotx, roty, rotz, spinspeed;
@@ -181,7 +181,7 @@ myrand(int range)
 static float
 myrandreal(void)
 {
-	return (float)(LRAND() / (MAXRAND));
+	return (LRAND() / (MAXRAND));
 }
 
 /* Some old, old, OLD code follows.  Ahh this takes me back..... */
@@ -273,17 +273,17 @@ MakeUpStuff(int allstuff, superquadricsstruct * sp)
 				b = g = r = 1.0;
 				b2 = g2 = r2 = 1.0;
 			} else {
-				b = g = r = (GLfloat) (140 + myrand(100)) / 255.0f;
-				b2 = g2 = r2 = ((r > 0.69) ? (1.0f - r) : r);
+				b = g = r = (GLfloat) (140 + myrand(100)) / 255.0;
+				b2 = g2 = r2 = ((r > 0.69) ? (1.0 - r) : r);
 			}
 		} else {
-			r = (GLfloat) (40 + myrand(200)) / 255.0f;
-			g = (GLfloat) (40 + myrand(200)) / 255.0f;
-			b = (GLfloat) (40 + myrand(200)) / 255.0f;
+			r = (GLfloat) (40 + myrand(200)) / 255.0;
+			g = (GLfloat) (40 + myrand(200)) / 255.0;
+			b = (GLfloat) (40 + myrand(200)) / 255.0;
 
-			r2 = ((myrand(4) && ((r < 0.31) || (r > 0.69))) ? (1.0f - r) : r);
-			g2 = ((myrand(4) && ((g < 0.31) || (g > 0.69))) ? (1.0f - g) : g);
-			b2 = ((myrand(4) && ((b < 0.31) || (b > 0.69))) ? (1.0f - b) : b);
+			r2 = ((myrand(4) && ((r < 0.31) || (r > 0.69))) ? (1.0 - r) : r);
+			g2 = ((myrand(4) && ((g < 0.31) || (g > 0.69))) ? (1.0 - g) : g);
+			b2 = ((myrand(4) && ((b < 0.31) || (b > 0.69))) ? (1.0 - b) : b);
 		}
 
 		pat = myrand(4);
@@ -388,13 +388,13 @@ DoneScale(superquadricsstruct * sp)
 				if ((ih > 1) || (iv > 1)) {
 					glBegin(GL_LINES);
 					if (ih > 1) {
-						glVertex3f((float)xx, (float)yy, (float)zz);
-						glVertex3f((float)sp->Prevxx[iv], (float)sp->Prevyy[iv], (float)sp->Prevzz[iv]);
+						glVertex3f(xx, yy, zz);
+						glVertex3f(sp->Prevxx[iv], sp->Prevyy[iv], sp->Prevzz[iv]);
                         polys++;
 					}
 					if (iv > 1) {
-						glVertex3f((float)xx, (float)yy, (float)zz);
-						glVertex3f((float)sp->Prevxx[iv - 1], (float)sp->Prevyy[iv - 1], (float)sp->Prevzz[iv - 1]);
+						glVertex3f(xx, yy, zz);
+						glVertex3f(sp->Prevxx[iv - 1], sp->Prevyy[iv - 1], sp->Prevzz[iv - 1]);
                         polys++;
 					}
 /* PURIFY 4.0.1 reports an unitialized memory read on the next line when using
@@ -412,18 +412,18 @@ DoneScale(superquadricsstruct * sp)
 					yn = sp->ss[iv];
 				}
 				if ((ih > 1) && (iv > 1)) {
-					glNormal3f((float)xn, (float)yn, (float)zn);
+					glNormal3f(xn, yn, zn);
 					glBegin(GL_POLYGON);
-					glVertex3f((float)xx, (float)yy, (float)zz);
+					glVertex3f(xx, yy, zz);
 					if (!sp->flatshade)
-						glNormal3f((float)sp->Prevxn[iv], (float)sp->Prevyn[iv], (float)sp->Prevzn[iv]);
-					glVertex3f((float)sp->Prevxx[iv], (float)sp->Prevyy[iv], (float)sp->Prevzz[iv]);
+						glNormal3f(sp->Prevxn[iv], sp->Prevyn[iv], sp->Prevzn[iv]);
+					glVertex3f(sp->Prevxx[iv], sp->Prevyy[iv], sp->Prevzz[iv]);
 					if (!sp->flatshade)
-						glNormal3f((float)xnp, (float)ynp, (float)znp);
-					glVertex3f((float)xp, (float)yp, (float)zp);
+						glNormal3f(xnp, ynp, znp);
+					glVertex3f(xp, yp, zp);
 					if (!sp->flatshade)
-						glNormal3f((float)sp->Prevxn[iv - 1], (float)sp->Prevyn[iv - 1], (float)sp->Prevzn[iv - 1]);
-					glVertex3f((float)sp->Prevxx[iv - 1], (float)sp->Prevyy[iv - 1], (float)sp->Prevzz[iv - 1]);
+						glNormal3f(sp->Prevxn[iv - 1], sp->Prevyn[iv - 1], sp->Prevzn[iv - 1]);
+					glVertex3f(sp->Prevxx[iv - 1], sp->Prevyy[iv - 1], sp->Prevzz[iv - 1]);
                     polys++;
 					glEnd();
 				}
@@ -432,8 +432,8 @@ DoneScale(superquadricsstruct * sp)
 						glShadeModel(GL_FLAT);
 					glDisable(GL_LIGHTING);
 					glBegin(GL_LINES);
-					glVertex3f((float)xx, (float)yy, (float)zz);
-					glVertex3f((float)(xx + xn), (float)(yy + yn), (float)(zz + zn));
+					glVertex3f(xx, yy, zz);
+					glVertex3f(xx + xn, yy + yn, zz + zn);
                     polys++;
 					glEnd();
 					if (!sp->flatshade)
@@ -505,8 +505,8 @@ SetCurrentShape(superquadricsstruct * sp)
 	}
 
 	sp->Mode = (double) (sp->now.Mode = sp->later.Mode);
-	sp->rotx = (float)(sp->now.rotx = sp->later.rotx);
-	sp->rotz = (float)(sp->now.rotz = sp->later.rotz);
+	sp->rotx = sp->now.rotx = sp->later.rotx;
+	sp->rotz = sp->now.rotz = sp->later.rotz;
 
 	sp->counter = -sp->maxwait;
 
@@ -541,14 +541,14 @@ NextSuperquadric(superquadricsstruct * sp)
 			sp->yExponent = sp->now.yExponent * fnow + sp->later.yExponent * flater;
 
 			for (t = 0; t < 4; ++t) {
-				sp->curmat[t][0] = (float)(sp->now.r[t] * fnow + sp->later.r[t] * flater);
-				sp->curmat[t][1] = (float)(sp->now.g[t] * fnow + sp->later.g[t] * flater);
-				sp->curmat[t][2] = (float)(sp->now.b[t] * fnow + sp->later.b[t] * flater);
+				sp->curmat[t][0] = sp->now.r[t] * fnow + sp->later.r[t] * flater;
+				sp->curmat[t][1] = sp->now.g[t] * fnow + sp->later.g[t] * flater;
+				sp->curmat[t][2] = sp->now.b[t] * fnow + sp->later.b[t] * flater;
 			}
 
 			sp->Mode = (double) sp->now.Mode * fnow + (double) sp->later.Mode * flater;
-			sp->rotx = (float)((double) sp->now.rotx * fnow + (double) sp->later.rotx * flater);
-			sp->rotz = (float)((double) sp->now.rotz * fnow + (double) sp->later.rotz * flater);
+			sp->rotx = (double) sp->now.rotx * fnow + (double) sp->later.rotx * flater;
+			sp->rotz = (double) sp->now.rotz * fnow + (double) sp->later.rotz * flater;
 
 			inputs(sp);
 		}
@@ -575,14 +575,14 @@ DisplaySuperquadrics(superquadricsstruct * sp)
 /*		ReshapeSuperquadrics(-1, -1);*/
 	}
 	glPushMatrix();
-	glTranslatef(0.0f, 0.0f, (float)(-((GLfloat) (sp->dist) / 16.0) - (sp->Mode * 3.0 - 1.0)));	/* viewing transform  */
-	glRotatef(sp->rotx, 1.0f, 0.0f, 0.0f);	/* pitch */
-	glRotatef(sp->rotz, 0.0f, 0.0f, 1.0f);	/* bank */
-	glRotatef(sp->roty, 0.0f, 1.0f, 0.0f);	/* "spin", like heading but comes after P & B */
+	glTranslatef(0.0, 0.0, -((GLfloat) (sp->dist) / 16.0) - (sp->Mode * 3.0 - 1.0));	/* viewing transform  */
+	glRotatef(sp->rotx, 1.0, 0.0, 0.0);	/* pitch */
+	glRotatef(sp->rotz, 0.0, 0.0, 1.0);	/* bank */
+	glRotatef(sp->roty, 0.0, 1.0, 0.0);	/* "spin", like heading but comes after P & B */
 
 	SetCull(0, sp);
 
-    glScalef(0.7f, 0.7f, 0.7f);  /* jwz: scale it down a bit */
+    glScalef(0.7, 0.7, 0.7);  /* jwz: scale it down a bit */
 	polys = DoneScale(sp);
 
 	glPopMatrix();
@@ -632,15 +632,15 @@ static void
 InitSuperquadrics(int wfmode, int snorm, int res, int count, float speed, superquadricsstruct * sp)
 {
 	GLfloat     ambient[] =
-	{0.4f, 0.4f, 0.4f, 1.0f};
+	{0.4, 0.4, 0.4, 1.0};
 	GLfloat     position[] =
-	{10.0f, 1.0f, 1.0f, 10.0f};
+	{10.0, 1.0, 1.0, 10.0};
 	GLfloat     mat_diffuse[] =
-	{1.0f, 0.5f, 0.5f, 1.0f};
+	{1.0, 0.5, 0.5, 1.0};
 	GLfloat     mat_specular[] =
-	{0.8f, 0.8f, 0.8f, 1.0f};
+	{0.8, 0.8, 0.8, 1.0};
 	GLfloat     mat_shininess[] =
-	{50.0f};
+	{50.0};
 
 	int         t;
 
@@ -721,8 +721,8 @@ InitSuperquadrics(int wfmode, int snorm, int res, int count, float speed, superq
 ENTRYPOINT void
 init_superquadrics(ModeInfo * mi)
 {
-	HDC display = MI_DISPLAY(mi);
-	HWND window = MI_WINDOW(mi);
+	Display    *display = MI_DISPLAY(mi);
+	Window      window = MI_WINDOW(mi);
 	int         screen = MI_SCREEN(mi);
 
 	superquadricsstruct *sp;
@@ -748,7 +748,7 @@ init_superquadrics(ModeInfo * mi)
 		{0, 1, 1, 0}
  */
 
-	if ((sp->hglrc = init_GL(mi)) != NULL) {
+	if ((sp->glx_context = init_GL(mi)) != NULL) {
 
 		InitSuperquadrics(MI_IS_WIREFRAME(mi), 0,
 				  MI_COUNT(mi), MI_CYCLES(mi), spinspeed, sp);
@@ -756,7 +756,7 @@ init_superquadrics(ModeInfo * mi)
 
 		DisplaySuperquadrics(sp);
 		glFinish();
-		SwapBuffers(display);
+		glXSwapBuffers(display, window);
 	} else {
 		MI_CLEARWINDOW(mi);
 	}
@@ -766,19 +766,19 @@ ENTRYPOINT void
 draw_superquadrics(ModeInfo * mi)
 {
 	superquadricsstruct *sp = &superquadrics[MI_SCREEN(mi)];
-	HDC display = MI_DISPLAY(mi);
-	HWND window = MI_WINDOW(mi);
+	Display    *display = MI_DISPLAY(mi);
+	Window      window = MI_WINDOW(mi);
 
-	if (!sp->hglrc)
+	if (!sp->glx_context)
 		return;
 
-	wglMakeCurrent(display, sp->hglrc);
+	glXMakeCurrent(display, window, *(sp->glx_context));
 
     mi->polygon_count = NextSuperquadricDisplay(sp);
 
     if (mi->fps_p) do_fps (mi);
 	glFinish();
-	SwapBuffers(display);
+	glXSwapBuffers(display, window);
 }
 
 ENTRYPOINT void
@@ -804,7 +804,7 @@ release_superquadrics(ModeInfo * mi)
 }
 
 
-//#endif
+#endif
 
 /* End of superquadrics.c */
 

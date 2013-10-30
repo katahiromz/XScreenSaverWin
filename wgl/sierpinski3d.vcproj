@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="sierpinski3d"
-	ProjectGUID="{3F8CCF0B-5F6C-49D3-8DEA-E6A2E9F4D1D8}"
+	ProjectGUID="{D7519E09-2D2F-4425-9F9B-76B6F748A0E8}"
 	RootNamespace="sierpinski3d"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
@@ -48,6 +48,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -117,11 +118,12 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -175,6 +177,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\colors.c"
+				>
+			</File>
+			<File
+				RelativePath=".\hsv.c"
+				>
+			</File>
+			<File
 				RelativePath=".\rotator.c"
 				>
 			</File>
@@ -196,6 +206,14 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\colors.h"
+				>
+			</File>
+			<File
+				RelativePath=".\hsv.h"
+				>
+			</File>
 			<File
 				RelativePath=".\resource.h"
 				>

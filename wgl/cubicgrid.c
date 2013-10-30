@@ -24,23 +24,24 @@
                    "*showFPS:       False         \n" \
                    "*wireframe:     False         \n"
 
-#define refresh_cubicgrid NULL
-
+# define refresh_cubicgrid 0
 //#include "xlockmore.h"
 
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
-//#define DEF_SPEED   "1.0"
-//#define DEF_DIV     "30"
-//#define DEF_ZOOM    "20"
-//#define DEF_BIGDOTS "True"
+#define DEF_SPEED   "1.0"
+#define DEF_DIV     "30"
+#define DEF_ZOOM    "20"
+#define DEF_BIGDOTS "True"
 
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
@@ -51,8 +52,8 @@
 /*************************************************************************/
 
 static int ticks = 30;
-static float size = 20.0;
-static float speed = 1.0f;
+static float size = 20;
+static float speed = 1.0;
 static Bool bigdots = True;
 
 #if 0
@@ -84,20 +85,19 @@ static Bool bigdots = True;
 #endif
 
 typedef struct {
-  //GLXContext    *glx_context;
-  HGLRC         hglrc;
+  GLXContext    *glx_context;
   GLfloat       ratio;
   GLint         list;
 
   rotator *rot;
-  //trackball_state *trackball;
-  //Bool button_down_p;
+  trackball_state *trackball;
+  Bool button_down_p;
   int npoints;
 } cubicgrid_conf;
 
 static cubicgrid_conf *cubicgrid = NULL;
 
-static const GLfloat zpos = -18.0f;
+static const GLfloat zpos = -18.0;
 
 /*************************************************************************/
 
@@ -156,19 +156,16 @@ static Bool draw_main(cubicgrid_conf *cp)
   glScalef(size/ticks, size/ticks, size/ticks);
 
   /* Do it twice because we don't track the device's orientation. */
-  //glRotatef( current_device_rotation(), 0, 0, 1);
-  glRotatef( 0.0, 0, 0, 1);
-  //gltrackball_rotate (cp->trackball);
-  //glRotatef(-current_device_rotation(), 0, 0, 1);
-  glRotatef(-0.0, 0, 0, 1);
+  glRotatef( current_device_rotation(), 0, 0, 1);
+  gltrackball_rotate (cp->trackball);
+  glRotatef(-current_device_rotation(), 0, 0, 1);
 
-  //get_rotation (cp->rot, &x, &y, &z, !cp->button_down_p);
-  get_rotation (cp->rot, &x, &y, &z, !False);
-  glRotatef ((float)(x * 360.0f), 1.0f, 0.0f, 0.0f);
-  glRotatef ((float)(y * 360.0f), 0.0f, 1.0f, 0.0f);
-  glRotatef ((float)(z * 360.0f), 0.0f, 0.0f, 1.0f);
+  get_rotation (cp->rot, &x, &y, &z, !cp->button_down_p);
+  glRotatef (x * 360, 1.0, 0.0, 0.0);
+  glRotatef (y * 360, 0.0, 1.0, 0.0);
+  glRotatef (z * 360, 0.0, 0.0, 1.0);
 
-  glTranslatef(-ticks/2.0f, -ticks/2.0f, -ticks/2.0f);
+  glTranslatef(-ticks/2.0, -ticks/2.0, -ticks/2.0);
   glCallList(cp->list);
   return True;
 }
@@ -177,7 +174,7 @@ static void init_gl(ModeInfo *mi)
 {
   cubicgrid_conf *cp = &cubicgrid[MI_SCREEN(mi)];
   int x, y, z;
-  float tf = (float)ticks;
+  float tf = ticks;
 
   glDrawBuffer(GL_BACK);
   if(bigdots) {
@@ -194,7 +191,7 @@ static void init_gl(ModeInfo *mi)
     for(x = 0; x < ticks; x++) {
       for(y = 0; y < ticks; y++) {
         for(z = 0; z < ticks; z++) {
-          glVertex3f((float)x, (float)y, (float)z);
+          glVertex3f(x, y, z);
           cp->npoints++;
         }
       }
@@ -208,7 +205,7 @@ static void init_gl(ModeInfo *mi)
       for(y = 0; y < ticks; y++) {
         for(z = 0; z < ticks; z++) {
           glColor3f(x/tf, y/tf, z/tf);
-          glVertex3f((float)x, (float)y, (float)z);
+          glVertex3f(x, y, z);
           cp->npoints++;
         }
       }
@@ -239,8 +236,8 @@ ENTRYPOINT void release_cubicgrid(ModeInfo *mi)
     int screen;
     for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
       cubicgrid_conf *cp = &cubicgrid[screen];
-      if (cp->hglrc) {
-        cp->hglrc = NULL;
+      if (cp->glx_context) {
+        cp->glx_context = NULL;
       }
     }
     free((void *)cubicgrid);
@@ -258,7 +255,7 @@ ENTRYPOINT void init_cubicgrid(ModeInfo *mi)
   }
   cp = &cubicgrid[MI_SCREEN(mi)];
 
-  if ((cp->hglrc = init_GL(mi)) != NULL) {
+  if ((cp->glx_context = init_GL(mi)) != NULL) {
     init_gl(mi);
     reshape_cubicgrid(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
   } else {
@@ -271,20 +268,20 @@ ENTRYPOINT void init_cubicgrid(ModeInfo *mi)
 
     cp->rot = make_rotator (spin_speed, spin_speed, spin_speed,
                             spin_accel, 0, True);
-    //cp->trackball = gltrackball_init ();
+    cp->trackball = gltrackball_init ();
   }
 }
 
 ENTRYPOINT void draw_cubicgrid(ModeInfo * mi) 
 {
-  HDC display = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display *display = MI_DISPLAY(mi);
+  Window window = MI_WINDOW(mi);
   cubicgrid_conf *cp;
   if (!cubicgrid) return;
   cp = &cubicgrid[MI_SCREEN(mi)];
   MI_IS_DRAWN(mi) = True;
-  if (!cp->hglrc) return;
-  wglMakeCurrent(display, cp->hglrc);
+  if (!cp->glx_context) return;
+  glXMakeCurrent(display, window, *(cp->glx_context));
   if (!draw_main(cp)) {
     release_cubicgrid(mi);
     return;
@@ -292,15 +289,15 @@ ENTRYPOINT void draw_cubicgrid(ModeInfo * mi)
   mi->polygon_count = cp->npoints;
   if (MI_IS_FPS(mi)) do_fps (mi);
   glFlush();
-  SwapBuffers(display);
+  glXSwapBuffers(display, window);
 }
 
 #ifndef STANDALONE
 ENTRYPOINT void change_cubicgrid(ModeInfo * mi) 
 {
   cubicgrid_conf *cp = &cubicgrid[MI_SCREEN(mi)];
-  if (!cp->hglrc) return;
-  wglMakeCurrent(MI_DISPLAY(mi), cp->hglrc);
+  if (!cp->glx_context) return;
+  glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(cp->glx_context));
   init_gl(mi);
 }
 #endif /* !STANDALONE */
@@ -308,4 +305,4 @@ ENTRYPOINT void change_cubicgrid(ModeInfo * mi)
 
 XSCREENSAVER_MODULE ("CubicGrid", cubicgrid)
 
-//#endif
+#endif

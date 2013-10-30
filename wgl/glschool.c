@@ -13,22 +13,24 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "win32.h"
-
 #include "glschool.h"
 
-#define sws_opts			xlockmore_opts
+//#define sws_opts			xlockmore_opts
 #define DELAY 20000
 #define DEFAULTS    "*delay:		20000       \n" \
                     "*showFPS:      False       \n" \
                     "*wireframe:    False       \n" \
 
-#define refresh_glschool		NULL
-#define release_glschool		NULL
-#define glschool_handle_event	NULL
+#define refresh_glschool		(0)
+#define release_glschool		(0)
+#define glschool_handle_event	(0)
 
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
@@ -55,17 +57,17 @@ static Bool			DoFog = False;
 static Bool			DoDrawBBox = True;
 static Bool			DoDrawGoal = False;
 static int			GoalChgFreq = 50;
-static float		MinVel = 1.0f;
-static float		MaxVel = 7.0f;
-static float		DistExp = 2.2f;
-static float		AccLimit = 8.0f;
-static float		AvoidFact = 1.5f;
-static float		MatchFact = 0.15f;
-static float		TargetFact = 80.0f;
-static float		CenterFact = 0.1f;
-static float		MinRadius = 30.0f;
-static float		Momentum = 0.9f;
-static float		DistComp = 10.0f;
+static float		MinVel = 1.0;
+static float		MaxVel = 7.0;
+static float		DistExp = 2.2;
+static float		AccLimit = 8.0;
+static float		AvoidFact = 1.5;
+static float		MatchFact = 0.15;
+static float		TargetFact = 80.0;
+static float		CenterFact = 0.1;
+static float		MinRadius = 30.0;
+static float		Momentum = 0.9;
+static float		DistComp = 10.0;
 
 #if 0
 	static XrmOptionDescRec opts[] = {
@@ -112,7 +114,6 @@ static float		DistComp = 10.0f;
 	ENTRYPOINT ModeSpecOpt glschool_opts = {countof(opts), opts, countof(vars), vars, NULL};
 #endif
 
-
 typedef struct {
 	int			nColors;
 	int			rotCounter;
@@ -125,8 +126,7 @@ typedef struct {
         int		fish_polys, box_polys;
 	XColor		*colors;
 	School		*school;
-	//GLXContext	*context;
-	HGLRC       hglrc;
+	GLXContext	*context;
 } glschool_configuration;
 
 static glschool_configuration	*scs = NULL;
@@ -138,7 +138,7 @@ reshape_glschool(ModeInfo *mi, int width, int height)
 	double					aspect = (double)width/(double)height;
 	glschool_configuration	*sc = &scs[MI_SCREEN(mi)];
 
-	wglMakeCurrent(MI_DISPLAY(mi), sc->hglrc);
+	glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(sc->context));
 	if (sc->school != (School *)0) {
 		glschool_setBBox(sc->school, -aspect*160, aspect*160, -130, 130, -450, -50.0);
 		glDeleteLists(sc->bboxList, 1);
@@ -169,7 +169,7 @@ init_glschool(ModeInfo *mi)
 	sc->drawBBox = DoDrawBBox;
 
 	sc->nColors = 360;
-	sc->hglrc = init_GL(mi);
+	sc->context = init_GL(mi);
 	sc->colors = (XColor *)calloc(sc->nColors, sizeof(XColor));
 	make_color_ramp(0, 0, 0,
 					0.0, 1.0, 1.0,
@@ -202,12 +202,12 @@ draw_glschool(ModeInfo *mi)
 	Display					*dpy = MI_DISPLAY(mi);
 	glschool_configuration	*sc = &scs[MI_SCREEN(mi)];
 
-	if (!sc->hglrc) {
+	if (!sc->context) {
 		fprintf(stderr, "no context\n");
 		return;
 	}
 
-	wglMakeCurrent(MI_DISPLAY(mi), sc->hglrc);
+	glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(sc->context));
 
         mi->polygon_count = 0;
 

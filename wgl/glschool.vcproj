@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="glschool"
-	ProjectGUID="{BB29322B-41BD-40B1-BD1C-5E7084178A27}"
+	ProjectGUID="{3613F789-0258-4473-B1B6-9511380D74B0}"
 	RootNamespace="glschool"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
@@ -48,6 +48,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -117,11 +118,12 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -190,6 +192,22 @@
 				RelativePath=".\glschool_gl.c"
 				>
 			</File>
+			<File
+				RelativePath=".\sphere.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tube.c"
+				>
+			</File>
+			<File
+				RelativePath=".\win32screensaver.c"
+				>
+			</File>
+			<File
+				RelativePath=".\yarandom.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="ヘッダー ファイル"
@@ -212,12 +230,36 @@
 				RelativePath=".\glschool_gl.h"
 				>
 			</File>
+			<File
+				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sphere.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tube.h"
+				>
+			</File>
+			<File
+				RelativePath=".\win32.h"
+				>
+			</File>
+			<File
+				RelativePath=".\yarandom.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="リソース ファイル"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\win32screensaver.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

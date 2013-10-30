@@ -53,8 +53,8 @@ static const char sccsid[] = "@(#)sproingiewrap.c	4.07 97/11/24 xlockmore";
 					"*fpsTop:       True    \n"			\
 					"*wireframe:	False	\n"
 
-#define refresh_sproingies NULL
-#define sproingies_handle_event NULL
+# define refresh_sproingies 0
+# define sproingies_handle_event 0
 
 #if 0
 	#ifdef STANDALONE
@@ -67,11 +67,14 @@ static const char sccsid[] = "@(#)sproingiewrap.c	4.07 97/11/24 xlockmore";
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
 #define DEF_SMART_SPROINGIES "True" /* Smart sproingies do not fall down the edge */
 
@@ -124,10 +127,9 @@ typedef struct {
 	GLfloat     angle;
 	GLuint      limit;
 	GLuint      count;
-	//GLXContext *glx_context;
-	HGLRC hglrc;
+	GLXContext *glx_context;
 	int         mono;
-	HWND window;
+	Window      window;
 } sproingiesstruct;
 
 static sproingiesstruct *sproingies = NULL;
@@ -136,7 +138,7 @@ static sproingiesstruct *sproingies = NULL;
 ENTRYPOINT void
 init_sproingies (ModeInfo * mi)
 {
-	HWND window = MI_WINDOW(mi);
+	Window      window = MI_WINDOW(mi);
 	int         screen = MI_SCREEN(mi);
 
 	int         count = MI_COUNT(mi);
@@ -154,7 +156,7 @@ init_sproingies (ModeInfo * mi)
 
 	sp->mono = (MI_IS_MONO(mi) ? 1 : 0);
 	sp->window = window;
-	if ((sp->hglrc = init_GL(mi)) != NULL) {
+	if ((sp->glx_context = init_GL(mi)) != NULL) {
 
 		if (MI_IS_WIREFRAME(mi))
 			wfmode = 1;
@@ -170,6 +172,7 @@ init_sproingies (ModeInfo * mi)
 		InitSproingies(wfmode, grnd, mspr, smrt_spr, MI_SCREEN(mi), MI_NUM_SCREENS(mi), sp->mono);
 
 		/* Viewport is specified size if size >= MINSIZE && size < screensize */
+		size = 0; // hacked by katahiromz
 		if (size == 0) {
 			w = MI_WIDTH(mi);
 			h = MI_HEIGHT(mi);
@@ -200,24 +203,23 @@ ENTRYPOINT void
 draw_sproingies (ModeInfo * mi)
 {
 	sproingiesstruct *sp = &sproingies[MI_SCREEN(mi)];
-	HDC display = MI_DISPLAY(mi);
-	HWND window = MI_WINDOW(mi);
+	Display    *display = MI_DISPLAY(mi);
+	Window      window = MI_WINDOW(mi);
 
-	if (!sp->hglrc)
+	if (!sp->glx_context)
 		return;
 
 	glDrawBuffer(GL_BACK);
-	wglMakeCurrent(display, sp->hglrc);
+	glXMakeCurrent(display, window, *(sp->glx_context));
 
     glPushMatrix();
-    //glRotatef(current_device_rotation(), 0, 0, 1);
-    glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef(current_device_rotation(), 0, 0, 1);
 	NextSproingieDisplay(MI_SCREEN(mi),mi->pause);	/* It will swap. */
     glPopMatrix();
 
     if (mi->fps_p) do_fps (mi);
     glFinish();
-    SwapBuffers(MI_DISPLAY(mi));
+    glXSwapBuffers(MI_DISPLAY(mi), MI_WINDOW(mi));
 }
 
 #if 0
@@ -250,9 +252,9 @@ release_sproingies (ModeInfo * mi)
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
 			sproingiesstruct *sp = &sproingies[screen];
 
-			if (sp->hglrc) {
+			if (sp->glx_context) {
 
-				wglMakeCurrent(MI_DISPLAY(mi), sp->hglrc);
+				glXMakeCurrent(MI_DISPLAY(mi), sp->window, *(sp->glx_context));
 				CleanupSproingies(MI_SCREEN(mi));
 			}
 		}
@@ -265,6 +267,6 @@ release_sproingies (ModeInfo * mi)
 
 XSCREENSAVER_MODULE ("Sproingies", sproingies)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */
 
 /* End of sproingiewrap.c */

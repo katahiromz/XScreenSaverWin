@@ -48,11 +48,13 @@ static const char sccsid[] = "@(#)flurry.c	4.07 97/11/24 xlockmore";
 # define DEFAULTS		"*delay:      10000 \n" \
 						"*showFPS:    False \n"
 
-#define refresh_flurry NULL
-#define flurry_handle_event NULL
-//#include "xlockmore.h"		/* from the xscreensaver distribution */
+# define refresh_flurry 0
+# define flurry_handle_event 0
+//# include "xlockmore.h"		/* from the xscreensaver distribution */
 
-//#ifdef USE_GL
+#include "flurry.h"
+
+#ifdef USE_GL
 
 static char *preset_str = "random";
 
@@ -87,10 +89,9 @@ static char *preset_str = "random";
 	    0,
 	    NULL
 	};
+
 	#endif
 #endif
-
-#include "flurry.h"
 
 global_info_t *flurry_info = NULL;
 
@@ -98,6 +99,7 @@ static double gTimeCounter = 0.0;
 
 static
 double currentTime(void) {
+  return GetTickCount() / 1000.0;
 #if 0
 	  struct timeval tv;
 	# ifdef GETTIMEOFDAY_TWO_ARGS
@@ -108,8 +110,6 @@ double currentTime(void) {
 	# endif
 
 	  return (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
-#else
-	return GetTickCount() / 1000.0f;
 #endif
 }
 
@@ -299,7 +299,7 @@ void GLRenderScene(global_info_t *global, flurry_info_t *flurry, double b)
 	case OPT_MODE_SCALAR_FRSQRTE:
 #endif
 #endif /* 0 */
-	    DrawSmoke_Scalar(global, flurry, flurry->s, (float)b);
+	    DrawSmoke_Scalar(global, flurry, flurry->s, b);
 	    break;
 #if 0
 #ifdef __VEC__
@@ -328,9 +328,9 @@ ENTRYPOINT void reshape_flurry(ModeInfo *mi, int width, int height)
 {
     global_info_t *global = flurry_info + MI_SCREEN(mi);
 
-    wglMakeCurrent(MI_DISPLAY(mi), global->hglrc);
+    glXMakeCurrent(MI_DISPLAY(mi), global->window, *(global->glx_context));
 
-    glViewport(0, 0, width, height);
+    glViewport(0.0, 0.0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, width, 0, height,-1,1);
@@ -339,8 +339,6 @@ ENTRYPOINT void reshape_flurry(ModeInfo *mi, int width, int height)
     glFlush();
     GLResize(global, (float)width, (float)height);
 }
-
-const char *progname = "Flurry";
 
 ENTRYPOINT void
 init_flurry(ModeInfo * mi)
@@ -408,7 +406,7 @@ init_flurry(ModeInfo * mi)
     case PRESET_FIRE: {
 	flurry_info_t *flurry;
 
-	flurry = new_flurry_info(global, 12, slowCyclicColorMode, 10000.0f, 0.2f, 1.0f);
+	flurry = new_flurry_info(global, 12, slowCyclicColorMode, 10000.0, 0.2, 1.0);
 	flurry->next = global->flurry;
 	global->flurry = flurry;	
         break;
@@ -416,7 +414,7 @@ init_flurry(ModeInfo * mi)
     case PRESET_PSYCHEDELIC: {
 	flurry_info_t *flurry;
 
-	flurry = new_flurry_info(global, 10, rainbowColorMode, 200.0f, 2.0f, 1.0f);
+	flurry = new_flurry_info(global, 10, rainbowColorMode, 200.0, 2.0, 1.0);
 	flurry->next = global->flurry;
 	global->flurry = flurry;	
         break;
@@ -424,15 +422,15 @@ init_flurry(ModeInfo * mi)
     case PRESET_RGB: {
 	flurry_info_t *flurry;
 
-	flurry = new_flurry_info(global, 3, redColorMode, 100.0f, 0.8f, 1.0f);
+	flurry = new_flurry_info(global, 3, redColorMode, 100.0, 0.8, 1.0);
 	flurry->next = global->flurry;
 	global->flurry = flurry;	
 
-	flurry = new_flurry_info(global, 3, greenColorMode, 100.0f, 0.8f, 1.0f);
+	flurry = new_flurry_info(global, 3, greenColorMode, 100.0, 0.8, 1.0);
 	flurry->next = global->flurry;
 	global->flurry = flurry;	
 
-	flurry = new_flurry_info(global, 3, blueColorMode, 100.0f, 0.8f, 1.0f);
+	flurry = new_flurry_info(global, 3, blueColorMode, 100.0, 0.8, 1.0);
 	flurry->next = global->flurry;
 	global->flurry = flurry;	
         break;
@@ -472,7 +470,7 @@ init_flurry(ModeInfo * mi)
     }
     } 
 
-    if ((global->hglrc = init_GL(mi)) != NULL) {
+    if ((global->glx_context = init_GL(mi)) != NULL) {
 	reshape_flurry(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 	GLSetupRC(global);
     } else {
@@ -492,8 +490,8 @@ draw_flurry(ModeInfo * mi)
 
     global_info_t *global = flurry_info + MI_SCREEN(mi);
     flurry_info_t *flurry;
-    HDC display = MI_DISPLAY(mi);
-    HWND window = MI_WINDOW(mi);
+    Display    *display = MI_DISPLAY(mi);
+    Window      window = MI_WINDOW(mi);
 
     newFrameTime = currentTime();
     if (oldFrameTime == -1) {
@@ -516,13 +514,13 @@ draw_flurry(ModeInfo * mi)
 
 	}
 	deltaFrameTime = newFrameTime - oldFrameTime;
-	alpha = (float)(5.0f * deltaFrameTime);
+	alpha = 5.0 * deltaFrameTime;
     }
     oldFrameTime = newFrameTime;
 
-    if (alpha > 0.2f) alpha = 0.2f;
+    if (alpha > 0.2) alpha = 0.2;
 
-    if (!global->hglrc)
+    if (!global->glx_context)
 	return;
 
     if (first) {
@@ -530,7 +528,7 @@ draw_flurry(ModeInfo * mi)
 	first = 0;
     }
     glDrawBuffer(GL_BACK);
-    wglMakeCurrent(display, global->hglrc);
+    glXMakeCurrent(display, window, *(global->glx_context));
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -546,7 +544,7 @@ draw_flurry(ModeInfo * mi)
     if (mi->fps_p) do_fps (mi);
 
     glFinish();
-    SwapBuffers(display);
+    glXSwapBuffers(display, window);
 }
 
 ENTRYPOINT void
@@ -559,8 +557,8 @@ release_flurry(ModeInfo * mi)
 	    global_info_t *global = &flurry_info[screen];
 	    flurry_info_t *flurry;
 
-	    if (global->hglrc) {
-		wglMakeCurrent(MI_DISPLAY(mi), global->hglrc);
+	    if (global->glx_context) {
+		glXMakeCurrent(MI_DISPLAY(mi), global->window, *(global->glx_context));
 	    }
 
 	    for (flurry = global->flurry; flurry; flurry=flurry->next) {
@@ -575,4 +573,4 @@ release_flurry(ModeInfo * mi)
 
 XSCREENSAVER_MODULE ("Flurry", flurry)
 
-//#endif
+#endif

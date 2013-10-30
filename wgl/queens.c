@@ -22,7 +22,7 @@
                        "*showFPS:     False \n" \
 		       "*wireframe:   False \n"	\
 
-#define refresh_queens NULL
+# define refresh_queens 0
 
 #if 0
 	#ifdef STANDALONE
@@ -30,9 +30,7 @@
 	#else
 	# include "xlock.h"
 	#endif
-#endif
 
-#if 0
 	#ifdef HAVE_COCOA
 	# include "jwxyz.h"
 	#else
@@ -49,11 +47,14 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
 //#include "gltrackball.h"
 #include "chessmodels.h"
@@ -70,7 +71,7 @@
 	};
 #endif
 
-static int rotate = True, wire, clearbits, flat = False;
+static int rotate, wire, clearbits, flat;
 
 #if 0
 	static argtype vars[] = {
@@ -95,11 +96,10 @@ static int rotate = True, wire, clearbits, flat = False;
 #define COLORSETS 5
 
 typedef struct {
-  //GLXContext *glx_context;
-  HGLRC hglrc;
-  HWND window;
-  //trackball_state *trackball;
-  //Bool button_down_p;
+  GLXContext *glx_context;
+  Window window;
+  trackball_state *trackball;
+  Bool button_down_p;
   GLfloat position[4];
   int queen_list;
 
@@ -115,11 +115,11 @@ static Queenscreen *qss = NULL;
 /* definition of white/black colors */
 static const GLfloat colors[COLORSETS][2][3] = 
   { 
-    {{0.43f, 0.54f, 0.76f}, {0.8f, 0.8f, 0.8f}},
-    {{0.5f, 0.7f, 0.9f}, {0.2f, 0.3f, 0.6f}},
-    {{0.53725490196f, 0.360784313725f, 0.521568627451f}, {0.6f, 0.6f, 0.6f}},
-    {{0.15f, 0.77f, 0.54f}, {0.5f, 0.5f, 0.5f}},
-    {{0.9f, 0.45f, 0.0f}, {0.5f, 0.5f, 0.5f}},
+    {{0.43, 0.54, 0.76}, {0.8, 0.8, 0.8}},
+    {{0.5, 0.7, 0.9}, {0.2, 0.3, 0.6}},
+    {{0.53725490196, 0.360784313725, 0.521568627451}, {0.6, 0.6, 0.6}},
+    {{0.15, 0.77, 0.54}, {0.5, 0.5, 0.5}},
+    {{0.9, 0.45, 0.0}, {0.5, 0.5, 0.5}},
   };
 
 #if 0
@@ -129,38 +129,38 @@ static const GLfloat colors[COLORSETS][2][3] =
 	  Queenscreen *qs = &qss[MI_SCREEN(mi)];
 
 	  if (event->xany.type == ButtonPress &&
-		  event->xbutton.button == Button1)
-		{
-		  qs->button_down_p = True;
-		  gltrackball_start (qs->trackball,
-							 event->xbutton.x, event->xbutton.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	      event->xbutton.button == Button1)
+	    {
+	      qs->button_down_p = True;
+	      gltrackball_start (qs->trackball,
+	                         event->xbutton.x, event->xbutton.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonRelease &&
-			   event->xbutton.button == Button1)
-		{
-		  qs->button_down_p = False;
-		  return True;
-		}
+	           event->xbutton.button == Button1)
+	    {
+	      qs->button_down_p = False;
+	      return True;
+	    }
 	  else if (event->xany.type == ButtonPress &&
-			   (event->xbutton.button == Button4 ||
-				event->xbutton.button == Button5 ||
-				event->xbutton.button == Button6 ||
-				event->xbutton.button == Button7))
-		{
-		  gltrackball_mousewheel (qs->trackball, event->xbutton.button, 5,
-								  !event->xbutton.state);
-		  return True;
-		}
+	           (event->xbutton.button == Button4 ||
+	            event->xbutton.button == Button5 ||
+	            event->xbutton.button == Button6 ||
+	            event->xbutton.button == Button7))
+	    {
+	      gltrackball_mousewheel (qs->trackball, event->xbutton.button, 5,
+	                              !event->xbutton.state);
+	      return True;
+	    }
 	  else if (event->xany.type == MotionNotify &&
-			   qs->button_down_p)
-		{
-		  gltrackball_track (qs->trackball,
-							 event->xmotion.x, event->xmotion.y,
-							 MI_WIDTH (mi), MI_HEIGHT (mi));
-		  return True;
-		}
+	           qs->button_down_p)
+	    {
+	      gltrackball_track (qs->trackball,
+	                         event->xmotion.x, event->xmotion.y,
+	                         MI_WIDTH (mi), MI_HEIGHT (mi));
+	      return True;
+	    }
 
 	  return False;
 	}
@@ -241,10 +241,10 @@ static int findSolution(Queenscreen *qs, int row, int col)
 static void go(Queenscreen *qs) { while(!findSolution(qs, 0, random()%qs->BOARDSIZE)); }
 
 /* lighting variables */
-static const GLfloat front_shininess[] = {60.0f};
-static const GLfloat front_specular[] = {0.4f, 0.4f, 0.4f, 1.0f};
-static const GLfloat ambient[] = {0.3f, 0.3f, 0.3f, 1.0f};
-static const GLfloat diffuse[] = {0.8f, 0.8f, 0.8f, 1.0f};
+static const GLfloat front_shininess[] = {60.0};
+static const GLfloat front_specular[] = {0.4, 0.4, 0.4, 1.0};
+static const GLfloat ambient[] = {0.3, 0.3, 0.3, 1.0};
+static const GLfloat diffuse[] = {0.8, 0.8, 0.8, 1.0};
 
 /* configure lighting */
 static void setup_lights(Queenscreen *qs) 
@@ -271,7 +271,7 @@ static void setup_lights(Queenscreen *qs)
 /* return alpha value for fading */
 static GLfloat findAlpha(Queenscreen *qs) 
 {
-  return (float)(qs->steps < 128 ? qs->steps/128.0 : qs->steps < 1024-128 ?1.0:(1024-qs->steps)/128.0);
+  return qs->steps < 128 ? qs->steps/128.0 : qs->steps < 1024-128 ?1.0:(1024-qs->steps)/128.0;
 }
 
 /* draw pieces */
@@ -291,7 +291,7 @@ static int drawPieces(Queenscreen *qs)
       glTranslatef(1.0, 0.0, 0.0);
     }
     
-    glTranslatef((float)(-1.0f*qs->BOARDSIZE), 0.0f, 1.0f);
+    glTranslatef(-1.0*qs->BOARDSIZE, 0.0, 1.0);
   }
   return polys;
 }
@@ -314,10 +314,10 @@ static int draw_reflections(Queenscreen *qs)
   /* only draw white squares */
   for(i = 0; i < qs->BOARDSIZE; ++i) {
     for(j = (qs->BOARDSIZE+i) % 2; j < qs->BOARDSIZE; j += 2) {
-      glVertex3f((float)i, 0.0f, j + 1.0f);
-      glVertex3f(i + 1.0f, 0.0f, j + 1.0f);
-      glVertex3f(i + 1.0f, 0.0f, (float)j);
-      glVertex3f((float)i, 0.0f, (float)j);
+      glVertex3f(i, 0.0, j + 1.0);
+      glVertex3f(i + 1.0, 0.0, j + 1.0);
+      glVertex3f(i + 1.0, 0.0, j);
+      glVertex3f(i, 0.0, j);
       polys++;
     }
   }
@@ -329,8 +329,8 @@ static int draw_reflections(Queenscreen *qs)
   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
   
   glPushMatrix(); 
-  glScalef(1.0f, -1.0f, 1.0f);
-  glTranslatef(0.5f, 0.001f, 0.5f);
+  glScalef(1.0, -1.0, 1.0);
+  glTranslatef(0.5, 0.001, 0.5);
   glLightfv(GL_LIGHT0, GL_POSITION, qs->position);
   polys += drawPieces(qs);
   glPopMatrix();
@@ -359,51 +359,51 @@ static int drawBoard(Queenscreen *qs)
       glColor4f(colors[qs->colorset][par][0],
 		colors[qs->colorset][par][1],
 		colors[qs->colorset][par][2],
-		0.70f);
-      glNormal3f(0.0f, 1.0f, 0.0f);
-      glVertex3f((float)i, 0.0f, j + 1.0f);
-      glVertex3f(i + 1.0f, 0.0f, j + 1.0f);
-      glVertex3f(i + 1.0f, 0.0f, (float)j);
-      glVertex3f((float)i, 0.0f, (float)j);
+		0.70);
+      glNormal3f(0.0, 1.0, 0.0);
+      glVertex3f(i, 0.0, j + 1.0);
+      glVertex3f(i + 1.0, 0.0, j + 1.0);
+      glVertex3f(i + 1.0, 0.0, j);
+      glVertex3f(i, 0.0, j);
       polys++;
     }
 
   glEnd();
 
   {
-    GLfloat off = 0.01f;
-    GLfloat w = (float)qs->BOARDSIZE;
-    GLfloat h = 0.1f;
+    GLfloat off = 0.01;
+    GLfloat w = qs->BOARDSIZE;
+    GLfloat h = 0.1;
 
     /* Give the board a slight lip. */
     /* #### oops, normals are wrong here, but you can't tell */
 
-    glColor3f(0.3f, 0.3f, 0.3f);
+    glColor3f(0.3, 0.3, 0.3);
     glBegin (GL_QUADS);
-    glVertex3f (0.0f,  0.0f, 0.0f);
-    glVertex3f (0.0f, -h, 0.0f);
-    glVertex3f (0.0f, -h, w);
-    glVertex3f (0.0f,  0.0f, w);
+    glVertex3f (0,  0, 0);
+    glVertex3f (0, -h, 0);
+    glVertex3f (0, -h, w);
+    glVertex3f (0,  0, w);
 
-    glVertex3f (0.0f,  0.0f, w);
-    glVertex3f (0.0f, -h, w);
+    glVertex3f (0,  0, w);
+    glVertex3f (0, -h, w);
     glVertex3f (w, -h, w);
-    glVertex3f (w,  0.0f, w);
+    glVertex3f (w,  0, w);
 
-    glVertex3f (w,  0.0f, w);
+    glVertex3f (w,  0, w);
     glVertex3f (w, -h, w);
-    glVertex3f (w, -h, 0.0f);
-    glVertex3f (w,  0.0f, 0.0f);
+    glVertex3f (w, -h, 0);
+    glVertex3f (w,  0, 0);
 
-    glVertex3f (w,  0.0f, 0.0f);
-    glVertex3f (w, -h, 0.0f);
-    glVertex3f (0.0f, -h, 0.0f);
-    glVertex3f (0.0f,  0.0f, 0.0f);
+    glVertex3f (w,  0, 0);
+    glVertex3f (w, -h, 0);
+    glVertex3f (0, -h, 0);
+    glVertex3f (0,  0, 0);
 
-    glVertex3f (0.0f, -h, 0.0f);
-    glVertex3f (w, -h, 0.0f);
+    glVertex3f (0, -h, 0);
+    glVertex3f (w, -h, 0);
     glVertex3f (w, -h, w);
-    glVertex3f (0.0f, -h, w);
+    glVertex3f (0, -h, w);
     glEnd();
     polys += 4;
 
@@ -462,26 +462,25 @@ static int display(Queenscreen *qs)
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
-  //glRotatef(current_device_rotation(), 0.0f, 0.0f, 1.0f);
-  glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
+  glRotatef(current_device_rotation(), 0, 0, 1);
 
   /* setup light attenuation */
   /* #### apparently this does nothing */
   glEnable(GL_COLOR_MATERIAL);
-  glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, (float)(0.8f/(0.01f+findAlpha(qs))));
-  glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.06f);
+  glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.8/(0.01+findAlpha(qs)));
+  glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.06);
 
   /** setup perspective */
-  glTranslatef(0.0f, 0.0f, (float)(-1.5f*qs->BOARDSIZE));
-  glRotatef(30.0f, 1.0f, 0.0f, 0.0f);
-  //gltrackball_rotate (qs->trackball);
-  glRotatef((float)(qs->theta*100.0), 0.0f, 1.0f, 0.0f);
-  glTranslatef((float)(-0.5*qs->BOARDSIZE), 0.0f, (float)(-0.5*qs->BOARDSIZE));
+  glTranslatef(0.0, 0.0, -1.5*qs->BOARDSIZE);
+  glRotatef(30.0, 1.0, 0.0, 0.0);
+  gltrackball_rotate (qs->trackball);
+  glRotatef(qs->theta*100, 0.0, 1.0, 0.0);
+  glTranslatef(-0.5*qs->BOARDSIZE, 0.0, -0.5*qs->BOARDSIZE);
 
   /* find light positions */
-  qs->position[0] = (float)(qs->BOARDSIZE/2.0 + qs->BOARDSIZE/1.4*-sin(qs->theta*100*M_PI/180.0));
-  qs->position[2] = (float)(qs->BOARDSIZE/2.0 + qs->BOARDSIZE/1.4*cos(qs->theta*100*M_PI/180.0));
-  qs->position[1] = 6.0f;
+  qs->position[0] = qs->BOARDSIZE/2.0 + qs->BOARDSIZE/1.4*-sin(qs->theta*100*M_PI/180.0);
+  qs->position[2] = qs->BOARDSIZE/2.0 + qs->BOARDSIZE/1.4*cos(qs->theta*100*M_PI/180.0);
+  qs->position[1] = 6.0;
 
   if(!wire) {
     glEnable(GL_LIGHTING);
@@ -492,12 +491,12 @@ static int display(Queenscreen *qs)
   /* Since the lighting attenuation trick up there doesn't seem to be working,
      let's drop the old board down and drop the new board in. */
   if (qs->steps < (max/8.0)) {
-    GLfloat y = (float)(qs->steps / (max/8.0));
-    y = SINF(M_PI/2 * y);
+    GLfloat y = qs->steps / (max/8.0);
+    y = sin (M_PI/2 * y);
     glTranslatef (0, 10 - (y * 10), 0);
   } else if (qs->steps > max-(max/8.0)) {
-    GLfloat y = (float)((qs->steps - (max-(max/8.0))) / (GLfloat) (max/8.0));
-    y = 1 - SINF(M_PI/2 * (1-y));
+    GLfloat y = (qs->steps - (max-(max/8.0))) / (GLfloat) (max/8.0);
+    y = 1 - sin (M_PI/2 * (1-y));
     glTranslatef (0, -y * 15, 0);
   }
 
@@ -510,14 +509,13 @@ static int display(Queenscreen *qs)
   if(!wire)
     glDisable(GL_BLEND);
 
-  glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1f);
+  glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
 
-  glTranslatef(0.5f, 0.0f, 0.5f);
+  glTranslatef(0.5, 0.0, 0.5);
   polys += drawPieces(qs);
 
   /* rotate camera */
-  //if(!qs->button_down_p)
-  if(!False)
+  if(!qs->button_down_p)
     qs->theta += .002;
 
   /* zero out board, find new solution of size MINBOARD <= i <= MAXBOARD */
@@ -533,21 +531,21 @@ static int display(Queenscreen *qs)
 
 static const GLfloat spidermodel[][3] =
   {
-    {0.48f, 0.48f, 0.22f},
-    {0.48f, 0.34f, 0.18f},
-    {0.34f, 0.34f, 0.10f},
-    {0.34f, 0.18f, 0.30f},
-    {0.18f, 0.14f, 0.38f},
-    {0.14f, 0.29f, 0.01f},
-    {0.29f, 0.18f, 0.18f},
-    {0.18f, 0.18f, 0.16f},
-    {0.18f, 0.20f, 0.26f},
-    {0.20f, 0.27f, 0.14f},
-    {0.27f, 0.24f, 0.08f},
-    {0.24f, 0.17f, 0.00f},
-    {0.17f, 0.095f, 0.08f},
-    {0.095f, 0.07f, 0.00f},
-    {0.07f, 0.00f, 0.12f},
+    {0.48, 0.48, 0.22},
+    {0.48, 0.34, 0.18},
+    {0.34, 0.34, 0.10},
+    {0.34, 0.18, 0.30},
+    {0.18, 0.14, 0.38},
+    {0.14, 0.29, 0.01},
+    {0.29, 0.18, 0.18},
+    {0.18, 0.18, 0.16},
+    {0.18, 0.20, 0.26},
+    {0.20, 0.27, 0.14},
+    {0.27, 0.24, 0.08},
+    {0.24, 0.17, 0.00},
+    {0.17, 0.095, 0.08},
+    {0.095, 0.07, 0.00},
+    {0.07, 0.00, 0.12},
   };
 
 
@@ -607,12 +605,12 @@ ENTRYPOINT void init_queens(ModeInfo *mi)
   qs = &qss[screen];
   qs->window = MI_WINDOW(mi);
   
-  if((qs->hglrc = init_GL(mi)))
+  if((qs->glx_context = init_GL(mi)))
     reshape_queens(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
   else
     MI_CLEARWINDOW(mi);
 
-  //qs->trackball = gltrackball_init ();
+  qs->trackball = gltrackball_init ();
 
   qs->BOARDSIZE = 8; /* 8 cuz its classic */
 
@@ -627,13 +625,13 @@ ENTRYPOINT void init_queens(ModeInfo *mi)
 ENTRYPOINT void draw_queens(ModeInfo *mi) 
 {
   Queenscreen *qs = &qss[MI_SCREEN(mi)];
-  HWND w = MI_WINDOW(mi);
-  HDC disp = MI_DISPLAY(mi);
+  Window w = MI_WINDOW(mi);
+  Display *disp = MI_DISPLAY(mi);
 
-  if(!qs->hglrc)
+  if(!qs->glx_context)
     return;
 
-  wglMakeCurrent(disp, qs->hglrc);
+  glXMakeCurrent(disp, w, *(qs->glx_context));
 
   if(flat)
     glShadeModel(GL_FLAT);
@@ -659,7 +657,7 @@ ENTRYPOINT void draw_queens(ModeInfo *mi)
 
   if(mi->fps_p) do_fps(mi);
   glFinish(); 
-  SwapBuffers(disp);
+  glXSwapBuffers(disp, w);
 }
 
 ENTRYPOINT void release_queens(ModeInfo *mi) 
@@ -673,4 +671,4 @@ ENTRYPOINT void release_queens(ModeInfo *mi)
 
 XSCREENSAVER_MODULE ("Queens", queens)
 
-//#endif
+#endif

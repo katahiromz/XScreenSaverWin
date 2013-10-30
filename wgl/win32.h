@@ -1,24 +1,47 @@
+#ifndef __XSCREENSAVER_WIN32_H__
+#define __XSCREENSAVER_WIN32_H__
+
 #define ENTRYPOINT static
+#define USE_GL 1
 
 typedef BOOL Bool;
 #define False FALSE
 #define True TRUE
 
-#define DoRed			(1<<0)
-#define DoGreen			(1<<1)
-#define DoBlue			(1<<2)
+#define DoRed           (1<<0)
+#define DoGreen         (1<<1)
+#define DoBlue          (1<<2)
 
-typedef struct win32_XColor {
+struct win32_XColor 
+{
   unsigned long pixel;
   unsigned short red, green, blue;
   char flags;  /* DoRed, DoGreen, DoBlue */
   char pad;
-} XColor;
+};
+typedef struct win32_XColor XColor;
+
+typedef UINT win32_Colormap;
+typedef win32_Colormap Colormap;
 
 #define Visual void
-#define Screen void
+#define trackball_state char*	// Not implemented yet
 
-typedef struct ModeInfo
+// in <ntdef.h>
+// #define DECLARE_HANDLE(n) typedef struct n##__{int i;}*n
+#ifdef STRICT
+	#define Display struct HDC__
+	#define Screen struct HWND__
+#else
+	#define Display void
+	#define Screen void
+#endif
+typedef HWND  Window;
+typedef HGLRC GLXContext;  // GLXContext is same as HGLRC*
+
+Display *DisplayOfScreen(Screen *s);
+
+struct win32_ModeInfo
 {
     HDC hdc;
     HWND hwnd;
@@ -27,11 +50,12 @@ typedef struct ModeInfo
     INT width;
     INT height;
     INT polygon_count;
-	INT recursion_depth;
+    INT recursion_depth;
     Bool fps_p;
     Bool is_drawn;
-	int pause;
-} ModeInfo;
+    int pause;
+};
+typedef struct win32_ModeInfo ModeInfo;
 
 #define MI_DISPLAY(mi) (mi)->hdc
 #define MI_WINDOW(mi) (mi)->hwnd
@@ -47,8 +71,8 @@ typedef struct ModeInfo
 #define MI_COUNT(MI) GdiGetBatchLimit()
 #define MI_BATCHCOUNT(MI) GdiGetBatchLimit()
 #define MI_IS_ICONIC(mi) FALSE
-#define MI_CYCLES(mi) 0
-#define MI_SIZE(mi) 0
+#define MI_CYCLES(mi) 10
+#define MI_SIZE(mi) 100
 
 #define FreeAllGL(mi) /**/
 
@@ -84,8 +108,8 @@ typedef struct SCREENSAVER
 } SCREENSAVER;
 
 typedef enum COLOR_SCHEME {
-	color_scheme_default, color_scheme_uniform, 
-	color_scheme_smooth, color_scheme_bright
+    color_scheme_default, color_scheme_uniform, 
+    color_scheme_smooth, color_scheme_bright
 };
 
 #ifdef WRITABLE_COLORS
@@ -114,14 +138,15 @@ typedef void (*HACK_REFRESH) (ModeInfo *);
 typedef void (*HACK_FREE) (ModeInfo *);
 
 #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) \
-	HACK_INIT hack_init = init_ ## PREFIX; \
-	HACK_DRAW hack_draw = draw_ ## PREFIX; \
-	HACK_REFRESH hack_refresh = refresh_ ## PREFIX; \
-	HACK_FREE hack_free = release_ ## PREFIX; \
-	DWORD hack_delay = DELAY;
+    HACK_INIT hack_init = init_ ## PREFIX; \
+    HACK_DRAW hack_draw = draw_ ## PREFIX; \
+    HACK_REFRESH hack_refresh = refresh_ ## PREFIX; \
+    HACK_FREE hack_free = release_ ## PREFIX; \
+    DWORD hack_delay = DELAY; \
+    const char *progname = CLASS;
 
 #define XSCREENSAVER_MODULE(CLASS,PREFIX) \
-	XSCREENSAVER_MODULE_2(CLASS,PREFIX,PREFIX)
+    XSCREENSAVER_MODULE_2(CLASS,PREFIX,PREFIX)
 
 extern HACK_INIT hack_init;
 extern HACK_DRAW hack_draw;
@@ -129,12 +154,21 @@ extern HACK_REFRESH hack_refresh;
 extern HACK_FREE hack_free;
 extern DWORD hack_delay;
 
-#ifndef M_PI
-#define M_PI		3.14159265358979323846
-#endif
-#ifndef M_PI_2
-#define M_PI_2		1.57079632679489661923
-#endif
-
-HGLRC init_GL(ModeInfo *mi);
+HGLRC *init_GL(ModeInfo *mi);
 void do_fps(ModeInfo *mi);
+void glXMakeCurrent(Display *d, Window w, GLXContext context);
+void glXSwapBuffers(Display *d, Window w);
+trackball_state *gltrackball_init(void);
+void gltrackball_rotate(trackball_state *trackball);
+float current_device_rotation(void);
+void check_gl_error(const char *name);
+void clear_gl_error(void);
+
+#define inline
+
+extern const char *progname;
+void gltrackball_get_quaternion(char **ppch, float q[4]);
+
+#define strcasecmp _stricmp
+
+#endif	// ndef __XSCREENSAVER_WIN32_H__

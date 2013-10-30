@@ -51,15 +51,25 @@
  */
 
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
+#if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif
+
+	#ifdef HAVE_UNISTD_H
+	# include <unistd.h>  /* for getpid() */
+	#endif
+	#include <sys/time.h> /* for gettimeofday() */
 #endif
 
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>  /* for getpid() */
-#endif
-//#include <sys/time.h> /* for gettimeofday() */
 #include <windows.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#include "win32.h"
 
 #include "yarandom.h"
 # undef ya_rand_init
@@ -103,10 +113,32 @@ ya_rand_init(unsigned int seed)
   int i;
   if (seed == 0)
     {
-      seed = GetTickCount();
-    }
+    	/*
+      struct timeval tp;
+#ifdef GETTIMEOFDAY_TWO_ARGS
+      struct timezone tzp;
+      gettimeofday(&tp, &tzp);
+#else
+      gettimeofday(&tp);
+#endif*/
 
+      /* Since the multiplications will have a larger effect on the
+         upper bits than the lower bits, after every addition in the
+         seed, perform a bitwise rotate by an odd number, resulting
+         in a better distribution of randomness throughout the bits.
+         -- Brian Carlson, 2010.
+       */
 #define ROT(X,N) (((X)<<(N)) | ((X)>>((sizeof(unsigned int)*8)-(N))))
+      //seed = (999 * tp.tv_sec);
+      //seed = ROT (seed, 11);
+      //seed += (1001 * tp.tv_usec);
+      //seed = ROT (seed, 7);
+      //seed += (1003 * getpid());
+      //seed = ROT (seed, 13);
+
+      seed =
+        (DWORD)(GetTickCount() ^ GetCurrentProcessId() ^ (DWORD_PTR)GetForegroundWindow());
+    }
 
   a[0] += seed;
   for (i = 1; i < VectorSize; i++)

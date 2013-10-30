@@ -17,11 +17,12 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdio.h>
 
 #include "win32.h"
-
 #include "rotator.h"
 
 #define DEF_LIGHT     "True"
@@ -72,15 +73,16 @@ enum {
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-#include <math.h>
 //#include "xlockmore.h"
 
-//#ifdef USE_GL					/* whole file */
+#ifdef USE_GL					/* whole file */
 
 //typedef struct timeval glhtime;
+typedef double glhtime;
 
 static double getTime(void)
 {
+	return GetTickCount() / 1000.0;
 #if 0
 		struct timeval t;
 	#ifdef GETTIMEOFDAY_TWO_ARGS
@@ -90,7 +92,6 @@ static double getTime(void)
 	#endif							/* !GETTIMEOFDAY_TWO_ARGS */
 		return t.tv_sec + t.tv_usec / 1000000.0;
 #endif
-	return GetTickCount() / 1000.0;
 }
 
 typedef enum {
@@ -144,8 +145,7 @@ typedef struct {
 } TrailPoint;
 
 typedef struct {
-	//GLXContext *glx_context;
-	HGLRC hglrc;
+	GLXContext *glx_context;
 	State state;
 	Bool wire;
 	Bool fog;
@@ -209,9 +209,9 @@ static glhcfg *glhanoi_cfg = NULL;
 static Bool fog = False;
 static Bool light = True;
 static Bool texture = True;
-static GLfloat trails = 2.0f;
+static GLfloat trails = 2;
 static int poles = 0;
-static GLfloat speed = 1.0f;
+static GLfloat speed = 1;
 
 #if 0
 	static XrmOptionDescRec opts[] = {
@@ -245,7 +245,9 @@ static GLfloat speed = 1.0f;
 	};
 
 	ENTRYPOINT ModeSpecOpt glhanoi_opts = { countof(opts), opts, countof(vars), vars, desc };
+#endif
 
+#if 0
 	#ifdef USE_MODULES
 	ModStruct glhanoi_description = {
 		"glhanoi", "init_glhanoi", "draw_glhanoi", "release_glhanoi",
@@ -256,35 +258,32 @@ static GLfloat speed = 1.0f;
 	#endif
 #endif
 
+static const GLfloat cBlack[] = { 0.0, 0.0, 0.0, 1.0 };
+static const GLfloat cWhite[] = { 1.0, 1.0, 1.0, 1.0 };
+static const GLfloat poleColor[] = { 0.545, 0.137, 0.137 };
+static const GLfloat baseColor[] = { 0.34, 0.34, 0.48 };
+/* static const GLfloat baseColor[] = { 0.545, 0.137, 0.137 }; */
+static const GLfloat fogcolor[] = { 0.5, 0.5, 0.5 };
+static GLfloat trailColor[] = { 1.0, 1.0, 1.0, 0.5 };
 
-static const GLfloat cBlack[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-static const GLfloat cWhite[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-static const GLfloat poleColor[] = { 0.545f, 0.137f, 0.137f };
-static const GLfloat baseColor[] = { 0.34f, 0.34f, 0.48f };
-/* static const GLfloat baseColor[] = { 0.545f, 0.137f, 0.137f }; */
-static const GLfloat fogcolor[] = { 0.5f, 0.5f, 0.5f };
-static GLfloat trailColor[] = { 1.0f, 1.0f, 1.0f, 0.5f };
+static const float left[] = { 1.0, 0.0, 0.0 };
+static const float up[] = { 0.0, 1.0, 0.0 };
+static const float front[] = { 0.0, 0.0, 1.0 };
+static const float right[] = { -1.0, 0.0, 0.0 };
+static const float down[] = { 0.0, -1.0, 0.0 };
+static const float back[] = { 0.0, 0.0, -1.0 };
 
-static const float left[] = { 1.0f, 0.0f, 0.0f };
-static const float up[] = { 0.0f, 1.0f, 0.0f };
-static const float front[] = { 0.0f, 0.0f, 1.0f };
-static const float right[] = { -1.0f, 0.0f, 0.0f };
-static const float down[] = { 0.0f, -1.0f, 0.0f };
-static const float back[] = { 0.0f, 0.0f, -1.0f };
+static const GLfloat pos0[4] = { 50.0, 50.0, 50.0, 0.0 };
+static const GLfloat amb0[4] = { 0.0, 0.0, 0.0, 1.0 };
+static const GLfloat dif0[4] = { 1.0, 1.0, 1.0, 1.0 };
+static const GLfloat spc0[4] = { 0.0, 1.0, 1.0, 1.0 };
 
-static const GLfloat pos0[4] = { 50.0f, 50.0f, 50.0f, 0.0f };
-static const GLfloat amb0[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-static const GLfloat dif0[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-static const GLfloat spc0[4] = { 0.0f, 1.0f, 1.0f, 1.0f };
+static const GLfloat pos1[4] = { -50.0, 50.0, -50.0, 0.0 };
+static const GLfloat amb1[4] = { 0.0, 0.0, 0.0, 1.0 };
+static const GLfloat dif1[4] = { 1.0, 1.0, 1.0, 1.0 };
+static const GLfloat spc1[4] = { 1.0, 1.0, 1.0, 1.0 };
 
-static const GLfloat pos1[4] = { -50.0f, 50.0f, -50.0f, 0.0f };
-static const GLfloat amb1[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-static const GLfloat dif1[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-static const GLfloat spc1[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-static float g = 3.0f * 9.80665f;		/* hmm, looks like we need more gravity, Scotty... */
-
-const char *progname = "GLHanoi";
+static float g = 3.0 * 9.80665;		/* hmm, looks like we need more gravity, Scotty... */
 
 static void checkAllocAndExit(Bool item, char *descr) {
 	if (!item) {
@@ -309,7 +308,7 @@ static Disk *pop(glhcfg *glhanoi, int idx)
 	return DOPOP(&glhanoi->pole[idx]);
 }
 
-static void swap(int *x, int *y)
+static inline void swap(int *x, int *y)
 {
 	*x = *x ^ *y;
 	*y = *x ^ *y;
@@ -402,18 +401,18 @@ static void moveSetup(glhcfg *glhanoi, Disk * disk)
 	/* was: absx = sqrt(disk->xmax - disk->xmin); */
 	dh = distance(poleSrc->position, poleDst->position);
 	absx = sqrt(dh);
-	ymax = (float)(glhanoi->poleHeight + dh);
+	ymax = glhanoi->poleHeight + dh;
 	if(glhanoi->state == FINISHED) {
-		ymax += (float)(dh * (double)(glhanoi->numberOfDisks - disk->id));
+		ymax += dh * (double)(glhanoi->numberOfDisks - disk->id);
 	}
 	h = ymax - disk->ymin;
 	/* A(a, b, c) = -4 c / (a - b)^2 */
 	/* theta = atan(4 h / (b - a)) */
-	theta = (float)atan(4 * h / dh);
-	if(theta < 0.0f)
-		theta += (float)M_PI;
-	costheta = COSF(theta);
-	sintheta = SINF(theta);
+	theta = atan(4 * h / dh);
+	if(theta < 0.0)
+		theta += M_PI;
+	costheta = cos(theta);
+	sintheta = sin(theta);
 	u = (float)
 		sqrt(fabs
 			 (-g /
@@ -422,12 +421,12 @@ static void moveSetup(glhcfg *glhanoi, Disk * disk)
 	disk->usintheta = u * sintheta;
 	disk->ucostheta = u * costheta;
 	/* Not to be confused: disk->dx is the per-time-unit portion of dx */
-	disk->dx = (float)(disk->ucostheta * dx / dh);
-	disk->dz = (float)(disk->ucostheta * dz / dh);
+	disk->dx = disk->ucostheta * dx / dh;
+	disk->dz = disk->ucostheta * dz / dh;
 	disk->t1 =
-		(float)((-u + sqrt(u * u + 2.0 * g * fabs(disk->ymin - disk->base0))) / g);
+		(-u + sqrt(u * u + 2.0 * g * fabs(disk->ymin - disk->base0))) / g;
 	disk->u1 = u + g * disk->t1;
-	disk->t2 = (float)(2.0f * disk->usintheta / g);
+	disk->t2 = 2.0 * disk->usintheta / g;
 	disk->u2 = disk->usintheta - g * disk->t2;
 
 	/* Compute direction of travel, in the XZ plane. */
@@ -598,7 +597,7 @@ static double lerp(double alpha, double start, double end)
 static void upfunc(GLdouble t, Disk * d)
 {
 	d->position[0] = d->xmin;
-	d->position[1] = (float)(d->base0 + (d->u1 - 0.5f * g * t) * t);
+	d->position[1] = d->base0 + (d->u1 - 0.5 * g * t) * t;
 	d->position[2] = d->zmin;
 
 	d->rotation[1] = 0.0;
@@ -607,18 +606,18 @@ static void upfunc(GLdouble t, Disk * d)
 static void parafunc(GLdouble t, Disk * d)
 {
 	/* ##was: d->position[0] = d->xmin + d->ucostheta * t; */
-	d->position[0] = (float)(d->xmin + d->dx * t);
-	d->position[2] = (float)(d->zmin + d->dz * t);
-	d->position[1] = (float)(d->ymin + (d->usintheta - 0.5 * g * t) * t);
+	d->position[0] = d->xmin + d->dx * t;
+	d->position[2] = d->zmin + d->dz * t;
+	d->position[1] = d->ymin + (d->usintheta - 0.5 * g * t) * t;
 	
-	d->rotation[1] = (float)(d->rotAngle * t / d->t2);
+	d->rotation[1] = d->rotAngle * t / d->t2;
 		/* d->rotAngle * (d->position[0] - d->xmin) / (d->xmax - d->xmin); */
 }
 
 static void downfunc(GLdouble t, Disk * d)
 {
 	d->position[0] = d->xmax;
-	d->position[1] = (float)(d->ymin + (d->u2 - 0.5 * g * t) * t);
+	d->position[1] = d->ymin + (d->u2 - 0.5 * g * t) * t;
 	d->position[2] = d->zmax;
 	
 	d->rotation[1] = 0.0;
@@ -638,7 +637,7 @@ static void enQTrail(glhcfg *glhanoi, GLfloat *posn)
 		tp->position[0] = posn[0];
 		tp->position[1] = posn[1] + glhanoi->diskHeight;
 		/* Slight jitter to prevent clashing with other trails */
-		tp->position[2] = (float)(posn[2] + (glhanoi->move % 23) * 0.01f);
+		tp->position[2] = posn[2] + (glhanoi->move % 23) * 0.01;
 		tp->startTime = t + TRAIL_START_DELAY;
 		tp->endTime = t + TRAIL_START_DELAY + glhanoi->trailDuration;
 		tp->isEnd = False;
@@ -708,14 +707,14 @@ static void updateView(glhcfg *glhanoi)
 	A = M_PI / 4.0 * (1.0 - latitude);
 	a = sqrt(b * b + c * c - 2.0 * b * c * cos(A));
 	B = asin(sin(A) * b / a);
-	glRotatef((float)(-B * 180 / M_PI), 1.0f, 0.0f, 0.0f);
+	glRotatef(-B * 180 / M_PI, 1.0, 0.0, 0.0);
 
 	glTranslatef(0.0f, 0.0f,
-				 (float)-(MIN_CAMERA_RADIUS +
+				 -(MIN_CAMERA_RADIUS +
 				   radius * (MAX_CAMERA_RADIUS - MIN_CAMERA_RADIUS)));
-	glRotatef((float)(longitude * 360.0f), 0.0f, 1.0f, 0.0f);
-	glRotatef((float)(latitude * 180.0f), COSF(longitude * 2.0 * M_PI), 0.0f,
-			  SINF(longitude * 2.0 * M_PI));
+	glRotatef(longitude * 360.0, 0.0f, 1.0f, 0.0f);
+	glRotatef(latitude * 180.0, cos(longitude * 2.0 * M_PI), 0.0,
+			  sin(longitude * 2.0 * M_PI));
 }
 
 static void changeState(glhcfg *glhanoi, State state)
@@ -752,7 +751,7 @@ static void update_glhanoi(glhcfg *glhanoi)
 		break;
 
 	case MOVE_DISK:
-		if(computePosition(glhanoi, (float)(t * glhanoi->currentDisk->speed), glhanoi->currentDisk)) {
+		if(computePosition(glhanoi, t * glhanoi->currentDisk->speed, glhanoi->currentDisk)) {
 			changeState(glhanoi, MOVE_FINISHED);
 		}
 		break;
@@ -795,7 +794,7 @@ static void update_glhanoi(glhcfg *glhanoi)
 				continue;
 			}
 
-			finished = computePosition(glhanoi, (float)(t - delay), &glhanoi->disk[i]);
+			finished = computePosition(glhanoi, t - delay, &glhanoi->disk[i]);
 			glhanoi->disk[i].rotation[1] = 0.0;
 
 			if(!finished) {
@@ -830,11 +829,11 @@ static void HSVtoRGBf(GLfloat h, GLfloat s, GLfloat v,
 			h = 0.0;
 		}
 		h /= 60.0;				/* h now in [0,6). */
-		i = (float)floor((double)h);	/* i now largest integer <= h */
+		i = floor((double)h);	/* i now largest integer <= h */
 		f = h - i;				/* f is no fractional part of h */
-		p = v * (1.0f - s);
-		q = v * (1.0f - (s * f));
-		t = (float)(v * (1.0f - (s * (1.0 - f))));
+		p = v * (1.0 - s);
+		q = v * (1.0 - (s * f));
+		t = v * (1.0 - (s * (1.0 - f)));
 		switch ((int)i) {
 		case 0:
 			*r = v;
@@ -899,7 +898,7 @@ static int drawTube(GLdouble bottomRadius, GLdouble topRadius,
 	GLfloat y;
 	GLfloat *cosCache = malloc(sizeof(GLfloat) * nSlice);
 	GLfloat *sinCache = malloc(sizeof(GLfloat) * nSlice);
-	GLuint slice;
+	GLint slice;
 	GLuint loop;
 	GLint lastSlice = nSlice - 1;
 	GLfloat radius;
@@ -919,15 +918,15 @@ static int drawTube(GLdouble bottomRadius, GLdouble topRadius,
 		topThickness = 0.0;
 	}
 	if(topRadius >= bottomRadius) {
-		maxRadius = (float)topRadius;
+		maxRadius = topRadius;
 	} else {
-		maxRadius = (float)bottomRadius;
+		maxRadius = bottomRadius;
 	}
 
 	/* bottom */
 	y = 0.0;
-	radius = (float)bottomRadius;
-	innerRadius = (float)(bottomRadius - bottomThickness);
+	radius = bottomRadius;
+	innerRadius = bottomRadius - bottomThickness;
 	/* innerTexCoordSize = texCoordSize * innerRadius / maxRadius; */
 	/* outerTexCoordSize = texCoordSize * radius / maxRadius; */
 	/* yTexCoord = minTexCoord; */
@@ -943,10 +942,10 @@ static int drawTube(GLdouble bottomRadius, GLdouble topRadius,
 	glVertex3f(0.0, y, radius);
 
 	for(slice = lastSlice; slice >= 0; --slice) {
-		GLfloat theta = (float)(2.0f * M_PI * (double)slice / nSlice);
+		GLfloat theta = 2.0 * M_PI * (double)slice / nSlice;
 
-		cosCache[slice] = COSF(theta);
-		sinCache[slice] = SINF(theta);
+		cosCache[slice] = cos(theta);
+		sinCache[slice] = sin(theta);
 
 		/* glTexCoord3f(midTexCoord + sinCache[slice] * innerTexCoordSize, */
 		/* yTexCoord, */
@@ -964,13 +963,16 @@ static int drawTube(GLdouble bottomRadius, GLdouble topRadius,
 	/* middle */
 	for(loop = 0; loop < nLoop; ++loop) {
 		GLfloat lowerRadius =
-			(float)(bottomRadius + (topRadius -
-							bottomRadius) * (float)loop / (nLoop));
+			bottomRadius + (topRadius -
+							bottomRadius) * (float)loop / (nLoop);
 		GLfloat upperRadius =
-			(float)(bottomRadius + (topRadius - bottomRadius) * (float)(loop + 1) / (nLoop));
-		GLfloat lowerY = (float)(height * (float)loop / (nLoop));
-		GLfloat upperY = (float)(height * (float)(loop + 1) / (nLoop));
-		GLfloat factor = (float)((topRadius - topThickness) - (bottomRadius - bottomThickness));
+			bottomRadius + (topRadius - bottomRadius) * (float)(loop +
+																1) /
+			(nLoop);
+		GLfloat lowerY = height * (float)loop / (nLoop);
+		GLfloat upperY = height * (float)(loop + 1) / (nLoop);
+		GLfloat factor = (topRadius - topThickness) -
+			(bottomRadius - bottomThickness);
 
 		/* outside */
 		glBegin(GL_QUAD_STRIP);
@@ -989,10 +991,10 @@ static int drawTube(GLdouble bottomRadius, GLdouble topRadius,
 		glEnd();
 
 		/* inside */
-		lowerRadius = (float)(bottomRadius - bottomThickness +
-			factor * (float)loop / (nLoop));
-		upperRadius = (float)(bottomRadius - bottomThickness +
-			factor * (float)(loop + 1) / (nLoop));
+		lowerRadius = bottomRadius - bottomThickness +
+			factor * (float)loop / (nLoop);
+		upperRadius = bottomRadius - bottomThickness +
+			factor * (float)(loop + 1) / (nLoop);
 
 		glBegin(GL_QUAD_STRIP);
 		glNormal3f(0.0, 0.0, -1.0);
@@ -1010,12 +1012,12 @@ static int drawTube(GLdouble bottomRadius, GLdouble topRadius,
 	}
 
 	/* top */
-	y = (float)height;
-	radius = (float)topRadius;
-	innerRadius = (float)(topRadius - topThickness);
+	y = height;
+	radius = topRadius;
+	innerRadius = topRadius - topThickness;
 
 	glBegin(GL_QUAD_STRIP);
-	glNormal3f(0.0f, 1.0f, 0.0f);
+	glNormal3f(0.0, 1.0, 0.0);
 	for(slice = 0; slice < nSlice; ++slice) {
 		glVertex3f(innerRadius * sinCache[slice], y,
 				   innerRadius * cosCache[slice]);
@@ -1023,8 +1025,8 @@ static int drawTube(GLdouble bottomRadius, GLdouble topRadius,
 		glVertex3f(radius * sinCache[slice], y, radius * cosCache[slice]);
         polys++;
 	}
-	glVertex3f(0.0f, y, innerRadius);
-	glVertex3f(0.0f, y, radius);
+	glVertex3f(0.0, y, innerRadius);
+	glVertex3f(0.0, y, radius);
 	glEnd();
     return polys;
 }
@@ -1102,11 +1104,11 @@ static int drawCuboid(GLfloat length, GLfloat width, GLfloat height)
 /* Set normal vector in xz plane, based on rotation around center. */
 static void setNormalV(glhcfg *glhanoi, GLfloat theta, int y1, int y2, int r1) {
 	if (y1 == y2) /* up/down */
-		glNormal3f(0.0f, y1 ? 1.0f : -1.0f, 0.0f);
+		glNormal3f(0.0, y1 ? 1.0 : -1.0, 0.0);
 	else if (!r1) /* inward */
-		glNormal3f(-COSF(theta), 0.0f, -SINF(theta));
+		glNormal3f(-cos(theta), 0.0, -sin(theta));
 	else /* outward */
-		glNormal3f(COSF(theta), 0.0f, SINF(theta));	
+		glNormal3f(cos(theta), 0.0, sin(theta));	
 }
 
 /* y1, r1, y2, r2 are indices into y, r, beg, end */
@@ -1114,7 +1116,7 @@ static int drawBaseStrip(glhcfg *glhanoi, int y1, int r1, int y2, int r2,
 		GLfloat y[2], GLfloat r[2], GLfloat beg[2][2], GLfloat end[2][2]) {
 	int i;
 	GLfloat theta, costh, sinth, x[2], z[2];
-	GLfloat theta1 = (float)((M_PI * 2) / (glhanoi->numberOfPoles + 1));
+	GLfloat theta1 = (M_PI * 2) / (glhanoi->numberOfPoles + 1);
 	
 	glBegin(GL_QUAD_STRIP);
 	
@@ -1124,9 +1126,9 @@ static int drawBaseStrip(glhcfg *glhanoi, int y1, int r1, int y2, int r2,
 	setNormalV(glhanoi, theta1, y1, y2, r1);
 	
 	for (i = 1; i < glhanoi->numberOfPoles; i++) {
-		theta = (float)(theta1 * (i + 0.5f));
-		costh = COSF(theta);
-		sinth = SINF(theta);
+		theta = theta1 * (i + 0.5);
+		costh = cos(theta);
+		sinth = sin(theta);
 		x[0] = costh * r[0];
 		x[1] = costh * r[1];
 		z[0] = sinth * r[0];
@@ -1141,7 +1143,7 @@ static int drawBaseStrip(glhcfg *glhanoi, int y1, int r1, int y2, int r2,
 	/* end edge */
 	glVertex3f(end[r1][0], y[y1], end[r1][1]);
 	glVertex3f(end[r2][0], y[y2], end[r2][1]);
-	setNormalV(glhanoi, (float)glhanoi->numberOfPoles, y1, y2, r1);
+	setNormalV(glhanoi, glhanoi->numberOfPoles, y1, y2, r1);
 
 	glEnd();
     return glhanoi->numberOfPoles;
@@ -1163,7 +1165,7 @@ static int drawRoundBase(glhcfg *glhanoi) {
 		beg[i][0] is x, [i][1] is z. */
 	GLfloat beg[2][2], end[2][2], begNorm, endNorm;
 	/* ratio of radius at base vertices to ratio at poles */
-	GLfloat longer = (float)(1.0f / COSF(M_PI / (glhanoi->numberOfPoles + 1)));
+	GLfloat longer = 1.0 / cos(M_PI / (glhanoi->numberOfPoles + 1));
 
 	r[0] = (glhanoi->poleDist - glhanoi->maxDiskRadius) * longer;
 	r[1] = (glhanoi->poleDist + glhanoi->maxDiskRadius) * longer;
@@ -1171,10 +1173,10 @@ static int drawRoundBase(glhcfg *glhanoi) {
 	y[1] = glhanoi->baseHeight;
 
 	/* compute beg, end. Make the ends square. */
-	theta = (float)(M_PI * 2 / (glhanoi->numberOfPoles + 1));
+	theta = M_PI * 2 / (glhanoi->numberOfPoles + 1);
 
-	costh = COSF(theta);
-	sinth = SINF(theta);
+	costh = cos(theta);
+	sinth = sin(theta);
 	beg[0][0] = (glhanoi->poleDist - glhanoi->maxDiskRadius) * costh +
 		glhanoi->maxDiskRadius * sinth;
 	beg[1][0] = (glhanoi->poleDist + glhanoi->maxDiskRadius) * costh +
@@ -1183,12 +1185,12 @@ static int drawRoundBase(glhcfg *glhanoi) {
 		glhanoi->maxDiskRadius * costh;
 	beg[1][1] = (glhanoi->poleDist + glhanoi->maxDiskRadius) * sinth -
 		glhanoi->maxDiskRadius * costh;
-	begNorm = (float)(theta - M_PI * 0.5f);
+	begNorm = theta - M_PI * 0.5;
 	
-	theta = (float)(M_PI * 2 * glhanoi->numberOfPoles / (glhanoi->numberOfPoles + 1));
+	theta = M_PI * 2 * glhanoi->numberOfPoles / (glhanoi->numberOfPoles + 1);
 
-	costh = COSF(theta);
-	sinth = SINF(theta);
+	costh = cos(theta);
+	sinth = sin(theta);
 	end[0][0] = (glhanoi->poleDist - glhanoi->maxDiskRadius) * costh -
 		glhanoi->maxDiskRadius * sinth;
 	end[1][0] = (glhanoi->poleDist + glhanoi->maxDiskRadius) * costh -
@@ -1197,7 +1199,7 @@ static int drawRoundBase(glhcfg *glhanoi) {
 		glhanoi->maxDiskRadius * costh;
 	end[1][1] = (glhanoi->poleDist + glhanoi->maxDiskRadius) * sinth +
 		glhanoi->maxDiskRadius * costh;
-	endNorm = (float)(theta + M_PI * 0.5f);
+	endNorm = theta + M_PI * 0.5;
 	
 	/* bottom: never seen
 	polys  = drawBaseStrip(glhanoi, 0, 0, 0, 1, y, r, beg, end); */
@@ -1215,13 +1217,13 @@ static int drawRoundBase(glhcfg *glhanoi) {
 	glVertex3f(beg[1][0], y[1], beg[1][1]);
 	glVertex3f(beg[1][0], y[0], beg[1][1]);
 	glVertex3f(beg[0][0], y[0], beg[0][1]);
-	glNormal3f(COSF(begNorm), 0.0f, SINF(begNorm));
+	glNormal3f(cos(begNorm), 0, sin(begNorm));
 
 	glVertex3f(end[0][0], y[0], end[0][1]);
 	glVertex3f(end[1][0], y[0], end[1][1]);
 	glVertex3f(end[1][0], y[1], end[1][1]);
 	glVertex3f(end[0][0], y[1], end[0][1]);
-	glNormal3f(COSF(endNorm), 0.0f, SINF(endNorm));
+	glNormal3f(cos(endNorm), 0, sin(endNorm));
 	
 	polys += 2;
 	
@@ -1245,14 +1247,14 @@ static int drawDisks(glhcfg *glhanoi)
 		glPushMatrix();
 		glTranslatef(pos[0], pos[1], pos[2]);
 		if(rot[1] != 0.0) {
-			glTranslatef(0.0f, glhanoi->diskHeight / 2.0f, 0.0f);
+			glTranslatef(0.0, glhanoi->diskHeight / 2.0, 0.0);
 			/* rotate around different axis depending on phi */
 			if (disk->phi != 0.0)
-				glRotatef((float)-disk->phi, 0.0f, 1.0f, 0.0f);
-			glRotatef(rot[1], 0.0f, 0.0f, 1.0f);
-			if (disk->phi != 0.0f)
-				glRotatef((float)disk->phi, 0.0f, 1.0f, 0.0f);
-			glTranslatef(0.0f, -glhanoi->diskHeight / 2.0f, 0.0f);
+				glRotatef(-disk->phi, 0.0, 1.0, 0.0);
+			glRotatef(rot[1], 0.0, 0.0, 1.0);
+			if (disk->phi != 0.0)
+				glRotatef(disk->phi, 0.0, 1.0, 0.0);
+			glTranslatef(0.0, -glhanoi->diskHeight / 2.0, 0.0);
 		}
 		glCallList(disk->displayList);
         polys += disk->polys;
@@ -1264,8 +1266,8 @@ static int drawDisks(glhcfg *glhanoi)
 
 static GLfloat getDiskRadius(glhcfg *glhanoi, int i)
 {
-	GLfloat retVal = (float)(glhanoi->maxDiskRadius *
-		((GLfloat) i + 3.0f) / (glhanoi->numberOfDisks + 3.0));
+	GLfloat retVal = glhanoi->maxDiskRadius *
+		((GLfloat) i + 3.0) / (glhanoi->numberOfDisks + 3.0);
 	return retVal;
 }
 
@@ -1276,28 +1278,27 @@ static void initData(glhcfg *glhanoi)
 
 	glhanoi->baseLength = BASE_LENGTH;
 	if (glhanoi->layoutLinear) {
-		glhanoi->maxDiskRadius = (float)(glhanoi->baseLength /
-			(2 * 0.95 * glhanoi->numberOfPoles));
+		glhanoi->maxDiskRadius = glhanoi->baseLength /
+			(2 * 0.95 * glhanoi->numberOfPoles);
 	} else {
-	    sinPiOverNP = SINF(M_PI / (glhanoi->numberOfPoles + 1));
-		glhanoi->maxDiskRadius = (float)(
-			(sinPiOverNP * glhanoi->baseLength * 0.5 * 0.95) / (1 + sinPiOverNP));
+	    sinPiOverNP = sin(M_PI / (glhanoi->numberOfPoles + 1));
+		glhanoi->maxDiskRadius = (sinPiOverNP * glhanoi->baseLength * 0.5 * 0.95) / (1 + sinPiOverNP);
 	}
 
-	glhanoi->poleDist = (float)(glhanoi->baseLength * 0.5f - glhanoi->maxDiskRadius);
-	glhanoi->poleRadius = (float)(glhanoi->maxDiskRadius / (glhanoi->numberOfDisks + 3.0f));
+	glhanoi->poleDist = glhanoi->baseLength * 0.5 - glhanoi->maxDiskRadius;
+	glhanoi->poleRadius = glhanoi->maxDiskRadius / (glhanoi->numberOfDisks + 3.0);
 	/* fprintf(stderr, "Debug: baseL = %f, maxDiskR = %f, poleR = %f\n",
 		glhanoi->baseLength, glhanoi->maxDiskRadius, glhanoi->poleRadius); */
-	glhanoi->baseWidth  = 2.0f * glhanoi->maxDiskRadius;
-	glhanoi->poleOffset = 2.0f * getDiskRadius(glhanoi, glhanoi->maxDiskIdx);
-	glhanoi->diskHeight = 2.0f * glhanoi->poleRadius;
-	glhanoi->baseHeight = 2.0f * glhanoi->poleRadius;
+	glhanoi->baseWidth  = 2.0 * glhanoi->maxDiskRadius;
+	glhanoi->poleOffset = 2.0 * getDiskRadius(glhanoi, glhanoi->maxDiskIdx);
+	glhanoi->diskHeight = 2.0 * glhanoi->poleRadius;
+	glhanoi->baseHeight = 2.0 * glhanoi->poleRadius;
 	glhanoi->poleHeight = glhanoi->numberOfDisks *
 		glhanoi->diskHeight + glhanoi->poleRadius;
 	/* numberOfMoves only applies if numberOfPoles = 3 */
 	glhanoi->numberOfMoves = (1 << glhanoi->numberOfDisks) - 1;
 	/* use golden ratio */
-	glhanoi->boardSize = (float)(glhanoi->baseLength * 0.5f * (1.0f + sqrt(5.0f)));
+	glhanoi->boardSize = glhanoi->baseLength * 0.5 * (1.0 + sqrt(5.0));
 
 	glhanoi->pole = (Pole *)calloc(glhanoi->numberOfPoles, sizeof(Pole));
 	checkAllocAndExit(!!glhanoi->pole, "poles");
@@ -1336,12 +1337,12 @@ static void initData(glhcfg *glhanoi)
 
 static void initView(glhcfg *glhanoi)
 {
-	glhanoi->camera[0] = 0.0f;
-	glhanoi->camera[1] = 0.0f;
-	glhanoi->camera[2] = 0.0f;
-	glhanoi->centre[0] = 0.0f;
-	glhanoi->centre[1] = (float)(glhanoi->poleHeight * 3.0f);
-	glhanoi->centre[2] = 0.0f;
+	glhanoi->camera[0] = 0.0;
+	glhanoi->camera[1] = 0.0;
+	glhanoi->camera[2] = 0.0;
+	glhanoi->centre[0] = 0.0;
+	glhanoi->centre[1] = glhanoi->poleHeight * 3.0;
+	glhanoi->centre[2] = 0.0;
 }
 
 /*
@@ -1591,7 +1592,7 @@ static void initFloor(glhcfg *glhanoi)
     glhanoi->floorpolys = 0;
 	checkAllocAndExit(!!(glhanoi->floorList = glGenLists(1)), "floor display list");
 	glNewList(glhanoi->floorList, GL_COMPILE);
-	x0 = (float)(-glhanoi->boardSize / 2.0f);
+	x0 = -glhanoi->boardSize / 2.0;
 	tx0 = 0.0f;
 	setMaterial(col, cWhite, 128);
 	setTexture(glhanoi, 0);
@@ -1599,7 +1600,7 @@ static void initFloor(glhcfg *glhanoi)
 	for(i = 0; i < BOARD_SQUARES; i++, x0 += tileSize, tx0 += texIncr) {
 		x1 = x0 + tileSize;
 		tx1 = tx0 + texIncr;
-		z0 = -glhanoi->boardSize / 2.0f;
+		z0 = -glhanoi->boardSize / 2.0;
 		tz0 = 0.0f;
 		for(j = 0; j < BOARD_SQUARES; j++, z0 += tileSize, tz0 += texIncr) {
 			int colIndex = (i + j) & 0x1;
@@ -1660,7 +1661,7 @@ static void initTowers(glhcfg *glhanoi)
 	setMaterial(poleColor, cWhite, 50);
 	for (i = 0; i < glhanoi->numberOfPoles; i++) {		
 		GLfloat *p = glhanoi->pole[i].position;
-		GLfloat rad = (float)((M_PI * 2.0 * (i + 1)) / (glhanoi->numberOfPoles + 1));
+		GLfloat rad = (M_PI * 2.0 * (i + 1)) / (glhanoi->numberOfPoles + 1);
 		
 		p[1] = glhanoi->baseHeight;
 
@@ -1670,8 +1671,8 @@ static void initTowers(glhcfg *glhanoi)
 			p[2] = 0.0f;
 		} else {
 			/* Circular layout: */
-			p[0] = COSF(rad) * glhanoi->poleDist;
-			p[2] = SINF(rad) * glhanoi->poleDist;
+			p[0] = cos(rad) * glhanoi->poleDist;
+			p[2] = sin(rad) * glhanoi->poleDist;
 		}
 		
 		glPushMatrix();
@@ -1712,7 +1713,7 @@ static void initDisks(glhcfg *glhanoi)
 	for(i = glhanoi->maxDiskIdx; i >= 0; i--) {
 		GLfloat height = (GLfloat) (glhanoi->maxDiskIdx - i);
 		double f = cfunc((GLfloat) i / (GLfloat) glhanoi->numberOfDisks);
-		GLfloat diskColor = (float)(f * 360.0f);
+		GLfloat diskColor = f * 360.0;
 		GLfloat color[3];
 		Disk *disk = &glhanoi->disk[i];
 
@@ -1726,8 +1727,8 @@ static void initDisks(glhcfg *glhanoi)
 		disk->polys = 0;
 
 		/* make smaller disks move faster */
-		disk->speed = (float)(lerp(((double)glhanoi->numberOfDisks - i) / glhanoi->numberOfDisks,
-			1.0, glhanoi->speed));
+		disk->speed = lerp(((double)glhanoi->numberOfDisks - i) / glhanoi->numberOfDisks,
+			1.0, glhanoi->speed);
 		/* fprintf(stderr, "disk id: %d, alpha: %0.2f, speed: %0.2f\n", disk->id,
 			((double)(glhanoi->maxDiskIdx - i)) / glhanoi->numberOfDisks, disk->speed); */
 
@@ -1738,7 +1739,7 @@ static void initDisks(glhcfg *glhanoi)
 
 		checkAllocAndExit(!!(disk->displayList = glGenLists(1)), "disk display list");
 		glNewList(disk->displayList, GL_COMPILE);
-		setMaterial(color, cWhite, 100);
+		setMaterial(color, cWhite, 100.0);
 		disk->polys += drawDisk3D(glhanoi->poleRadius, 
                                   getDiskRadius(glhanoi, i),
                                   glhanoi->diskHeight);
@@ -1793,7 +1794,7 @@ static int drawTrails1(glhcfg *glhanoi, double t, double thickness, double alpha
 	Bool fresh = False;
 	GLfloat trailDurInv = 1.0f / glhanoi->trailDuration;
 
-	glLineWidth((float)thickness);
+	glLineWidth(thickness);
 
 	glBegin(GL_LINES);
 	
@@ -1810,7 +1811,7 @@ static int drawTrails1(glhcfg *glhanoi, double t, double thickness, double alpha
 			if (!fresh) fresh = True;
 			if (prev > -1) {
 				/* Fade to invisible with age */
-				trailColor[3] = (float)(alpha * (tqi->endTime - t) * trailDurInv);
+				trailColor[3] = alpha * (tqi->endTime - t) * trailDurInv;
 				/* Can't use setMaterial(trailColor, cBlack, 0) because our color needs an alpha value. */
 				glColor4fv(trailColor);
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, trailColor);
@@ -1883,7 +1884,7 @@ ENTRYPOINT void init_glhanoi(ModeInfo * mi)
 	}
 
 	glhanoi = &glhanoi_cfg[MI_SCREEN(mi)];
-	glhanoi->hglrc = init_GL(mi);
+	glhanoi->glx_context = init_GL(mi);
 	glhanoi->numberOfDisks = MI_BATCHCOUNT(mi);
 	
     if (glhanoi->numberOfDisks <= 1)
@@ -1896,8 +1897,9 @@ ENTRYPOINT void init_glhanoi(ModeInfo * mi)
 
 	glhanoi->maxDiskIdx = glhanoi->numberOfDisks - 1;
 
-	glhanoi->numberOfPoles = 3;
 	//glhanoi->numberOfPoles = get_integer_resource(MI_DISPLAY(mi), "poles", "Integer");
+	glhanoi->numberOfPoles = poles;
+
 	/* Set a number of poles from 3 to numberOfDisks + 1, biased toward lower values,
 		with probability decreasing linearly. */
     if (glhanoi->numberOfPoles <= 2)
@@ -1953,7 +1955,7 @@ ENTRYPOINT void init_glhanoi(ModeInfo * mi)
 		glFogf(GL_FOG_DENSITY, 0.35f);
 		glHint(GL_FOG_HINT, GL_NICEST);
 		glFogf(GL_FOG_START, MIN_CAMERA_RADIUS);
-		glFogf(GL_FOG_END, (float)(MAX_CAMERA_RADIUS / 1.9f));
+		glFogf(GL_FOG_END, MAX_CAMERA_RADIUS / 1.9);
 		glEnable(GL_FOG);
 	}
 
@@ -1964,13 +1966,13 @@ ENTRYPOINT void init_glhanoi(ModeInfo * mi)
 ENTRYPOINT void draw_glhanoi(ModeInfo * mi)
 {
 	glhcfg *glhanoi = &glhanoi_cfg[MI_SCREEN(mi)];
-	HDC dpy = MI_DISPLAY(mi);
-	HWND window = MI_WINDOW(mi);
+	Display *dpy = MI_DISPLAY(mi);
+	Window window = MI_WINDOW(mi);
 
-	if(!glhanoi->hglrc)
+	if(!glhanoi->glx_context)
 		return;
 
-    wglMakeCurrent(MI_DISPLAY(mi), glhanoi->hglrc);
+    glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(glhanoi->glx_context));
 
 	glPolygonMode(GL_FRONT, glhanoi->wire ? GL_LINE : GL_FILL);
 
@@ -1978,8 +1980,7 @@ ENTRYPOINT void draw_glhanoi(ModeInfo * mi)
     mi->polygon_count = 0;
 
 	glLoadIdentity();
-    //glRotatef(current_device_rotation(), 0, 0, 1);
-    glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef(current_device_rotation(), 0, 0, 1);
 
 	update_glhanoi(glhanoi);
 	updateView(glhanoi);
@@ -2003,7 +2004,7 @@ ENTRYPOINT void draw_glhanoi(ModeInfo * mi)
 	}
 	glFinish();
 
-	SwapBuffers(dpy);
+	glXSwapBuffers(dpy, window);
 }
 
 #if 0
@@ -2080,4 +2081,4 @@ ENTRYPOINT void release_glhanoi(ModeInfo * mi)
 
 XSCREENSAVER_MODULE ("GLHanoi", glhanoi)
 
-//#endif							/* USE_GL */
+#endif							/* USE_GL */

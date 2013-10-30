@@ -34,31 +34,23 @@ static const char sccsid[] = "@(#)polytopes.c  1.2 05/09/28 xlockmore";
  * Graphics, and Higher Dimensions", Scientific American Library, 1990.
  */
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <stdio.h>
-#include <math.h>
-
-#include "win32.h"
-
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-#define SQRT15OVER4 1.93649167310370844259f /* sqrt(15/4) */
-#define SQRT10OVER3 1.82574185835055371152f /* sqrt(10/3) */
-#define SQRT5OVER2  1.58113883008418966600f /* sqrt(5/2) */
-#define SQRT5OVER6  0.91287092917527685576f /* sqrt(5/6) */
-#define SQRT5OVER12 0.64549722436790281420f /* sqrt(5/12) */
-#define SQRT2       1.41421356237309504880f /* sqrt(2) */
-#define GOLDEN      1.61803398874989484820f /* (sqrt(5)+1)/2 */
-#define GOLDENINV   0.61803398874989484820f /* (sqrt(5)-1)/2 */
-#define SQRT2INV    0.70710678118654752440f /* sqrt(1/2) */
-#define GOLDEN2     1.14412280563536859520f /* ((sqrt(5)+1)/2)/sqrt(2) */
-#define GOLDENINV2  0.43701602444882107080f /* ((sqrt(5)-1)/2)/sqrt(2) */
-#define GOLDEN22    1.85122958682191611960f /* (((sqrt(5)+1)/2)^2)/sqrt(2) */
-#define GOLDENINV22 0.27009075673772645360f /* (((sqrt(5)-1)/2)^2)/sqrt(2) */
+#define SQRT15OVER4 1.93649167310370844259 /* sqrt(15/4) */
+#define SQRT10OVER3 1.82574185835055371152 /* sqrt(10/3) */
+#define SQRT5OVER2  1.58113883008418966600 /* sqrt(5/2) */
+#define SQRT5OVER6  0.91287092917527685576 /* sqrt(5/6) */
+#define SQRT5OVER12 0.64549722436790281420 /* sqrt(5/12) */
+#define SQRT2       1.41421356237309504880 /* sqrt(2) */
+#define GOLDEN      1.61803398874989484820 /* (sqrt(5)+1)/2 */
+#define GOLDENINV   0.61803398874989484820 /* (sqrt(5)-1)/2 */
+#define SQRT2INV    0.70710678118654752440 /* sqrt(1/2) */
+#define GOLDEN2     1.14412280563536859520 /* ((sqrt(5)+1)/2)/sqrt(2) */
+#define GOLDENINV2  0.43701602444882107080 /* ((sqrt(5)-1)/2)/sqrt(2) */
+#define GOLDEN22    1.85122958682191611960 /* (((sqrt(5)+1)/2)^2)/sqrt(2) */
+#define GOLDENINV22 0.27009075673772645360 /* (((sqrt(5)-1)/2)^2)/sqrt(2) */
 
 #define DISP_WIREFRAME            0
 #define DISP_SURFACE              1
@@ -110,19 +102,31 @@ static const char sccsid[] = "@(#)polytopes.c  1.2 05/09/28 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-//#ifdef USE_GL
+#include <windows.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <stdio.h>
+
+#include "win32.h"
+
+#ifdef USE_GL
 
 #if 0
 	#ifndef HAVE_COCOA
 	# include <X11/keysym.h>
 	#endif
-	//#include "gltrackball.h"
+	#include "gltrackball.h"
+#endif
 
+#if 0
 	#ifdef USE_MODULES
 	ModStruct   polytopes_description =
 	{"polytopes", "init_polytopes", "draw_polytopes", "release_polytopes",
 	 "draw_polytopes", "change_polytopes", NULL, &polytopes_opts,
-	 25000, 1, 1, 1, 1.0f, 4, "",
+	 25000, 1, 1, 1, 1.0, 4, "",
 	 "Shows one of the six regular 4d polytopes rotating in 4d", 0, NULL};
 	#endif
 #endif
@@ -137,15 +141,15 @@ static char *proj_3d = "perspective";
 static int projection_3d;
 static char *proj_4d = "perspective";
 static int projection_4d;
-static float speed_wx = 1.1f;
-static float speed_wy = 1.3f;
-static float speed_wz = 1.5f;
-static float speed_xy = 1.7f;
-static float speed_xz = 1.9f;
-static float speed_yz = 2.1f;
+static float speed_wx = 1.1;
+static float speed_wy = 1.3;
+static float speed_wz = 1.5;
+static float speed_xy = 1.7;
+static float speed_xz = 1.9;
+static float speed_yz = 2.1;
 
-static const float offset4d[4] = {  0.0f,  0.0f,  0.0f,  3.0f };
-static const float offset3d[4] = {  0.0f,  0.0f, -2.0f,  0.0f };
+static const float offset4d[4] = {  0.0,  0.0,  0.0,  3.0 };
+static const float offset3d[4] = {  0.0,  0.0, -2.0,  0.0 };
 
 #if 0
 	static XrmOptionDescRec opts[] =
@@ -222,10 +226,10 @@ static const float offset3d[4] = {  0.0f,  0.0f, -2.0f,  0.0f };
 #define NUM_FACE_5 10
 #define VERT_PER_FACE_5 3
 
-#define MIN_EDGE_DEPTH_5 (-0.5f)
-#define MAX_EDGE_DEPTH_5 0.75f
-#define MIN_FACE_DEPTH_5 (-0.5f)
-#define MAX_FACE_DEPTH_5 (1.0f/3.0f)
+#define MIN_EDGE_DEPTH_5 (-0.5)
+#define MAX_EDGE_DEPTH_5 0.75
+#define MIN_FACE_DEPTH_5 (-0.5)
+#define MAX_FACE_DEPTH_5 (1.0/3.0)
 
 
 /* 8-cell {4,3,3} */
@@ -234,10 +238,10 @@ static const float offset3d[4] = {  0.0f,  0.0f, -2.0f,  0.0f };
 #define NUM_FACE_8 24
 #define VERT_PER_FACE_8 4
 
-#define MIN_EDGE_DEPTH_8 (-1.0f)
-#define MAX_EDGE_DEPTH_8 1.0f
-#define MIN_FACE_DEPTH_8 (-1.0f)
-#define MAX_FACE_DEPTH_8 1.0f
+#define MIN_EDGE_DEPTH_8 (-1.0)
+#define MAX_EDGE_DEPTH_8 1.0
+#define MIN_FACE_DEPTH_8 (-1.0)
+#define MAX_FACE_DEPTH_8 1.0
 
 /* 16-cell {3,3,4} */
 #define NUM_VERT_16 8
@@ -245,10 +249,10 @@ static const float offset3d[4] = {  0.0f,  0.0f, -2.0f,  0.0f };
 #define NUM_FACE_16 32
 #define VERT_PER_FACE_16 3
 
-#define MIN_EDGE_DEPTH_16 (-1.0f)
-#define MAX_EDGE_DEPTH_16 1.0f
-#define MIN_FACE_DEPTH_16 (-2.0f/3.0f)
-#define MAX_FACE_DEPTH_16 (2.0f/3.0f)
+#define MIN_EDGE_DEPTH_16 (-1.0)
+#define MAX_EDGE_DEPTH_16 1.0
+#define MIN_FACE_DEPTH_16 (-2.0/3.0)
+#define MAX_FACE_DEPTH_16 (2.0/3.0)
 
 
 /* 24-cell {3,4,3} */
@@ -281,16 +285,15 @@ static const float offset3d[4] = {  0.0f,  0.0f, -2.0f,  0.0f };
 #define NUM_FACE_600 1200
 #define VERT_PER_FACE_600 3
 
-#define MIN_EDGE_DEPTH_600 (-GOLDEN/2.0f-1)
-#define MAX_EDGE_DEPTH_600 (GOLDEN/2.0f+1)
-#define MIN_FACE_DEPTH_600 ((-2*GOLDEN-2)/3.0f)
-#define MAX_FACE_DEPTH_600 ((2*GOLDEN+2)/3.0f)
+#define MIN_EDGE_DEPTH_600 (-GOLDEN/2.0-1)
+#define MAX_EDGE_DEPTH_600 (GOLDEN/2.0+1)
+#define MIN_FACE_DEPTH_600 ((-2*GOLDEN-2)/3.0)
+#define MAX_FACE_DEPTH_600 ((2*GOLDEN+2)/3.0)
 
 
 typedef struct {
   GLint       WindH, WindW;
-  //GLXContext *glx_context;
-  HGLRC hglrc;
+  GLXContext *glx_context;
   /* 4D rotation angles */
   float alpha, beta, delta, zeta, eta, theta;
   /* Aspect ratio of the current window */
@@ -298,9 +301,9 @@ typedef struct {
   /* Counter */
   int tick, poly;
   /* Trackball states */
-  //trackball_state *trackballs[2];
-  //int current_trackball;
-  //Bool button_pressed;
+  trackball_state *trackballs[2];
+  int current_trackball;
+  Bool button_pressed;
 
   float edge_color_5[NUM_EDGE_5][4];
   float face_color_5[NUM_FACE_5][4];
@@ -340,9 +343,9 @@ static polytopesstruct *poly = (polytopesstruct *) NULL;
 static const float vert_5[NUM_VERT_5][4] = {
   { -SQRT5OVER2, -SQRT5OVER6, -SQRT5OVER12, -0.5 },
   {  SQRT5OVER2, -SQRT5OVER6, -SQRT5OVER12, -0.5 },
-  {         0.0f, SQRT10OVER3, -SQRT5OVER12, -0.5 },
-  {         0.0f,         0.0f,  SQRT15OVER4, -0.5 },
-  {         0.0f,         0.0f,          0.0f,  2.0f }
+  {         0.0, SQRT10OVER3, -SQRT5OVER12, -0.5 },
+  {         0.0,         0.0,  SQRT15OVER4, -0.5 },
+  {         0.0,         0.0,          0.0,  2.0 }
 };
 
 static const int edge_5[NUM_EDGE_5][2] = {
@@ -357,14 +360,14 @@ static const int face_5[NUM_FACE_5][VERT_PER_FACE_5] = {
 
 
 static const float vert_8[NUM_VERT_8][4] = {
-  { -1.0f, -1.0f, -1.0f, -1.0 }, {  1.0f, -1.0f, -1.0f, -1.0 },
-  { -1.0f,  1.0f, -1.0f, -1.0 }, {  1.0f,  1.0f, -1.0f, -1.0 },
-  { -1.0f, -1.0f,  1.0f, -1.0 }, {  1.0f, -1.0f,  1.0f, -1.0 },
-  { -1.0f,  1.0f,  1.0f, -1.0 }, {  1.0f,  1.0f,  1.0f, -1.0 },
-  { -1.0f, -1.0f, -1.0f,  1.0f }, {  1.0f, -1.0f, -1.0f,  1.0f },
-  { -1.0f,  1.0f, -1.0f,  1.0f }, {  1.0f,  1.0f, -1.0f,  1.0f },
-  { -1.0f, -1.0f,  1.0f,  1.0f }, {  1.0f, -1.0f,  1.0f,  1.0f },
-  { -1.0f,  1.0f,  1.0f,  1.0f }, {  1.0f,  1.0f,  1.0f,  1.0f }
+  { -1.0, -1.0, -1.0, -1.0 }, {  1.0, -1.0, -1.0, -1.0 },
+  { -1.0,  1.0, -1.0, -1.0 }, {  1.0,  1.0, -1.0, -1.0 },
+  { -1.0, -1.0,  1.0, -1.0 }, {  1.0, -1.0,  1.0, -1.0 },
+  { -1.0,  1.0,  1.0, -1.0 }, {  1.0,  1.0,  1.0, -1.0 },
+  { -1.0, -1.0, -1.0,  1.0 }, {  1.0, -1.0, -1.0,  1.0 },
+  { -1.0,  1.0, -1.0,  1.0 }, {  1.0,  1.0, -1.0,  1.0 },
+  { -1.0, -1.0,  1.0,  1.0 }, {  1.0, -1.0,  1.0,  1.0 },
+  { -1.0,  1.0,  1.0,  1.0 }, {  1.0,  1.0,  1.0,  1.0 }
 };
 
 static const int edge_8[NUM_EDGE_8][2] = {
@@ -390,10 +393,10 @@ static const int face_8[NUM_FACE_8][VERT_PER_FACE_8] = {
 
 
 static const float vert_16[NUM_VERT_16][4] = {
-  {  0.0f,  0.0f,  0.0f, -2.0f }, {  0.0f,  0.0f, -2.0,  0.0f },
-  {  0.0f, -2.0,  0.0f,  0.0f }, { -2.0,  0.0f,  0.0f,  0.0f },
-  {  2.0f,  0.0f,  0.0f,  0.0f }, {  0.0f,  2.0f,  0.0f,  0.0f },
-  {  0.0f,  0.0f,  2.0f,  0.0f }, {  0.0f,  0.0f,  0.0f,  2.0f }
+  {  0.0,  0.0,  0.0, -2.0 }, {  0.0,  0.0, -2.0,  0.0 },
+  {  0.0, -2.0,  0.0,  0.0 }, { -2.0,  0.0,  0.0,  0.0 },
+  {  2.0,  0.0,  0.0,  0.0 }, {  0.0,  2.0,  0.0,  0.0 },
+  {  0.0,  0.0,  2.0,  0.0 }, {  0.0,  0.0,  0.0,  2.0 }
 };
 
 static const int edge_16[NUM_EDGE_16][2] = {
@@ -415,18 +418,18 @@ static const int face_16[NUM_FACE_16][VERT_PER_FACE_16] = {
 
 
 static const float vert_24[NUM_VERT_24][4] = {
-  {    0.0f,    0.0f, -SQRT2, -SQRT2 }, {    0.0f, -SQRT2,    0.0f, -SQRT2 },
-  { -SQRT2,    0.0f,    0.0f, -SQRT2 }, {  SQRT2,    0.0f,    0.0f, -SQRT2 },
-  {    0.0f,  SQRT2,    0.0f, -SQRT2 }, {    0.0f,    0.0f,  SQRT2, -SQRT2 },
-  {    0.0f, -SQRT2, -SQRT2,    0.0f }, { -SQRT2,    0.0f, -SQRT2,    0.0f },
-  {  SQRT2,    0.0f, -SQRT2,    0.0f }, {    0.0f,  SQRT2, -SQRT2,    0.0f },
-  { -SQRT2, -SQRT2,    0.0f,    0.0f }, {  SQRT2, -SQRT2,    0.0f,    0.0f },
-  { -SQRT2,  SQRT2,    0.0f,    0.0f }, {  SQRT2,  SQRT2,    0.0f,    0.0f },
-  {    0.0f, -SQRT2,  SQRT2,    0.0f }, { -SQRT2,    0.0f,  SQRT2,    0.0f },
-  {  SQRT2,    0.0f,  SQRT2,    0.0f }, {    0.0f,  SQRT2,  SQRT2,    0.0f },
-  {    0.0f,    0.0f, -SQRT2,  SQRT2 }, {    0.0f, -SQRT2,    0.0f,  SQRT2 },
-  { -SQRT2,    0.0f,    0.0f,  SQRT2 }, {  SQRT2,    0.0f,    0.0f,  SQRT2 },
-  {    0.0f,  SQRT2,    0.0f,  SQRT2 }, {    0.0f,    0.0f,  SQRT2,  SQRT2 }
+  {    0.0,    0.0, -SQRT2, -SQRT2 }, {    0.0, -SQRT2,    0.0, -SQRT2 },
+  { -SQRT2,    0.0,    0.0, -SQRT2 }, {  SQRT2,    0.0,    0.0, -SQRT2 },
+  {    0.0,  SQRT2,    0.0, -SQRT2 }, {    0.0,    0.0,  SQRT2, -SQRT2 },
+  {    0.0, -SQRT2, -SQRT2,    0.0 }, { -SQRT2,    0.0, -SQRT2,    0.0 },
+  {  SQRT2,    0.0, -SQRT2,    0.0 }, {    0.0,  SQRT2, -SQRT2,    0.0 },
+  { -SQRT2, -SQRT2,    0.0,    0.0 }, {  SQRT2, -SQRT2,    0.0,    0.0 },
+  { -SQRT2,  SQRT2,    0.0,    0.0 }, {  SQRT2,  SQRT2,    0.0,    0.0 },
+  {    0.0, -SQRT2,  SQRT2,    0.0 }, { -SQRT2,    0.0,  SQRT2,    0.0 },
+  {  SQRT2,    0.0,  SQRT2,    0.0 }, {    0.0,  SQRT2,  SQRT2,    0.0 },
+  {    0.0,    0.0, -SQRT2,  SQRT2 }, {    0.0, -SQRT2,    0.0,  SQRT2 },
+  { -SQRT2,    0.0,    0.0,  SQRT2 }, {  SQRT2,    0.0,    0.0,  SQRT2 },
+  {    0.0,  SQRT2,    0.0,  SQRT2 }, {    0.0,    0.0,  SQRT2,  SQRT2 }
 };
 
 static const int edge_24[NUM_EDGE_24][2] = {
@@ -479,47 +482,47 @@ static const int face_24[NUM_FACE_24][VERT_PER_FACE_24] = {
 
 
 static const float vert_120[NUM_VERT_120][4] = {
-  { -GOLDENINV22,          0.0f,    -SQRT2INV,    -GOLDEN22 },
-  {  GOLDENINV22,          0.0f,    -SQRT2INV,    -GOLDEN22 },
+  { -GOLDENINV22,          0.0,    -SQRT2INV,    -GOLDEN22 },
+  {  GOLDENINV22,          0.0,    -SQRT2INV,    -GOLDEN22 },
   {  -GOLDENINV2,  -GOLDENINV2,  -GOLDENINV2,    -GOLDEN22 },
   {   GOLDENINV2,  -GOLDENINV2,  -GOLDENINV2,    -GOLDEN22 },
   {  -GOLDENINV2,   GOLDENINV2,  -GOLDENINV2,    -GOLDEN22 },
   {   GOLDENINV2,   GOLDENINV2,  -GOLDENINV2,    -GOLDEN22 },
-  {          0.0f,    -SQRT2INV, -GOLDENINV22,    -GOLDEN22 },
-  {          0.0f,     SQRT2INV, -GOLDENINV22,    -GOLDEN22 },
-  {    -SQRT2INV, -GOLDENINV22,          0.0f,    -GOLDEN22 },
-  {     SQRT2INV, -GOLDENINV22,          0.0f,    -GOLDEN22 },
-  {    -SQRT2INV,  GOLDENINV22,          0.0f,    -GOLDEN22 },
-  {     SQRT2INV,  GOLDENINV22,          0.0f,    -GOLDEN22 },
-  {          0.0f,    -SQRT2INV,  GOLDENINV22,    -GOLDEN22 },
-  {          0.0f,     SQRT2INV,  GOLDENINV22,    -GOLDEN22 },
+  {          0.0,    -SQRT2INV, -GOLDENINV22,    -GOLDEN22 },
+  {          0.0,     SQRT2INV, -GOLDENINV22,    -GOLDEN22 },
+  {    -SQRT2INV, -GOLDENINV22,          0.0,    -GOLDEN22 },
+  {     SQRT2INV, -GOLDENINV22,          0.0,    -GOLDEN22 },
+  {    -SQRT2INV,  GOLDENINV22,          0.0,    -GOLDEN22 },
+  {     SQRT2INV,  GOLDENINV22,          0.0,    -GOLDEN22 },
+  {          0.0,    -SQRT2INV,  GOLDENINV22,    -GOLDEN22 },
+  {          0.0,     SQRT2INV,  GOLDENINV22,    -GOLDEN22 },
   {  -GOLDENINV2,  -GOLDENINV2,   GOLDENINV2,    -GOLDEN22 },
   {   GOLDENINV2,  -GOLDENINV2,   GOLDENINV2,    -GOLDEN22 },
   {  -GOLDENINV2,   GOLDENINV2,   GOLDENINV2,    -GOLDEN22 },
   {   GOLDENINV2,   GOLDENINV2,   GOLDENINV2,    -GOLDEN22 },
-  { -GOLDENINV22,          0.0f,     SQRT2INV,    -GOLDEN22 },
-  {  GOLDENINV22,          0.0f,     SQRT2INV,    -GOLDEN22 },
-  {  -GOLDENINV2,          0.0f,     -GOLDEN2,  -SQRT5OVER2 },
-  {   GOLDENINV2,          0.0f,     -GOLDEN2,  -SQRT5OVER2 },
+  { -GOLDENINV22,          0.0,     SQRT2INV,    -GOLDEN22 },
+  {  GOLDENINV22,          0.0,     SQRT2INV,    -GOLDEN22 },
+  {  -GOLDENINV2,          0.0,     -GOLDEN2,  -SQRT5OVER2 },
+  {   GOLDENINV2,          0.0,     -GOLDEN2,  -SQRT5OVER2 },
   {    -SQRT2INV,    -SQRT2INV,    -SQRT2INV,  -SQRT5OVER2 },
   {     SQRT2INV,    -SQRT2INV,    -SQRT2INV,  -SQRT5OVER2 },
   {    -SQRT2INV,     SQRT2INV,    -SQRT2INV,  -SQRT5OVER2 },
   {     SQRT2INV,     SQRT2INV,    -SQRT2INV,  -SQRT5OVER2 },
-  {          0.0f,     -GOLDEN2,  -GOLDENINV2,  -SQRT5OVER2 },
-  {          0.0f,      GOLDEN2,  -GOLDENINV2,  -SQRT5OVER2 },
-  {     -GOLDEN2,  -GOLDENINV2,          0.0f,  -SQRT5OVER2 },
-  {      GOLDEN2,  -GOLDENINV2,          0.0f,  -SQRT5OVER2 },
-  {     -GOLDEN2,   GOLDENINV2,          0.0f,  -SQRT5OVER2 },
-  {      GOLDEN2,   GOLDENINV2,          0.0f,  -SQRT5OVER2 },
-  {          0.0f,     -GOLDEN2,   GOLDENINV2,  -SQRT5OVER2 },
-  {          0.0f,      GOLDEN2,   GOLDENINV2,  -SQRT5OVER2 },
+  {          0.0,     -GOLDEN2,  -GOLDENINV2,  -SQRT5OVER2 },
+  {          0.0,      GOLDEN2,  -GOLDENINV2,  -SQRT5OVER2 },
+  {     -GOLDEN2,  -GOLDENINV2,          0.0,  -SQRT5OVER2 },
+  {      GOLDEN2,  -GOLDENINV2,          0.0,  -SQRT5OVER2 },
+  {     -GOLDEN2,   GOLDENINV2,          0.0,  -SQRT5OVER2 },
+  {      GOLDEN2,   GOLDENINV2,          0.0,  -SQRT5OVER2 },
+  {          0.0,     -GOLDEN2,   GOLDENINV2,  -SQRT5OVER2 },
+  {          0.0,      GOLDEN2,   GOLDENINV2,  -SQRT5OVER2 },
   {    -SQRT2INV,    -SQRT2INV,     SQRT2INV,  -SQRT5OVER2 },
   {     SQRT2INV,    -SQRT2INV,     SQRT2INV,  -SQRT5OVER2 },
   {    -SQRT2INV,     SQRT2INV,     SQRT2INV,  -SQRT5OVER2 },
   {     SQRT2INV,     SQRT2INV,     SQRT2INV,  -SQRT5OVER2 },
-  {  -GOLDENINV2,          0.0f,      GOLDEN2,  -SQRT5OVER2 },
-  {   GOLDENINV2,          0.0f,      GOLDEN2,  -SQRT5OVER2 },
-  {          0.0f,          0.0f,       -SQRT2,       -SQRT2 },
+  {  -GOLDENINV2,          0.0,      GOLDEN2,  -SQRT5OVER2 },
+  {   GOLDENINV2,          0.0,      GOLDEN2,  -SQRT5OVER2 },
+  {          0.0,          0.0,       -SQRT2,       -SQRT2 },
   {    -SQRT2INV,  -GOLDENINV2,     -GOLDEN2,       -SQRT2 },
   {     SQRT2INV,  -GOLDENINV2,     -GOLDEN2,       -SQRT2 },
   {    -SQRT2INV,   GOLDENINV2,     -GOLDEN2,       -SQRT2 },
@@ -532,10 +535,10 @@ static const float vert_120[NUM_VERT_120][4] = {
   {      GOLDEN2,    -SQRT2INV,  -GOLDENINV2,       -SQRT2 },
   {     -GOLDEN2,     SQRT2INV,  -GOLDENINV2,       -SQRT2 },
   {      GOLDEN2,     SQRT2INV,  -GOLDENINV2,       -SQRT2 },
-  {          0.0f,       -SQRT2,          0.0f,       -SQRT2 },
-  {       -SQRT2,          0.0f,          0.0f,       -SQRT2 },
-  {        SQRT2,          0.0f,          0.0f,       -SQRT2 },
-  {          0.0f,        SQRT2,          0.0f,       -SQRT2 },
+  {          0.0,       -SQRT2,          0.0,       -SQRT2 },
+  {       -SQRT2,          0.0,          0.0,       -SQRT2 },
+  {        SQRT2,          0.0,          0.0,       -SQRT2 },
+  {          0.0,        SQRT2,          0.0,       -SQRT2 },
   {     -GOLDEN2,    -SQRT2INV,   GOLDENINV2,       -SQRT2 },
   {      GOLDEN2,    -SQRT2INV,   GOLDENINV2,       -SQRT2 },
   {     -GOLDEN2,     SQRT2INV,   GOLDENINV2,       -SQRT2 },
@@ -548,9 +551,9 @@ static const float vert_120[NUM_VERT_120][4] = {
   {     SQRT2INV,  -GOLDENINV2,      GOLDEN2,       -SQRT2 },
   {    -SQRT2INV,   GOLDENINV2,      GOLDEN2,       -SQRT2 },
   {     SQRT2INV,   GOLDENINV2,      GOLDEN2,       -SQRT2 },
-  {          0.0f,          0.0f,        SQRT2,       -SQRT2 },
-  {          0.0f,  -GOLDENINV2,  -SQRT5OVER2,     -GOLDEN2 },
-  {          0.0f,   GOLDENINV2,  -SQRT5OVER2,     -GOLDEN2 },
+  {          0.0,          0.0,        SQRT2,       -SQRT2 },
+  {          0.0,  -GOLDENINV2,  -SQRT5OVER2,     -GOLDEN2 },
+  {          0.0,   GOLDENINV2,  -SQRT5OVER2,     -GOLDEN2 },
   {  -GOLDENINV2,    -SQRT2INV,       -SQRT2,     -GOLDEN2 },
   {   GOLDENINV2,    -SQRT2INV,       -SQRT2,     -GOLDEN2 },
   {  -GOLDENINV2,     SQRT2INV,       -SQRT2,     -GOLDEN2 },
@@ -569,26 +572,26 @@ static const float vert_120[NUM_VERT_120][4] = {
   {        SQRT2,   GOLDENINV2,    -SQRT2INV,     -GOLDEN2 },
   {    -SQRT2INV,       -SQRT2,  -GOLDENINV2,     -GOLDEN2 },
   {     SQRT2INV,       -SQRT2,  -GOLDENINV2,     -GOLDEN2 },
-  {  -SQRT5OVER2,          0.0f,  -GOLDENINV2,     -GOLDEN2 },
-  {   SQRT5OVER2,          0.0f,  -GOLDENINV2,     -GOLDEN2 },
+  {  -SQRT5OVER2,          0.0,  -GOLDENINV2,     -GOLDEN2 },
+  {   SQRT5OVER2,          0.0,  -GOLDENINV2,     -GOLDEN2 },
   {    -SQRT2INV,        SQRT2,  -GOLDENINV2,     -GOLDEN2 },
   {     SQRT2INV,        SQRT2,  -GOLDENINV2,     -GOLDEN2 },
   {     -GOLDEN2,     -GOLDEN2, -GOLDENINV22,     -GOLDEN2 },
   {      GOLDEN2,     -GOLDEN2, -GOLDENINV22,     -GOLDEN2 },
   {     -GOLDEN2,      GOLDEN2, -GOLDENINV22,     -GOLDEN2 },
   {      GOLDEN2,      GOLDEN2, -GOLDENINV22,     -GOLDEN2 },
-  {  -GOLDENINV2,  -SQRT5OVER2,          0.0f,     -GOLDEN2 },
-  {   GOLDENINV2,  -SQRT5OVER2,          0.0f,     -GOLDEN2 },
-  {  -GOLDENINV2,   SQRT5OVER2,          0.0f,     -GOLDEN2 },
-  {   GOLDENINV2,   SQRT5OVER2,          0.0f,     -GOLDEN2 },
+  {  -GOLDENINV2,  -SQRT5OVER2,          0.0,     -GOLDEN2 },
+  {   GOLDENINV2,  -SQRT5OVER2,          0.0,     -GOLDEN2 },
+  {  -GOLDENINV2,   SQRT5OVER2,          0.0,     -GOLDEN2 },
+  {   GOLDENINV2,   SQRT5OVER2,          0.0,     -GOLDEN2 },
   {     -GOLDEN2,     -GOLDEN2,  GOLDENINV22,     -GOLDEN2 },
   {      GOLDEN2,     -GOLDEN2,  GOLDENINV22,     -GOLDEN2 },
   {     -GOLDEN2,      GOLDEN2,  GOLDENINV22,     -GOLDEN2 },
   {      GOLDEN2,      GOLDEN2,  GOLDENINV22,     -GOLDEN2 },
   {    -SQRT2INV,       -SQRT2,   GOLDENINV2,     -GOLDEN2 },
   {     SQRT2INV,       -SQRT2,   GOLDENINV2,     -GOLDEN2 },
-  {  -SQRT5OVER2,          0.0f,   GOLDENINV2,     -GOLDEN2 },
-  {   SQRT5OVER2,          0.0f,   GOLDENINV2,     -GOLDEN2 },
+  {  -SQRT5OVER2,          0.0,   GOLDENINV2,     -GOLDEN2 },
+  {   SQRT5OVER2,          0.0,   GOLDENINV2,     -GOLDEN2 },
   {    -SQRT2INV,        SQRT2,   GOLDENINV2,     -GOLDEN2 },
   {     SQRT2INV,        SQRT2,   GOLDENINV2,     -GOLDEN2 },
   {       -SQRT2,  -GOLDENINV2,     SQRT2INV,     -GOLDEN2 },
@@ -607,10 +610,10 @@ static const float vert_120[NUM_VERT_120][4] = {
   {   GOLDENINV2,    -SQRT2INV,        SQRT2,     -GOLDEN2 },
   {  -GOLDENINV2,     SQRT2INV,        SQRT2,     -GOLDEN2 },
   {   GOLDENINV2,     SQRT2INV,        SQRT2,     -GOLDEN2 },
-  {          0.0f,  -GOLDENINV2,   SQRT5OVER2,     -GOLDEN2 },
-  {          0.0f,   GOLDENINV2,   SQRT5OVER2,     -GOLDEN2 },
-  {          0.0f, -GOLDENINV22,    -GOLDEN22,    -SQRT2INV },
-  {          0.0f,  GOLDENINV22,    -GOLDEN22,    -SQRT2INV },
+  {          0.0,  -GOLDENINV2,   SQRT5OVER2,     -GOLDEN2 },
+  {          0.0,   GOLDENINV2,   SQRT5OVER2,     -GOLDEN2 },
+  {          0.0, -GOLDENINV22,    -GOLDEN22,    -SQRT2INV },
+  {          0.0,  GOLDENINV22,    -GOLDEN22,    -SQRT2INV },
   {    -SQRT2INV,    -SQRT2INV,  -SQRT5OVER2,    -SQRT2INV },
   {     SQRT2INV,    -SQRT2INV,  -SQRT5OVER2,    -SQRT2INV },
   {    -SQRT2INV,     SQRT2INV,  -SQRT5OVER2,    -SQRT2INV },
@@ -635,14 +638,14 @@ static const float vert_120[NUM_VERT_120][4] = {
   {        SQRT2,     -GOLDEN2,  -GOLDENINV2,    -SQRT2INV },
   {       -SQRT2,      GOLDEN2,  -GOLDENINV2,    -SQRT2INV },
   {        SQRT2,      GOLDEN2,  -GOLDENINV2,    -SQRT2INV },
-  {    -GOLDEN22,          0.0f, -GOLDENINV22,    -SQRT2INV },
-  {     GOLDEN22,          0.0f, -GOLDENINV22,    -SQRT2INV },
-  { -GOLDENINV22,    -GOLDEN22,          0.0f,    -SQRT2INV },
-  {  GOLDENINV22,    -GOLDEN22,          0.0f,    -SQRT2INV },
-  { -GOLDENINV22,     GOLDEN22,          0.0f,    -SQRT2INV },
-  {  GOLDENINV22,     GOLDEN22,          0.0f,    -SQRT2INV },
-  {    -GOLDEN22,          0.0f,  GOLDENINV22,    -SQRT2INV },
-  {     GOLDEN22,          0.0f,  GOLDENINV22,    -SQRT2INV },
+  {    -GOLDEN22,          0.0, -GOLDENINV22,    -SQRT2INV },
+  {     GOLDEN22,          0.0, -GOLDENINV22,    -SQRT2INV },
+  { -GOLDENINV22,    -GOLDEN22,          0.0,    -SQRT2INV },
+  {  GOLDENINV22,    -GOLDEN22,          0.0,    -SQRT2INV },
+  { -GOLDENINV22,     GOLDEN22,          0.0,    -SQRT2INV },
+  {  GOLDENINV22,     GOLDEN22,          0.0,    -SQRT2INV },
+  {    -GOLDEN22,          0.0,  GOLDENINV22,    -SQRT2INV },
+  {     GOLDEN22,          0.0,  GOLDENINV22,    -SQRT2INV },
   {       -SQRT2,     -GOLDEN2,   GOLDENINV2,    -SQRT2INV },
   {        SQRT2,     -GOLDEN2,   GOLDENINV2,    -SQRT2INV },
   {       -SQRT2,      GOLDEN2,   GOLDENINV2,    -SQRT2INV },
@@ -667,24 +670,24 @@ static const float vert_120[NUM_VERT_120][4] = {
   {     SQRT2INV,    -SQRT2INV,   SQRT5OVER2,    -SQRT2INV },
   {    -SQRT2INV,     SQRT2INV,   SQRT5OVER2,    -SQRT2INV },
   {     SQRT2INV,     SQRT2INV,   SQRT5OVER2,    -SQRT2INV },
-  {          0.0f, -GOLDENINV22,     GOLDEN22,    -SQRT2INV },
-  {          0.0f,  GOLDENINV22,     GOLDEN22,    -SQRT2INV },
+  {          0.0, -GOLDENINV22,     GOLDEN22,    -SQRT2INV },
+  {          0.0,  GOLDENINV22,     GOLDEN22,    -SQRT2INV },
   {  -GOLDENINV2,  -GOLDENINV2,    -GOLDEN22,  -GOLDENINV2 },
   {   GOLDENINV2,  -GOLDENINV2,    -GOLDEN22,  -GOLDENINV2 },
   {  -GOLDENINV2,   GOLDENINV2,    -GOLDEN22,  -GOLDENINV2 },
   {   GOLDENINV2,   GOLDENINV2,    -GOLDEN22,  -GOLDENINV2 },
-  {     -GOLDEN2,          0.0f,  -SQRT5OVER2,  -GOLDENINV2 },
-  {      GOLDEN2,          0.0f,  -SQRT5OVER2,  -GOLDENINV2 },
+  {     -GOLDEN2,          0.0,  -SQRT5OVER2,  -GOLDENINV2 },
+  {      GOLDEN2,          0.0,  -SQRT5OVER2,  -GOLDENINV2 },
   {    -SQRT2INV,     -GOLDEN2,       -SQRT2,  -GOLDENINV2 },
   {     SQRT2INV,     -GOLDEN2,       -SQRT2,  -GOLDENINV2 },
   {    -SQRT2INV,      GOLDEN2,       -SQRT2,  -GOLDENINV2 },
   {     SQRT2INV,      GOLDEN2,       -SQRT2,  -GOLDENINV2 },
-  {          0.0f,  -SQRT5OVER2,     -GOLDEN2,  -GOLDENINV2 },
+  {          0.0,  -SQRT5OVER2,     -GOLDEN2,  -GOLDENINV2 },
   {       -SQRT2,    -SQRT2INV,     -GOLDEN2,  -GOLDENINV2 },
   {        SQRT2,    -SQRT2INV,     -GOLDEN2,  -GOLDENINV2 },
   {       -SQRT2,     SQRT2INV,     -GOLDEN2,  -GOLDENINV2 },
   {        SQRT2,     SQRT2INV,     -GOLDEN2,  -GOLDENINV2 },
-  {          0.0f,   SQRT5OVER2,     -GOLDEN2,  -GOLDENINV2 },
+  {          0.0,   SQRT5OVER2,     -GOLDEN2,  -GOLDENINV2 },
   {     -GOLDEN2,       -SQRT2,    -SQRT2INV,  -GOLDENINV2 },
   {      GOLDEN2,       -SQRT2,    -SQRT2INV,  -GOLDENINV2 },
   {     -GOLDEN2,        SQRT2,    -SQRT2INV,  -GOLDENINV2 },
@@ -697,10 +700,10 @@ static const float vert_120[NUM_VERT_120][4] = {
   {     GOLDEN22,   GOLDENINV2,  -GOLDENINV2,  -GOLDENINV2 },
   {  -GOLDENINV2,     GOLDEN22,  -GOLDENINV2,  -GOLDENINV2 },
   {   GOLDENINV2,     GOLDEN22,  -GOLDENINV2,  -GOLDENINV2 },
-  {  -SQRT5OVER2,     -GOLDEN2,          0.0f,  -GOLDENINV2 },
-  {   SQRT5OVER2,     -GOLDEN2,          0.0f,  -GOLDENINV2 },
-  {  -SQRT5OVER2,      GOLDEN2,          0.0f,  -GOLDENINV2 },
-  {   SQRT5OVER2,      GOLDEN2,          0.0f,  -GOLDENINV2 },
+  {  -SQRT5OVER2,     -GOLDEN2,          0.0,  -GOLDENINV2 },
+  {   SQRT5OVER2,     -GOLDEN2,          0.0,  -GOLDENINV2 },
+  {  -SQRT5OVER2,      GOLDEN2,          0.0,  -GOLDENINV2 },
+  {   SQRT5OVER2,      GOLDEN2,          0.0,  -GOLDENINV2 },
   {  -GOLDENINV2,    -GOLDEN22,   GOLDENINV2,  -GOLDENINV2 },
   {   GOLDENINV2,    -GOLDEN22,   GOLDENINV2,  -GOLDENINV2 },
   {    -GOLDEN22,  -GOLDENINV2,   GOLDENINV2,  -GOLDENINV2 },
@@ -713,138 +716,138 @@ static const float vert_120[NUM_VERT_120][4] = {
   {      GOLDEN2,       -SQRT2,     SQRT2INV,  -GOLDENINV2 },
   {     -GOLDEN2,        SQRT2,     SQRT2INV,  -GOLDENINV2 },
   {      GOLDEN2,        SQRT2,     SQRT2INV,  -GOLDENINV2 },
-  {          0.0f,  -SQRT5OVER2,      GOLDEN2,  -GOLDENINV2 },
+  {          0.0,  -SQRT5OVER2,      GOLDEN2,  -GOLDENINV2 },
   {       -SQRT2,    -SQRT2INV,      GOLDEN2,  -GOLDENINV2 },
   {        SQRT2,    -SQRT2INV,      GOLDEN2,  -GOLDENINV2 },
   {       -SQRT2,     SQRT2INV,      GOLDEN2,  -GOLDENINV2 },
   {        SQRT2,     SQRT2INV,      GOLDEN2,  -GOLDENINV2 },
-  {          0.0f,   SQRT5OVER2,      GOLDEN2,  -GOLDENINV2 },
+  {          0.0,   SQRT5OVER2,      GOLDEN2,  -GOLDENINV2 },
   {    -SQRT2INV,     -GOLDEN2,        SQRT2,  -GOLDENINV2 },
   {     SQRT2INV,     -GOLDEN2,        SQRT2,  -GOLDENINV2 },
   {    -SQRT2INV,      GOLDEN2,        SQRT2,  -GOLDENINV2 },
   {     SQRT2INV,      GOLDEN2,        SQRT2,  -GOLDENINV2 },
-  {     -GOLDEN2,          0.0f,   SQRT5OVER2,  -GOLDENINV2 },
-  {      GOLDEN2,          0.0f,   SQRT5OVER2,  -GOLDENINV2 },
+  {     -GOLDEN2,          0.0,   SQRT5OVER2,  -GOLDENINV2 },
+  {      GOLDEN2,          0.0,   SQRT5OVER2,  -GOLDENINV2 },
   {  -GOLDENINV2,  -GOLDENINV2,     GOLDEN22,  -GOLDENINV2 },
   {   GOLDENINV2,  -GOLDENINV2,     GOLDEN22,  -GOLDENINV2 },
   {  -GOLDENINV2,   GOLDENINV2,     GOLDEN22,  -GOLDENINV2 },
   {   GOLDENINV2,   GOLDENINV2,     GOLDEN22,  -GOLDENINV2 },
-  {    -SQRT2INV,          0.0f,    -GOLDEN22, -GOLDENINV22 },
-  {     SQRT2INV,          0.0f,    -GOLDEN22, -GOLDENINV22 },
+  {    -SQRT2INV,          0.0,    -GOLDEN22, -GOLDENINV22 },
+  {     SQRT2INV,          0.0,    -GOLDEN22, -GOLDENINV22 },
   {     -GOLDEN2,     -GOLDEN2,     -GOLDEN2, -GOLDENINV22 },
   {      GOLDEN2,     -GOLDEN2,     -GOLDEN2, -GOLDENINV22 },
   {     -GOLDEN2,      GOLDEN2,     -GOLDEN2, -GOLDENINV22 },
   {      GOLDEN2,      GOLDEN2,     -GOLDEN2, -GOLDENINV22 },
-  {          0.0f,    -GOLDEN22,    -SQRT2INV, -GOLDENINV22 },
-  {          0.0f,     GOLDEN22,    -SQRT2INV, -GOLDENINV22 },
-  {    -GOLDEN22,    -SQRT2INV,          0.0f, -GOLDENINV22 },
-  {     GOLDEN22,    -SQRT2INV,          0.0f, -GOLDENINV22 },
-  {    -GOLDEN22,     SQRT2INV,          0.0f, -GOLDENINV22 },
-  {     GOLDEN22,     SQRT2INV,          0.0f, -GOLDENINV22 },
-  {          0.0f,    -GOLDEN22,     SQRT2INV, -GOLDENINV22 },
-  {          0.0f,     GOLDEN22,     SQRT2INV, -GOLDENINV22 },
+  {          0.0,    -GOLDEN22,    -SQRT2INV, -GOLDENINV22 },
+  {          0.0,     GOLDEN22,    -SQRT2INV, -GOLDENINV22 },
+  {    -GOLDEN22,    -SQRT2INV,          0.0, -GOLDENINV22 },
+  {     GOLDEN22,    -SQRT2INV,          0.0, -GOLDENINV22 },
+  {    -GOLDEN22,     SQRT2INV,          0.0, -GOLDENINV22 },
+  {     GOLDEN22,     SQRT2INV,          0.0, -GOLDENINV22 },
+  {          0.0,    -GOLDEN22,     SQRT2INV, -GOLDENINV22 },
+  {          0.0,     GOLDEN22,     SQRT2INV, -GOLDENINV22 },
   {     -GOLDEN2,     -GOLDEN2,      GOLDEN2, -GOLDENINV22 },
   {      GOLDEN2,     -GOLDEN2,      GOLDEN2, -GOLDENINV22 },
   {     -GOLDEN2,      GOLDEN2,      GOLDEN2, -GOLDENINV22 },
   {      GOLDEN2,      GOLDEN2,      GOLDEN2, -GOLDENINV22 },
-  {    -SQRT2INV,          0.0f,     GOLDEN22, -GOLDENINV22 },
-  {     SQRT2INV,          0.0f,     GOLDEN22, -GOLDENINV22 },
-  { -GOLDENINV22,    -SQRT2INV,    -GOLDEN22,          0.0f },
-  {  GOLDENINV22,    -SQRT2INV,    -GOLDEN22,          0.0f },
-  { -GOLDENINV22,     SQRT2INV,    -GOLDEN22,          0.0f },
-  {  GOLDENINV22,     SQRT2INV,    -GOLDEN22,          0.0f },
-  {  -GOLDENINV2,     -GOLDEN2,  -SQRT5OVER2,          0.0f },
-  {   GOLDENINV2,     -GOLDEN2,  -SQRT5OVER2,          0.0f },
-  {  -GOLDENINV2,      GOLDEN2,  -SQRT5OVER2,          0.0f },
-  {   GOLDENINV2,      GOLDEN2,  -SQRT5OVER2,          0.0f },
-  {          0.0f,       -SQRT2,       -SQRT2,          0.0f },
-  {       -SQRT2,          0.0f,       -SQRT2,          0.0f },
-  {        SQRT2,          0.0f,       -SQRT2,          0.0f },
-  {          0.0f,        SQRT2,       -SQRT2,          0.0f },
-  {  -SQRT5OVER2,  -GOLDENINV2,     -GOLDEN2,          0.0f },
-  {   SQRT5OVER2,  -GOLDENINV2,     -GOLDEN2,          0.0f },
-  {  -SQRT5OVER2,   GOLDENINV2,     -GOLDEN2,          0.0f },
-  {   SQRT5OVER2,   GOLDENINV2,     -GOLDEN2,          0.0f },
-  {    -GOLDEN22, -GOLDENINV22,    -SQRT2INV,          0.0f },
-  {     GOLDEN22, -GOLDENINV22,    -SQRT2INV,          0.0f },
-  {    -GOLDEN22,  GOLDENINV22,    -SQRT2INV,          0.0f },
-  {     GOLDEN22,  GOLDENINV22,    -SQRT2INV,          0.0f },
-  {     -GOLDEN2,  -SQRT5OVER2,  -GOLDENINV2,          0.0f },
-  {      GOLDEN2,  -SQRT5OVER2,  -GOLDENINV2,          0.0f },
-  {     -GOLDEN2,   SQRT5OVER2,  -GOLDENINV2,          0.0f },
-  {      GOLDEN2,   SQRT5OVER2,  -GOLDENINV2,          0.0f },
-  {    -SQRT2INV,    -GOLDEN22, -GOLDENINV22,          0.0f },
-  {     SQRT2INV,    -GOLDEN22, -GOLDENINV22,          0.0f },
-  {    -SQRT2INV,     GOLDEN22, -GOLDENINV22,          0.0f },
-  {     SQRT2INV,     GOLDEN22, -GOLDENINV22,          0.0f },
-  {       -SQRT2,       -SQRT2,          0.0f,          0.0f },
-  {        SQRT2,       -SQRT2,          0.0f,          0.0f },
-  {       -SQRT2,        SQRT2,          0.0f,          0.0f },
-  {        SQRT2,        SQRT2,          0.0f,          0.0f },
-  {    -SQRT2INV,    -GOLDEN22,  GOLDENINV22,          0.0f },
-  {     SQRT2INV,    -GOLDEN22,  GOLDENINV22,          0.0f },
-  {    -SQRT2INV,     GOLDEN22,  GOLDENINV22,          0.0f },
-  {     SQRT2INV,     GOLDEN22,  GOLDENINV22,          0.0f },
-  {     -GOLDEN2,  -SQRT5OVER2,   GOLDENINV2,          0.0f },
-  {      GOLDEN2,  -SQRT5OVER2,   GOLDENINV2,          0.0f },
-  {     -GOLDEN2,   SQRT5OVER2,   GOLDENINV2,          0.0f },
-  {      GOLDEN2,   SQRT5OVER2,   GOLDENINV2,          0.0f },
-  {    -GOLDEN22, -GOLDENINV22,     SQRT2INV,          0.0f },
-  {     GOLDEN22, -GOLDENINV22,     SQRT2INV,          0.0f },
-  {    -GOLDEN22,  GOLDENINV22,     SQRT2INV,          0.0f },
-  {     GOLDEN22,  GOLDENINV22,     SQRT2INV,          0.0f },
-  {  -SQRT5OVER2,  -GOLDENINV2,      GOLDEN2,          0.0f },
-  {   SQRT5OVER2,  -GOLDENINV2,      GOLDEN2,          0.0f },
-  {  -SQRT5OVER2,   GOLDENINV2,      GOLDEN2,          0.0f },
-  {   SQRT5OVER2,   GOLDENINV2,      GOLDEN2,          0.0f },
-  {          0.0f,       -SQRT2,        SQRT2,          0.0f },
-  {       -SQRT2,          0.0f,        SQRT2,          0.0f },
-  {        SQRT2,          0.0f,        SQRT2,          0.0f },
-  {          0.0f,        SQRT2,        SQRT2,          0.0f },
-  {  -GOLDENINV2,     -GOLDEN2,   SQRT5OVER2,          0.0f },
-  {   GOLDENINV2,     -GOLDEN2,   SQRT5OVER2,          0.0f },
-  {  -GOLDENINV2,      GOLDEN2,   SQRT5OVER2,          0.0f },
-  {   GOLDENINV2,      GOLDEN2,   SQRT5OVER2,          0.0f },
-  { -GOLDENINV22,    -SQRT2INV,     GOLDEN22,          0.0f },
-  {  GOLDENINV22,    -SQRT2INV,     GOLDEN22,          0.0f },
-  { -GOLDENINV22,     SQRT2INV,     GOLDEN22,          0.0f },
-  {  GOLDENINV22,     SQRT2INV,     GOLDEN22,          0.0f },
-  {    -SQRT2INV,          0.0f,    -GOLDEN22,  GOLDENINV22 },
-  {     SQRT2INV,          0.0f,    -GOLDEN22,  GOLDENINV22 },
+  {    -SQRT2INV,          0.0,     GOLDEN22, -GOLDENINV22 },
+  {     SQRT2INV,          0.0,     GOLDEN22, -GOLDENINV22 },
+  { -GOLDENINV22,    -SQRT2INV,    -GOLDEN22,          0.0 },
+  {  GOLDENINV22,    -SQRT2INV,    -GOLDEN22,          0.0 },
+  { -GOLDENINV22,     SQRT2INV,    -GOLDEN22,          0.0 },
+  {  GOLDENINV22,     SQRT2INV,    -GOLDEN22,          0.0 },
+  {  -GOLDENINV2,     -GOLDEN2,  -SQRT5OVER2,          0.0 },
+  {   GOLDENINV2,     -GOLDEN2,  -SQRT5OVER2,          0.0 },
+  {  -GOLDENINV2,      GOLDEN2,  -SQRT5OVER2,          0.0 },
+  {   GOLDENINV2,      GOLDEN2,  -SQRT5OVER2,          0.0 },
+  {          0.0,       -SQRT2,       -SQRT2,          0.0 },
+  {       -SQRT2,          0.0,       -SQRT2,          0.0 },
+  {        SQRT2,          0.0,       -SQRT2,          0.0 },
+  {          0.0,        SQRT2,       -SQRT2,          0.0 },
+  {  -SQRT5OVER2,  -GOLDENINV2,     -GOLDEN2,          0.0 },
+  {   SQRT5OVER2,  -GOLDENINV2,     -GOLDEN2,          0.0 },
+  {  -SQRT5OVER2,   GOLDENINV2,     -GOLDEN2,          0.0 },
+  {   SQRT5OVER2,   GOLDENINV2,     -GOLDEN2,          0.0 },
+  {    -GOLDEN22, -GOLDENINV22,    -SQRT2INV,          0.0 },
+  {     GOLDEN22, -GOLDENINV22,    -SQRT2INV,          0.0 },
+  {    -GOLDEN22,  GOLDENINV22,    -SQRT2INV,          0.0 },
+  {     GOLDEN22,  GOLDENINV22,    -SQRT2INV,          0.0 },
+  {     -GOLDEN2,  -SQRT5OVER2,  -GOLDENINV2,          0.0 },
+  {      GOLDEN2,  -SQRT5OVER2,  -GOLDENINV2,          0.0 },
+  {     -GOLDEN2,   SQRT5OVER2,  -GOLDENINV2,          0.0 },
+  {      GOLDEN2,   SQRT5OVER2,  -GOLDENINV2,          0.0 },
+  {    -SQRT2INV,    -GOLDEN22, -GOLDENINV22,          0.0 },
+  {     SQRT2INV,    -GOLDEN22, -GOLDENINV22,          0.0 },
+  {    -SQRT2INV,     GOLDEN22, -GOLDENINV22,          0.0 },
+  {     SQRT2INV,     GOLDEN22, -GOLDENINV22,          0.0 },
+  {       -SQRT2,       -SQRT2,          0.0,          0.0 },
+  {        SQRT2,       -SQRT2,          0.0,          0.0 },
+  {       -SQRT2,        SQRT2,          0.0,          0.0 },
+  {        SQRT2,        SQRT2,          0.0,          0.0 },
+  {    -SQRT2INV,    -GOLDEN22,  GOLDENINV22,          0.0 },
+  {     SQRT2INV,    -GOLDEN22,  GOLDENINV22,          0.0 },
+  {    -SQRT2INV,     GOLDEN22,  GOLDENINV22,          0.0 },
+  {     SQRT2INV,     GOLDEN22,  GOLDENINV22,          0.0 },
+  {     -GOLDEN2,  -SQRT5OVER2,   GOLDENINV2,          0.0 },
+  {      GOLDEN2,  -SQRT5OVER2,   GOLDENINV2,          0.0 },
+  {     -GOLDEN2,   SQRT5OVER2,   GOLDENINV2,          0.0 },
+  {      GOLDEN2,   SQRT5OVER2,   GOLDENINV2,          0.0 },
+  {    -GOLDEN22, -GOLDENINV22,     SQRT2INV,          0.0 },
+  {     GOLDEN22, -GOLDENINV22,     SQRT2INV,          0.0 },
+  {    -GOLDEN22,  GOLDENINV22,     SQRT2INV,          0.0 },
+  {     GOLDEN22,  GOLDENINV22,     SQRT2INV,          0.0 },
+  {  -SQRT5OVER2,  -GOLDENINV2,      GOLDEN2,          0.0 },
+  {   SQRT5OVER2,  -GOLDENINV2,      GOLDEN2,          0.0 },
+  {  -SQRT5OVER2,   GOLDENINV2,      GOLDEN2,          0.0 },
+  {   SQRT5OVER2,   GOLDENINV2,      GOLDEN2,          0.0 },
+  {          0.0,       -SQRT2,        SQRT2,          0.0 },
+  {       -SQRT2,          0.0,        SQRT2,          0.0 },
+  {        SQRT2,          0.0,        SQRT2,          0.0 },
+  {          0.0,        SQRT2,        SQRT2,          0.0 },
+  {  -GOLDENINV2,     -GOLDEN2,   SQRT5OVER2,          0.0 },
+  {   GOLDENINV2,     -GOLDEN2,   SQRT5OVER2,          0.0 },
+  {  -GOLDENINV2,      GOLDEN2,   SQRT5OVER2,          0.0 },
+  {   GOLDENINV2,      GOLDEN2,   SQRT5OVER2,          0.0 },
+  { -GOLDENINV22,    -SQRT2INV,     GOLDEN22,          0.0 },
+  {  GOLDENINV22,    -SQRT2INV,     GOLDEN22,          0.0 },
+  { -GOLDENINV22,     SQRT2INV,     GOLDEN22,          0.0 },
+  {  GOLDENINV22,     SQRT2INV,     GOLDEN22,          0.0 },
+  {    -SQRT2INV,          0.0,    -GOLDEN22,  GOLDENINV22 },
+  {     SQRT2INV,          0.0,    -GOLDEN22,  GOLDENINV22 },
   {     -GOLDEN2,     -GOLDEN2,     -GOLDEN2,  GOLDENINV22 },
   {      GOLDEN2,     -GOLDEN2,     -GOLDEN2,  GOLDENINV22 },
   {     -GOLDEN2,      GOLDEN2,     -GOLDEN2,  GOLDENINV22 },
   {      GOLDEN2,      GOLDEN2,     -GOLDEN2,  GOLDENINV22 },
-  {          0.0f,    -GOLDEN22,    -SQRT2INV,  GOLDENINV22 },
-  {          0.0f,     GOLDEN22,    -SQRT2INV,  GOLDENINV22 },
-  {    -GOLDEN22,    -SQRT2INV,          0.0f,  GOLDENINV22 },
-  {     GOLDEN22,    -SQRT2INV,          0.0f,  GOLDENINV22 },
-  {    -GOLDEN22,     SQRT2INV,          0.0f,  GOLDENINV22 },
-  {     GOLDEN22,     SQRT2INV,          0.0f,  GOLDENINV22 },
-  {          0.0f,    -GOLDEN22,     SQRT2INV,  GOLDENINV22 },
-  {          0.0f,     GOLDEN22,     SQRT2INV,  GOLDENINV22 },
+  {          0.0,    -GOLDEN22,    -SQRT2INV,  GOLDENINV22 },
+  {          0.0,     GOLDEN22,    -SQRT2INV,  GOLDENINV22 },
+  {    -GOLDEN22,    -SQRT2INV,          0.0,  GOLDENINV22 },
+  {     GOLDEN22,    -SQRT2INV,          0.0,  GOLDENINV22 },
+  {    -GOLDEN22,     SQRT2INV,          0.0,  GOLDENINV22 },
+  {     GOLDEN22,     SQRT2INV,          0.0,  GOLDENINV22 },
+  {          0.0,    -GOLDEN22,     SQRT2INV,  GOLDENINV22 },
+  {          0.0,     GOLDEN22,     SQRT2INV,  GOLDENINV22 },
   {     -GOLDEN2,     -GOLDEN2,      GOLDEN2,  GOLDENINV22 },
   {      GOLDEN2,     -GOLDEN2,      GOLDEN2,  GOLDENINV22 },
   {     -GOLDEN2,      GOLDEN2,      GOLDEN2,  GOLDENINV22 },
   {      GOLDEN2,      GOLDEN2,      GOLDEN2,  GOLDENINV22 },
-  {    -SQRT2INV,          0.0f,     GOLDEN22,  GOLDENINV22 },
-  {     SQRT2INV,          0.0f,     GOLDEN22,  GOLDENINV22 },
+  {    -SQRT2INV,          0.0,     GOLDEN22,  GOLDENINV22 },
+  {     SQRT2INV,          0.0,     GOLDEN22,  GOLDENINV22 },
   {  -GOLDENINV2,  -GOLDENINV2,    -GOLDEN22,   GOLDENINV2 },
   {   GOLDENINV2,  -GOLDENINV2,    -GOLDEN22,   GOLDENINV2 },
   {  -GOLDENINV2,   GOLDENINV2,    -GOLDEN22,   GOLDENINV2 },
   {   GOLDENINV2,   GOLDENINV2,    -GOLDEN22,   GOLDENINV2 },
-  {     -GOLDEN2,          0.0f,  -SQRT5OVER2,   GOLDENINV2 },
-  {      GOLDEN2,          0.0f,  -SQRT5OVER2,   GOLDENINV2 },
+  {     -GOLDEN2,          0.0,  -SQRT5OVER2,   GOLDENINV2 },
+  {      GOLDEN2,          0.0,  -SQRT5OVER2,   GOLDENINV2 },
   {    -SQRT2INV,     -GOLDEN2,       -SQRT2,   GOLDENINV2 },
   {     SQRT2INV,     -GOLDEN2,       -SQRT2,   GOLDENINV2 },
   {    -SQRT2INV,      GOLDEN2,       -SQRT2,   GOLDENINV2 },
   {     SQRT2INV,      GOLDEN2,       -SQRT2,   GOLDENINV2 },
-  {          0.0f,  -SQRT5OVER2,     -GOLDEN2,   GOLDENINV2 },
+  {          0.0,  -SQRT5OVER2,     -GOLDEN2,   GOLDENINV2 },
   {       -SQRT2,    -SQRT2INV,     -GOLDEN2,   GOLDENINV2 },
   {        SQRT2,    -SQRT2INV,     -GOLDEN2,   GOLDENINV2 },
   {       -SQRT2,     SQRT2INV,     -GOLDEN2,   GOLDENINV2 },
   {        SQRT2,     SQRT2INV,     -GOLDEN2,   GOLDENINV2 },
-  {          0.0f,   SQRT5OVER2,     -GOLDEN2,   GOLDENINV2 },
+  {          0.0,   SQRT5OVER2,     -GOLDEN2,   GOLDENINV2 },
   {     -GOLDEN2,       -SQRT2,    -SQRT2INV,   GOLDENINV2 },
   {      GOLDEN2,       -SQRT2,    -SQRT2INV,   GOLDENINV2 },
   {     -GOLDEN2,        SQRT2,    -SQRT2INV,   GOLDENINV2 },
@@ -857,10 +860,10 @@ static const float vert_120[NUM_VERT_120][4] = {
   {     GOLDEN22,   GOLDENINV2,  -GOLDENINV2,   GOLDENINV2 },
   {  -GOLDENINV2,     GOLDEN22,  -GOLDENINV2,   GOLDENINV2 },
   {   GOLDENINV2,     GOLDEN22,  -GOLDENINV2,   GOLDENINV2 },
-  {  -SQRT5OVER2,     -GOLDEN2,          0.0f,   GOLDENINV2 },
-  {   SQRT5OVER2,     -GOLDEN2,          0.0f,   GOLDENINV2 },
-  {  -SQRT5OVER2,      GOLDEN2,          0.0f,   GOLDENINV2 },
-  {   SQRT5OVER2,      GOLDEN2,          0.0f,   GOLDENINV2 },
+  {  -SQRT5OVER2,     -GOLDEN2,          0.0,   GOLDENINV2 },
+  {   SQRT5OVER2,     -GOLDEN2,          0.0,   GOLDENINV2 },
+  {  -SQRT5OVER2,      GOLDEN2,          0.0,   GOLDENINV2 },
+  {   SQRT5OVER2,      GOLDEN2,          0.0,   GOLDENINV2 },
   {  -GOLDENINV2,    -GOLDEN22,   GOLDENINV2,   GOLDENINV2 },
   {   GOLDENINV2,    -GOLDEN22,   GOLDENINV2,   GOLDENINV2 },
   {    -GOLDEN22,  -GOLDENINV2,   GOLDENINV2,   GOLDENINV2 },
@@ -873,24 +876,24 @@ static const float vert_120[NUM_VERT_120][4] = {
   {      GOLDEN2,       -SQRT2,     SQRT2INV,   GOLDENINV2 },
   {     -GOLDEN2,        SQRT2,     SQRT2INV,   GOLDENINV2 },
   {      GOLDEN2,        SQRT2,     SQRT2INV,   GOLDENINV2 },
-  {          0.0f,  -SQRT5OVER2,      GOLDEN2,   GOLDENINV2 },
+  {          0.0,  -SQRT5OVER2,      GOLDEN2,   GOLDENINV2 },
   {       -SQRT2,    -SQRT2INV,      GOLDEN2,   GOLDENINV2 },
   {        SQRT2,    -SQRT2INV,      GOLDEN2,   GOLDENINV2 },
   {       -SQRT2,     SQRT2INV,      GOLDEN2,   GOLDENINV2 },
   {        SQRT2,     SQRT2INV,      GOLDEN2,   GOLDENINV2 },
-  {          0.0f,   SQRT5OVER2,      GOLDEN2,   GOLDENINV2 },
+  {          0.0,   SQRT5OVER2,      GOLDEN2,   GOLDENINV2 },
   {    -SQRT2INV,     -GOLDEN2,        SQRT2,   GOLDENINV2 },
   {     SQRT2INV,     -GOLDEN2,        SQRT2,   GOLDENINV2 },
   {    -SQRT2INV,      GOLDEN2,        SQRT2,   GOLDENINV2 },
   {     SQRT2INV,      GOLDEN2,        SQRT2,   GOLDENINV2 },
-  {     -GOLDEN2,          0.0f,   SQRT5OVER2,   GOLDENINV2 },
-  {      GOLDEN2,          0.0f,   SQRT5OVER2,   GOLDENINV2 },
+  {     -GOLDEN2,          0.0,   SQRT5OVER2,   GOLDENINV2 },
+  {      GOLDEN2,          0.0,   SQRT5OVER2,   GOLDENINV2 },
   {  -GOLDENINV2,  -GOLDENINV2,     GOLDEN22,   GOLDENINV2 },
   {   GOLDENINV2,  -GOLDENINV2,     GOLDEN22,   GOLDENINV2 },
   {  -GOLDENINV2,   GOLDENINV2,     GOLDEN22,   GOLDENINV2 },
   {   GOLDENINV2,   GOLDENINV2,     GOLDEN22,   GOLDENINV2 },
-  {          0.0f, -GOLDENINV22,    -GOLDEN22,     SQRT2INV },
-  {          0.0f,  GOLDENINV22,    -GOLDEN22,     SQRT2INV },
+  {          0.0, -GOLDENINV22,    -GOLDEN22,     SQRT2INV },
+  {          0.0,  GOLDENINV22,    -GOLDEN22,     SQRT2INV },
   {    -SQRT2INV,    -SQRT2INV,  -SQRT5OVER2,     SQRT2INV },
   {     SQRT2INV,    -SQRT2INV,  -SQRT5OVER2,     SQRT2INV },
   {    -SQRT2INV,     SQRT2INV,  -SQRT5OVER2,     SQRT2INV },
@@ -915,14 +918,14 @@ static const float vert_120[NUM_VERT_120][4] = {
   {        SQRT2,     -GOLDEN2,  -GOLDENINV2,     SQRT2INV },
   {       -SQRT2,      GOLDEN2,  -GOLDENINV2,     SQRT2INV },
   {        SQRT2,      GOLDEN2,  -GOLDENINV2,     SQRT2INV },
-  {    -GOLDEN22,          0.0f, -GOLDENINV22,     SQRT2INV },
-  {     GOLDEN22,          0.0f, -GOLDENINV22,     SQRT2INV },
-  { -GOLDENINV22,    -GOLDEN22,          0.0f,     SQRT2INV },
-  {  GOLDENINV22,    -GOLDEN22,          0.0f,     SQRT2INV },
-  { -GOLDENINV22,     GOLDEN22,          0.0f,     SQRT2INV },
-  {  GOLDENINV22,     GOLDEN22,          0.0f,     SQRT2INV },
-  {    -GOLDEN22,          0.0f,  GOLDENINV22,     SQRT2INV },
-  {     GOLDEN22,          0.0f,  GOLDENINV22,     SQRT2INV },
+  {    -GOLDEN22,          0.0, -GOLDENINV22,     SQRT2INV },
+  {     GOLDEN22,          0.0, -GOLDENINV22,     SQRT2INV },
+  { -GOLDENINV22,    -GOLDEN22,          0.0,     SQRT2INV },
+  {  GOLDENINV22,    -GOLDEN22,          0.0,     SQRT2INV },
+  { -GOLDENINV22,     GOLDEN22,          0.0,     SQRT2INV },
+  {  GOLDENINV22,     GOLDEN22,          0.0,     SQRT2INV },
+  {    -GOLDEN22,          0.0,  GOLDENINV22,     SQRT2INV },
+  {     GOLDEN22,          0.0,  GOLDENINV22,     SQRT2INV },
   {       -SQRT2,     -GOLDEN2,   GOLDENINV2,     SQRT2INV },
   {        SQRT2,     -GOLDEN2,   GOLDENINV2,     SQRT2INV },
   {       -SQRT2,      GOLDEN2,   GOLDENINV2,     SQRT2INV },
@@ -947,10 +950,10 @@ static const float vert_120[NUM_VERT_120][4] = {
   {     SQRT2INV,    -SQRT2INV,   SQRT5OVER2,     SQRT2INV },
   {    -SQRT2INV,     SQRT2INV,   SQRT5OVER2,     SQRT2INV },
   {     SQRT2INV,     SQRT2INV,   SQRT5OVER2,     SQRT2INV },
-  {          0.0f, -GOLDENINV22,     GOLDEN22,     SQRT2INV },
-  {          0.0f,  GOLDENINV22,     GOLDEN22,     SQRT2INV },
-  {          0.0f,  -GOLDENINV2,  -SQRT5OVER2,      GOLDEN2 },
-  {          0.0f,   GOLDENINV2,  -SQRT5OVER2,      GOLDEN2 },
+  {          0.0, -GOLDENINV22,     GOLDEN22,     SQRT2INV },
+  {          0.0,  GOLDENINV22,     GOLDEN22,     SQRT2INV },
+  {          0.0,  -GOLDENINV2,  -SQRT5OVER2,      GOLDEN2 },
+  {          0.0,   GOLDENINV2,  -SQRT5OVER2,      GOLDEN2 },
   {  -GOLDENINV2,    -SQRT2INV,       -SQRT2,      GOLDEN2 },
   {   GOLDENINV2,    -SQRT2INV,       -SQRT2,      GOLDEN2 },
   {  -GOLDENINV2,     SQRT2INV,       -SQRT2,      GOLDEN2 },
@@ -969,26 +972,26 @@ static const float vert_120[NUM_VERT_120][4] = {
   {        SQRT2,   GOLDENINV2,    -SQRT2INV,      GOLDEN2 },
   {    -SQRT2INV,       -SQRT2,  -GOLDENINV2,      GOLDEN2 },
   {     SQRT2INV,       -SQRT2,  -GOLDENINV2,      GOLDEN2 },
-  {  -SQRT5OVER2,          0.0f,  -GOLDENINV2,      GOLDEN2 },
-  {   SQRT5OVER2,          0.0f,  -GOLDENINV2,      GOLDEN2 },
+  {  -SQRT5OVER2,          0.0,  -GOLDENINV2,      GOLDEN2 },
+  {   SQRT5OVER2,          0.0,  -GOLDENINV2,      GOLDEN2 },
   {    -SQRT2INV,        SQRT2,  -GOLDENINV2,      GOLDEN2 },
   {     SQRT2INV,        SQRT2,  -GOLDENINV2,      GOLDEN2 },
   {     -GOLDEN2,     -GOLDEN2, -GOLDENINV22,      GOLDEN2 },
   {      GOLDEN2,     -GOLDEN2, -GOLDENINV22,      GOLDEN2 },
   {     -GOLDEN2,      GOLDEN2, -GOLDENINV22,      GOLDEN2 },
   {      GOLDEN2,      GOLDEN2, -GOLDENINV22,      GOLDEN2 },
-  {  -GOLDENINV2,  -SQRT5OVER2,          0.0f,      GOLDEN2 },
-  {   GOLDENINV2,  -SQRT5OVER2,          0.0f,      GOLDEN2 },
-  {  -GOLDENINV2,   SQRT5OVER2,          0.0f,      GOLDEN2 },
-  {   GOLDENINV2,   SQRT5OVER2,          0.0f,      GOLDEN2 },
+  {  -GOLDENINV2,  -SQRT5OVER2,          0.0,      GOLDEN2 },
+  {   GOLDENINV2,  -SQRT5OVER2,          0.0,      GOLDEN2 },
+  {  -GOLDENINV2,   SQRT5OVER2,          0.0,      GOLDEN2 },
+  {   GOLDENINV2,   SQRT5OVER2,          0.0,      GOLDEN2 },
   {     -GOLDEN2,     -GOLDEN2,  GOLDENINV22,      GOLDEN2 },
   {      GOLDEN2,     -GOLDEN2,  GOLDENINV22,      GOLDEN2 },
   {     -GOLDEN2,      GOLDEN2,  GOLDENINV22,      GOLDEN2 },
   {      GOLDEN2,      GOLDEN2,  GOLDENINV22,      GOLDEN2 },
   {    -SQRT2INV,       -SQRT2,   GOLDENINV2,      GOLDEN2 },
   {     SQRT2INV,       -SQRT2,   GOLDENINV2,      GOLDEN2 },
-  {  -SQRT5OVER2,          0.0f,   GOLDENINV2,      GOLDEN2 },
-  {   SQRT5OVER2,          0.0f,   GOLDENINV2,      GOLDEN2 },
+  {  -SQRT5OVER2,          0.0,   GOLDENINV2,      GOLDEN2 },
+  {   SQRT5OVER2,          0.0,   GOLDENINV2,      GOLDEN2 },
   {    -SQRT2INV,        SQRT2,   GOLDENINV2,      GOLDEN2 },
   {     SQRT2INV,        SQRT2,   GOLDENINV2,      GOLDEN2 },
   {       -SQRT2,  -GOLDENINV2,     SQRT2INV,      GOLDEN2 },
@@ -1007,9 +1010,9 @@ static const float vert_120[NUM_VERT_120][4] = {
   {   GOLDENINV2,    -SQRT2INV,        SQRT2,      GOLDEN2 },
   {  -GOLDENINV2,     SQRT2INV,        SQRT2,      GOLDEN2 },
   {   GOLDENINV2,     SQRT2INV,        SQRT2,      GOLDEN2 },
-  {          0.0f,  -GOLDENINV2,   SQRT5OVER2,      GOLDEN2 },
-  {          0.0f,   GOLDENINV2,   SQRT5OVER2,      GOLDEN2 },
-  {          0.0f,          0.0f,       -SQRT2,        SQRT2 },
+  {          0.0,  -GOLDENINV2,   SQRT5OVER2,      GOLDEN2 },
+  {          0.0,   GOLDENINV2,   SQRT5OVER2,      GOLDEN2 },
+  {          0.0,          0.0,       -SQRT2,        SQRT2 },
   {    -SQRT2INV,  -GOLDENINV2,     -GOLDEN2,        SQRT2 },
   {     SQRT2INV,  -GOLDENINV2,     -GOLDEN2,        SQRT2 },
   {    -SQRT2INV,   GOLDENINV2,     -GOLDEN2,        SQRT2 },
@@ -1022,10 +1025,10 @@ static const float vert_120[NUM_VERT_120][4] = {
   {      GOLDEN2,    -SQRT2INV,  -GOLDENINV2,        SQRT2 },
   {     -GOLDEN2,     SQRT2INV,  -GOLDENINV2,        SQRT2 },
   {      GOLDEN2,     SQRT2INV,  -GOLDENINV2,        SQRT2 },
-  {          0.0f,       -SQRT2,          0.0f,        SQRT2 },
-  {       -SQRT2,          0.0f,          0.0f,        SQRT2 },
-  {        SQRT2,          0.0f,          0.0f,        SQRT2 },
-  {          0.0f,        SQRT2,          0.0f,        SQRT2 },
+  {          0.0,       -SQRT2,          0.0,        SQRT2 },
+  {       -SQRT2,          0.0,          0.0,        SQRT2 },
+  {        SQRT2,          0.0,          0.0,        SQRT2 },
+  {          0.0,        SQRT2,          0.0,        SQRT2 },
   {     -GOLDEN2,    -SQRT2INV,   GOLDENINV2,        SQRT2 },
   {      GOLDEN2,    -SQRT2INV,   GOLDENINV2,        SQRT2 },
   {     -GOLDEN2,     SQRT2INV,   GOLDENINV2,        SQRT2 },
@@ -1038,47 +1041,47 @@ static const float vert_120[NUM_VERT_120][4] = {
   {     SQRT2INV,  -GOLDENINV2,      GOLDEN2,        SQRT2 },
   {    -SQRT2INV,   GOLDENINV2,      GOLDEN2,        SQRT2 },
   {     SQRT2INV,   GOLDENINV2,      GOLDEN2,        SQRT2 },
-  {          0.0f,          0.0f,        SQRT2,        SQRT2 },
-  {  -GOLDENINV2,          0.0f,     -GOLDEN2,   SQRT5OVER2 },
-  {   GOLDENINV2,          0.0f,     -GOLDEN2,   SQRT5OVER2 },
+  {          0.0,          0.0,        SQRT2,        SQRT2 },
+  {  -GOLDENINV2,          0.0,     -GOLDEN2,   SQRT5OVER2 },
+  {   GOLDENINV2,          0.0,     -GOLDEN2,   SQRT5OVER2 },
   {    -SQRT2INV,    -SQRT2INV,    -SQRT2INV,   SQRT5OVER2 },
   {     SQRT2INV,    -SQRT2INV,    -SQRT2INV,   SQRT5OVER2 },
   {    -SQRT2INV,     SQRT2INV,    -SQRT2INV,   SQRT5OVER2 },
   {     SQRT2INV,     SQRT2INV,    -SQRT2INV,   SQRT5OVER2 },
-  {          0.0f,     -GOLDEN2,  -GOLDENINV2,   SQRT5OVER2 },
-  {          0.0f,      GOLDEN2,  -GOLDENINV2,   SQRT5OVER2 },
-  {     -GOLDEN2,  -GOLDENINV2,          0.0f,   SQRT5OVER2 },
-  {      GOLDEN2,  -GOLDENINV2,          0.0f,   SQRT5OVER2 },
-  {     -GOLDEN2,   GOLDENINV2,          0.0f,   SQRT5OVER2 },
-  {      GOLDEN2,   GOLDENINV2,          0.0f,   SQRT5OVER2 },
-  {          0.0f,     -GOLDEN2,   GOLDENINV2,   SQRT5OVER2 },
-  {          0.0f,      GOLDEN2,   GOLDENINV2,   SQRT5OVER2 },
+  {          0.0,     -GOLDEN2,  -GOLDENINV2,   SQRT5OVER2 },
+  {          0.0,      GOLDEN2,  -GOLDENINV2,   SQRT5OVER2 },
+  {     -GOLDEN2,  -GOLDENINV2,          0.0,   SQRT5OVER2 },
+  {      GOLDEN2,  -GOLDENINV2,          0.0,   SQRT5OVER2 },
+  {     -GOLDEN2,   GOLDENINV2,          0.0,   SQRT5OVER2 },
+  {      GOLDEN2,   GOLDENINV2,          0.0,   SQRT5OVER2 },
+  {          0.0,     -GOLDEN2,   GOLDENINV2,   SQRT5OVER2 },
+  {          0.0,      GOLDEN2,   GOLDENINV2,   SQRT5OVER2 },
   {    -SQRT2INV,    -SQRT2INV,     SQRT2INV,   SQRT5OVER2 },
   {     SQRT2INV,    -SQRT2INV,     SQRT2INV,   SQRT5OVER2 },
   {    -SQRT2INV,     SQRT2INV,     SQRT2INV,   SQRT5OVER2 },
   {     SQRT2INV,     SQRT2INV,     SQRT2INV,   SQRT5OVER2 },
-  {  -GOLDENINV2,          0.0f,      GOLDEN2,   SQRT5OVER2 },
-  {   GOLDENINV2,          0.0f,      GOLDEN2,   SQRT5OVER2 },
-  { -GOLDENINV22,          0.0f,    -SQRT2INV,     GOLDEN22 },
-  {  GOLDENINV22,          0.0f,    -SQRT2INV,     GOLDEN22 },
+  {  -GOLDENINV2,          0.0,      GOLDEN2,   SQRT5OVER2 },
+  {   GOLDENINV2,          0.0,      GOLDEN2,   SQRT5OVER2 },
+  { -GOLDENINV22,          0.0,    -SQRT2INV,     GOLDEN22 },
+  {  GOLDENINV22,          0.0,    -SQRT2INV,     GOLDEN22 },
   {  -GOLDENINV2,  -GOLDENINV2,  -GOLDENINV2,     GOLDEN22 },
   {   GOLDENINV2,  -GOLDENINV2,  -GOLDENINV2,     GOLDEN22 },
   {  -GOLDENINV2,   GOLDENINV2,  -GOLDENINV2,     GOLDEN22 },
   {   GOLDENINV2,   GOLDENINV2,  -GOLDENINV2,     GOLDEN22 },
-  {          0.0f,    -SQRT2INV, -GOLDENINV22,     GOLDEN22 },
-  {          0.0f,     SQRT2INV, -GOLDENINV22,     GOLDEN22 },
-  {    -SQRT2INV, -GOLDENINV22,          0.0f,     GOLDEN22 },
-  {     SQRT2INV, -GOLDENINV22,          0.0f,     GOLDEN22 },
-  {    -SQRT2INV,  GOLDENINV22,          0.0f,     GOLDEN22 },
-  {     SQRT2INV,  GOLDENINV22,          0.0f,     GOLDEN22 },
-  {          0.0f,    -SQRT2INV,  GOLDENINV22,     GOLDEN22 },
-  {          0.0f,     SQRT2INV,  GOLDENINV22,     GOLDEN22 },
+  {          0.0,    -SQRT2INV, -GOLDENINV22,     GOLDEN22 },
+  {          0.0,     SQRT2INV, -GOLDENINV22,     GOLDEN22 },
+  {    -SQRT2INV, -GOLDENINV22,          0.0,     GOLDEN22 },
+  {     SQRT2INV, -GOLDENINV22,          0.0,     GOLDEN22 },
+  {    -SQRT2INV,  GOLDENINV22,          0.0,     GOLDEN22 },
+  {     SQRT2INV,  GOLDENINV22,          0.0,     GOLDEN22 },
+  {          0.0,    -SQRT2INV,  GOLDENINV22,     GOLDEN22 },
+  {          0.0,     SQRT2INV,  GOLDENINV22,     GOLDEN22 },
   {  -GOLDENINV2,  -GOLDENINV2,   GOLDENINV2,     GOLDEN22 },
   {   GOLDENINV2,  -GOLDENINV2,   GOLDENINV2,     GOLDEN22 },
   {  -GOLDENINV2,   GOLDENINV2,   GOLDENINV2,     GOLDEN22 },
   {   GOLDENINV2,   GOLDENINV2,   GOLDENINV2,     GOLDEN22 },
-  { -GOLDENINV22,          0.0f,     SQRT2INV,     GOLDEN22 },
-  {  GOLDENINV22,          0.0f,     SQRT2INV,     GOLDEN22 }
+  { -GOLDENINV22,          0.0,     SQRT2INV,     GOLDEN22 },
+  {  GOLDENINV22,          0.0,     SQRT2INV,     GOLDEN22 }
 };
 
 static const int edge_120[NUM_EDGE_120][2] = {
@@ -1110,103 +1113,103 @@ static const int edge_120[NUM_EDGE_120][2] = {
   {  47,  92 }, {  48,  83 }, {  48,  93 }, {  49,  84 }, {  49,  94 },
   {  50,  85 }, {  50,  95 }, {  51,  86 }, {  51,  96 }, {  52,  87 },
   {  52,  97 }, {  53,  98 }, {  53,  99 }, {  54,  90 }, {  54, 108 },
-  {  55,  91 }, {  55, 109 }, {  56, 1 }, {  56, 101 }, {  57, 102 },
+  {  55,  91 }, {  55, 109 }, {  56, 100 }, {  56, 101 }, {  57, 102 },
   {  57, 112 }, {  58, 103 }, {  58, 113 }, {  59, 104 }, {  59, 114 },
   {  60, 105 }, {  60, 115 }, {  61, 106 }, {  61, 116 }, {  62, 107 },
-  {  62, 117 }, {  63, 1 }, {  63, 122 }, {  64, 111 }, {  64, 123 },
-  {  65, 118 }, {  65, 124 }, {  66, 119 }, {  66, 125 }, {  67, 1 },
+  {  62, 117 }, {  63, 110 }, {  63, 122 }, {  64, 111 }, {  64, 123 },
+  {  65, 118 }, {  65, 124 }, {  66, 119 }, {  66, 125 }, {  67, 120 },
   {  67, 126 }, {  68, 121 }, {  68, 127 }, {  69, 128 }, {  69, 129 },
-  {  70,  72 }, {  70,  73 }, {  70, 1 }, {  71,  74 }, {  71,  75 },
+  {  70,  72 }, {  70,  73 }, {  70, 130 }, {  71,  74 }, {  71,  75 },
   {  71, 131 }, {  72,  76 }, {  72, 132 }, {  73,  77 }, {  73, 133 },
   {  74,  82 }, {  74, 134 }, {  75,  83 }, {  75, 135 }, {  76,  77 },
-  {  76, 1 }, {  77, 141 }, {  78,  80 }, {  78,  84 }, {  78, 136 },
+  {  76, 140 }, {  77, 141 }, {  78,  80 }, {  78,  84 }, {  78, 136 },
   {  79,  81 }, {  79,  85 }, {  79, 137 }, {  80,  86 }, {  80, 138 },
   {  81,  87 }, {  81, 139 }, {  82,  83 }, {  82, 142 }, {  83, 143 },
   {  84,  90 }, {  84, 146 }, {  85,  91 }, {  85, 147 }, {  86,  90 },
   {  86, 148 }, {  87,  91 }, {  87, 149 }, {  88,  94 }, {  88,  98 },
   {  88, 144 }, {  89,  95 }, {  89,  99 }, {  89, 145 }, {  90, 156 },
-  {  91, 157 }, {  92,  96 }, {  92, 1 }, {  92, 1 }, {  93,  97 },
+  {  91, 157 }, {  92,  96 }, {  92, 100 }, {  92, 150 }, {  93,  97 },
   {  93, 101 }, {  93, 151 }, {  94, 102 }, {  94, 152 }, {  95, 103 },
   {  95, 153 }, {  96, 104 }, {  96, 154 }, {  97, 105 }, {  97, 155 },
-  {  98, 106 }, {  98, 158 }, {  99, 107 }, {  99, 159 }, { 1, 1 },
-  { 1, 1 }, { 101, 111 }, { 101, 161 }, { 102, 106 }, { 102, 164 },
-  { 103, 107 }, { 103, 165 }, { 104, 1 }, { 104, 166 }, { 105, 111 },
+  {  98, 106 }, {  98, 158 }, {  99, 107 }, {  99, 159 }, { 100, 110 },
+  { 100, 160 }, { 101, 111 }, { 101, 161 }, { 102, 106 }, { 102, 164 },
+  { 103, 107 }, { 103, 165 }, { 104, 110 }, { 104, 166 }, { 105, 111 },
   { 105, 167 }, { 106, 168 }, { 107, 169 }, { 108, 112 }, { 108, 114 },
-  { 108, 162 }, { 109, 113 }, { 109, 115 }, { 109, 163 }, { 1, 174 },
-  { 111, 175 }, { 112, 118 }, { 112, 1 }, { 113, 119 }, { 113, 171 },
-  { 114, 1 }, { 114, 172 }, { 115, 121 }, { 115, 173 }, { 116, 117 },
-  { 116, 124 }, { 116, 176 }, { 117, 125 }, { 117, 177 }, { 118, 1 },
-  { 118, 1 }, { 119, 121 }, { 119, 181 }, { 1, 182 }, { 121, 183 },
+  { 108, 162 }, { 109, 113 }, { 109, 115 }, { 109, 163 }, { 110, 174 },
+  { 111, 175 }, { 112, 118 }, { 112, 170 }, { 113, 119 }, { 113, 171 },
+  { 114, 120 }, { 114, 172 }, { 115, 121 }, { 115, 173 }, { 116, 117 },
+  { 116, 124 }, { 116, 176 }, { 117, 125 }, { 117, 177 }, { 118, 120 },
+  { 118, 180 }, { 119, 121 }, { 119, 181 }, { 120, 182 }, { 121, 183 },
   { 122, 123 }, { 122, 126 }, { 122, 178 }, { 123, 127 }, { 123, 179 },
   { 124, 128 }, { 124, 184 }, { 125, 128 }, { 125, 185 }, { 126, 129 },
   { 126, 186 }, { 127, 129 }, { 127, 187 }, { 128, 188 }, { 129, 189 },
-  { 1, 131 }, { 1, 1 }, { 1, 191 }, { 131, 192 }, { 131, 193 },
-  { 132, 136 }, { 132, 1 }, { 132, 196 }, { 133, 137 }, { 133, 191 },
+  { 130, 131 }, { 130, 190 }, { 130, 191 }, { 131, 192 }, { 131, 193 },
+  { 132, 136 }, { 132, 190 }, { 132, 196 }, { 133, 137 }, { 133, 191 },
   { 133, 197 }, { 134, 138 }, { 134, 192 }, { 134, 198 }, { 135, 139 },
   { 135, 193 }, { 135, 199 }, { 136, 194 }, { 136, 201 }, { 137, 195 },
   { 137, 202 }, { 138, 194 }, { 138, 203 }, { 139, 195 }, { 139, 204 },
-  { 1, 144 }, { 1, 196 }, { 1, 2 }, { 141, 145 }, { 141, 197 },
-  { 141, 2 }, { 142, 1 }, { 142, 198 }, { 142, 205 }, { 143, 151 },
-  { 143, 199 }, { 143, 205 }, { 144, 206 }, { 144, 2 }, { 145, 207 },
+  { 140, 144 }, { 140, 196 }, { 140, 200 }, { 141, 145 }, { 141, 197 },
+  { 141, 200 }, { 142, 150 }, { 142, 198 }, { 142, 205 }, { 143, 151 },
+  { 143, 199 }, { 143, 205 }, { 144, 206 }, { 144, 210 }, { 145, 207 },
   { 145, 211 }, { 146, 152 }, { 146, 201 }, { 146, 212 }, { 147, 153 },
   { 147, 202 }, { 147, 213 }, { 148, 154 }, { 148, 203 }, { 148, 214 },
-  { 149, 155 }, { 149, 204 }, { 149, 215 }, { 1, 208 }, { 1, 216 },
+  { 149, 155 }, { 149, 204 }, { 149, 215 }, { 150, 208 }, { 150, 216 },
   { 151, 209 }, { 151, 217 }, { 152, 206 }, { 152, 218 }, { 153, 207 },
-  { 153, 219 }, { 154, 208 }, { 154, 2 }, { 155, 209 }, { 155, 221 },
+  { 153, 219 }, { 154, 208 }, { 154, 220 }, { 155, 209 }, { 155, 221 },
   { 156, 162 }, { 156, 212 }, { 156, 214 }, { 157, 163 }, { 157, 213 },
-  { 157, 215 }, { 158, 159 }, { 158, 2 }, { 158, 222 }, { 159, 211 },
-  { 159, 223 }, { 1, 161 }, { 1, 216 }, { 1, 228 }, { 161, 217 },
+  { 157, 215 }, { 158, 159 }, { 158, 210 }, { 158, 222 }, { 159, 211 },
+  { 159, 223 }, { 160, 161 }, { 160, 216 }, { 160, 228 }, { 161, 217 },
   { 161, 229 }, { 162, 224 }, { 162, 226 }, { 163, 225 }, { 163, 227 },
-  { 164, 1 }, { 164, 218 }, { 164, 2 }, { 165, 171 }, { 165, 219 },
-  { 165, 231 }, { 166, 172 }, { 166, 2 }, { 166, 232 }, { 167, 173 },
-  { 167, 221 }, { 167, 233 }, { 168, 176 }, { 168, 222 }, { 168, 2 },
-  { 169, 177 }, { 169, 223 }, { 169, 231 }, { 1, 224 }, { 1, 235 },
+  { 164, 170 }, { 164, 218 }, { 164, 230 }, { 165, 171 }, { 165, 219 },
+  { 165, 231 }, { 166, 172 }, { 166, 220 }, { 166, 232 }, { 167, 173 },
+  { 167, 221 }, { 167, 233 }, { 168, 176 }, { 168, 222 }, { 168, 230 },
+  { 169, 177 }, { 169, 223 }, { 169, 231 }, { 170, 224 }, { 170, 235 },
   { 171, 225 }, { 171, 236 }, { 172, 226 }, { 172, 237 }, { 173, 227 },
   { 173, 238 }, { 174, 178 }, { 174, 228 }, { 174, 232 }, { 175, 179 },
-  { 175, 229 }, { 175, 233 }, { 176, 234 }, { 176, 2 }, { 177, 234 },
+  { 175, 229 }, { 175, 233 }, { 176, 234 }, { 176, 240 }, { 177, 234 },
   { 177, 241 }, { 178, 239 }, { 178, 242 }, { 179, 239 }, { 179, 243 },
-  { 1, 184 }, { 1, 235 }, { 1, 244 }, { 181, 185 }, { 181, 236 },
+  { 180, 184 }, { 180, 235 }, { 180, 244 }, { 181, 185 }, { 181, 236 },
   { 181, 245 }, { 182, 186 }, { 182, 237 }, { 182, 244 }, { 183, 187 },
-  { 183, 238 }, { 183, 245 }, { 184, 2 }, { 184, 246 }, { 185, 241 },
+  { 183, 238 }, { 183, 245 }, { 184, 240 }, { 184, 246 }, { 185, 241 },
   { 185, 247 }, { 186, 242 }, { 186, 248 }, { 187, 243 }, { 187, 249 },
   { 188, 189 }, { 188, 246 }, { 188, 247 }, { 189, 248 }, { 189, 249 },
-  { 1, 2 }, { 1, 2 }, { 191, 251 }, { 191, 271 }, { 192, 2 },
-  { 192, 272 }, { 193, 251 }, { 193, 273 }, { 194, 2 }, { 194, 279 },
-  { 195, 251 }, { 195, 2 }, { 196, 252 }, { 196, 274 }, { 197, 253 },
+  { 190, 250 }, { 190, 270 }, { 191, 251 }, { 191, 271 }, { 192, 250 },
+  { 192, 272 }, { 193, 251 }, { 193, 273 }, { 194, 250 }, { 194, 279 },
+  { 195, 251 }, { 195, 280 }, { 196, 252 }, { 196, 274 }, { 197, 253 },
   { 197, 275 }, { 198, 254 }, { 198, 276 }, { 199, 255 }, { 199, 277 },
-  { 2, 256 }, { 2, 278 }, { 201, 252 }, { 201, 282 }, { 202, 253 },
+  { 200, 256 }, { 200, 278 }, { 201, 252 }, { 201, 282 }, { 202, 253 },
   { 202, 283 }, { 203, 254 }, { 203, 284 }, { 204, 255 }, { 204, 285 },
-  { 205, 257 }, { 205, 281 }, { 206, 252 }, { 206, 2 }, { 207, 253 },
+  { 205, 257 }, { 205, 281 }, { 206, 252 }, { 206, 290 }, { 207, 253 },
   { 207, 291 }, { 208, 254 }, { 208, 292 }, { 209, 255 }, { 209, 293 },
-  { 2, 256 }, { 2, 294 }, { 211, 256 }, { 211, 295 }, { 212, 258 },
-  { 212, 286 }, { 213, 259 }, { 213, 287 }, { 214, 2 }, { 214, 288 },
+  { 210, 256 }, { 210, 294 }, { 211, 256 }, { 211, 295 }, { 212, 258 },
+  { 212, 286 }, { 213, 259 }, { 213, 287 }, { 214, 260 }, { 214, 288 },
   { 215, 261 }, { 215, 289 }, { 216, 257 }, { 216, 296 }, { 217, 257 },
   { 217, 297 }, { 218, 258 }, { 218, 298 }, { 219, 259 }, { 219, 299 },
-  { 2, 2 }, { 2, 300 }, { 221, 261 }, { 221, 301 }, { 222, 262 },
+  { 220, 260 }, { 220, 300 }, { 221, 261 }, { 221, 301 }, { 222, 262 },
   { 222, 302 }, { 223, 262 }, { 223, 303 }, { 224, 258 }, { 224, 310 },
-  { 225, 259 }, { 225, 311 }, { 226, 2 }, { 226, 312 }, { 227, 261 },
+  { 225, 259 }, { 225, 311 }, { 226, 260 }, { 226, 312 }, { 227, 261 },
   { 227, 313 }, { 228, 263 }, { 228, 304 }, { 229, 263 }, { 229, 305 },
-  { 2, 264 }, { 2, 306 }, { 231, 265 }, { 231, 307 }, { 232, 266 },
+  { 230, 264 }, { 230, 306 }, { 231, 265 }, { 231, 307 }, { 232, 266 },
   { 232, 308 }, { 233, 267 }, { 233, 309 }, { 234, 262 }, { 234, 318 },
   { 235, 264 }, { 235, 314 }, { 236, 265 }, { 236, 315 }, { 237, 266 },
   { 237, 316 }, { 238, 267 }, { 238, 317 }, { 239, 263 }, { 239, 321 },
-  { 2, 264 }, { 2, 322 }, { 241, 265 }, { 241, 323 }, { 242, 266 },
+  { 240, 264 }, { 240, 322 }, { 241, 265 }, { 241, 323 }, { 242, 266 },
   { 242, 324 }, { 243, 267 }, { 243, 325 }, { 244, 268 }, { 244, 319 },
   { 245, 269 }, { 245, 320 }, { 246, 268 }, { 246, 326 }, { 247, 269 },
   { 247, 327 }, { 248, 268 }, { 248, 328 }, { 249, 269 }, { 249, 329 },
-  { 2, 330 }, { 251, 331 }, { 252, 332 }, { 253, 333 }, { 254, 334 },
+  { 250, 330 }, { 251, 331 }, { 252, 332 }, { 253, 333 }, { 254, 334 },
   { 255, 335 }, { 256, 336 }, { 257, 337 }, { 258, 338 }, { 259, 339 },
-  { 2, 340 }, { 261, 341 }, { 262, 342 }, { 263, 343 }, { 264, 344 },
+  { 260, 340 }, { 261, 341 }, { 262, 342 }, { 263, 343 }, { 264, 344 },
   { 265, 345 }, { 266, 346 }, { 267, 347 }, { 268, 348 }, { 269, 349 },
-  { 2, 271 }, { 2, 274 }, { 2, 350 }, { 271, 275 }, { 271, 351 },
+  { 270, 271 }, { 270, 274 }, { 270, 350 }, { 271, 275 }, { 271, 351 },
   { 272, 273 }, { 272, 276 }, { 272, 352 }, { 273, 277 }, { 273, 353 },
   { 274, 278 }, { 274, 356 }, { 275, 278 }, { 275, 357 }, { 276, 281 },
   { 276, 358 }, { 277, 281 }, { 277, 359 }, { 278, 360 }, { 279, 282 },
-  { 279, 284 }, { 279, 354 }, { 2, 283 }, { 2, 285 }, { 2, 355 },
+  { 279, 284 }, { 279, 354 }, { 280, 283 }, { 280, 285 }, { 280, 355 },
   { 281, 365 }, { 282, 286 }, { 282, 361 }, { 283, 287 }, { 283, 362 },
   { 284, 288 }, { 284, 363 }, { 285, 289 }, { 285, 364 }, { 286, 288 },
   { 286, 372 }, { 287, 289 }, { 287, 373 }, { 288, 374 }, { 289, 375 },
-  { 2, 294 }, { 2, 298 }, { 2, 366 }, { 291, 295 }, { 291, 299 },
+  { 290, 294 }, { 290, 298 }, { 290, 366 }, { 291, 295 }, { 291, 299 },
   { 291, 367 }, { 292, 296 }, { 292, 300 }, { 292, 368 }, { 293, 297 },
   { 293, 301 }, { 293, 369 }, { 294, 302 }, { 294, 370 }, { 295, 303 },
   { 295, 371 }, { 296, 304 }, { 296, 376 }, { 297, 305 }, { 297, 377 },
@@ -1357,7 +1360,7 @@ static const int face_120[NUM_FACE_120][VERT_PER_FACE_120] = {
   {  25,  44,  81,  87,  52 }, {  25,  48,  93,  97,  52 },
   {  26,  45,  76,  77,  46 }, {  26,  45,  88,  98,  53 },
   {  26,  46,  89,  99,  53 }, {  27,  47,  82,  83,  48 },
-  {  27,  47,  92, 1,  56 }, {  27,  48,  93, 101,  56 },
+  {  27,  47,  92, 100,  56 }, {  27,  48,  93, 101,  56 },
   {  28,  49,  84,  90,  54 }, {  28,  49,  94, 102,  57 },
   {  28,  54, 108, 112,  57 }, {  29,  50,  85,  91,  55 },
   {  29,  50,  95, 103,  58 }, {  29,  55, 109, 113,  58 },
@@ -1365,38 +1368,38 @@ static const int face_120[NUM_FACE_120][VERT_PER_FACE_120] = {
   {  30,  54, 108, 114,  59 }, {  31,  52,  87,  91,  55 },
   {  31,  52,  97, 105,  60 }, {  31,  55, 109, 115,  60 },
   {  32,  53,  98, 106,  61 }, {  32,  53,  99, 107,  62 },
-  {  32,  61, 116, 117,  62 }, {  33,  56, 1, 1,  63 },
+  {  32,  61, 116, 117,  62 }, {  33,  56, 100, 110,  63 },
   {  33,  56, 101, 111,  64 }, {  33,  63, 122, 123,  64 },
   {  34,  57, 102, 106,  61 }, {  34,  57, 112, 118,  65 },
   {  34,  61, 116, 124,  65 }, {  35,  58, 103, 107,  62 },
   {  35,  58, 113, 119,  66 }, {  35,  62, 117, 125,  66 },
-  {  36,  59, 104, 1,  63 }, {  36,  59, 114, 1,  67 },
+  {  36,  59, 104, 110,  63 }, {  36,  59, 114, 120,  67 },
   {  36,  63, 122, 126,  67 }, {  37,  60, 105, 111,  64 },
   {  37,  60, 115, 121,  68 }, {  37,  64, 123, 127,  68 },
-  {  38,  65, 118, 1,  67 }, {  38,  65, 124, 128,  69 },
+  {  38,  65, 118, 120,  67 }, {  38,  65, 124, 128,  69 },
   {  38,  67, 126, 129,  69 }, {  39,  66, 119, 121,  68 },
   {  39,  66, 125, 128,  69 }, {  39,  68, 127, 129,  69 },
-  {  40,  70, 1, 131,  71 }, {  41,  72, 132, 136,  78 },
+  {  40,  70, 130, 131,  71 }, {  41,  72, 132, 136,  78 },
   {  42,  73, 133, 137,  79 }, {  43,  74, 134, 138,  80 },
-  {  44,  75, 135, 139,  81 }, {  45,  76, 1, 144,  88 },
-  {  46,  77, 141, 145,  89 }, {  47,  82, 142, 1,  92 },
+  {  44,  75, 135, 139,  81 }, {  45,  76, 140, 144,  88 },
+  {  46,  77, 141, 145,  89 }, {  47,  82, 142, 150,  92 },
   {  48,  83, 143, 151,  93 }, {  49,  84, 146, 152,  94 },
   {  50,  85, 147, 153,  95 }, {  51,  86, 148, 154,  96 },
   {  52,  87, 149, 155,  97 }, {  53,  98, 158, 159,  99 },
   {  54,  90, 156, 162, 108 }, {  55,  91, 157, 163, 109 },
-  {  56, 1, 1, 161, 101 }, {  57, 102, 164, 1, 112 },
+  {  56, 100, 160, 161, 101 }, {  57, 102, 164, 170, 112 },
   {  58, 103, 165, 171, 113 }, {  59, 104, 166, 172, 114 },
   {  60, 105, 167, 173, 115 }, {  61, 106, 168, 176, 116 },
-  {  62, 107, 169, 177, 117 }, {  63, 1, 174, 178, 122 },
-  {  64, 111, 175, 179, 123 }, {  65, 118, 1, 184, 124 },
-  {  66, 119, 181, 185, 125 }, {  67, 1, 182, 186, 126 },
+  {  62, 107, 169, 177, 117 }, {  63, 110, 174, 178, 122 },
+  {  64, 111, 175, 179, 123 }, {  65, 118, 180, 184, 124 },
+  {  66, 119, 181, 185, 125 }, {  67, 120, 182, 186, 126 },
   {  68, 121, 183, 187, 127 }, {  69, 128, 188, 189, 129 },
-  {  70,  72,  76,  77,  73 }, {  70,  72, 132, 1, 1 },
-  {  70,  73, 133, 191, 1 }, {  71,  74,  82,  83,  75 },
+  {  70,  72,  76,  77,  73 }, {  70,  72, 132, 190, 130 },
+  {  70,  73, 133, 191, 130 }, {  71,  74,  82,  83,  75 },
   {  71,  74, 134, 192, 131 }, {  71,  75, 135, 193, 131 },
-  {  72,  76, 1, 196, 132 }, {  73,  77, 141, 197, 133 },
+  {  72,  76, 140, 196, 132 }, {  73,  77, 141, 197, 133 },
   {  74,  82, 142, 198, 134 }, {  75,  83, 143, 199, 135 },
-  {  76,  77, 141, 2, 1 }, {  78,  80,  86,  90,  84 },
+  {  76,  77, 141, 200, 140 }, {  78,  80,  86,  90,  84 },
   {  78,  80, 138, 194, 136 }, {  78,  84, 146, 201, 136 },
   {  79,  81,  87,  91,  85 }, {  79,  81, 139, 195, 137 },
   {  79,  85, 147, 202, 137 }, {  80,  86, 148, 203, 138 },
@@ -1404,133 +1407,133 @@ static const int face_120[NUM_FACE_120][VERT_PER_FACE_120] = {
   {  84,  90, 156, 212, 146 }, {  85,  91, 157, 213, 147 },
   {  86,  90, 156, 214, 148 }, {  87,  91, 157, 215, 149 },
   {  88,  94, 102, 106,  98 }, {  88,  94, 152, 206, 144 },
-  {  88,  98, 158, 2, 144 }, {  89,  95, 103, 107,  99 },
+  {  88,  98, 158, 210, 144 }, {  89,  95, 103, 107,  99 },
   {  89,  95, 153, 207, 145 }, {  89,  99, 159, 211, 145 },
-  {  92,  96, 104, 1, 1 }, {  92,  96, 154, 208, 1 },
-  {  92, 1, 1, 216, 1 }, {  93,  97, 105, 111, 101 },
+  {  92,  96, 104, 110, 100 }, {  92,  96, 154, 208, 150 },
+  {  92, 100, 160, 216, 150 }, {  93,  97, 105, 111, 101 },
   {  93,  97, 155, 209, 151 }, {  93, 101, 161, 217, 151 },
   {  94, 102, 164, 218, 152 }, {  95, 103, 165, 219, 153 },
-  {  96, 104, 166, 2, 154 }, {  97, 105, 167, 221, 155 },
+  {  96, 104, 166, 220, 154 }, {  97, 105, 167, 221, 155 },
   {  98, 106, 168, 222, 158 }, {  99, 107, 169, 223, 159 },
-  { 1, 1, 174, 228, 1 }, { 101, 111, 175, 229, 161 },
-  { 102, 106, 168, 2, 164 }, { 103, 107, 169, 231, 165 },
-  { 104, 1, 174, 232, 166 }, { 105, 111, 175, 233, 167 },
-  { 108, 112, 118, 1, 114 }, { 108, 112, 1, 224, 162 },
+  { 100, 110, 174, 228, 160 }, { 101, 111, 175, 229, 161 },
+  { 102, 106, 168, 230, 164 }, { 103, 107, 169, 231, 165 },
+  { 104, 110, 174, 232, 166 }, { 105, 111, 175, 233, 167 },
+  { 108, 112, 118, 120, 114 }, { 108, 112, 170, 224, 162 },
   { 108, 114, 172, 226, 162 }, { 109, 113, 119, 121, 115 },
   { 109, 113, 171, 225, 163 }, { 109, 115, 173, 227, 163 },
-  { 112, 118, 1, 235, 1 }, { 113, 119, 181, 236, 171 },
-  { 114, 1, 182, 237, 172 }, { 115, 121, 183, 238, 173 },
+  { 112, 118, 180, 235, 170 }, { 113, 119, 181, 236, 171 },
+  { 114, 120, 182, 237, 172 }, { 115, 121, 183, 238, 173 },
   { 116, 117, 125, 128, 124 }, { 116, 117, 177, 234, 176 },
-  { 116, 124, 184, 2, 176 }, { 117, 125, 185, 241, 177 },
-  { 118, 1, 182, 244, 1 }, { 119, 121, 183, 245, 181 },
+  { 116, 124, 184, 240, 176 }, { 117, 125, 185, 241, 177 },
+  { 118, 120, 182, 244, 180 }, { 119, 121, 183, 245, 181 },
   { 122, 123, 127, 129, 126 }, { 122, 123, 179, 239, 178 },
   { 122, 126, 186, 242, 178 }, { 123, 127, 187, 243, 179 },
   { 124, 128, 188, 246, 184 }, { 125, 128, 188, 247, 185 },
   { 126, 129, 189, 248, 186 }, { 127, 129, 189, 249, 187 },
-  { 1, 131, 192, 2, 1 }, { 1, 131, 193, 251, 191 },
-  { 1, 1, 2, 271, 191 }, { 131, 192, 272, 273, 193 },
-  { 132, 136, 194, 2, 1 }, { 132, 136, 201, 252, 196 },
-  { 132, 1, 2, 274, 196 }, { 133, 137, 195, 251, 191 },
+  { 130, 131, 192, 250, 190 }, { 130, 131, 193, 251, 191 },
+  { 130, 190, 270, 271, 191 }, { 131, 192, 272, 273, 193 },
+  { 132, 136, 194, 250, 190 }, { 132, 136, 201, 252, 196 },
+  { 132, 190, 270, 274, 196 }, { 133, 137, 195, 251, 191 },
   { 133, 137, 202, 253, 197 }, { 133, 191, 271, 275, 197 },
-  { 134, 138, 194, 2, 192 }, { 134, 138, 203, 254, 198 },
+  { 134, 138, 194, 250, 192 }, { 134, 138, 203, 254, 198 },
   { 134, 192, 272, 276, 198 }, { 135, 139, 195, 251, 193 },
   { 135, 139, 204, 255, 199 }, { 135, 193, 273, 277, 199 },
-  { 136, 194, 279, 282, 201 }, { 137, 195, 2, 283, 202 },
-  { 138, 194, 279, 284, 203 }, { 139, 195, 2, 285, 204 },
-  { 1, 144, 206, 252, 196 }, { 1, 144, 2, 256, 2 },
-  { 1, 196, 274, 278, 2 }, { 141, 145, 207, 253, 197 },
-  { 141, 145, 211, 256, 2 }, { 141, 197, 275, 278, 2 },
-  { 142, 1, 208, 254, 198 }, { 142, 1, 216, 257, 205 },
+  { 136, 194, 279, 282, 201 }, { 137, 195, 280, 283, 202 },
+  { 138, 194, 279, 284, 203 }, { 139, 195, 280, 285, 204 },
+  { 140, 144, 206, 252, 196 }, { 140, 144, 210, 256, 200 },
+  { 140, 196, 274, 278, 200 }, { 141, 145, 207, 253, 197 },
+  { 141, 145, 211, 256, 200 }, { 141, 197, 275, 278, 200 },
+  { 142, 150, 208, 254, 198 }, { 142, 150, 216, 257, 205 },
   { 142, 198, 276, 281, 205 }, { 143, 151, 209, 255, 199 },
   { 143, 151, 217, 257, 205 }, { 143, 199, 277, 281, 205 },
-  { 144, 206, 2, 294, 2 }, { 145, 207, 291, 295, 211 },
+  { 144, 206, 290, 294, 210 }, { 145, 207, 291, 295, 211 },
   { 146, 152, 206, 252, 201 }, { 146, 152, 218, 258, 212 },
   { 146, 201, 282, 286, 212 }, { 147, 153, 207, 253, 202 },
   { 147, 153, 219, 259, 213 }, { 147, 202, 283, 287, 213 },
-  { 148, 154, 208, 254, 203 }, { 148, 154, 2, 2, 214 },
+  { 148, 154, 208, 254, 203 }, { 148, 154, 220, 260, 214 },
   { 148, 203, 284, 288, 214 }, { 149, 155, 209, 255, 204 },
   { 149, 155, 221, 261, 215 }, { 149, 204, 285, 289, 215 },
-  { 1, 208, 292, 296, 216 }, { 151, 209, 293, 297, 217 },
-  { 152, 206, 2, 298, 218 }, { 153, 207, 291, 299, 219 },
-  { 154, 208, 292, 300, 2 }, { 155, 209, 293, 301, 221 },
-  { 156, 162, 224, 258, 212 }, { 156, 162, 226, 2, 214 },
+  { 150, 208, 292, 296, 216 }, { 151, 209, 293, 297, 217 },
+  { 152, 206, 290, 298, 218 }, { 153, 207, 291, 299, 219 },
+  { 154, 208, 292, 300, 220 }, { 155, 209, 293, 301, 221 },
+  { 156, 162, 224, 258, 212 }, { 156, 162, 226, 260, 214 },
   { 156, 212, 286, 288, 214 }, { 157, 163, 225, 259, 213 },
   { 157, 163, 227, 261, 215 }, { 157, 213, 287, 289, 215 },
-  { 158, 159, 211, 256, 2 }, { 158, 159, 223, 262, 222 },
-  { 158, 2, 294, 302, 222 }, { 159, 211, 295, 303, 223 },
-  { 1, 161, 217, 257, 216 }, { 1, 161, 229, 263, 228 },
-  { 1, 216, 296, 304, 228 }, { 161, 217, 297, 305, 229 },
+  { 158, 159, 211, 256, 210 }, { 158, 159, 223, 262, 222 },
+  { 158, 210, 294, 302, 222 }, { 159, 211, 295, 303, 223 },
+  { 160, 161, 217, 257, 216 }, { 160, 161, 229, 263, 228 },
+  { 160, 216, 296, 304, 228 }, { 161, 217, 297, 305, 229 },
   { 162, 224, 310, 312, 226 }, { 163, 225, 311, 313, 227 },
-  { 164, 1, 224, 258, 218 }, { 164, 1, 235, 264, 2 },
-  { 164, 218, 298, 306, 2 }, { 165, 171, 225, 259, 219 },
+  { 164, 170, 224, 258, 218 }, { 164, 170, 235, 264, 230 },
+  { 164, 218, 298, 306, 230 }, { 165, 171, 225, 259, 219 },
   { 165, 171, 236, 265, 231 }, { 165, 219, 299, 307, 231 },
-  { 166, 172, 226, 2, 2 }, { 166, 172, 237, 266, 232 },
-  { 166, 2, 300, 308, 232 }, { 167, 173, 227, 261, 221 },
+  { 166, 172, 226, 260, 220 }, { 166, 172, 237, 266, 232 },
+  { 166, 220, 300, 308, 232 }, { 167, 173, 227, 261, 221 },
   { 167, 173, 238, 267, 233 }, { 167, 221, 301, 309, 233 },
-  { 168, 176, 234, 262, 222 }, { 168, 176, 2, 264, 2 },
-  { 168, 222, 302, 306, 2 }, { 169, 177, 234, 262, 223 },
+  { 168, 176, 234, 262, 222 }, { 168, 176, 240, 264, 230 },
+  { 168, 222, 302, 306, 230 }, { 169, 177, 234, 262, 223 },
   { 169, 177, 241, 265, 231 }, { 169, 223, 303, 307, 231 },
-  { 1, 224, 310, 314, 235 }, { 171, 225, 311, 315, 236 },
+  { 170, 224, 310, 314, 235 }, { 171, 225, 311, 315, 236 },
   { 172, 226, 312, 316, 237 }, { 173, 227, 313, 317, 238 },
   { 174, 178, 239, 263, 228 }, { 174, 178, 242, 266, 232 },
   { 174, 228, 304, 308, 232 }, { 175, 179, 239, 263, 229 },
   { 175, 179, 243, 267, 233 }, { 175, 229, 305, 309, 233 },
-  { 176, 234, 318, 322, 2 }, { 177, 234, 318, 323, 241 },
+  { 176, 234, 318, 322, 240 }, { 177, 234, 318, 323, 241 },
   { 178, 239, 321, 324, 242 }, { 179, 239, 321, 325, 243 },
-  { 1, 184, 2, 264, 235 }, { 1, 184, 246, 268, 244 },
-  { 1, 235, 314, 319, 244 }, { 181, 185, 241, 265, 236 },
+  { 180, 184, 240, 264, 235 }, { 180, 184, 246, 268, 244 },
+  { 180, 235, 314, 319, 244 }, { 181, 185, 241, 265, 236 },
   { 181, 185, 247, 269, 245 }, { 181, 236, 315, 320, 245 },
   { 182, 186, 242, 266, 237 }, { 182, 186, 248, 268, 244 },
   { 182, 237, 316, 319, 244 }, { 183, 187, 243, 267, 238 },
   { 183, 187, 249, 269, 245 }, { 183, 238, 317, 320, 245 },
-  { 184, 2, 322, 326, 246 }, { 185, 241, 323, 327, 247 },
+  { 184, 240, 322, 326, 246 }, { 185, 241, 323, 327, 247 },
   { 186, 242, 324, 328, 248 }, { 187, 243, 325, 329, 249 },
   { 188, 189, 248, 268, 246 }, { 188, 189, 249, 269, 247 },
   { 188, 246, 326, 327, 247 }, { 189, 248, 328, 329, 249 },
-  { 1, 2, 330, 350, 2 }, { 191, 251, 331, 351, 271 },
-  { 192, 2, 330, 352, 272 }, { 193, 251, 331, 353, 273 },
-  { 194, 2, 330, 354, 279 }, { 195, 251, 331, 355, 2 },
+  { 190, 250, 330, 350, 270 }, { 191, 251, 331, 351, 271 },
+  { 192, 250, 330, 352, 272 }, { 193, 251, 331, 353, 273 },
+  { 194, 250, 330, 354, 279 }, { 195, 251, 331, 355, 280 },
   { 196, 252, 332, 356, 274 }, { 197, 253, 333, 357, 275 },
   { 198, 254, 334, 358, 276 }, { 199, 255, 335, 359, 277 },
-  { 2, 256, 336, 360, 278 }, { 201, 252, 332, 361, 282 },
+  { 200, 256, 336, 360, 278 }, { 201, 252, 332, 361, 282 },
   { 202, 253, 333, 362, 283 }, { 203, 254, 334, 363, 284 },
   { 204, 255, 335, 364, 285 }, { 205, 257, 337, 365, 281 },
-  { 206, 252, 332, 366, 2 }, { 207, 253, 333, 367, 291 },
+  { 206, 252, 332, 366, 290 }, { 207, 253, 333, 367, 291 },
   { 208, 254, 334, 368, 292 }, { 209, 255, 335, 369, 293 },
-  { 2, 256, 336, 370, 294 }, { 211, 256, 336, 371, 295 },
+  { 210, 256, 336, 370, 294 }, { 211, 256, 336, 371, 295 },
   { 212, 258, 338, 372, 286 }, { 213, 259, 339, 373, 287 },
-  { 214, 2, 340, 374, 288 }, { 215, 261, 341, 375, 289 },
+  { 214, 260, 340, 374, 288 }, { 215, 261, 341, 375, 289 },
   { 216, 257, 337, 376, 296 }, { 217, 257, 337, 377, 297 },
   { 218, 258, 338, 378, 298 }, { 219, 259, 339, 379, 299 },
-  { 2, 2, 340, 380, 300 }, { 221, 261, 341, 381, 301 },
+  { 220, 260, 340, 380, 300 }, { 221, 261, 341, 381, 301 },
   { 222, 262, 342, 382, 302 }, { 223, 262, 342, 383, 303 },
   { 224, 258, 338, 384, 310 }, { 225, 259, 339, 385, 311 },
-  { 226, 2, 340, 386, 312 }, { 227, 261, 341, 387, 313 },
+  { 226, 260, 340, 386, 312 }, { 227, 261, 341, 387, 313 },
   { 228, 263, 343, 388, 304 }, { 229, 263, 343, 389, 305 },
-  { 2, 264, 344, 390, 306 }, { 231, 265, 345, 391, 307 },
+  { 230, 264, 344, 390, 306 }, { 231, 265, 345, 391, 307 },
   { 232, 266, 346, 392, 308 }, { 233, 267, 347, 393, 309 },
   { 234, 262, 342, 394, 318 }, { 235, 264, 344, 395, 314 },
   { 236, 265, 345, 396, 315 }, { 237, 266, 346, 397, 316 },
   { 238, 267, 347, 398, 317 }, { 239, 263, 343, 399, 321 },
-  { 2, 264, 344, 400, 322 }, { 241, 265, 345, 401, 323 },
+  { 240, 264, 344, 400, 322 }, { 241, 265, 345, 401, 323 },
   { 242, 266, 346, 402, 324 }, { 243, 267, 347, 403, 325 },
   { 244, 268, 348, 404, 319 }, { 245, 269, 349, 405, 320 },
   { 246, 268, 348, 406, 326 }, { 247, 269, 349, 407, 327 },
   { 248, 268, 348, 408, 328 }, { 249, 269, 349, 409, 329 },
-  { 2, 271, 275, 278, 274 }, { 2, 271, 351, 410, 350 },
-  { 2, 274, 356, 412, 350 }, { 271, 275, 357, 413, 351 },
+  { 270, 271, 275, 278, 274 }, { 270, 271, 351, 410, 350 },
+  { 270, 274, 356, 412, 350 }, { 271, 275, 357, 413, 351 },
   { 272, 273, 277, 281, 276 }, { 272, 273, 353, 411, 352 },
   { 272, 276, 358, 414, 352 }, { 273, 277, 359, 415, 353 },
   { 274, 278, 360, 420, 356 }, { 275, 278, 360, 421, 357 },
   { 276, 281, 365, 422, 358 }, { 277, 281, 365, 423, 359 },
   { 279, 282, 286, 288, 284 }, { 279, 282, 361, 416, 354 },
-  { 279, 284, 363, 418, 354 }, { 2, 283, 287, 289, 285 },
-  { 2, 283, 362, 417, 355 }, { 2, 285, 364, 419, 355 },
+  { 279, 284, 363, 418, 354 }, { 280, 283, 287, 289, 285 },
+  { 280, 283, 362, 417, 355 }, { 280, 285, 364, 419, 355 },
   { 282, 286, 372, 426, 361 }, { 283, 287, 373, 427, 362 },
   { 284, 288, 374, 428, 363 }, { 285, 289, 375, 429, 364 },
   { 286, 288, 374, 436, 372 }, { 287, 289, 375, 437, 373 },
-  { 2, 294, 302, 306, 298 }, { 2, 294, 370, 424, 366 },
-  { 2, 298, 378, 432, 366 }, { 291, 295, 303, 307, 299 },
+  { 290, 294, 302, 306, 298 }, { 290, 294, 370, 424, 366 },
+  { 290, 298, 378, 432, 366 }, { 291, 295, 303, 307, 299 },
   { 291, 295, 371, 425, 367 }, { 291, 299, 379, 433, 367 },
   { 292, 296, 304, 308, 300 }, { 292, 296, 376, 430, 368 },
   { 292, 300, 380, 434, 368 }, { 293, 297, 305, 309, 301 },
@@ -1690,126 +1693,126 @@ static const int face_120[NUM_FACE_120][VERT_PER_FACE_120] = {
 
 
 static const float vert_600[NUM_VERT_600][4] = {
-  {        0.0f,        0.0f,        0.0f,       -2.0f },
-  {        0.0f, -GOLDENINV,       -1.0f,    -GOLDEN },
-  {        0.0f,  GOLDENINV,       -1.0f,    -GOLDEN },
-  {       -1.0f,        0.0f, -GOLDENINV,    -GOLDEN },
-  {        1.0f,        0.0f, -GOLDENINV,    -GOLDEN },
-  { -GOLDENINV,       -1.0f,        0.0f,    -GOLDEN },
-  {  GOLDENINV,       -1.0f,        0.0f,    -GOLDEN },
-  { -GOLDENINV,        1.0f,        0.0f,    -GOLDEN },
-  {  GOLDENINV,        1.0f,        0.0f,    -GOLDEN },
-  {       -1.0f,        0.0f,  GOLDENINV,    -GOLDEN },
-  {        1.0f,        0.0f,  GOLDENINV,    -GOLDEN },
-  {        0.0f, -GOLDENINV,        1.0f,    -GOLDEN },
-  {        0.0f,  GOLDENINV,        1.0f,    -GOLDEN },
-  { -GOLDENINV,        0.0f,    -GOLDEN,       -1.0 },
-  {  GOLDENINV,        0.0f,    -GOLDEN,       -1.0 },
-  {       -1.0f,       -1.0f,       -1.0f,       -1.0 },
-  {        1.0f,       -1.0f,       -1.0f,       -1.0 },
-  {       -1.0f,        1.0f,       -1.0f,       -1.0 },
-  {        1.0f,        1.0f,       -1.0f,       -1.0 },
-  {        0.0f,    -GOLDEN, -GOLDENINV,       -1.0 },
-  {        0.0f,     GOLDEN, -GOLDENINV,       -1.0 },
-  {    -GOLDEN, -GOLDENINV,        0.0f,       -1.0 },
-  {     GOLDEN, -GOLDENINV,        0.0f,       -1.0 },
-  {    -GOLDEN,  GOLDENINV,        0.0f,       -1.0 },
-  {     GOLDEN,  GOLDENINV,        0.0f,       -1.0 },
-  {        0.0f,    -GOLDEN,  GOLDENINV,       -1.0 },
-  {        0.0f,     GOLDEN,  GOLDENINV,       -1.0 },
-  {       -1.0f,       -1.0f,        1.0f,       -1.0 },
-  {        1.0f,       -1.0f,        1.0f,       -1.0 },
-  {       -1.0f,        1.0f,        1.0f,       -1.0 },
-  {        1.0f,        1.0f,        1.0f,       -1.0 },
-  { -GOLDENINV,        0.0f,     GOLDEN,       -1.0 },
-  {  GOLDENINV,        0.0f,     GOLDEN,       -1.0 },
-  {        0.0f,       -1.0f,    -GOLDEN, -GOLDENINV },
-  {        0.0f,        1.0f,    -GOLDEN, -GOLDENINV },
-  {    -GOLDEN,        0.0f,       -1.0f, -GOLDENINV },
-  {     GOLDEN,        0.0f,       -1.0f, -GOLDENINV },
-  {       -1.0f,    -GOLDEN,        0.0f, -GOLDENINV },
-  {        1.0f,    -GOLDEN,        0.0f, -GOLDENINV },
-  {       -1.0f,     GOLDEN,        0.0f, -GOLDENINV },
-  {        1.0f,     GOLDEN,        0.0f, -GOLDENINV },
-  {    -GOLDEN,        0.0f,        1.0f, -GOLDENINV },
-  {     GOLDEN,        0.0f,        1.0f, -GOLDENINV },
-  {        0.0f,       -1.0f,     GOLDEN, -GOLDENINV },
-  {        0.0f,        1.0f,     GOLDEN, -GOLDENINV },
-  {        0.0f,        0.0f,       -2.0,        0.0f },
-  {       -1.0f, -GOLDENINV,    -GOLDEN,        0.0f },
-  {        1.0f, -GOLDENINV,    -GOLDEN,        0.0f },
-  {       -1.0f,  GOLDENINV,    -GOLDEN,        0.0f },
-  {        1.0f,  GOLDENINV,    -GOLDEN,        0.0f },
-  { -GOLDENINV,    -GOLDEN,       -1.0f,        0.0f },
-  {  GOLDENINV,    -GOLDEN,       -1.0f,        0.0f },
-  { -GOLDENINV,     GOLDEN,       -1.0f,        0.0f },
-  {  GOLDENINV,     GOLDEN,       -1.0f,        0.0f },
-  {    -GOLDEN,       -1.0f, -GOLDENINV,        0.0f },
-  {     GOLDEN,       -1.0f, -GOLDENINV,        0.0f },
-  {    -GOLDEN,        1.0f, -GOLDENINV,        0.0f },
-  {     GOLDEN,        1.0f, -GOLDENINV,        0.0f },
-  {        0.0f,       -2.0,        0.0f,        0.0f },
-  {       -2.0,        0.0f,        0.0f,        0.0f },
-  {        2.0f,        0.0f,        0.0f,        0.0f },
-  {        0.0f,        2.0f,        0.0f,        0.0f },
-  {    -GOLDEN,       -1.0f,  GOLDENINV,        0.0f },
-  {     GOLDEN,       -1.0f,  GOLDENINV,        0.0f },
-  {    -GOLDEN,        1.0f,  GOLDENINV,        0.0f },
-  {     GOLDEN,        1.0f,  GOLDENINV,        0.0f },
-  { -GOLDENINV,    -GOLDEN,        1.0f,        0.0f },
-  {  GOLDENINV,    -GOLDEN,        1.0f,        0.0f },
-  { -GOLDENINV,     GOLDEN,        1.0f,        0.0f },
-  {  GOLDENINV,     GOLDEN,        1.0f,        0.0f },
-  {       -1.0f, -GOLDENINV,     GOLDEN,        0.0f },
-  {        1.0f, -GOLDENINV,     GOLDEN,        0.0f },
-  {       -1.0f,  GOLDENINV,     GOLDEN,        0.0f },
-  {        1.0f,  GOLDENINV,     GOLDEN,        0.0f },
-  {        0.0f,        0.0f,        2.0f,        0.0f },
-  {        0.0f,       -1.0f,    -GOLDEN,  GOLDENINV },
-  {        0.0f,        1.0f,    -GOLDEN,  GOLDENINV },
-  {    -GOLDEN,        0.0f,       -1.0f,  GOLDENINV },
-  {     GOLDEN,        0.0f,       -1.0f,  GOLDENINV },
-  {       -1.0f,    -GOLDEN,        0.0f,  GOLDENINV },
-  {        1.0f,    -GOLDEN,        0.0f,  GOLDENINV },
-  {       -1.0f,     GOLDEN,        0.0f,  GOLDENINV },
-  {        1.0f,     GOLDEN,        0.0f,  GOLDENINV },
-  {    -GOLDEN,        0.0f,        1.0f,  GOLDENINV },
-  {     GOLDEN,        0.0f,        1.0f,  GOLDENINV },
-  {        0.0f,       -1.0f,     GOLDEN,  GOLDENINV },
-  {        0.0f,        1.0f,     GOLDEN,  GOLDENINV },
-  { -GOLDENINV,        0.0f,    -GOLDEN,        1.0f },
-  {  GOLDENINV,        0.0f,    -GOLDEN,        1.0f },
-  {       -1.0f,       -1.0f,       -1.0f,        1.0f },
-  {        1.0f,       -1.0f,       -1.0f,        1.0f },
-  {       -1.0f,        1.0f,       -1.0f,        1.0f },
-  {        1.0f,        1.0f,       -1.0f,        1.0f },
-  {        0.0f,    -GOLDEN, -GOLDENINV,        1.0f },
-  {        0.0f,     GOLDEN, -GOLDENINV,        1.0f },
-  {    -GOLDEN, -GOLDENINV,        0.0f,        1.0f },
-  {     GOLDEN, -GOLDENINV,        0.0f,        1.0f },
-  {    -GOLDEN,  GOLDENINV,        0.0f,        1.0f },
-  {     GOLDEN,  GOLDENINV,        0.0f,        1.0f },
-  {        0.0f,    -GOLDEN,  GOLDENINV,        1.0f },
-  {        0.0f,     GOLDEN,  GOLDENINV,        1.0f },
-  {       -1.0f,       -1.0f,        1.0f,        1.0f },
-  {        1.0f,       -1.0f,        1.0f,        1.0f },
-  {       -1.0f,        1.0f,        1.0f,        1.0f },
-  {        1.0f,        1.0f,        1.0f,        1.0f },
-  { -GOLDENINV,        0.0f,     GOLDEN,        1.0f },
-  {  GOLDENINV,        0.0f,     GOLDEN,        1.0f },
-  {        0.0f, -GOLDENINV,       -1.0f,     GOLDEN },
-  {        0.0f,  GOLDENINV,       -1.0f,     GOLDEN },
-  {       -1.0f,        0.0f, -GOLDENINV,     GOLDEN },
-  {        1.0f,        0.0f, -GOLDENINV,     GOLDEN },
-  { -GOLDENINV,       -1.0f,        0.0f,     GOLDEN },
-  {  GOLDENINV,       -1.0f,        0.0f,     GOLDEN },
-  { -GOLDENINV,        1.0f,        0.0f,     GOLDEN },
-  {  GOLDENINV,        1.0f,        0.0f,     GOLDEN },
-  {       -1.0f,        0.0f,  GOLDENINV,     GOLDEN },
-  {        1.0f,        0.0f,  GOLDENINV,     GOLDEN },
-  {        0.0f, -GOLDENINV,        1.0f,     GOLDEN },
-  {        0.0f,  GOLDENINV,        1.0f,     GOLDEN },
-  {        0.0f,        0.0f,        0.0f,        2.0f }
+  {        0.0,        0.0,        0.0,       -2.0 },
+  {        0.0, -GOLDENINV,       -1.0,    -GOLDEN },
+  {        0.0,  GOLDENINV,       -1.0,    -GOLDEN },
+  {       -1.0,        0.0, -GOLDENINV,    -GOLDEN },
+  {        1.0,        0.0, -GOLDENINV,    -GOLDEN },
+  { -GOLDENINV,       -1.0,        0.0,    -GOLDEN },
+  {  GOLDENINV,       -1.0,        0.0,    -GOLDEN },
+  { -GOLDENINV,        1.0,        0.0,    -GOLDEN },
+  {  GOLDENINV,        1.0,        0.0,    -GOLDEN },
+  {       -1.0,        0.0,  GOLDENINV,    -GOLDEN },
+  {        1.0,        0.0,  GOLDENINV,    -GOLDEN },
+  {        0.0, -GOLDENINV,        1.0,    -GOLDEN },
+  {        0.0,  GOLDENINV,        1.0,    -GOLDEN },
+  { -GOLDENINV,        0.0,    -GOLDEN,       -1.0 },
+  {  GOLDENINV,        0.0,    -GOLDEN,       -1.0 },
+  {       -1.0,       -1.0,       -1.0,       -1.0 },
+  {        1.0,       -1.0,       -1.0,       -1.0 },
+  {       -1.0,        1.0,       -1.0,       -1.0 },
+  {        1.0,        1.0,       -1.0,       -1.0 },
+  {        0.0,    -GOLDEN, -GOLDENINV,       -1.0 },
+  {        0.0,     GOLDEN, -GOLDENINV,       -1.0 },
+  {    -GOLDEN, -GOLDENINV,        0.0,       -1.0 },
+  {     GOLDEN, -GOLDENINV,        0.0,       -1.0 },
+  {    -GOLDEN,  GOLDENINV,        0.0,       -1.0 },
+  {     GOLDEN,  GOLDENINV,        0.0,       -1.0 },
+  {        0.0,    -GOLDEN,  GOLDENINV,       -1.0 },
+  {        0.0,     GOLDEN,  GOLDENINV,       -1.0 },
+  {       -1.0,       -1.0,        1.0,       -1.0 },
+  {        1.0,       -1.0,        1.0,       -1.0 },
+  {       -1.0,        1.0,        1.0,       -1.0 },
+  {        1.0,        1.0,        1.0,       -1.0 },
+  { -GOLDENINV,        0.0,     GOLDEN,       -1.0 },
+  {  GOLDENINV,        0.0,     GOLDEN,       -1.0 },
+  {        0.0,       -1.0,    -GOLDEN, -GOLDENINV },
+  {        0.0,        1.0,    -GOLDEN, -GOLDENINV },
+  {    -GOLDEN,        0.0,       -1.0, -GOLDENINV },
+  {     GOLDEN,        0.0,       -1.0, -GOLDENINV },
+  {       -1.0,    -GOLDEN,        0.0, -GOLDENINV },
+  {        1.0,    -GOLDEN,        0.0, -GOLDENINV },
+  {       -1.0,     GOLDEN,        0.0, -GOLDENINV },
+  {        1.0,     GOLDEN,        0.0, -GOLDENINV },
+  {    -GOLDEN,        0.0,        1.0, -GOLDENINV },
+  {     GOLDEN,        0.0,        1.0, -GOLDENINV },
+  {        0.0,       -1.0,     GOLDEN, -GOLDENINV },
+  {        0.0,        1.0,     GOLDEN, -GOLDENINV },
+  {        0.0,        0.0,       -2.0,        0.0 },
+  {       -1.0, -GOLDENINV,    -GOLDEN,        0.0 },
+  {        1.0, -GOLDENINV,    -GOLDEN,        0.0 },
+  {       -1.0,  GOLDENINV,    -GOLDEN,        0.0 },
+  {        1.0,  GOLDENINV,    -GOLDEN,        0.0 },
+  { -GOLDENINV,    -GOLDEN,       -1.0,        0.0 },
+  {  GOLDENINV,    -GOLDEN,       -1.0,        0.0 },
+  { -GOLDENINV,     GOLDEN,       -1.0,        0.0 },
+  {  GOLDENINV,     GOLDEN,       -1.0,        0.0 },
+  {    -GOLDEN,       -1.0, -GOLDENINV,        0.0 },
+  {     GOLDEN,       -1.0, -GOLDENINV,        0.0 },
+  {    -GOLDEN,        1.0, -GOLDENINV,        0.0 },
+  {     GOLDEN,        1.0, -GOLDENINV,        0.0 },
+  {        0.0,       -2.0,        0.0,        0.0 },
+  {       -2.0,        0.0,        0.0,        0.0 },
+  {        2.0,        0.0,        0.0,        0.0 },
+  {        0.0,        2.0,        0.0,        0.0 },
+  {    -GOLDEN,       -1.0,  GOLDENINV,        0.0 },
+  {     GOLDEN,       -1.0,  GOLDENINV,        0.0 },
+  {    -GOLDEN,        1.0,  GOLDENINV,        0.0 },
+  {     GOLDEN,        1.0,  GOLDENINV,        0.0 },
+  { -GOLDENINV,    -GOLDEN,        1.0,        0.0 },
+  {  GOLDENINV,    -GOLDEN,        1.0,        0.0 },
+  { -GOLDENINV,     GOLDEN,        1.0,        0.0 },
+  {  GOLDENINV,     GOLDEN,        1.0,        0.0 },
+  {       -1.0, -GOLDENINV,     GOLDEN,        0.0 },
+  {        1.0, -GOLDENINV,     GOLDEN,        0.0 },
+  {       -1.0,  GOLDENINV,     GOLDEN,        0.0 },
+  {        1.0,  GOLDENINV,     GOLDEN,        0.0 },
+  {        0.0,        0.0,        2.0,        0.0 },
+  {        0.0,       -1.0,    -GOLDEN,  GOLDENINV },
+  {        0.0,        1.0,    -GOLDEN,  GOLDENINV },
+  {    -GOLDEN,        0.0,       -1.0,  GOLDENINV },
+  {     GOLDEN,        0.0,       -1.0,  GOLDENINV },
+  {       -1.0,    -GOLDEN,        0.0,  GOLDENINV },
+  {        1.0,    -GOLDEN,        0.0,  GOLDENINV },
+  {       -1.0,     GOLDEN,        0.0,  GOLDENINV },
+  {        1.0,     GOLDEN,        0.0,  GOLDENINV },
+  {    -GOLDEN,        0.0,        1.0,  GOLDENINV },
+  {     GOLDEN,        0.0,        1.0,  GOLDENINV },
+  {        0.0,       -1.0,     GOLDEN,  GOLDENINV },
+  {        0.0,        1.0,     GOLDEN,  GOLDENINV },
+  { -GOLDENINV,        0.0,    -GOLDEN,        1.0 },
+  {  GOLDENINV,        0.0,    -GOLDEN,        1.0 },
+  {       -1.0,       -1.0,       -1.0,        1.0 },
+  {        1.0,       -1.0,       -1.0,        1.0 },
+  {       -1.0,        1.0,       -1.0,        1.0 },
+  {        1.0,        1.0,       -1.0,        1.0 },
+  {        0.0,    -GOLDEN, -GOLDENINV,        1.0 },
+  {        0.0,     GOLDEN, -GOLDENINV,        1.0 },
+  {    -GOLDEN, -GOLDENINV,        0.0,        1.0 },
+  {     GOLDEN, -GOLDENINV,        0.0,        1.0 },
+  {    -GOLDEN,  GOLDENINV,        0.0,        1.0 },
+  {     GOLDEN,  GOLDENINV,        0.0,        1.0 },
+  {        0.0,    -GOLDEN,  GOLDENINV,        1.0 },
+  {        0.0,     GOLDEN,  GOLDENINV,        1.0 },
+  {       -1.0,       -1.0,        1.0,        1.0 },
+  {        1.0,       -1.0,        1.0,        1.0 },
+  {       -1.0,        1.0,        1.0,        1.0 },
+  {        1.0,        1.0,        1.0,        1.0 },
+  { -GOLDENINV,        0.0,     GOLDEN,        1.0 },
+  {  GOLDENINV,        0.0,     GOLDEN,        1.0 },
+  {        0.0, -GOLDENINV,       -1.0,     GOLDEN },
+  {        0.0,  GOLDENINV,       -1.0,     GOLDEN },
+  {       -1.0,        0.0, -GOLDENINV,     GOLDEN },
+  {        1.0,        0.0, -GOLDENINV,     GOLDEN },
+  { -GOLDENINV,       -1.0,        0.0,     GOLDEN },
+  {  GOLDENINV,       -1.0,        0.0,     GOLDEN },
+  { -GOLDENINV,        1.0,        0.0,     GOLDEN },
+  {  GOLDENINV,        1.0,        0.0,     GOLDEN },
+  {       -1.0,        0.0,  GOLDENINV,     GOLDEN },
+  {        1.0,        0.0,  GOLDENINV,     GOLDEN },
+  {        0.0, -GOLDENINV,        1.0,     GOLDEN },
+  {        0.0,  GOLDENINV,        1.0,     GOLDEN },
+  {        0.0,        0.0,        0.0,        2.0 }
 };
 
 static const int edge_600[NUM_EDGE_600][2] = {
@@ -1901,7 +1904,7 @@ static const int edge_600[NUM_EDGE_600][2] = {
   {  58,  99 }, {  59,  62 }, {  59,  64 }, {  59,  77 }, {  59,  83 },
   {  59,  95 }, {  59,  97 }, {  60,  63 }, {  60,  65 }, {  60,  78 },
   {  60,  84 }, {  60,  96 }, {  60,  98 }, {  61,  68 }, {  61,  69 },
-  {  61,  81 }, {  61,  82 }, {  61,  94 }, {  61, 1 }, {  62,  66 },
+  {  61,  81 }, {  61,  82 }, {  61,  94 }, {  61, 100 }, {  62,  66 },
   {  62,  70 }, {  62,  79 }, {  62,  83 }, {  62,  95 }, {  62, 101 },
   {  63,  67 }, {  63,  71 }, {  63,  80 }, {  63,  84 }, {  63,  96 },
   {  63, 102 }, {  64,  68 }, {  64,  72 }, {  64,  81 }, {  64,  83 },
@@ -1909,8 +1912,8 @@ static const int edge_600[NUM_EDGE_600][2] = {
   {  65,  84 }, {  65,  98 }, {  65, 104 }, {  66,  67 }, {  66,  70 },
   {  66,  79 }, {  66,  85 }, {  66,  99 }, {  66, 101 }, {  67,  71 },
   {  67,  80 }, {  67,  85 }, {  67,  99 }, {  67, 102 }, {  68,  69 },
-  {  68,  72 }, {  68,  81 }, {  68,  86 }, {  68, 1 }, {  68, 103 },
-  {  69,  73 }, {  69,  82 }, {  69,  86 }, {  69, 1 }, {  69, 104 },
+  {  68,  72 }, {  68,  81 }, {  68,  86 }, {  68, 100 }, {  68, 103 },
+  {  69,  73 }, {  69,  82 }, {  69,  86 }, {  69, 100 }, {  69, 104 },
   {  70,  72 }, {  70,  74 }, {  70,  83 }, {  70,  85 }, {  70, 101 },
   {  70, 105 }, {  71,  73 }, {  71,  74 }, {  71,  84 }, {  71,  85 },
   {  71, 102 }, {  71, 106 }, {  72,  74 }, {  72,  83 }, {  72,  86 },
@@ -1920,39 +1923,39 @@ static const int edge_600[NUM_EDGE_600][2] = {
   {  75,  93 }, {  75, 107 }, {  76,  87 }, {  76,  88 }, {  76,  91 },
   {  76,  92 }, {  76,  94 }, {  76, 108 }, {  77,  87 }, {  77,  89 },
   {  77,  91 }, {  77,  95 }, {  77,  97 }, {  77, 109 }, {  78,  88 },
-  {  78,  90 }, {  78,  92 }, {  78,  96 }, {  78,  98 }, {  78, 1 },
+  {  78,  90 }, {  78,  92 }, {  78,  96 }, {  78,  98 }, {  78, 110 },
   {  79,  89 }, {  79,  93 }, {  79,  95 }, {  79,  99 }, {  79, 101 },
   {  79, 111 }, {  80,  90 }, {  80,  93 }, {  80,  96 }, {  80,  99 },
   {  80, 102 }, {  80, 112 }, {  81,  91 }, {  81,  94 }, {  81,  97 },
-  {  81, 1 }, {  81, 103 }, {  81, 113 }, {  82,  92 }, {  82,  94 },
-  {  82,  98 }, {  82, 1 }, {  82, 104 }, {  82, 114 }, {  83,  95 },
+  {  81, 100 }, {  81, 103 }, {  81, 113 }, {  82,  92 }, {  82,  94 },
+  {  82,  98 }, {  82, 100 }, {  82, 104 }, {  82, 114 }, {  83,  95 },
   {  83,  97 }, {  83, 101 }, {  83, 103 }, {  83, 105 }, {  83, 115 },
   {  84,  96 }, {  84,  98 }, {  84, 102 }, {  84, 104 }, {  84, 106 },
   {  84, 116 }, {  85,  99 }, {  85, 101 }, {  85, 102 }, {  85, 105 },
-  {  85, 106 }, {  85, 117 }, {  86, 1 }, {  86, 103 }, {  86, 104 },
+  {  85, 106 }, {  85, 117 }, {  86, 100 }, {  86, 103 }, {  86, 104 },
   {  86, 105 }, {  86, 106 }, {  86, 118 }, {  87,  88 }, {  87,  89 },
   {  87,  91 }, {  87, 107 }, {  87, 108 }, {  87, 109 }, {  88,  90 },
-  {  88,  92 }, {  88, 107 }, {  88, 108 }, {  88, 1 }, {  89,  93 },
+  {  88,  92 }, {  88, 107 }, {  88, 108 }, {  88, 110 }, {  89,  93 },
   {  89,  95 }, {  89, 107 }, {  89, 109 }, {  89, 111 }, {  90,  93 },
-  {  90,  96 }, {  90, 107 }, {  90, 1 }, {  90, 112 }, {  91,  94 },
+  {  90,  96 }, {  90, 107 }, {  90, 110 }, {  90, 112 }, {  91,  94 },
   {  91,  97 }, {  91, 108 }, {  91, 109 }, {  91, 113 }, {  92,  94 },
-  {  92,  98 }, {  92, 108 }, {  92, 1 }, {  92, 114 }, {  93,  99 },
-  {  93, 107 }, {  93, 111 }, {  93, 112 }, {  94, 1 }, {  94, 108 },
+  {  92,  98 }, {  92, 108 }, {  92, 110 }, {  92, 114 }, {  93,  99 },
+  {  93, 107 }, {  93, 111 }, {  93, 112 }, {  94, 100 }, {  94, 108 },
   {  94, 113 }, {  94, 114 }, {  95,  97 }, {  95, 101 }, {  95, 109 },
-  {  95, 111 }, {  95, 115 }, {  96,  98 }, {  96, 102 }, {  96, 1 },
+  {  95, 111 }, {  95, 115 }, {  96,  98 }, {  96, 102 }, {  96, 110 },
   {  96, 112 }, {  96, 116 }, {  97, 103 }, {  97, 109 }, {  97, 113 },
-  {  97, 115 }, {  98, 104 }, {  98, 1 }, {  98, 114 }, {  98, 116 },
+  {  97, 115 }, {  98, 104 }, {  98, 110 }, {  98, 114 }, {  98, 116 },
   {  99, 101 }, {  99, 102 }, {  99, 111 }, {  99, 112 }, {  99, 117 },
-  { 1, 103 }, { 1, 104 }, { 1, 113 }, { 1, 114 }, { 1, 118 },
+  { 100, 103 }, { 100, 104 }, { 100, 113 }, { 100, 114 }, { 100, 118 },
   { 101, 105 }, { 101, 111 }, { 101, 115 }, { 101, 117 }, { 102, 106 },
   { 102, 112 }, { 102, 116 }, { 102, 117 }, { 103, 105 }, { 103, 113 },
   { 103, 115 }, { 103, 118 }, { 104, 106 }, { 104, 114 }, { 104, 116 },
   { 104, 118 }, { 105, 106 }, { 105, 115 }, { 105, 117 }, { 105, 118 },
   { 106, 116 }, { 106, 117 }, { 106, 118 }, { 107, 108 }, { 107, 109 },
-  { 107, 1 }, { 107, 111 }, { 107, 112 }, { 107, 119 }, { 108, 109 },
-  { 108, 1 }, { 108, 113 }, { 108, 114 }, { 108, 119 }, { 109, 111 },
-  { 109, 113 }, { 109, 115 }, { 109, 119 }, { 1, 112 }, { 1, 114 },
-  { 1, 116 }, { 1, 119 }, { 111, 112 }, { 111, 115 }, { 111, 117 },
+  { 107, 110 }, { 107, 111 }, { 107, 112 }, { 107, 119 }, { 108, 109 },
+  { 108, 110 }, { 108, 113 }, { 108, 114 }, { 108, 119 }, { 109, 111 },
+  { 109, 113 }, { 109, 115 }, { 109, 119 }, { 110, 112 }, { 110, 114 },
+  { 110, 116 }, { 110, 119 }, { 111, 112 }, { 111, 115 }, { 111, 117 },
   { 111, 119 }, { 112, 116 }, { 112, 117 }, { 112, 119 }, { 113, 114 },
   { 113, 115 }, { 113, 118 }, { 113, 119 }, { 114, 116 }, { 114, 118 },
   { 114, 119 }, { 115, 117 }, { 115, 118 }, { 115, 119 }, { 116, 117 },
@@ -2157,9 +2160,9 @@ static const int face_600[NUM_FACE_600][VERT_PER_FACE_600] = {
   {  59,  77,  97 }, {  59,  83,  95 }, {  59,  83,  97 }, {  59,  95,  97 },
   {  60,  63,  84 }, {  60,  63,  96 }, {  60,  65,  84 }, {  60,  65,  98 },
   {  60,  78,  96 }, {  60,  78,  98 }, {  60,  84,  96 }, {  60,  84,  98 },
-  {  60,  96,  98 }, {  61,  68,  69 }, {  61,  68,  81 }, {  61,  68, 1 },
-  {  61,  69,  82 }, {  61,  69, 1 }, {  61,  81,  94 }, {  61,  81, 1 },
-  {  61,  82,  94 }, {  61,  82, 1 }, {  61,  94, 1 }, {  62,  66,  70 },
+  {  60,  96,  98 }, {  61,  68,  69 }, {  61,  68,  81 }, {  61,  68, 100 },
+  {  61,  69,  82 }, {  61,  69, 100 }, {  61,  81,  94 }, {  61,  81, 100 },
+  {  61,  82,  94 }, {  61,  82, 100 }, {  61,  94, 100 }, {  62,  66,  70 },
   {  62,  66,  79 }, {  62,  66, 101 }, {  62,  70,  83 }, {  62,  70, 101 },
   {  62,  79,  95 }, {  62,  79, 101 }, {  62,  83,  95 }, {  62,  83, 101 },
   {  62,  95, 101 }, {  63,  67,  71 }, {  63,  67,  80 }, {  63,  67, 102 },
@@ -2174,10 +2177,10 @@ static const int face_600[NUM_FACE_600][VERT_PER_FACE_600] = {
   {  66,  79, 101 }, {  66,  85,  99 }, {  66,  85, 101 }, {  66,  99, 101 },
   {  67,  71,  85 }, {  67,  71, 102 }, {  67,  80,  99 }, {  67,  80, 102 },
   {  67,  85,  99 }, {  67,  85, 102 }, {  67,  99, 102 }, {  68,  69,  86 },
-  {  68,  69, 1 }, {  68,  72,  86 }, {  68,  72, 103 }, {  68,  81, 1 },
-  {  68,  81, 103 }, {  68,  86, 1 }, {  68,  86, 103 }, {  68, 1, 103 },
-  {  69,  73,  86 }, {  69,  73, 104 }, {  69,  82, 1 }, {  69,  82, 104 },
-  {  69,  86, 1 }, {  69,  86, 104 }, {  69, 1, 104 }, {  70,  72,  74 },
+  {  68,  69, 100 }, {  68,  72,  86 }, {  68,  72, 103 }, {  68,  81, 100 },
+  {  68,  81, 103 }, {  68,  86, 100 }, {  68,  86, 103 }, {  68, 100, 103 },
+  {  69,  73,  86 }, {  69,  73, 104 }, {  69,  82, 100 }, {  69,  82, 104 },
+  {  69,  86, 100 }, {  69,  86, 104 }, {  69, 100, 104 }, {  70,  72,  74 },
   {  70,  72,  83 }, {  70,  72, 105 }, {  70,  74,  85 }, {  70,  74, 105 },
   {  70,  83, 101 }, {  70,  83, 105 }, {  70,  85, 101 }, {  70,  85, 105 },
   {  70, 101, 105 }, {  71,  73,  74 }, {  71,  73,  84 }, {  71,  73, 106 },
@@ -2195,19 +2198,19 @@ static const int face_600[NUM_FACE_600][VERT_PER_FACE_600] = {
   {  76,  92, 108 }, {  76,  94, 108 }, {  77,  87,  89 }, {  77,  87,  91 },
   {  77,  87, 109 }, {  77,  89,  95 }, {  77,  89, 109 }, {  77,  91,  97 },
   {  77,  91, 109 }, {  77,  95,  97 }, {  77,  95, 109 }, {  77,  97, 109 },
-  {  78,  88,  90 }, {  78,  88,  92 }, {  78,  88, 1 }, {  78,  90,  96 },
-  {  78,  90, 1 }, {  78,  92,  98 }, {  78,  92, 1 }, {  78,  96,  98 },
-  {  78,  96, 1 }, {  78,  98, 1 }, {  79,  89,  93 }, {  79,  89,  95 },
+  {  78,  88,  90 }, {  78,  88,  92 }, {  78,  88, 110 }, {  78,  90,  96 },
+  {  78,  90, 110 }, {  78,  92,  98 }, {  78,  92, 110 }, {  78,  96,  98 },
+  {  78,  96, 110 }, {  78,  98, 110 }, {  79,  89,  93 }, {  79,  89,  95 },
   {  79,  89, 111 }, {  79,  93,  99 }, {  79,  93, 111 }, {  79,  95, 101 },
   {  79,  95, 111 }, {  79,  99, 101 }, {  79,  99, 111 }, {  79, 101, 111 },
   {  80,  90,  93 }, {  80,  90,  96 }, {  80,  90, 112 }, {  80,  93,  99 },
   {  80,  93, 112 }, {  80,  96, 102 }, {  80,  96, 112 }, {  80,  99, 102 },
   {  80,  99, 112 }, {  80, 102, 112 }, {  81,  91,  94 }, {  81,  91,  97 },
-  {  81,  91, 113 }, {  81,  94, 1 }, {  81,  94, 113 }, {  81,  97, 103 },
-  {  81,  97, 113 }, {  81, 1, 103 }, {  81, 1, 113 }, {  81, 103, 113 },
-  {  82,  92,  94 }, {  82,  92,  98 }, {  82,  92, 114 }, {  82,  94, 1 },
-  {  82,  94, 114 }, {  82,  98, 104 }, {  82,  98, 114 }, {  82, 1, 104 },
-  {  82, 1, 114 }, {  82, 104, 114 }, {  83,  95,  97 }, {  83,  95, 101 },
+  {  81,  91, 113 }, {  81,  94, 100 }, {  81,  94, 113 }, {  81,  97, 103 },
+  {  81,  97, 113 }, {  81, 100, 103 }, {  81, 100, 113 }, {  81, 103, 113 },
+  {  82,  92,  94 }, {  82,  92,  98 }, {  82,  92, 114 }, {  82,  94, 100 },
+  {  82,  94, 114 }, {  82,  98, 104 }, {  82,  98, 114 }, {  82, 100, 104 },
+  {  82, 100, 114 }, {  82, 104, 114 }, {  83,  95,  97 }, {  83,  95, 101 },
   {  83,  95, 115 }, {  83,  97, 103 }, {  83,  97, 115 }, {  83, 101, 105 },
   {  83, 101, 115 }, {  83, 103, 105 }, {  83, 103, 115 }, {  83, 105, 115 },
   {  84,  96,  98 }, {  84,  96, 102 }, {  84,  96, 116 }, {  84,  98, 104 },
@@ -2215,46 +2218,46 @@ static const int face_600[NUM_FACE_600][VERT_PER_FACE_600] = {
   {  84, 104, 116 }, {  84, 106, 116 }, {  85,  99, 101 }, {  85,  99, 102 },
   {  85,  99, 117 }, {  85, 101, 105 }, {  85, 101, 117 }, {  85, 102, 106 },
   {  85, 102, 117 }, {  85, 105, 106 }, {  85, 105, 117 }, {  85, 106, 117 },
-  {  86, 1, 103 }, {  86, 1, 104 }, {  86, 1, 118 }, {  86, 103, 105 },
+  {  86, 100, 103 }, {  86, 100, 104 }, {  86, 100, 118 }, {  86, 103, 105 },
   {  86, 103, 118 }, {  86, 104, 106 }, {  86, 104, 118 }, {  86, 105, 106 },
   {  86, 105, 118 }, {  86, 106, 118 }, {  87,  88, 107 }, {  87,  88, 108 },
   {  87,  89, 107 }, {  87,  89, 109 }, {  87,  91, 108 }, {  87,  91, 109 },
   {  87, 107, 108 }, {  87, 107, 109 }, {  87, 108, 109 }, {  88,  90, 107 },
-  {  88,  90, 1 }, {  88,  92, 108 }, {  88,  92, 1 }, {  88, 107, 108 },
-  {  88, 107, 1 }, {  88, 108, 1 }, {  89,  93, 107 }, {  89,  93, 111 },
+  {  88,  90, 110 }, {  88,  92, 108 }, {  88,  92, 110 }, {  88, 107, 108 },
+  {  88, 107, 110 }, {  88, 108, 110 }, {  89,  93, 107 }, {  89,  93, 111 },
   {  89,  95, 109 }, {  89,  95, 111 }, {  89, 107, 109 }, {  89, 107, 111 },
-  {  89, 109, 111 }, {  90,  93, 107 }, {  90,  93, 112 }, {  90,  96, 1 },
-  {  90,  96, 112 }, {  90, 107, 1 }, {  90, 107, 112 }, {  90, 1, 112 },
+  {  89, 109, 111 }, {  90,  93, 107 }, {  90,  93, 112 }, {  90,  96, 110 },
+  {  90,  96, 112 }, {  90, 107, 110 }, {  90, 107, 112 }, {  90, 110, 112 },
   {  91,  94, 108 }, {  91,  94, 113 }, {  91,  97, 109 }, {  91,  97, 113 },
   {  91, 108, 109 }, {  91, 108, 113 }, {  91, 109, 113 }, {  92,  94, 108 },
-  {  92,  94, 114 }, {  92,  98, 1 }, {  92,  98, 114 }, {  92, 108, 1 },
-  {  92, 108, 114 }, {  92, 1, 114 }, {  93,  99, 111 }, {  93,  99, 112 },
-  {  93, 107, 111 }, {  93, 107, 112 }, {  93, 111, 112 }, {  94, 1, 113 },
-  {  94, 1, 114 }, {  94, 108, 113 }, {  94, 108, 114 }, {  94, 113, 114 },
+  {  92,  94, 114 }, {  92,  98, 110 }, {  92,  98, 114 }, {  92, 108, 110 },
+  {  92, 108, 114 }, {  92, 110, 114 }, {  93,  99, 111 }, {  93,  99, 112 },
+  {  93, 107, 111 }, {  93, 107, 112 }, {  93, 111, 112 }, {  94, 100, 113 },
+  {  94, 100, 114 }, {  94, 108, 113 }, {  94, 108, 114 }, {  94, 113, 114 },
   {  95,  97, 109 }, {  95,  97, 115 }, {  95, 101, 111 }, {  95, 101, 115 },
-  {  95, 109, 111 }, {  95, 109, 115 }, {  95, 111, 115 }, {  96,  98, 1 },
-  {  96,  98, 116 }, {  96, 102, 112 }, {  96, 102, 116 }, {  96, 1, 112 },
-  {  96, 1, 116 }, {  96, 112, 116 }, {  97, 103, 113 }, {  97, 103, 115 },
+  {  95, 109, 111 }, {  95, 109, 115 }, {  95, 111, 115 }, {  96,  98, 110 },
+  {  96,  98, 116 }, {  96, 102, 112 }, {  96, 102, 116 }, {  96, 110, 112 },
+  {  96, 110, 116 }, {  96, 112, 116 }, {  97, 103, 113 }, {  97, 103, 115 },
   {  97, 109, 113 }, {  97, 109, 115 }, {  97, 113, 115 }, {  98, 104, 114 },
-  {  98, 104, 116 }, {  98, 1, 114 }, {  98, 1, 116 }, {  98, 114, 116 },
+  {  98, 104, 116 }, {  98, 110, 114 }, {  98, 110, 116 }, {  98, 114, 116 },
   {  99, 101, 111 }, {  99, 101, 117 }, {  99, 102, 112 }, {  99, 102, 117 },
-  {  99, 111, 112 }, {  99, 111, 117 }, {  99, 112, 117 }, { 1, 103, 113 },
-  { 1, 103, 118 }, { 1, 104, 114 }, { 1, 104, 118 }, { 1, 113, 114 },
-  { 1, 113, 118 }, { 1, 114, 118 }, { 101, 105, 115 }, { 101, 105, 117 },
+  {  99, 111, 112 }, {  99, 111, 117 }, {  99, 112, 117 }, { 100, 103, 113 },
+  { 100, 103, 118 }, { 100, 104, 114 }, { 100, 104, 118 }, { 100, 113, 114 },
+  { 100, 113, 118 }, { 100, 114, 118 }, { 101, 105, 115 }, { 101, 105, 117 },
   { 101, 111, 115 }, { 101, 111, 117 }, { 101, 115, 117 }, { 102, 106, 116 },
   { 102, 106, 117 }, { 102, 112, 116 }, { 102, 112, 117 }, { 102, 116, 117 },
   { 103, 105, 115 }, { 103, 105, 118 }, { 103, 113, 115 }, { 103, 113, 118 },
   { 103, 115, 118 }, { 104, 106, 116 }, { 104, 106, 118 }, { 104, 114, 116 },
   { 104, 114, 118 }, { 104, 116, 118 }, { 105, 106, 117 }, { 105, 106, 118 },
   { 105, 115, 117 }, { 105, 115, 118 }, { 105, 117, 118 }, { 106, 116, 117 },
-  { 106, 116, 118 }, { 106, 117, 118 }, { 107, 108, 109 }, { 107, 108, 1 },
-  { 107, 108, 119 }, { 107, 109, 111 }, { 107, 109, 119 }, { 107, 1, 112 },
-  { 107, 1, 119 }, { 107, 111, 112 }, { 107, 111, 119 }, { 107, 112, 119 },
-  { 108, 109, 113 }, { 108, 109, 119 }, { 108, 1, 114 }, { 108, 1, 119 },
+  { 106, 116, 118 }, { 106, 117, 118 }, { 107, 108, 109 }, { 107, 108, 110 },
+  { 107, 108, 119 }, { 107, 109, 111 }, { 107, 109, 119 }, { 107, 110, 112 },
+  { 107, 110, 119 }, { 107, 111, 112 }, { 107, 111, 119 }, { 107, 112, 119 },
+  { 108, 109, 113 }, { 108, 109, 119 }, { 108, 110, 114 }, { 108, 110, 119 },
   { 108, 113, 114 }, { 108, 113, 119 }, { 108, 114, 119 }, { 109, 111, 115 },
   { 109, 111, 119 }, { 109, 113, 115 }, { 109, 113, 119 }, { 109, 115, 119 },
-  { 1, 112, 116 }, { 1, 112, 119 }, { 1, 114, 116 }, { 1, 114, 119 },
-  { 1, 116, 119 }, { 111, 112, 117 }, { 111, 112, 119 }, { 111, 115, 117 },
+  { 110, 112, 116 }, { 110, 112, 119 }, { 110, 114, 116 }, { 110, 114, 119 },
+  { 110, 116, 119 }, { 111, 112, 117 }, { 111, 112, 119 }, { 111, 115, 117 },
   { 111, 115, 119 }, { 111, 117, 119 }, { 112, 116, 117 }, { 112, 116, 119 },
   { 112, 117, 119 }, { 113, 114, 118 }, { 113, 114, 119 }, { 113, 115, 118 },
   { 113, 115, 119 }, { 113, 118, 119 }, { 114, 116, 118 }, { 114, 116, 119 },
@@ -2270,9 +2273,9 @@ static void rotatewx(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][1];
@@ -2289,9 +2292,9 @@ static void rotatewy(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][0];
@@ -2308,9 +2311,9 @@ static void rotatewz(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][0];
@@ -2327,9 +2330,9 @@ static void rotatexy(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][2];
@@ -2346,9 +2349,9 @@ static void rotatexz(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][1];
@@ -2365,9 +2368,9 @@ static void rotateyz(float m[4][4], float phi)
   float c, s, u, v;
   int i;
 
-  phi *= (float)(M_PI/180.0f);
-  c = COSF(phi);
-  s = SINF(phi);
+  phi *= M_PI/180.0;
+  c = cos(phi);
+  s = sin(phi);
   for (i=0; i<4; i++)
   {
     u = m[i][0];
@@ -2386,7 +2389,7 @@ static void rotateall(float al, float be, float de, float ze, float et,
 
   for (i=0; i<4; i++)
     for (j=0; j<4; j++)
-      m[i][j] = (float)(i==j);
+      m[i][j] = (i==j);
   rotatewx(m,al);
   rotatewy(m,be);
   rotatewz(m,de);
@@ -2439,7 +2442,7 @@ static void quats_to_rotmat(float p[4], float q[4], float m[4][4])
   th = atan2(r02,sqrt(r00*r00+r01*r01))*180.0/M_PI;
   ze = atan2(-r01,r00)*180.0/M_PI;
 
-  rotateall((float)al,(float)be,(float)de,(float)ze,(float)et,(float)-th,m);
+  rotateall(al,be,de,ze,et,-th,m);
 }
 
 
@@ -2458,7 +2461,7 @@ static void normal(const float *p, const float *q, const float *r,
   n[0] = u[1]*v[2]-u[2]*v[1];
   n[1] = u[2]*v[0]-u[0]*v[2];
   n[2] = u[0]*v[1]-u[1]*v[0];
-  t = (float)sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
+  t = sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
   n[0] /= t;
   n[1] /= t;
   n[2] /= t;
@@ -2474,12 +2477,11 @@ static void project(ModeInfo *mi, const float vert[][4], float v[][4], int num)
 
   rotateall(pp->alpha,pp->beta,pp->delta,pp->zeta,pp->eta,pp->theta,r1);
 
-  //gltrackball_get_quaternion(pp->trackballs[0],q1);
-  //gltrackball_get_quaternion(pp->trackballs[1],q2);
-  //quats_to_rotmat(q1,q2,r2);
+  gltrackball_get_quaternion(pp->trackballs[0],q1);
+  gltrackball_get_quaternion(pp->trackballs[1],q2);
+  quats_to_rotmat(q1,q2,r2);
 
-  //mult_rotmat(r2,r1,m);
-  memcpy(&m, &r1, sizeof(m));
+  mult_rotmat(r2,r1,m);
 
   /* Project the vertices from 4d to 3d. */
   for (i=0; i<num; i++)
@@ -2526,8 +2528,8 @@ static void draw(ModeInfo *mi,
 {
   int i, j;
   float n[3];
-  GLfloat red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
-  GLfloat red_trans[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+  GLfloat red[4] = { 1.0, 0.0, 0.0, 1.0 };
+  GLfloat red_trans[4] = { 1.0, 0.0, 0.0, 1.0 };
 
   mi->polygon_count = 0;
   if (display_mode == DISP_WIREFRAME)
@@ -2549,7 +2551,7 @@ static void draw(ModeInfo *mi,
   {
     if (color_mode == COLORS_SINGLE)
     {
-      red_trans[3] = face_color_trans[0][3]/2.0f;
+      red_trans[3] = face_color_trans[0][3]/2.0;
       if (display_mode == DISP_TRANSPARENT)
         glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE,red_trans);
       else
@@ -2665,7 +2667,7 @@ static void color(float depth, float alpha, float min, float max,
   int s;
 
   d = (depth-min)/(max-min);
-  s = (int)floor(d*4.0);
+  s = floor(d*4.0);
   t = d*4.0-s;
   if (s < 0)
     s += 6;
@@ -2674,34 +2676,34 @@ static void color(float depth, float alpha, float min, float max,
   switch (s)
   {
     case 0:
-      color[0] = 1.0f;
-      color[1] = (float)t;
-      color[2] = 0.0f;
+      color[0] = 1.0;
+      color[1] = t;
+      color[2] = 0.0;
       break;
     case 1:
-      color[0] = (float)(1.0f-t);
-      color[1] = 1.0f;
-      color[2] = 0.0f;
+      color[0] = 1.0-t;
+      color[1] = 1.0;
+      color[2] = 0.0;
       break;
     case 2:
-      color[0] = 0.0f;
-      color[1] = 1.0f;
-      color[2] = (float)t;
+      color[0] = 0.0;
+      color[1] = 1.0;
+      color[2] = t;
       break;
     case 3:
-      color[0] = 0.0f;
-      color[1] = (float)(1.0f-t);
-      color[2] = 1.0f;
+      color[0] = 0.0;
+      color[1] = 1.0-t;
+      color[2] = 1.0;
       break;
     case 4:
-      color[0] = (float)t;
-      color[1] = 0.0f;
-      color[2] = 1.0f;
+      color[0] = t;
+      color[1] = 0.0;
+      color[2] = 1.0;
       break;
     case 5:
-      color[0] = 1.0f;
-      color[1] = 0.0f;
-      color[2] = (float)(1.0f-t);
+      color[0] = 1.0;
+      color[1] = 0.0;
+      color[2] = 1.0-t;
       break;
   }
   color[3] = alpha;
@@ -2725,8 +2727,8 @@ static void colors(const float vert[][4],
 
   for (i=0; i<num_edge; i++)
   {
-    depth = (vert[edge[i][0]][3]+vert[edge[i][1]][3])/2.0f;
-    color(depth,1.0f,min_edge_depth,max_edge_depth,edge_color[i]);
+    depth = (vert[edge[i][0]][3]+vert[edge[i][1]][3])/2.0;
+    color(depth,1.0,min_edge_depth,max_edge_depth,edge_color[i]);
   }
   for (i=0; i<num_face; i++)
   {
@@ -2734,7 +2736,7 @@ static void colors(const float vert[][4],
     for (j=0; j<vert_per_face; j++)
       depth += vert[face[i*vert_per_face+j]][3];
     depth /= vert_per_face;
-    color(depth,1.0f,min_face_depth,max_face_depth,face_color[i]);
+    color(depth,1.0,min_face_depth,max_face_depth,face_color[i]);
     color(depth,alpha,min_face_depth,max_face_depth,face_color_trans[i]);
   }
 }
@@ -2747,37 +2749,37 @@ static void set_colors(ModeInfo *mi)
   /* 5-cell. */
   colors(vert_5,edge_5,NUM_EDGE_5,(int *)face_5,NUM_FACE_5,
          VERT_PER_FACE_5,hp->edge_color_5,hp->face_color_5,
-         hp->face_color_trans_5,0.5f,MIN_EDGE_DEPTH_5,
+         hp->face_color_trans_5,0.5,MIN_EDGE_DEPTH_5,
          MAX_EDGE_DEPTH_5,MIN_FACE_DEPTH_5,MAX_FACE_DEPTH_5);
 
   /* 8-cell. */
   colors(vert_8,edge_8,NUM_EDGE_8,(int *)face_8,NUM_FACE_8,
          VERT_PER_FACE_8,hp->edge_color_8,hp->face_color_8,
-         hp->face_color_trans_8,0.4f,MIN_EDGE_DEPTH_8,
+         hp->face_color_trans_8,0.4,MIN_EDGE_DEPTH_8,
          MAX_EDGE_DEPTH_8,MIN_FACE_DEPTH_8,MAX_FACE_DEPTH_8);
 
   /* 16-cell. */
   colors(vert_16,edge_16,NUM_EDGE_16,(int *)face_16,NUM_FACE_16,
          VERT_PER_FACE_16,hp->edge_color_16,hp->face_color_16,
-         hp->face_color_trans_16,0.25f,MIN_EDGE_DEPTH_16,
+         hp->face_color_trans_16,0.25,MIN_EDGE_DEPTH_16,
          MAX_EDGE_DEPTH_16,MIN_FACE_DEPTH_16,MAX_FACE_DEPTH_16);
 
   /* 24-cell. */
   colors(vert_24,edge_24,NUM_EDGE_24,(int *)face_24,NUM_FACE_24,
          VERT_PER_FACE_24,hp->edge_color_24,hp->face_color_24,
-         hp->face_color_trans_24,0.25f,MIN_EDGE_DEPTH_24,
+         hp->face_color_trans_24,0.25,MIN_EDGE_DEPTH_24,
          MAX_EDGE_DEPTH_24,MIN_FACE_DEPTH_24,MAX_FACE_DEPTH_24);
 
   /* 120-cell. */
   colors(vert_120,edge_120,NUM_EDGE_120,(int *)face_120,NUM_FACE_120,
          VERT_PER_FACE_120,hp->edge_color_120,hp->face_color_120,
-         hp->face_color_trans_120,0.15f,MIN_EDGE_DEPTH_120,
+         hp->face_color_trans_120,0.15,MIN_EDGE_DEPTH_120,
          MAX_EDGE_DEPTH_120,MIN_FACE_DEPTH_120,MAX_FACE_DEPTH_120);
 
   /* 600-cell. */
   colors(vert_600,edge_600,NUM_EDGE_600,(int *)face_600,NUM_FACE_600,
          VERT_PER_FACE_600,hp->edge_color_600,hp->face_color_600,
-         hp->face_color_trans_600,0.06f,MIN_EDGE_DEPTH_600,
+         hp->face_color_trans_600,0.06,MIN_EDGE_DEPTH_600,
          MAX_EDGE_DEPTH_600,MIN_FACE_DEPTH_600,MAX_FACE_DEPTH_600);
 }
 
@@ -2805,8 +2807,7 @@ static void display_polytopes(ModeInfo *mi)
 {
   polytopesstruct *pp = &poly[MI_SCREEN(mi)];
 
-  //if (!pp->button_pressed)
-  if (!False)
+  if (!pp->button_pressed)
   {
     pp->alpha += speed_wx * pp->speed_scale;
     if (pp->alpha >= 360.0)
@@ -2833,9 +2834,9 @@ static void display_polytopes(ModeInfo *mi)
   if (projection_3d == DISP_3D_ORTHOGRAPHIC)
   {
     if (pp->aspect >= 1.0)
-      glOrtho(-pp->aspect,pp->aspect,-1.0f,1.0f,0.1,100.0);
+      glOrtho(-pp->aspect,pp->aspect,-1.0,1.0,0.1,100.0);
     else
-      glOrtho(-1.0f,1.0f,-1.0/pp->aspect,1.0/pp->aspect,0.1,100.0);
+      glOrtho(-1.0,1.0,-1.0/pp->aspect,1.0/pp->aspect,0.1,100.0);
   }
   else
   {
@@ -2889,53 +2890,53 @@ ENTRYPOINT void reshape_polytopes(ModeInfo *mi, int width, int height)
 	  char c = 0;
 
 	  if (event->xany.type == KeyPress || event->xany.type == KeyRelease)
-	    XLookupString (&event->xkey, &c, 1, &sym, 0);
+		XLookupString (&event->xkey, &c, 1, &sym, 0);
 
 	  if (event->xany.type == ButtonPress &&
-	      event->xbutton.button == Button1)
+		  event->xbutton.button == Button1)
 	  {
-	    pp->button_pressed = True;
-	    gltrackball_start(pp->trackballs[pp->current_trackball],
-	                      event->xbutton.x, event->xbutton.y,
-	                      MI_WIDTH(mi), MI_HEIGHT(mi));
-	    return True;
+		pp->button_pressed = True;
+		gltrackball_start(pp->trackballs[pp->current_trackball],
+						  event->xbutton.x, event->xbutton.y,
+						  MI_WIDTH(mi), MI_HEIGHT(mi));
+		return True;
 	  }
 	  else if (event->xany.type == ButtonRelease &&
-	           event->xbutton.button == Button1)
+			   event->xbutton.button == Button1)
 	  {
-	    pp->button_pressed = False;
-	    return True;
+		pp->button_pressed = False;
+		return True;
 	  }
 	  else if (event->xany.type == KeyPress)
 	  {
-	    if (sym == XK_Shift_L || sym == XK_Shift_R)
-	    {
-	      pp->current_trackball = 1;
-	      if (pp->button_pressed)
-	        gltrackball_start(pp->trackballs[pp->current_trackball],
-	                          event->xbutton.x, event->xbutton.y,
-	                          MI_WIDTH(mi), MI_HEIGHT(mi));
-	      return True;
-	    }
+		if (sym == XK_Shift_L || sym == XK_Shift_R)
+		{
+		  pp->current_trackball = 1;
+		  if (pp->button_pressed)
+			gltrackball_start(pp->trackballs[pp->current_trackball],
+							  event->xbutton.x, event->xbutton.y,
+							  MI_WIDTH(mi), MI_HEIGHT(mi));
+		  return True;
+		}
 	  }
 	  else if (event->xany.type == KeyRelease)
 	  {
-	    if (sym == XK_Shift_L || sym == XK_Shift_R)
-	    {
-	      pp->current_trackball = 0;
-	      if (pp->button_pressed)
-	        gltrackball_start(pp->trackballs[pp->current_trackball],
-	                          event->xbutton.x, event->xbutton.y,
-	                          MI_WIDTH(mi), MI_HEIGHT(mi));
-	      return True;
-	    }
+		if (sym == XK_Shift_L || sym == XK_Shift_R)
+		{
+		  pp->current_trackball = 0;
+		  if (pp->button_pressed)
+			gltrackball_start(pp->trackballs[pp->current_trackball],
+							  event->xbutton.x, event->xbutton.y,
+							  MI_WIDTH(mi), MI_HEIGHT(mi));
+		  return True;
+		}
 	  }
 	  else if (event->xany.type == MotionNotify && pp->button_pressed)
 	  {
-	    gltrackball_track(pp->trackballs[pp->current_trackball],
-	                      event->xmotion.x, event->xmotion.y,
-	                      MI_WIDTH(mi), MI_HEIGHT(mi));
-	    return True;
+		gltrackball_track(pp->trackballs[pp->current_trackball],
+						  event->xmotion.x, event->xmotion.y,
+						  MI_WIDTH(mi), MI_HEIGHT(mi));
+		return True;
 	  }
 
 	  return False;
@@ -2969,21 +2970,21 @@ ENTRYPOINT void init_polytopes(ModeInfo *mi)
   }
   pp = &poly[MI_SCREEN(mi)];
 
-  //pp->trackballs[0] = gltrackball_init();
-  //pp->trackballs[1] = gltrackball_init();
-  //pp->current_trackball = 0;
-  //pp->button_pressed = False;
+  pp->trackballs[0] = gltrackball_init();
+  pp->trackballs[1] = gltrackball_init();
+  pp->current_trackball = 0;
+  pp->button_pressed = False;
 
   /* Set the display mode. */
-  if (!_stricmp(mode,"wireframe") || !_stricmp(mode,"0"))
+  if (!strcasecmp(mode,"wireframe") || !strcasecmp(mode,"0"))
   {
     display_mode = DISP_WIREFRAME;
   }
-  else if (!_stricmp(mode,"surface") || !_stricmp(mode,"1"))
+  else if (!strcasecmp(mode,"surface") || !strcasecmp(mode,"1"))
   {
     display_mode = DISP_SURFACE;
   }
-  else if (!_stricmp(mode,"transparent") || !_stricmp(mode,"2"))
+  else if (!strcasecmp(mode,"transparent") || !strcasecmp(mode,"2"))
   {
     display_mode = DISP_TRANSPARENT;
   }
@@ -2993,31 +2994,31 @@ ENTRYPOINT void init_polytopes(ModeInfo *mi)
   }
 
   /* Set the Klein bottle. */
-  if (!_stricmp(poly_str,"random") || !_stricmp(poly_str,"-1"))
+  if (!strcasecmp(poly_str,"random") || !strcasecmp(poly_str,"-1"))
   {
     polytope = POLYTOPE_RANDOM;
   }
-  else if (!_stricmp(poly_str,"5-cell") || !_stricmp(poly_str,"0"))
+  else if (!strcasecmp(poly_str,"5-cell") || !strcasecmp(poly_str,"0"))
   {
     polytope = POLYTOPE_5_CELL;
   }
-  else if (!_stricmp(poly_str,"8-cell") || !_stricmp(poly_str,"1"))
+  else if (!strcasecmp(poly_str,"8-cell") || !strcasecmp(poly_str,"1"))
   {
     polytope = POLYTOPE_8_CELL;
   }
-  else if (!_stricmp(poly_str,"16-cell") || !_stricmp(poly_str,"2"))
+  else if (!strcasecmp(poly_str,"16-cell") || !strcasecmp(poly_str,"2"))
   {
     polytope = POLYTOPE_16_CELL;
   }
-  else if (!_stricmp(poly_str,"24-cell") || !_stricmp(poly_str,"3"))
+  else if (!strcasecmp(poly_str,"24-cell") || !strcasecmp(poly_str,"3"))
   {
     polytope = POLYTOPE_24_CELL;
   }
-  else if (!_stricmp(poly_str,"120-cell") || !_stricmp(poly_str,"4"))
+  else if (!strcasecmp(poly_str,"120-cell") || !strcasecmp(poly_str,"4"))
   {
     polytope = POLYTOPE_120_CELL;
   }
-  else if (!_stricmp(poly_str,"600-cell") || !_stricmp(poly_str,"5"))
+  else if (!strcasecmp(poly_str,"600-cell") || !strcasecmp(poly_str,"5"))
   {
     polytope = POLYTOPE_600_CELL;
   }
@@ -3027,11 +3028,11 @@ ENTRYPOINT void init_polytopes(ModeInfo *mi)
   }
 
   /* Set the color mode. */
-  if (!_stricmp(color_str,"single") || !_stricmp(color_str,"0"))
+  if (!strcasecmp(color_str,"single") || !strcasecmp(color_str,"0"))
   {
     color_mode = COLORS_SINGLE;
   }
-  else if (!_stricmp(color_str,"depth") || !_stricmp(color_str,"1"))
+  else if (!strcasecmp(color_str,"depth") || !strcasecmp(color_str,"1"))
   {
     color_mode = COLORS_DEPTH;
   }
@@ -3041,11 +3042,11 @@ ENTRYPOINT void init_polytopes(ModeInfo *mi)
   }
 
   /* Set the 3d projection mode. */
-  if (!_stricmp(proj_3d,"perspective") || !_stricmp(proj_3d,"0"))
+  if (!strcasecmp(proj_3d,"perspective") || !strcasecmp(proj_3d,"0"))
   {
     projection_3d = DISP_3D_PERSPECTIVE;
   }
-  else if (!_stricmp(proj_3d,"orthographic") || !_stricmp(proj_3d,"1"))
+  else if (!strcasecmp(proj_3d,"orthographic") || !strcasecmp(proj_3d,"1"))
   {
     projection_3d = DISP_3D_ORTHOGRAPHIC;
   }
@@ -3055,11 +3056,11 @@ ENTRYPOINT void init_polytopes(ModeInfo *mi)
   }
 
   /* Set the 4d projection mode. */
-  if (!_stricmp(proj_4d,"perspective") || !_stricmp(proj_4d,"0"))
+  if (!strcasecmp(proj_4d,"perspective") || !strcasecmp(proj_4d,"0"))
   {
     projection_4d = DISP_4D_PERSPECTIVE;
   }
-  else if (!_stricmp(proj_4d,"orthographic") || !_stricmp(proj_4d,"1"))
+  else if (!strcasecmp(proj_4d,"orthographic") || !strcasecmp(proj_4d,"1"))
   {
     projection_4d = DISP_4D_ORTHOGRAPHIC;
   }
@@ -3069,9 +3070,9 @@ ENTRYPOINT void init_polytopes(ModeInfo *mi)
   }
 
   /* make multiple screens rotate at slightly different rates. */
-  pp->speed_scale = (float)(0.9f + frand(0.3f));
+  pp->speed_scale = 0.9 + frand(0.3);
 
-  if ((pp->hglrc = init_GL(mi)) != NULL)
+  if ((pp->glx_context = init_GL(mi)) != NULL)
   {
     reshape_polytopes(mi,MI_WIDTH(mi),MI_HEIGHT(mi));
     glDrawBuffer(GL_BACK);
@@ -3090,14 +3091,14 @@ ENTRYPOINT void init_polytopes(ModeInfo *mi)
  */
 ENTRYPOINT void draw_polytopes(ModeInfo *mi)
 {
-  static const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
-  static const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-  static const GLfloat light_specular[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-  static const GLfloat light_position[] = { 0.0f, 0.0f, 1.0f, 0.0f };
-  static const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static const GLfloat light_ambient[]  = { 0.0, 0.0, 0.0, 1.0 };
+  static const GLfloat light_diffuse[]  = { 1.0, 1.0, 1.0, 1.0 };
+  static const GLfloat light_specular[] = { 0.0, 0.0, 0.0, 1.0 };
+  static const GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
+  static const GLfloat mat_specular[]   = { 1.0, 1.0, 1.0, 1.0 };
 
-  HDC display = MI_DISPLAY(mi);
-  HWND window = MI_WINDOW(mi);
+  Display         *display = MI_DISPLAY(mi);
+  Window          window = MI_WINDOW(mi);
   polytopesstruct *hp;
 
   if (poly == NULL)
@@ -3105,18 +3106,18 @@ ENTRYPOINT void draw_polytopes(ModeInfo *mi)
   hp = &poly[MI_SCREEN(mi)];
 
   MI_IS_DRAWN(mi) = True;
-  if (!hp->hglrc)
+  if (!hp->glx_context)
     return;
 
-  wglMakeCurrent(display, hp->hglrc);
+  glXMakeCurrent(display,window,*(hp->glx_context));
 
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   if (projection_3d == DISP_3D_PERSPECTIVE)
-    gluPerspective(60.0,1.0f,0.1,100.0);
+    gluPerspective(60.0,1.0,0.1,100.0);
   else
-    glOrtho(-1.0f,1.0f,-1.0f,1.0f,0.1,100.0);;
+    glOrtho(-1.0,1.0,-1.0,1.0,0.1,100.0);;
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
@@ -3178,7 +3179,7 @@ ENTRYPOINT void draw_polytopes(ModeInfo *mi)
 
   glFlush();
 
-  SwapBuffers(display);
+  glXSwapBuffers(display,window);
 }
 
 
@@ -3200,8 +3201,8 @@ ENTRYPOINT void release_polytopes(ModeInfo *mi)
     {
       polytopesstruct *hp = &poly[screen];
 
-      if (hp->hglrc)
-        hp->hglrc = NULL;
+      if (hp->glx_context)
+        hp->glx_context = (GLXContext *)NULL;
     }
     (void) free((void *)poly);
     poly = (polytopesstruct *)NULL;
@@ -3214,14 +3215,14 @@ ENTRYPOINT void change_polytopes(ModeInfo *mi)
 {
   polytopesstruct *hp = &poly[MI_SCREEN(mi)];
 
-  if (!hp->hglrc)
+  if (!hp->glx_context)
     return;
 
-  wglMakeCurrent(MI_DISPLAY(mi), hp->hglrc);
+  glXMakeCurrent(MI_DISPLAY(mi),MI_WINDOW(mi),*(hp->glx_context));
   init(mi);
 }
 #endif /* !STANDALONE */
 
 XSCREENSAVER_MODULE ("Polytopes", polytopes)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */
