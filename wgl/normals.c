@@ -11,14 +11,11 @@
  * Compute normal vectors for arbitrary triangles.
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
+#if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif
 #endif
-
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <math.h>
 
 #include "win32.h"
 

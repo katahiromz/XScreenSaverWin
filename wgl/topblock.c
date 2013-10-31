@@ -39,13 +39,6 @@ History
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #include "win32.h"
 
 //#include "xlockmore.h"

@@ -1,7 +1,7 @@
 XScreenSaverWin
 ===============
 
-This is XScreenSaver for Windows by Katayama Hirofumi MZ.
+This is XScreenSaver for Windows, porting by Katayama Hirofumi MZ.
 
 http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 

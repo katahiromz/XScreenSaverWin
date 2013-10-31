@@ -103,13 +103,6 @@ static const char sccsid[] = "@(#)moebius.c	5.01 2001/03/01 xlockmore";
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #include "win32.h"
 
 #ifdef MODE_moebius

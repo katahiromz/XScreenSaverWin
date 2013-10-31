@@ -36,14 +36,6 @@ static const char sccsid[] = "@(#)sproingies.c	4.04 97/07/28 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-#include <stdio.h>
-
 #include "win32.h"
 
 #ifdef USE_GL

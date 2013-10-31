@@ -138,13 +138,6 @@ static const char sccsid[] = "@(#)klein.c  1.1 08/10/04 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #include "win32.h"
 
 #ifdef USE_GL

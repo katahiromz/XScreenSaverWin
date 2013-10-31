@@ -5,11 +5,7 @@
 	#ifdef HAVE_CONFIG_H
 	# include "config.h"
 	#endif /* HAVE_CONFIG_H */
-#endif
 
-#include <stdlib.h>
-
-#if 0
 	#ifndef HAVE_COCOA
 	# include <GL/gl.h>
 	#endif
@@ -19,8 +15,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include <windows.h>
-#include <GL/gl.h>
+#include "win32.h"
 
 struct gllist{
 	GLenum format;

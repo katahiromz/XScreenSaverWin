@@ -16,14 +16,6 @@ static const char sccsid[] = "@(#)buildlwo.c	4.02 97/04/20 xlockmore";
  *
  */
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-#include <stdio.h>
-
 #include "win32.h"
 
 #if 0

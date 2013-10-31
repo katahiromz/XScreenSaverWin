@@ -32,13 +32,6 @@ static const char sccsid[] = "@(#)boxed.c	0.9 01/09/26 xlockmore";
  *
  */
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #include "win32.h"
 
 #include "boxed.h"

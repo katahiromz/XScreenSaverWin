@@ -13,11 +13,6 @@
    to hack the screen with.
  */
 
-#include <windows.h>
-#include <scrnsave.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
 #include "win32.h"
 
 //#include "utils.h"

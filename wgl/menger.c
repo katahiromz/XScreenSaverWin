@@ -50,6 +50,7 @@
  *  just draw them as spots on the surface!  It would look the same.
  */
 
+#define DELAY 30000
 #define DEFAULTS	"*delay:	 30000          \n" \
 			"*showFPS:       False          \n" \
 			"*wireframe:     False          \n" \
@@ -60,10 +61,11 @@
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-#include "xlockmore.h"
+//#include "xlockmore.h"
+#include "win32.h"
 #include "colors.h"
 #include "rotator.h"
-#include "gltrackball.h"
+//#include "gltrackball.h"
 #include <ctype.h>
 
 #ifdef USE_GL /* whole file */
@@ -98,28 +100,29 @@ typedef struct {
 
 static sponge_configuration *sps = NULL;
 
-static Bool do_spin;
-static Bool do_wander;
-static int speed;
-static int max_depth;
+static Bool do_spin = True;
+static Bool do_wander = True;
+static int speed = 150;
+static int max_depth = 3;
 
-static XrmOptionDescRec opts[] = {
-  { "-wander", ".wander",   XrmoptionNoArg, "True"  },
-  { "+wander", ".wander",   XrmoptionNoArg, "False" },
-  { "-spin",   ".spin",     XrmoptionSepArg, 0 },
-  { "-speed",  ".speed",    XrmoptionSepArg, 0 },
-  { "-depth",  ".maxDepth", XrmoptionSepArg, 0 },
-};
+#if 0
+	static XrmOptionDescRec opts[] = {
+	  { "-wander", ".wander",   XrmoptionNoArg, "True"  },
+	  { "+wander", ".wander",   XrmoptionNoArg, "False" },
+	  { "-spin",   ".spin",     XrmoptionSepArg, 0 },
+	  { "-speed",  ".speed",    XrmoptionSepArg, 0 },
+	  { "-depth",  ".maxDepth", XrmoptionSepArg, 0 },
+	};
 
-static argtype vars[] = {
-  {&do_spin,     "spin",     "Spin",     DEF_SPIN,      t_Bool},
-  {&do_wander,   "wander",   "Wander",   DEF_WANDER,    t_Bool},
-  {&speed,       "speed",    "Speed",    DEF_SPEED,     t_Int},
-  {&max_depth,   "maxDepth", "MaxDepth", DEF_MAX_DEPTH, t_Int},
-};
+	static argtype vars[] = {
+	  {&do_spin,     "spin",     "Spin",     DEF_SPIN,      t_Bool},
+	  {&do_wander,   "wander",   "Wander",   DEF_WANDER,    t_Bool},
+	  {&speed,       "speed",    "Speed",    DEF_SPEED,     t_Int},
+	  {&max_depth,   "maxDepth", "MaxDepth", DEF_MAX_DEPTH, t_Int},
+	};
 
-ENTRYPOINT ModeSpecOpt sponge_opts = {countof(opts), opts, countof(vars), vars, NULL};
-
+	ENTRYPOINT ModeSpecOpt sponge_opts = {countof(opts), opts, countof(vars), vars, NULL};
+#endif
 
 /* Window management, etc
  */
@@ -340,49 +343,49 @@ build_sponge (sponge_configuration *sp, Bool wireframe, int level)
   glEndList();
 }
 
+#if 0
+	ENTRYPOINT Bool
+	sponge_handle_event (ModeInfo *mi, XEvent *event)
+	{
+	  sponge_configuration *sp = &sps[MI_SCREEN(mi)];
 
-ENTRYPOINT Bool
-sponge_handle_event (ModeInfo *mi, XEvent *event)
-{
-  sponge_configuration *sp = &sps[MI_SCREEN(mi)];
+	  if (event->xany.type == ButtonPress &&
+		  event->xbutton.button == Button1)
+		{
+		  sp->button_down_p = True;
+		  gltrackball_start (sp->trackball,
+							 event->xbutton.x, event->xbutton.y,
+							 MI_WIDTH (mi), MI_HEIGHT (mi));
+		  return True;
+		}
+	  else if (event->xany.type == ButtonRelease &&
+			   event->xbutton.button == Button1)
+		{
+		  sp->button_down_p = False;
+		  return True;
+		}
+	  else if (event->xany.type == ButtonPress &&
+			   (event->xbutton.button == Button4 ||
+				event->xbutton.button == Button5 ||
+				event->xbutton.button == Button6 ||
+				event->xbutton.button == Button7))
+		{
+		  gltrackball_mousewheel (sp->trackball, event->xbutton.button, 5,
+								  !!event->xbutton.state);
+		  return True;
+		}
+	  else if (event->xany.type == MotionNotify &&
+			   sp->button_down_p)
+		{
+		  gltrackball_track (sp->trackball,
+							 event->xmotion.x, event->xmotion.y,
+							 MI_WIDTH (mi), MI_HEIGHT (mi));
+		  return True;
+		}
 
-  if (event->xany.type == ButtonPress &&
-      event->xbutton.button == Button1)
-    {
-      sp->button_down_p = True;
-      gltrackball_start (sp->trackball,
-                         event->xbutton.x, event->xbutton.y,
-                         MI_WIDTH (mi), MI_HEIGHT (mi));
-      return True;
-    }
-  else if (event->xany.type == ButtonRelease &&
-           event->xbutton.button == Button1)
-    {
-      sp->button_down_p = False;
-      return True;
-    }
-  else if (event->xany.type == ButtonPress &&
-           (event->xbutton.button == Button4 ||
-            event->xbutton.button == Button5 ||
-            event->xbutton.button == Button6 ||
-            event->xbutton.button == Button7))
-    {
-      gltrackball_mousewheel (sp->trackball, event->xbutton.button, 5,
-                              !!event->xbutton.state);
-      return True;
-    }
-  else if (event->xany.type == MotionNotify &&
-           sp->button_down_p)
-    {
-      gltrackball_track (sp->trackball,
-                         event->xmotion.x, event->xmotion.y,
-                         MI_WIDTH (mi), MI_HEIGHT (mi));
-      return True;
-    }
-
-  return False;
-}
-
+	  return False;
+	}
+#endif
 
 
 ENTRYPOINT void 

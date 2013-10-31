@@ -197,6 +197,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\xcolor.c"
+				>
+			</File>
+			<File
 				RelativePath=".\yarandom.c"
 				>
 			</File>

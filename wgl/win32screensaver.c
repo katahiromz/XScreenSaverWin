@@ -1,15 +1,11 @@
-#include <windows.h>
-#include <scrnsave.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
 #include "win32.h"
+#include <scrnsave.h>
 #include "resource.h"
 
-#ifdef UNICODE
-#pragma comment(lib, "scrnsavw.lib")
+#ifdef _UNICODE
+	#pragma comment(lib, "scrnsavw.lib")
 #else
-#pragma comment(lib, "scrnsave.lib")
+	#pragma comment(lib, "scrnsave.lib")
 #endif
 
 PIXELFORMATDESCRIPTOR pfd =
@@ -63,8 +59,8 @@ BOOL ss_init(HWND hwnd)
 
     wglMakeCurrent(ss.hdc, ss.hglrc);
 
-    ss.modeinfo.hdc = ss.hdc;
-    ss.modeinfo.hwnd = hwnd;
+    ss.modeinfo.dpy = ss.hdc;
+    ss.modeinfo.window = hwnd;
     ss.modeinfo.num_screen = 1;
     ss.modeinfo.screen_number = 0;
     ss.modeinfo.width = ss.w;
@@ -191,5 +187,21 @@ void gltrackball_get_quaternion(char **ppch, float q[4])
 
 Display *DisplayOfScreen(Screen *s)
 {
-	return GetWindowDC(s);
+    return GetWindowDC(s);
+}
+
+Bool has_writable_cells (Screen *s, Visual *v)
+{
+    return False;
+}
+
+int ffs(int i)
+{
+    int j;
+
+    if (i == 0)
+        return 0;
+    for (j = 1; (i & 1) == 0; j++)
+        i >>= 1;
+    return j;
 }

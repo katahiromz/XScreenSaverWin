@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\hsv.c"
+				>
+			</File>
+			<File
 				RelativePath=".\sphere.c"
 				>
 			</File>
@@ -202,6 +206,10 @@
 			</File>
 			<File
 				RelativePath=".\win32screensaver.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xcolor.c"
 				>
 			</File>
 			<File
@@ -228,6 +236,10 @@
 			</File>
 			<File
 				RelativePath=".\glschool_gl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\hsv.h"
 				>
 			</File>
 			<File

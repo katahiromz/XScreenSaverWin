@@ -67,14 +67,6 @@ static const char sccsid[] = "@(#)morph3d.c	5.01 2001/03/01 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-#include <stdio.h>
-
 #include "win32.h"
 
 #ifdef MODE_moebius

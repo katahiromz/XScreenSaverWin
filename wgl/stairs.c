@@ -61,22 +61,19 @@ static const char sccsid[] = "@(#)stairs.c	4.07 97/11/24 xlockmore";
 
 # define refresh_stairs NULL
 
-#ifdef STANDALONE
-# include "xlockmore.h"		/* from the xscreensaver distribution */
-#else /* !STANDALONE */
-# include "xlock.h"			/* from the xlockmore distribution */
-#endif /* !STANDALONE */
-
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <math.h>
+#if 0
+	#ifdef STANDALONE
+	# include "xlockmore.h"		/* from the xscreensaver distribution */
+	#else /* !STANDALONE */
+	# include "xlock.h"			/* from the xlockmore distribution */
+	#endif /* !STANDALONE */
+#endif
 
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
-#if 0
+#if 1
 #include "e_textures.h"
 #else
 #include "xpm-ximage.h"
@@ -84,18 +81,19 @@ static const char sccsid[] = "@(#)stairs.c	4.07 97/11/24 xlockmore";
 #endif
 
 #include "sphere.h"
-#include "gltrackball.h"
+//#include "gltrackball.h"
 
-ENTRYPOINT ModeSpecOpt stairs_opts =
-{0, NULL, 0, NULL, NULL};
+#if 0
+	ENTRYPOINT ModeSpecOpt stairs_opts =
+	{0, NULL, 0, NULL, NULL};
 
-#ifdef USE_MODULES
-ModStruct   stairs_description =
-{"stairs", "init_stairs", "draw_stairs", "release_stairs",
- "draw_stairs", "change_stairs", NULL, &stairs_opts,
- 1000, 1, 1, 1, 4, 1.0, "",
- "Shows Infinite Stairs, an Escher-like scene", 0, NULL};
-
+	#ifdef USE_MODULES
+	ModStruct   stairs_description =
+	{"stairs", "init_stairs", "draw_stairs", "release_stairs",
+	 "draw_stairs", "change_stairs", NULL, &stairs_opts,
+	 1000, 1, 1, 1, 4, 1.0, "",
+	 "Shows Infinite Stairs, an Escher-like scene", 0, NULL};
+	#endif
 #endif
 
 #define Scale4Window               0.3
@@ -346,64 +344,65 @@ reshape_stairs (ModeInfo * mi, int width, int height)
 	}
 }
 
-ENTRYPOINT Bool
-stairs_handle_event (ModeInfo *mi, XEvent *event)
-{
-  stairsstruct *sp = &stairs[MI_SCREEN(mi)];
+#if 0
+	ENTRYPOINT Bool
+	stairs_handle_event (ModeInfo *mi, XEvent *event)
+	{
+	  stairsstruct *sp = &stairs[MI_SCREEN(mi)];
 
-  if (event->xany.type == ButtonPress &&
-      event->xbutton.button == Button1)
-    {
-      sp->button_down_p = True;
-      gltrackball_start (sp->trackball,
-                         event->xbutton.x, event->xbutton.y,
-                         MI_WIDTH (mi), MI_HEIGHT (mi));
-      return True;
-    }
-  else if (event->xany.type == ButtonRelease &&
-           event->xbutton.button == Button1)
-    {
-      sp->button_down_p = False;
-      return True;
-    }
-  else if (event->xany.type == ButtonPress &&
-           (event->xbutton.button == Button4 ||
-            event->xbutton.button == Button5 ||
-            event->xbutton.button == Button6 ||
-            event->xbutton.button == Button7))
-    {
-      gltrackball_mousewheel (sp->trackball, event->xbutton.button, 10,
-                              !!event->xbutton.state);
-      return True;
-    }
-  else if (event->xany.type == MotionNotify &&
-           sp->button_down_p)
-    {
-      gltrackball_track (sp->trackball,
-                         event->xmotion.x, event->xmotion.y,
-                         MI_WIDTH (mi), MI_HEIGHT (mi));
-      return True;
-    }
-  else if (event->xany.type == KeyPress)
-    {
-      KeySym keysym;
-      char c = 0;
-      XLookupString (&event->xkey, &c, 1, &keysym, 0);
-      if (c == ' ')
-        {
-          gltrackball_reset (sp->trackball);
-          return True;
-        }
-    }
+	  if (event->xany.type == ButtonPress &&
+		  event->xbutton.button == Button1)
+		{
+		  sp->button_down_p = True;
+		  gltrackball_start (sp->trackball,
+							 event->xbutton.x, event->xbutton.y,
+							 MI_WIDTH (mi), MI_HEIGHT (mi));
+		  return True;
+		}
+	  else if (event->xany.type == ButtonRelease &&
+			   event->xbutton.button == Button1)
+		{
+		  sp->button_down_p = False;
+		  return True;
+		}
+	  else if (event->xany.type == ButtonPress &&
+			   (event->xbutton.button == Button4 ||
+				event->xbutton.button == Button5 ||
+				event->xbutton.button == Button6 ||
+				event->xbutton.button == Button7))
+		{
+		  gltrackball_mousewheel (sp->trackball, event->xbutton.button, 10,
+								  !!event->xbutton.state);
+		  return True;
+		}
+	  else if (event->xany.type == MotionNotify &&
+			   sp->button_down_p)
+		{
+		  gltrackball_track (sp->trackball,
+							 event->xmotion.x, event->xmotion.y,
+							 MI_WIDTH (mi), MI_HEIGHT (mi));
+		  return True;
+		}
+	  else if (event->xany.type == KeyPress)
+		{
+		  KeySym keysym;
+		  char c = 0;
+		  XLookupString (&event->xkey, &c, 1, &keysym, 0);
+		  if (c == ' ')
+			{
+			  gltrackball_reset (sp->trackball);
+			  return True;
+			}
+		}
 
-  return False;
-}
-
+	  return False;
+	}
+#endif
 
 static void
 pinit(ModeInfo *mi)
 {
-  /* int status; */
+    int status;
 	glClearDepth(1.0);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
@@ -427,7 +426,7 @@ pinit(ModeInfo *mi)
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-#if 0
+#if 1
     clear_gl_error();
     status = gluBuild2DMipmaps(GL_TEXTURE_2D, 3,
                                WoodTextureWidth, WoodTextureHeight,
@@ -609,7 +608,7 @@ change_stairs (ModeInfo * mi)
 		return;
 
 	glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(sp->glx_context));
-	pinit();
+	pinit(mi);
 }
 #endif /* !STANDALONE */
 

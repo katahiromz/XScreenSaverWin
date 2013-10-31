@@ -48,6 +48,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -117,11 +118,12 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -175,11 +177,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\sphere.c"
+				>
+			</File>
+			<File
 				RelativePath=".\stairs.c"
 				>
 			</File>
 			<File
 				RelativePath=".\win32screensaver.c"
+				>
+			</File>
+			<File
+				RelativePath=".\yarandom.c"
 				>
 			</File>
 		</Filter>
@@ -189,11 +199,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\e_textures.h"
+				>
+			</File>
+			<File
 				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
+				RelativePath=".\sphere.h"
+				>
+			</File>
+			<File
 				RelativePath=".\win32.h"
+				>
+			</File>
+			<File
+				RelativePath=".\yarandom.h"
 				>
 			</File>
 		</Filter>

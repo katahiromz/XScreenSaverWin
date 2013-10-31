@@ -41,13 +41,6 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #include "win32.h"
 #include "sphere.h"
 //#include "gltrackball.h"
