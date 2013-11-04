@@ -288,10 +288,8 @@ draw_histogram (ModeInfo *mi, GLfloat ratio)
 {
   bit_configuration *bp = &bps[MI_SCREEN(mi)];
   int samples = countof (bp->histogram);
-  //GLfloat scalex = (GLfloat) mi->xgwa.width / samples;
-  //GLfloat scaley = mi->xgwa.height / 255.0 / 4;  /* about 1/4th of screen */
-  GLfloat scalex = (GLfloat) MI_WIDTH(mi) / samples;
-  GLfloat scaley = MI_HEIGHT(mi) / 255.0 / 4;  /* about 1/4th of screen */
+  GLfloat scalex = (GLfloat) mi->xgwa.width / samples;
+  GLfloat scaley = mi->xgwa.height / 255.0 / 4;  /* about 1/4th of screen */
   int polys = 0;
   int overlays = 5;
   int k;

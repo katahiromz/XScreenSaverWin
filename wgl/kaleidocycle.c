@@ -33,6 +33,9 @@
 //#include "gltrackball.h"
 #include <ctype.h>
 
+#undef MI_COUNT
+#define MI_COUNT(mi) 16
+
 #ifdef USE_GL /* whole file */
 
 #define DEF_SPIN        "Z"

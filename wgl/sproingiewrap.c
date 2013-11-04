@@ -66,6 +66,12 @@ static const char sccsid[] = "@(#)sproingiewrap.c	4.07 97/11/24 xlockmore";
 
 #include "win32.h"
 
+
+#undef MI_COUNT
+#define MI_COUNT(mi) 8
+#undef MI_SIZE
+#define MI_SIZE(mi) 0
+
 #ifdef USE_GL
 
 #define DEF_SMART_SPROINGIES "True" /* Smart sproingies do not fall down the edge */

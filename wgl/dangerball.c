@@ -29,6 +29,9 @@
 //#include "gltrackball.h"
 #include <ctype.h>
 
+#undef MI_COUNT
+#define MI_COUNT(mi) 30
+
 #ifdef USE_GL /* whole file */
 
 

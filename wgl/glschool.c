@@ -12,6 +12,7 @@
 
 #include "win32.h"
 #include "glschool.h"
+#include "colors.h"
 
 //#define sws_opts			xlockmore_opts
 #define DELAY 20000

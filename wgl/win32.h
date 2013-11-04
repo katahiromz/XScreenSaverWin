@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef STRICT
-	#define STRICT
+    #define STRICT
 #endif
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -22,6 +22,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #define USE_GL 1
+#define HAVE_GLBINDTEXTURE
 #define inline
 #define ENTRYPOINT static
 #define strcasecmp _stricmp
@@ -31,59 +32,101 @@
 #define Xrealloc realloc
 #define Xfree free
 
-enum { XYBitmap, XYPixmap, ZPixmap };
-enum { MSBFirst, LSBFirst };
-
+typedef BYTE CARD8;
+typedef WORD CARD16;
 typedef DWORD CARD32;
 
-//#define GL_UNSIGNED_INT_8_8_8_8_REV		0x8367
+#define GL_UNSIGNED_INT_8_8_8_8_REV GL_UNSIGNED_BYTE
+
+#ifndef  GL_TEXTURE_MAX_ANISOTROPY_EXT
+# define GL_TEXTURE_MAX_ANISOTROPY_EXT      0x84FE
+#endif
+#ifndef  GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
+# define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT  0x84FF
+#endif
+
+#ifndef GL_LIGHT_MODEL_COLOR_CONTROL
+# define GL_LIGHT_MODEL_COLOR_CONTROL       0x81F8
+#endif
+#ifndef GL_SEPARATE_SPECULAR_COLOR
+# define GL_SEPARATE_SPECULAR_COLOR         0x81FA
+#endif
+
+#define None NULL
+
+#ifdef MSGBOXOUTPUT
+#define fprintf win32_fprintf
+int __cdecl win32_fprintf(FILE *fp, const char *fmt, ...);
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
+// Bool
 
 typedef BOOL Bool;
 #define False FALSE
 #define True TRUE
 
 //////////////////////////////////////////////////////////////////////////////
+// Drawable
 
-#define DoRed           (1<<0)
-#define DoGreen         (1<<1)
-#define DoBlue          (1<<2)
+typedef INT Drawable;
+typedef INT Pixmap;
+typedef INT Window;
 
-struct win32_XColor 
-{
-  unsigned long pixel;
-  unsigned short red, green, blue;
-  char flags;  /* DoRed, DoGreen, DoBlue */
-  char pad;
-};
-typedef struct win32_XColor XColor;
+//////////////////////////////////////////////////////////////////////////////
+// Visual
+
+#define Visual int
+
+//////////////////////////////////////////////////////////////////////////////
+// Colormap
+
+typedef unsigned long Colormap;
+
+//////////////////////////////////////////////////////////////////////////////
+// XRectangle
+
+typedef struct {
+    short x, y;
+    unsigned short width, height;
+} XRectangle;
+
 
 //////////////////////////////////////////////////////////////////////////////
 
-typedef unsigned long win32_Colormap;
-typedef win32_Colormap Colormap;
+#define trackball_state char*   // Not implemented yet
 
-//////////////////////////////////////////////////////////////////////////////
-
-#define Visual void
-#define trackball_state char*	// Not implemented yet
+void gltrackball_start(trackball_state* trackball, int n1, int n2, int n3, int n4);
+void gltrackball_track(trackball_state* trackball, int n1, int n2, int n3, int n4);
 
 typedef int Status;
 
 #ifdef STRICT
-	#define Display struct HDC__
-	#define Screen struct HWND__
+    #define Display struct HDC__
+    #define Screen struct HWND__
 #else
-	#define Display void
-	#define Screen void
+    #define Display void
+    #define Screen void
 #endif
-typedef HWND  Window;
+
 typedef HGLRC GLXContext;
 
 //////////////////////////////////////////////////////////////////////////////
+// XWindowAttributes
 
-struct win32_ModeInfo
+typedef struct {
+    int width;
+    int height;
+    int depth;
+    Visual *visual;
+    Colormap colormap;
+    Screen *screen;
+} XWindowAttributes;
+
+//////////////////////////////////////////////////////////////////////////////
+// ModeInfo
+
+typedef struct 
 {
     Display *dpy;
     Window window;
@@ -96,32 +139,39 @@ struct win32_ModeInfo
     Bool fps_p;
     Bool is_drawn;
     int pause;
-};
-typedef struct win32_ModeInfo ModeInfo;
+    int count;
+    XWindowAttributes xgwa;
+} ModeInfo;
 
 #define MI_DISPLAY(mi) (mi)->dpy
-#define MI_WINDOW(mi) (mi)->window
+#define MI_WINDOW(mi) 0
 #define MI_NUM_SCREENS(mi) 1
 #define MI_SCREEN(mi) 0
 #define MI_WIDTH(mi) (mi)->width
 #define MI_HEIGHT(mi) (mi)->height
+#define MI_WIN_WIDTH(mi) (mi)->width
+#define MI_WIN_HEIGHT(mi) (mi)->height
 #define MI_IS_DRAWN(mi) (mi)->is_drawn
 #define MI_IS_FPS(mi) FALSE
 #define MI_IS_MONO(mi) FALSE
 #define MI_CLEARWINDOW(mi) glClear(GL_COLOR_BUFFER_BIT)
 #define MI_IS_WIREFRAME(mi) FALSE
-#define MI_COUNT(MI) GdiGetBatchLimit()
-#define MI_BATCHCOUNT(MI) GdiGetBatchLimit()
+#define MI_COUNT(MI) (mi)->count
+#define MI_BATCHCOUNT(MI) (mi)->count
 #define MI_IS_ICONIC(mi) FALSE
 #define MI_CYCLES(mi) 10
 #define MI_SIZE(mi) 100
 #ifdef NDEBUG
 #define MI_IS_DEBUG(mi) FALSE
+#define MI_IS_VERBOSE(mi) FALSE
 #else
 #define MI_IS_DEBUG(mi) TRUE
+#define MI_IS_VERBOSE(mi) TRUE
 #endif
 #define MI_NAME(mi) progname
 #define MI_DELAY(mi) DELAY
+#define MI_VISUAL(mi) NULL
+#define MI_COLORMAP(mi) 0
 
 #define FreeAllGL(mi) /**/
 
@@ -222,66 +272,95 @@ void gltrackball_get_quaternion(char **ppch, float q[4]);
 float current_device_rotation(void);
 
 int ffs(int i);
+int visual_cells(Screen *screen, Visual *visual);
+int visual_depth(Screen *screen, Visual *visual);
+
+void
+load_texture_async(Screen *screen, Window window,
+                   GLXContext glx_context,
+                   int desired_width, int desired_height,
+                   Bool mipmap_p,
+                   GLuint texid,
+                   void (*callback) (const char *filename,
+                                     XRectangle *geometry,
+                                     int image_width,
+                                     int image_height,
+                                     int texture_width,
+                                     int texture_height,
+                                     void *closure),
+                   void *closure);
 
 //////////////////////////////////////////////////////////////////////////////
+// XImage
 
-typedef char *XPointer;
+// format
+enum { XYBitmap, XYPixmap, ZPixmap, RGBAPixmap };
 
-typedef struct win32_XImage {
-    int width, height;		/* size of image */
-    int xoffset;		/* number of pixels offset in X direction */
-    int format;			/* XYBitmap, XYPixmap, ZPixmap */
-    char *data;			/* pointer to image data */
-    int byte_order;		/* data byte order, LSBFirst, MSBFirst */
-    int bitmap_unit;		/* quant. of scanline 8, 16, 32 */
-    int bitmap_bit_order;	/* LSBFirst, MSBFirst */
-    int bitmap_pad;		/* 8, 16, 32 either XY or ZPixmap */
-    int depth;			/* depth of image */
-    int bytes_per_line;		/* accelarator to next line */
-    int bits_per_pixel;		/* bits per pixel (ZPixmap) */
-    unsigned long red_mask;	/* bits in z arrangment */
-    unsigned long green_mask;
-    unsigned long blue_mask;
-    XPointer obdata;		/* hook for the object routines to hang on */
-    struct funcs {		/* image manipulation routines */
-	struct win32_XImage *(*create_image)(
-		Display* /* display */,
-		Visual*		/* visual */,
-		unsigned int	/* depth */,
-		int		/* format */,
-		int		/* offset */,
-		char*		/* data */,
-		unsigned int	/* width */,
-		unsigned int	/* height */,
-		int		/* bitmap_pad */,
-		int		/* bytes_per_line */);
-	int (*destroy_image)        (struct win32_XImage *);
-	unsigned long (*get_pixel)  (struct win32_XImage *, int, int);
-	int (*put_pixel)            (struct win32_XImage *, int, int, unsigned long);
-	struct win32_XImage *(*sub_image)(struct win32_XImage *, int, int, unsigned int, unsigned int);
-	int (*add_pixel)            (struct win32_XImage *, long);
-	} f;
+// byte_order/bitmap_bit_order
+enum { MSBFirst, LSBFirst };
+
+typedef struct
+{
+    int depth;
+    unsigned int width, height;
+    int format;
+    int bytes_per_line;
+    int bits_per_pixel;
+    int bitmap_bit_order;
+    int byte_order;
+    char *data;
+    int xoffset, yoffset;
+    unsigned int red_mask, green_mask, blue_mask;
+    int bitmap_pad;
 } XImage;
 
+#define MASK_LH(l, h)       (((1 << (1 + (h) - (l))) - 1) << (l))
+#define BM_ARGB(a, r, g, b) MASK_LH(0, (b) - 1)
+#define GM_ARGB(a, r, g, b) MASK_LH(b, (b) + (g) - 1)
+#define RM_ARGB(a, r, g, b) MASK_LH((b) + (g), (b) + (g) + (r) - 1)
+#define AM_ARGB(a, r, g, b) MASK_LH((b) + (g) + (r), \
+                                    (b) + (g) + (r) + (a) - 1)
+
+XImage *XCreateImage(Display *dpy, Visual *visual, int depth, int format,
+    int offset, char *data, unsigned int width, unsigned int height,
+    int xpad, int image_bytes_per_line);
+int XDestroyImage(XImage *image);
+
+unsigned long XGetPixel(XImage *image, int x, int y);
+int XPutPixel(XImage *ximage, int x, int y, unsigned long pixel);
+
+Pixmap XCreatePixmap(
+    Display *dpy,
+    Drawable d,
+    unsigned int width,
+    unsigned int height,
+    unsigned int depth);
+int XFreePixmap(Display *dpy, Pixmap pixmap);
+
 //////////////////////////////////////////////////////////////////////////////
+// GC
 
-typedef struct _XExtData {
-	int number;		/* number returned by XRegisterExtension */
-	struct _XExtData *next;	/* next item on list of data for structure */
-	int (*free_private)(	/* called to free private storage */
-	struct _XExtData *extension
-	);
-	XPointer private_data;	/* data private to this extension. */
-} XExtData;
+typedef HDC GC;
 
-//////////////////////////////////////////////////////////////////////////////
+typedef struct
+{
+    unsigned long foreground;
+    unsigned long background;
+} XGCValues;
 
-typedef struct {
-	XExtData *ext_data;	/* hook for extension to hang data */
-	int depth;		/* depth of this image format */
-	int bits_per_pixel;	/* bits/pixel at this depth */
-	int scanline_pad;	/* scanline must padded to this multiple */
-} ScreenFormat;
+GC XCreateGC(
+     Display *dpy, 
+     Drawable d,
+     unsigned long valuemask, 
+     XGCValues *values);
+int XFreeGC(Display *dpy, GC gc);
+
+int XCopyArea(
+     Display *dpy,
+     Drawable src_drawable, Drawable dst_drawable, GC gc,
+     int src_x, int src_y,
+     unsigned int width, unsigned int height,
+     int dst_x, int dst_y);
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -291,59 +370,43 @@ Display *DisplayOfScreen(Screen *s);
 #define DefaultColormap(dpy, scr) 0
 
 //////////////////////////////////////////////////////////////////////////////
+// XColor
 
-extern Status XAllocColor(
-    Display*		/* display */,
-    Colormap		/* colormap */,
-    XColor*		/* screen_in_out */
-);
-extern Status XAllocColorCells(
-    Display*		/* display */,
-    Colormap		/* colormap */,
-    Bool	        /* contig */,
-    unsigned long*	/* plane_masks_return */,
-    unsigned int	/* nplanes */,
-    unsigned long*	/* pixels_return */,
-    unsigned int 	/* npixels */
-);
-extern int XFreeColors(
-    Display*		/* display */,
-    Colormap		/* colormap */,
-    unsigned long*	/* pixels */,
-    int			/* npixels */,
-    unsigned long	/* planes */
-);
-extern int XStoreColors(
-    Display*		/* display */,
-    Colormap		/* colormap */,
-    XColor*		/* color */,
-    int			/* ncolors */
-);
-extern int XFlush(
-    Display*		/* display */
-);
-extern XImage *XCreateImage(
-    Display*		/* display */,
-    Visual*		/* visual */,
-    unsigned int	/* depth */,
-    int			/* format */,
-    int			/* offset */,
-    char*		/* data */,
-    unsigned int	/* width */,
-    unsigned int	/* height */,
-    int			/* bitmap_pad */,
-    int			/* bytes_per_line */
-);
-#define XDestroyImage(ximage) \
-	((*((ximage)->f.destroy_image))((ximage)))
-#define XGetPixel(ximage, x, y) \
-	((*((ximage)->f.get_pixel))((ximage), (x), (y)))
-#define XPutPixel(ximage, x, y, pixel) \
-	((*((ximage)->f.put_pixel))((ximage), (x), (y), (pixel)))
-#define XSubImage(ximage, x, y, width, height)  \
-	((*((ximage)->f.sub_image))((ximage), (x), (y), (width), (height)))
-#define XAddPixel(ximage, value) \
-	((*((ximage)->f.add_pixel))((ximage), (value)))
+#define DoRed           (1<<0)
+#define DoGreen         (1<<1)
+#define DoBlue          (1<<2)
+
+typedef struct
+{
+  unsigned long pixel;
+  unsigned short red, green, blue;
+  char flags;  /* DoRed, DoGreen, DoBlue */
+  char pad;
+} XColor;
+
+Bool XAllocColor(Display *d, Colormap cmap, XColor *color);
+Status XAllocColorCells(
+    Display*        d,
+    Colormap        cmap,
+    Bool            contig,
+    unsigned long*  plane_masks_return,
+    unsigned int    nplanes,
+    unsigned long*  pixels_return,
+    unsigned int    npixels);
+int XFreeColors(
+    Display*        d,
+    Colormap        cmap,
+    unsigned long*  pixels,
+    int             npixels,
+    unsigned long   planes);
+int XStoreColors(
+    Display*    display,
+    Colormap    cmap,
+    XColor*     color,
+    int         ncolors);
+int XFlush(Display *d);
+int XQueryColor(Display *dpy, Colormap cmap, XColor *def);
+int XParseColor(Display *d, Colormap cmap, const char *name, XColor *c);
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -355,8 +418,14 @@ typedef struct SCREENSAVER
     UINT x0, y0;
     UINT w, h;
     ModeInfo modeinfo;
+    HBITMAP hbmScreenShot;
 } SCREENSAVER;
+
+extern SCREENSAVER ss;
+
+XImage *GetScreenShotXImage(void);
+void CreateTextureFromImage(XImage *ximage, GLuint texid);
 
 //////////////////////////////////////////////////////////////////////////////
 
-#endif	// ndef __XSCREENSAVER_WIN32_H__
+#endif  // ndef __XSCREENSAVER_WIN32_H__

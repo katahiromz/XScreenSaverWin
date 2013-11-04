@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib scrnsave.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="comctl32.lib opengl32.lib glu32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).scr"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib scrnsave.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="comctl32.lib opengl32.lib glu32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).scr"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
@@ -182,6 +182,10 @@
 			</File>
 			<File
 				RelativePath=".\win32screensaver.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xcolor.c"
 				>
 			</File>
 			<File

@@ -36,6 +36,9 @@
 #include "rotator.h"
 //#include "gltrackball.h"
 
+#undef MI_COUNT
+#define MI_COUNT(mi) 30
+
 #define DEF_START	"0.00"
 #define DEF_DILATE	"1.00"
 #define DEF_END		"27.79"
@@ -97,10 +100,10 @@ static const char *do_tx1 = "(none)", *do_tx2 = "(none)", *do_tx3 = "(none)", *d
 
 #include "xpm-ximage.h"
 #include "images/logo-180.xpm"
-#include "images/tunnelstar.xpm"
-#include "images/timetunnel0.xpm"
-#include "images/timetunnel1.xpm"
-#include "images/timetunnel2.xpm"
+#include "../images/tunnelstar.xpm"
+#include "../images/timetunnel0.xpm"
+#include "../images/timetunnel1.xpm"
+#include "../images/timetunnel2.xpm"
 
 
 #ifdef USE_GL /* whole file */
@@ -375,47 +378,47 @@ reshape_tunnel (ModeInfo *mi, int width, int height)
 }
 
 
+#if 0
+	ENTRYPOINT Bool
+	tunnel_handle_event (ModeInfo *mi, XEvent *event)
+	{
+	  tunnel_configuration *tc = &tconf[MI_SCREEN(mi)];
 
+	  if (event->xany.type == ButtonPress &&
+		  event->xbutton.button == Button1)
+		{
+		  tc->button_down_p = True;
+		  gltrackball_start (tc->trackball,
+							 event->xbutton.x, event->xbutton.y,
+							 MI_WIDTH (mi), MI_HEIGHT (mi));
+		  return True;
+		}
+	  else if (event->xany.type == ButtonRelease &&
+			   event->xbutton.button == Button1)
+		{
+		  tc->button_down_p = False;
+		  return True;
+		}
+	  else if (event->xany.type == ButtonPress &&
+			   (event->xbutton.button == Button4 ||
+				event->xbutton.button == Button5))
+		{
+		  gltrackball_mousewheel (tc->trackball, event->xbutton.button, 10,
+								  !!event->xbutton.state);
+		  return True;
+		}
+	  else if (event->xany.type == MotionNotify &&
+			   tc->button_down_p)
+		{
+		  gltrackball_track (tc->trackball,
+							 event->xmotion.x, event->xmotion.y,
+							 MI_WIDTH (mi), MI_HEIGHT (mi));
+		  return True;
+		}
 
-ENTRYPOINT Bool
-tunnel_handle_event (ModeInfo *mi, XEvent *event)
-{
-  tunnel_configuration *tc = &tconf[MI_SCREEN(mi)];
-
-  if (event->xany.type == ButtonPress &&
-      event->xbutton.button == Button1)
-    {
-      tc->button_down_p = True;
-      gltrackball_start (tc->trackball,
-                         event->xbutton.x, event->xbutton.y,
-                         MI_WIDTH (mi), MI_HEIGHT (mi));
-      return True;
-    }
-  else if (event->xany.type == ButtonRelease &&
-           event->xbutton.button == Button1)
-    {
-      tc->button_down_p = False;
-      return True;
-    }
-  else if (event->xany.type == ButtonPress &&
-           (event->xbutton.button == Button4 ||
-            event->xbutton.button == Button5))
-    {
-      gltrackball_mousewheel (tc->trackball, event->xbutton.button, 10,
-                              !!event->xbutton.state);
-      return True;
-    }
-  else if (event->xany.type == MotionNotify &&
-           tc->button_down_p)
-    {
-      gltrackball_track (tc->trackball,
-                         event->xmotion.x, event->xmotion.y,
-                         MI_WIDTH (mi), MI_HEIGHT (mi));
-      return True;
-    }
-
-  return False;
-}
+	  return False;
+	}
+#endif
 
 static void setTexParams(void)
 {

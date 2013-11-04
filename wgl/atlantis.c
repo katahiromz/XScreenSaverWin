@@ -125,12 +125,19 @@ static const char sccsid[] = "@(#)atlantis.c	5.08 2003/04/09 xlockmore";
 
 #include "win32.h"
 
+#undef MI_COUNT
+#define MI_COUNT(mi) 4
+#undef MI_CYCLES
+#define MI_CYCLES(mi) 100
+#undef MI_SIZE
+#define MI_SIZE(mi) 6000
+
 #ifdef USE_GL
 
 #include "atlantis.h"
 
 
-static int  whalespeed = 250;
+static int whalespeed = 250;
 static int do_texture = True;
 static int do_gradient = True;
 

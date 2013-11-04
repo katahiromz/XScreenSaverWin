@@ -79,6 +79,13 @@ static const char sccsid[] = "@(#)pipes.c	4.07 97/11/24 xlockmore";
 
 #include "win32.h"
 
+#undef MI_COUNT
+#define MI_COUNT(mi) 2
+#undef MI_CYCLES
+#define MI_CYCLES(mi) 5
+#undef MI_SIZE
+#define MI_SIZE(mi) 500
+
 #ifdef USE_GL
 
 #if 0

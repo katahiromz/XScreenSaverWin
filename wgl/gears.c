@@ -33,6 +33,9 @@
 //#include "gltrackball.h"
 #include <ctype.h>
 
+#undef MI_COUNT
+#define MI_COUNT(mi) 0
+
 #ifdef USE_GL /* whole file */
 
 #undef BELLRAND

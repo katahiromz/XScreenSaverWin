@@ -43,7 +43,7 @@
                        "*showFPS:   False     \n" \
                        "*wireframe: False     \n"
 
-#define refresh_flipflop NULL
+# define refresh_flipflop 0
 
 #if 0
 	#ifdef STANDALONE
@@ -53,15 +53,9 @@
 	#endif /* STANDALONE */
 #endif
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <stdio.h>
-#include <math.h>
-
 #include "win32.h"
 
-//#ifdef USE_GL
+#ifdef USE_GL
 
 //#include "gltrackball.h"
 
@@ -84,13 +78,13 @@
 	};
 #endif
 
-static int wire = False, clearbits;
+static int wire, clearbits;
 static int board_x_size = 9, board_y_size = 9, board_avg_size = 0;
 static int numsquares = 0, freesquares = 0;
 static float half_thick;
-static float spin = 0.1f;
+static float spin = 0.1;
 static char* flipflopmode_str = "tiles";
-static Bool textured = False;
+static int textured = False;
 
 #if 0
 	static argtype vars[] = {
@@ -143,9 +137,8 @@ typedef struct {
 } randsheet;
 
 typedef struct {
-    //GLXContext *glx_context;
-	HGLRC hglrc;
-    HWND window;
+    GLXContext *glx_context;
+    Window window;
     trackball_state *trackball;
     Bool button_down_p;
 
@@ -174,7 +167,7 @@ typedef struct {
 
 static Flipflopcreen *qs = NULL;
 
-#include "grab-ximage.h"
+//#include "grab-ximage.h"
 
 static void randsheet_create( randsheet *rs );
 static void randsheet_initialize( randsheet *rs );
@@ -208,47 +201,49 @@ setup_lights(void)
     glEnable(GL_LIGHT0);
 }
 
-ENTRYPOINT Bool
-flipflop_handle_event (ModeInfo *mi, XEvent *event)
-{
-    Flipflopcreen *c = &qs[MI_SCREEN(mi)];
+#if 0
+	ENTRYPOINT Bool
+	flipflop_handle_event (ModeInfo *mi, XEvent *event)
+	{
+	    Flipflopcreen *c = &qs[MI_SCREEN(mi)];
 
-    if (event->xany.type == ButtonPress &&
-        event->xbutton.button == Button1)
-        {
-            c->button_down_p = True;
-            gltrackball_start (c->trackball,
-                               event->xbutton.x, event->xbutton.y,
-                               MI_WIDTH (mi), MI_HEIGHT (mi));
-            return True;
-        }
-    else if (event->xany.type == ButtonRelease &&
-             event->xbutton.button == Button1)
-        {
-            c->button_down_p = False;
-            return True;
-        }
-    else if (event->xany.type == ButtonPress &&
-             (event->xbutton.button == Button4 ||
-              event->xbutton.button == Button5 ||
-              event->xbutton.button == Button6 ||
-              event->xbutton.button == Button7))
-        {
-            gltrackball_mousewheel (c->trackball, event->xbutton.button, 5,
-                                    !event->xbutton.state);
-            return True;
-        }
-    else if (event->xany.type == MotionNotify &&
-             c->button_down_p)
-        {
-            gltrackball_track (c->trackball,
-                               event->xmotion.x, event->xmotion.y,
-                               MI_WIDTH (mi), MI_HEIGHT (mi));
-            return True;
-        }
+	    if (event->xany.type == ButtonPress &&
+	        event->xbutton.button == Button1)
+	        {
+	            c->button_down_p = True;
+	            gltrackball_start (c->trackball,
+	                               event->xbutton.x, event->xbutton.y,
+	                               MI_WIDTH (mi), MI_HEIGHT (mi));
+	            return True;
+	        }
+	    else if (event->xany.type == ButtonRelease &&
+	             event->xbutton.button == Button1)
+	        {
+	            c->button_down_p = False;
+	            return True;
+	        }
+	    else if (event->xany.type == ButtonPress &&
+	             (event->xbutton.button == Button4 ||
+	              event->xbutton.button == Button5 ||
+	              event->xbutton.button == Button6 ||
+	              event->xbutton.button == Button7))
+	        {
+	            gltrackball_mousewheel (c->trackball, event->xbutton.button, 5,
+	                                    !event->xbutton.state);
+	            return True;
+	        }
+	    else if (event->xany.type == MotionNotify &&
+	             c->button_down_p)
+	        {
+	            gltrackball_track (c->trackball,
+	                               event->xmotion.x, event->xmotion.y,
+	                               MI_WIDTH (mi), MI_HEIGHT (mi));
+	            return True;
+	        }
 
-    return False;
-}
+	    return False;
+	}
+#endif
 
 /* draw board */
 static int
@@ -357,10 +352,19 @@ image_loaded_cb (const char *filename, XRectangle *geometry,
     c->got_texture = True;
 }
 
+/* Should be in <GL/glext.h> */
+# ifndef  GL_TEXTURE_MAX_ANISOTROPY_EXT
+#  define GL_TEXTURE_MAX_ANISOTROPY_EXT     0x84FE
+# endif
+# ifndef  GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
+#  define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
+# endif
+
 static void
 get_texture(ModeInfo *modeinfo)
 {
     Flipflopcreen *c = &qs[MI_SCREEN(modeinfo)];
+    randsheet *rs = c->sheet;
 
     c->got_texture = False;
     c->mipmap = True;
@@ -886,4 +890,4 @@ randsheet_draw( randsheet *rs )
 
 XSCREENSAVER_MODULE ("FlipFlop", flipflop)
 
-//#endif /* USE_GL */
+#endif /* USE_GL */

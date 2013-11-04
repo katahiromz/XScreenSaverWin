@@ -16,10 +16,13 @@
 	#ifdef HAVE_CONFIG_H
 	# include "config.h"
 	#endif
+#endif
 
-	#include <stdlib.h>
-	#include <stdio.h>
+#include "win32.h"
+#include <stdlib.h>
+#include <stdio.h>
 
+#if 0
 	#ifdef HAVE_COCOA
 	# include "jwxyz.h"
 	#else
@@ -27,7 +30,6 @@
 	#endif
 #endif
 
-#include "win32.h"
 #include "xpm-ximage.h"
 
 extern char *progname;
@@ -388,7 +390,7 @@ xpm_to_ximage_1 (Display *dpy, Visual *visual, Colormap cmap,
                               (const char * const *) xpm_data,
                               &iw, &ih, &pixels, &npixels, &mask);
   if (pixels) free (pixels);
-  
+
   bpl = ximage->bytes_per_line;
   data = ximage->data;
   ximage->data = malloc (ximage->height * bpl);
@@ -417,6 +419,17 @@ xpm_to_ximage_1 (Display *dpy, Visual *visual, Colormap cmap,
     
       for (x = 0; x < ximage->width; x++)
         {
+          XColor color;
+          unsigned char r, g, b, a;
+          unsigned long pixel;
+          color.pixel = iline[x];
+          XQueryColor(dpy, cmap, &color);
+          r = color.red / 256;
+          g = color.green / 256;
+          b = color.blue / 256;
+          a = (mask ? ((mask [(y2 * w8) + (x >> 3)] & (1 << (x % 8)))
+              ? 0xFF : 0) : 0xFF);
+#if 0
           unsigned long pixel = iline[x];
           unsigned char r = (pixel & rmsk) >> rpos;
           unsigned char g = (pixel & gmsk) >> gpos;
@@ -425,15 +438,18 @@ xpm_to_ximage_1 (Display *dpy, Visual *visual, Colormap cmap,
                              ? ((mask [(y2 * w8) + (x >> 3)] & (1 << (x % 8)))
                                 ? 0xFF : 0)
                              : 0xFF);
+#endif
 # if 0
           pixel = ((r << rpos) | (g << gpos) | (b << bpos) | (a << apos));
 # else
-          pixel = ((a << 24) | (b << 16) | (g <<  8) | r);
+          pixel = ((a << 24) | (b << 16) | (g << 8) | r);
 # endif
           oline[x] = pixel;
         }
     }
   free (data);
+
+  ximage->format = RGBAPixmap;
 
   return ximage;
 }

@@ -37,6 +37,9 @@
 #include "rotator.h"
 #include <ctype.h>
 
+#undef MI_COUNT
+#define MI_COUNT(mi) 13
+
 #ifdef USE_GL /* whole file */
 
 

@@ -233,7 +233,7 @@ init_unk (ModeInfo *mi)
 
   bp->trackball = gltrackball_init ();
 
-  //if (MI_COUNT(mi) < 1) MI_COUNT(mi) = 1;
+  if (MI_COUNT(mi) < 1) MI_COUNT(mi) = 1;
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -391,8 +391,7 @@ draw_unk (ModeInfo *mi)
   glLineWidth (2);
 
   /* Lower the resolution to get a decent frame rate on iPhone 4s */
-  //if (mi->xgwa.width <= 640 || mi->xgwa.height <= 640)
-  if (MI_WIDTH(mi) <= 640 || MI_HEIGHT(mi) <= 640)
+  if (mi->xgwa.width <= 640 || mi->xgwa.height <= 640)
     {
       ytop *= 0.6;
       xinc *= 3;
@@ -416,15 +415,13 @@ draw_unk (ModeInfo *mi)
 
 
   /* Make the image fill the screen a little more fully */
-  //if (mi->xgwa.width <= 640 || mi->xgwa.height <= 640)
-  if (MI_WIDTH(mi) <= 640 || MI_HEIGHT(mi) <= 640)
+  if (mi->xgwa.width <= 640 || mi->xgwa.height <= 640)
     {
       glScalef (1.2, 1.2, 1.2);
       glTranslatef (-0.08, 0, 0);
     }
 
-  //if (mi->xgwa.width <= 480 || mi->xgwa.height <= 480)
-  if (MI_WIDTH(mi) <= 480 || MI_HEIGHT(mi) <= 480)
+  if (mi->xgwa.width <= 480 || mi->xgwa.height <= 480)
     glLineWidth (1);
 
 

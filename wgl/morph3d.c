@@ -85,6 +85,9 @@ static const char sccsid[] = "@(#)morph3d.c	5.01 2001/03/01 xlockmore";
 
 #endif
 
+#undef MI_COUNT
+#define MI_COUNT(mi) 0
+
 #define Scale4Window               0.3
 #define Scale4Iconic               1.0
 

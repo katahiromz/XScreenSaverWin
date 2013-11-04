@@ -32,6 +32,9 @@
 				 
 # define refresh_glhanoi 0
 
+#undef MI_COUNT
+#define MI_COUNT(mi) 0
+
 /* polygon resolution of poles and disks */
 #define NSLICE 32
 #define NLOOPS 1

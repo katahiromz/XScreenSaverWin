@@ -89,6 +89,11 @@ static const char sccsid[] = "@(#)superquadrics.c	4.07 97/11/24 xlockmore";
 
 #include "win32.h"
 
+#undef MI_COUNT
+#define MI_COUNT(mi) 25
+#undef MI_CYCLES
+#define MI_CYCLES(mi) 40
+
 #ifdef USE_GL
 
 /*-
