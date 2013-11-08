@@ -63,6 +63,7 @@ static const char sccsid[] = "@(#)ant.c	5.00 2000/11/01 xlockmore";
 #define COUNT -3
 #define CYCLES 40000
 #define SIZE_ -12
+#define NCOLORS 64
 # define DEFAULTS	"*delay:   20000 \n" \
 					"*count:   -3    \n" \
 					"*cycles:  40000 \n" \

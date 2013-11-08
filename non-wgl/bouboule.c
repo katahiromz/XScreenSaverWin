@@ -73,9 +73,11 @@ static const char sccsid[] = "@(#)bouboule.c	4.00 97/01/01 xlockmore";
  *       star after a close one.
  */
 
+#define NOARGS
 #define DELAY 20000
 #define COUNT 100
 #define SIZE_ 15
+#define NCOLORS 64
 # define DEFAULTS	"*count:		100     \n"			\
 					"*size:			15      \n"			\
 					"*delay:		20000   \n"			\

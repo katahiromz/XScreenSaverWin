@@ -42,6 +42,7 @@ static const char sccsid[] = "@(#)galaxy.c 4.04 97/07/28 xlockmore";
 #define DELAY 20000
 #define COUNT -5
 #define CYCLES 250
+#define NCOLORS 64
 # define DEFAULTS	"*delay:  20000  \n"   \
 					"*count:  -5     \n"   \
 					"*cycles:  250   \n"   \
@@ -124,10 +125,11 @@ ENTRYPOINT ModeSpecOpt galaxy_opts =
 #define GALAXYMINSIZE  0.15
 #define QCONS    0.001
 
+#define COLORBASE  16
+
 #if 0
-	#define COLORBASE  16
 	/* colors per galaxy */
-	/* #define COLORSTEP  (NUMCOLORS/COLORBASE) */
+	/*#define COLORSTEP  (NUMCOLORS/COLORBASE)*/
 	# define COLORSTEP (MI_NCOLORS(mi)/COLORBASE)
 #endif
 
@@ -213,15 +215,8 @@ startover(ModeInfo * mi)
   Galaxy     *gt = &gp->galaxies[i];
   double      sinw1, sinw2, cosw1, cosw2;
 
-#if 1   // hacked by katahiromz
-  gt->galcol = 246 + NRAND(10);
-  {
-    XColor color;
-    color.pixel = gt->galcol;
-    XQueryColor(MI_DISPLAY(mi), DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
-    if (color.green > (color.red + color.blue) * 2 / 3)
-      gt->galcol++;
-  }
+#if 1	// hacked by katahiromz
+  gt->galcol = NRAND(NCOLORS);
 #else
   gt->galcol = NRAND(COLORBASE - 2);
   if (gt->galcol > 1)
@@ -446,7 +441,7 @@ draw_galaxy(ModeInfo * mi)
     }
     // hacked by katahiromz
     //XSetForeground(display, gc, MI_PIXEL(mi, COLORSTEP * gt->galcol));
-    XSetForeground(display, gc, gt->galcol);
+    XSetForeground(display, gc, MI_PIXEL(mi, gt->galcol));
     XDrawPoints(display, window, gc, gt->newpoints, gt->nstars,
                 CoordModeOrigin);
 

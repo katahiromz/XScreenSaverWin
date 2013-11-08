@@ -68,6 +68,7 @@ static const char sccsid[] = "@(#)apollonian.c	5.02 2001/07/01 xlockmore";
 #define DELAY 1000000
 #define COUNT 64
 #define CYCLES 20
+#define NCOLORS 64
 # define DEFAULTS	"*delay:   1000000 \n" \
 					"*count:   64      \n" \
 					"*cycles:  20      \n" \

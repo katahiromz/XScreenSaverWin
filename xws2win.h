@@ -68,6 +68,7 @@ typedef DWORD CARD32;
 enum { CoordModeOrigin, CoordModePrevious };
 enum { Convex };
 enum { OK = 0, BadAlloc, BadGC, BadValue, BadFont, BadMatch, BadPixmap };
+enum { GXcopy = R2_COPYPEN, GXxor = R2_XORPEN };
 
 //////////////////////////////////////////////////////////////////////////////
 // Bool
@@ -283,6 +284,46 @@ int XCopyArea(
      int dst_x, int dst_y);
 
 //////////////////////////////////////////////////////////////////////////////
+// XColor
+
+#define DoRed           (1<<0)
+#define DoGreen         (1<<1)
+#define DoBlue          (1<<2)
+
+typedef struct
+{
+  unsigned long pixel;
+  unsigned short red, green, blue;
+  char flags;  /* DoRed, DoGreen, DoBlue */
+  char pad;
+} XColor;
+
+Bool XAllocColor(Display *d, Colormap cmap, XColor *color);
+Status XAllocColorCells(
+    Display*        d,
+    Colormap        cmap,
+    Bool            contig,
+    unsigned long*  plane_masks_return,
+    unsigned int    nplanes,
+    unsigned long*  pixels_return,
+    unsigned int    npixels);
+int XFreeColors(
+    Display*        d,
+    Colormap        cmap,
+    unsigned long*  pixels,
+    int             npixels,
+    unsigned long   planes);
+int XStoreColors(
+    Display*    display,
+    Colormap    cmap,
+    XColor*     color,
+    int         ncolors);
+int XFlush(Display *d);
+int XQueryColor(Display *dpy, Colormap cmap, XColor *def);
+int XParseColor(Display *d, Colormap cmap, const char *name, XColor *c);
+unsigned long load_color(Display *dpy, Colormap cmap, const char *name);
+
+//////////////////////////////////////////////////////////////////////////////
 // ModeInfo
 
 typedef struct
@@ -290,19 +331,23 @@ typedef struct
     Display *dpy;
     Window window;
     GC gc;
-    INT num_screen;
-    INT screen_number;
-    INT width;
-    INT height;
-    INT polygon_count;
-    INT recursion_depth;
+    int num_screen;
+    int screen_number;
+    int width;
+    int height;
+    int polygon_count;
+    int recursion_depth;
     Bool fps_p;
     Bool is_drawn;
-    INT pause;
-    INT count;
-    INT cycles;
-    INT size;
+    int pause;
+    int count;
+    int cycles;
+    int size;
     XWindowAttributes xgwa;
+    int npixels;
+    XColor *colors;
+    unsigned long *pixels;
+    Bool writable_p;
 } ModeInfo;
 
 #define MI_DISPLAY(mi) (mi)->dpy
@@ -337,11 +382,12 @@ typedef struct
 #define MI_VISUAL(mi) NULL
 #define MI_COLORMAP(mi) 0
 #define MI_WIN_BLACK_PIXEL(mi) 0
-#define MI_PIXEL(mi, pixel) pixel
+#define MI_PIXEL(mi,n) ((mi)->pixels[n])
 #define MI_BLACK_PIXEL(mi) 0
 #define MI_WHITE_PIXEL(mi) 255
-#define MI_NPIXELS(mi) (256 - 20)
+#define MI_NPIXELS(mi) (mi)->npixels
 #define MI_IS_FULLRANDOM(mi) TRUE
+#define MI_IS_INSTALL(mi) TRUE
 
 #define FreeAllGL(mi) /**/
 
@@ -388,6 +434,8 @@ typedef enum COLOR_SCHEME {
 
 //////////////////////////////////////////////////////////////////////////////
 
+#define MAX_COLORS 0x1000
+
 # define XSCREENSAVER_LINK(NAME) \
    struct xscreensaver_function_table *xscreensaver_function_table = &NAME;
 
@@ -406,17 +454,18 @@ typedef void (*HACK_DRAW)(ModeInfo *);
 typedef void (*HACK_REFRESH)(ModeInfo *);
 typedef void (*HACK_FREE)(ModeInfo *);
 
-typedef void (*HACK_INIT2)(Display *display, Window window);
-typedef void (*HACK_DRAW2)(Display *dpy, Window window, void *closure);
-typedef void (*HACK_RESHAPE)(Display *dpy, Window window, void *closure, unsigned int w, unsigned int h);
-typedef void (*HACK_FREE2)(Display *dpy, Window window, void *closure);
-
+extern char *progname;
+extern DWORD hack_delay;
 extern int hack_count;
 extern int hack_count_enabled;
 extern int hack_cycles;
 extern int hack_cycles_enabled;
 extern int hack_size;
 extern int hack_size_enabled;
+extern int hack_ncolors;
+extern int hack_ncolors_enabled;
+extern int hack_color_scheme;
+
 extern int hack_argcount;
 extern argtype *hack_arginfo;
 
@@ -447,15 +496,17 @@ extern argtype *hack_arginfo;
         int hack_size = 0; \
         int hack_size_enabled = False
 #endif
+#ifdef NCOLORS
+    #define HACK_NCOLORS \
+        int hack_ncolors = NCOLORS; \
+        int hack_ncolors_enabled = True
+#else
+    #define HACK_NCOLORS \
+        int hack_ncolors = 0; \
+        int hack_ncolors_enabled = False
+#endif
 
-#ifdef HACK
-    #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) \
-        HACK_INIT2 hack_init = PREFIX ## _init; \
-        HACK_DRAW2 hack_draw2 = PREFIX ## _draw; \
-        HACK_RESHAPE hack_refresh = PREFIX ## _reshape; \
-        HACK_FREE2 hack_free = PREFIX ## _free; \
-        char *progname = CLASS;
-#elif defined(NOARGS)
+#ifdef NOARGS
     #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) \
         HACK_INIT hack_init = init_ ## PREFIX; \
         HACK_DRAW hack_draw = draw_ ## PREFIX; \
@@ -466,8 +517,10 @@ extern argtype *hack_arginfo;
         HACK_COUNT; \
         HACK_CYCLES; \
         HACK_SIZE; \
+        HACK_NCOLORS; \
         argtype *hack_arginfo = NULL; \
-        int hack_argcount = 0;
+        int hack_argcount = 0; \
+        int hack_color_scheme = XLOCKMORE_COLOR_SCHEME;
 #else
     #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) \
         HACK_INIT hack_init = init_ ## PREFIX; \
@@ -479,8 +532,10 @@ extern argtype *hack_arginfo;
         HACK_COUNT; \
         HACK_CYCLES; \
         HACK_SIZE; \
+        HACK_NCOLORS; \
         argtype *hack_arginfo = vars; \
-        int hack_argcount = sizeof(vars) / sizeof(vars[0]);
+        int hack_argcount = sizeof(vars) / sizeof(vars[0]); \
+        int hack_color_scheme = XLOCKMORE_COLOR_SCHEME;
 #endif
 
 #define XSCREENSAVER_MODULE(CLASS,PREFIX) \
@@ -490,14 +545,6 @@ extern HACK_INIT hack_init;
 extern HACK_DRAW hack_draw;
 extern HACK_REFRESH hack_refresh;
 extern HACK_FREE hack_free;
-
-extern HACK_INIT2 hack_init2;
-extern HACK_DRAW2 hack_draw2;
-extern HACK_RESHAPE hack_reshape;
-extern HACK_FREE2 hack_free2;
-
-extern DWORD hack_delay;
-extern char *progname;
 
 //////////////////////////////////////////////////////////////////////////////
 // OpenGL-related
@@ -648,46 +695,6 @@ int XFillArc(Display *dpy, Drawable d, GC gc,
     int angle1, int angle2);
 int XFillArcs(Display *dpy, Drawable d, GC gc,
     XArc *arcs, int n_arcs);
-
-//////////////////////////////////////////////////////////////////////////////
-// XColor
-
-#define DoRed           (1<<0)
-#define DoGreen         (1<<1)
-#define DoBlue          (1<<2)
-
-typedef struct
-{
-  unsigned long pixel;
-  unsigned short red, green, blue;
-  char flags;  /* DoRed, DoGreen, DoBlue */
-  char pad;
-} XColor;
-
-Bool XAllocColor(Display *d, Colormap cmap, XColor *color);
-Status XAllocColorCells(
-    Display*        d,
-    Colormap        cmap,
-    Bool            contig,
-    unsigned long*  plane_masks_return,
-    unsigned int    nplanes,
-    unsigned long*  pixels_return,
-    unsigned int    npixels);
-int XFreeColors(
-    Display*        d,
-    Colormap        cmap,
-    unsigned long*  pixels,
-    int             npixels,
-    unsigned long   planes);
-int XStoreColors(
-    Display*    display,
-    Colormap    cmap,
-    XColor*     color,
-    int         ncolors);
-int XFlush(Display *d);
-int XQueryColor(Display *dpy, Colormap cmap, XColor *def);
-int XParseColor(Display *d, Colormap cmap, const char *name, XColor *c);
-unsigned long load_color(Display *dpy, Colormap cmap, const char *name);
 
 //////////////////////////////////////////////////////////////////////////////
 // screen saver

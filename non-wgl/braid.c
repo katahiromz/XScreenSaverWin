@@ -37,6 +37,7 @@ static const char sccsid[] = "@(#)braid.c	5.00 2000/11/01 xlockmore";
 #define COUNT 15
 #define CYCLES 100
 #define SIZE_ -7
+#define NCOLORS 64
 # define DEFAULTS  "*delay: 1000 \n" \
 				   "*count: 15 \n" \
 				   "*cycles: 100 \n" \

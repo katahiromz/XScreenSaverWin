@@ -772,7 +772,7 @@ typedef struct
     WORD blue;
 } xColorItem;
 
-static xColorItem win_colormap_items[256] =
+static xColorItem win_colormap_items[MAX_COLORS] =
 {
     {0, 0, 0},                      //[0]
     {0x8000, 0, 0},                 //[1]
@@ -845,7 +845,7 @@ static xColorItem win_colormap_items[256] =
     {0xff00, 0xff00, 0xff00}        // [255]
 };
 
-static BOOL win_pixel_used[256] =
+static BOOL win_pixel_used[MAX_COLORS] =
 {
     // [0]
     TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
@@ -950,13 +950,13 @@ Colormap XCreateColormap(
             memcpy(colormaps[i].items, win_colormap_items, 256 * sizeof(xColorItem));
 
             // allocate pixel_used
-            colormaps[i].pixel_used = (BOOL *)calloc(256, sizeof(BOOL));
+            colormaps[i].pixel_used = (BOOL *)calloc(MAX_COLORS, sizeof(BOOL));
             if (colormaps[i].pixel_used == NULL)
             {
                 free(colormaps[i].items);
                 return 0;
             }
-            memcpy(colormaps[i].pixel_used, win_pixel_used, 256 * sizeof(BOOL));
+            memcpy(colormaps[i].pixel_used, win_pixel_used, MAX_COLORS * sizeof(BOOL));
 
             colormap_num++;
             return i;
