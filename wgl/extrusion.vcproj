@@ -49,6 +49,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -124,6 +125,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -213,6 +215,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\rotator.c"
+				>
+			</File>
+			<File
 				RelativePath=".\wgl.c"
 				>
 			</File>
@@ -221,7 +227,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\xcolor.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ximage.c"
+				>
+			</File>
+			<File
 				RelativePath=".\xpm-ximage.c"
+				>
+			</File>
+			<File
+				RelativePath="..\yarandom.c"
 				>
 			</File>
 		</Filter>
@@ -243,11 +261,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\xws2win.h"
+				RelativePath=".\rotator.h"
 				>
 			</File>
 			<File
 				RelativePath=".\xpm-ximage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xws2win.h"
+				>
+			</File>
+			<File
+				RelativePath="..\yarandom.h"
 				>
 			</File>
 		</Filter>
