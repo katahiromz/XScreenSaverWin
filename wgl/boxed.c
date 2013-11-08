@@ -79,36 +79,32 @@ static GLfloat cfg_explosion = 15.0;
 static GLfloat cfg_decay = 0.07;
 static GLfloat cfg_momentum = 0.6;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	    {"-speed", ".boxed.speed", XrmoptionSepArg, 0},
-	    {"-balls", ".boxed.balls", XrmoptionSepArg, 0},
-	    {"-ballsize", ".boxed.ballsize", XrmoptionSepArg, 0},
-	    {"-explosion", ".boxed.explosion", XrmoptionSepArg, 0},
-	    {"-decay", ".boxed.decay", XrmoptionSepArg, 0},
-	    {"-momentum", ".boxed.momentum", XrmoptionSepArg, 0},
-	};
+static XrmOptionDescRec opts[] = {
+    {"-speed", ".boxed.speed", XrmoptionSepArg, 0},
+    {"-balls", ".boxed.balls", XrmoptionSepArg, 0},
+    {"-ballsize", ".boxed.ballsize", XrmoptionSepArg, 0},
+    {"-explosion", ".boxed.explosion", XrmoptionSepArg, 0},
+    {"-decay", ".boxed.decay", XrmoptionSepArg, 0},
+    {"-momentum", ".boxed.momentum", XrmoptionSepArg, 0},
+};
 
-	static argtype vars[] = {
-	    {&speed, "speed", "Speed", DEF_SPEED, t_Float},
-	    {&cfg_balls, "balls", "Balls", DEF_BALLS, t_Int},
-	    {&cfg_ballsize, "ballsize", "Ball Size", DEF_BALLSIZE, t_Float},
-	    {&cfg_explosion, "explosion", "Explosion", DEF_EXPLOSION, t_Float},
-	    {&cfg_decay, "decay", "Explosion Decay", DEF_DECAY, t_Float},
-	    {&cfg_momentum, "momentum", "Explosion Momentum", DEF_MOMENTUM, t_Float},
-	};
+static argtype vars[] = {
+    {&speed, "speed", "Speed", DEF_SPEED, t_Float},
+    {&cfg_balls, "balls", "Balls", DEF_BALLS, t_Int},
+    {&cfg_ballsize, "ballsize", "Ball Size", DEF_BALLSIZE, t_Float},
+    {&cfg_explosion, "explosion", "Explosion", DEF_EXPLOSION, t_Float},
+    {&cfg_decay, "decay", "Explosion Decay", DEF_DECAY, t_Float},
+    {&cfg_momentum, "momentum", "Explosion Momentum", DEF_MOMENTUM, t_Float},
+};
 
-	ENTRYPOINT ModeSpecOpt boxed_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt boxed_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-
-	ModStruct   boxed_description = { 
-	     "boxed", "init_boxed", "draw_boxed", "release_boxed",
-	     "draw_boxed", "init_boxed", NULL, &boxed_opts,
-	     1000, 1, 2, 1, 4, 1.0, "",
-	     "Shows GL's boxed balls", 0, NULL};
-
-	#endif
+#ifdef USE_MODULES
+ModStruct   boxed_description = { 
+     "boxed", "init_boxed", "draw_boxed", "release_boxed",
+     "draw_boxed", "init_boxed", NULL, &boxed_opts,
+     1000, 1, 2, 1, 4, 1.0, "",
+     "Shows GL's boxed balls", 0, NULL};
 #endif
 
 //#define BOOL int

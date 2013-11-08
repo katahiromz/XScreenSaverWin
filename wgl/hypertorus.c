@@ -108,7 +108,7 @@ static const char sccsid[] = "@(#)hypertorus.c  1.2 05/09/28 xlockmore";
 	#endif
 #endif
 
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #if 0
 	#ifdef USE_MODULES
@@ -141,75 +141,73 @@ static float speed_yz = 2.1;
 static const float offset4d[4] = {  0.0,  0.0,  0.0,  2.0 };
 static const float offset3d[4] = {  0.0,  0.0, -2.0,  0.0 };
 
-#if 0
-	static XrmOptionDescRec opts[] =
-	{
-	  {"-mode",            ".displayMode",  XrmoptionSepArg, 0 },
-	  {"-wireframe",       ".displayMode",  XrmoptionNoArg,  "wireframe" },
-	  {"-surface",         ".displayMode",  XrmoptionNoArg,  "surface" },
-	  {"-transparent",     ".displayMode",  XrmoptionNoArg,  "transparent" },
-	  {"-appearance",      ".appearance",   XrmoptionSepArg, 0 },
-	  {"-solid",           ".appearance",   XrmoptionNoArg,  "solid" },
-	  {"-bands",           ".appearance",   XrmoptionNoArg,  "bands" },
-	  {"-spirals-1",       ".appearance",   XrmoptionNoArg,  "spirals-1" },
-	  {"-spirals-2",       ".appearance",   XrmoptionNoArg,  "spirals-2" },
-	  {"-spirals-4",       ".appearance",   XrmoptionNoArg,  "spirals-4" },
-	  {"-spirals-8",       ".appearance",   XrmoptionNoArg,  "spirals-8" },
-	  {"-spirals-16",      ".appearance",   XrmoptionNoArg,  "spirals-16" },
-	  {"-twosided",        ".colors",       XrmoptionNoArg,  "twosided" },
-	  {"-colorwheel",      ".colors",       XrmoptionNoArg,  "colorwheel" },
-	  {"-perspective-3d",  ".projection3d", XrmoptionNoArg,  "perspective" },
-	  {"-orthographic-3d", ".projection3d", XrmoptionNoArg,  "orthographic" },
-	  {"-perspective-4d",  ".projection4d", XrmoptionNoArg,  "perspective" },
-	  {"-orthographic-4d", ".projection4d", XrmoptionNoArg,  "orthographic" },
-	  {"-speed-wx",        ".speedwx",      XrmoptionSepArg, 0 },
-	  {"-speed-wy",        ".speedwy",      XrmoptionSepArg, 0 },
-	  {"-speed-wz",        ".speedwz",      XrmoptionSepArg, 0 },
-	  {"-speed-xy",        ".speedxy",      XrmoptionSepArg, 0 },
-	  {"-speed-xz",        ".speedxz",      XrmoptionSepArg, 0 },
-	  {"-speed-yz",        ".speedyz",      XrmoptionSepArg, 0 }
-	};
+static XrmOptionDescRec opts[] =
+{
+  {"-mode",            ".displayMode",  XrmoptionSepArg, 0 },
+  {"-wireframe",       ".displayMode",  XrmoptionNoArg,  "wireframe" },
+  {"-surface",         ".displayMode",  XrmoptionNoArg,  "surface" },
+  {"-transparent",     ".displayMode",  XrmoptionNoArg,  "transparent" },
+  {"-appearance",      ".appearance",   XrmoptionSepArg, 0 },
+  {"-solid",           ".appearance",   XrmoptionNoArg,  "solid" },
+  {"-bands",           ".appearance",   XrmoptionNoArg,  "bands" },
+  {"-spirals-1",       ".appearance",   XrmoptionNoArg,  "spirals-1" },
+  {"-spirals-2",       ".appearance",   XrmoptionNoArg,  "spirals-2" },
+  {"-spirals-4",       ".appearance",   XrmoptionNoArg,  "spirals-4" },
+  {"-spirals-8",       ".appearance",   XrmoptionNoArg,  "spirals-8" },
+  {"-spirals-16",      ".appearance",   XrmoptionNoArg,  "spirals-16" },
+  {"-twosided",        ".colors",       XrmoptionNoArg,  "twosided" },
+  {"-colorwheel",      ".colors",       XrmoptionNoArg,  "colorwheel" },
+  {"-perspective-3d",  ".projection3d", XrmoptionNoArg,  "perspective" },
+  {"-orthographic-3d", ".projection3d", XrmoptionNoArg,  "orthographic" },
+  {"-perspective-4d",  ".projection4d", XrmoptionNoArg,  "perspective" },
+  {"-orthographic-4d", ".projection4d", XrmoptionNoArg,  "orthographic" },
+  {"-speed-wx",        ".speedwx",      XrmoptionSepArg, 0 },
+  {"-speed-wy",        ".speedwy",      XrmoptionSepArg, 0 },
+  {"-speed-wz",        ".speedwz",      XrmoptionSepArg, 0 },
+  {"-speed-xy",        ".speedxy",      XrmoptionSepArg, 0 },
+  {"-speed-xz",        ".speedxz",      XrmoptionSepArg, 0 },
+  {"-speed-yz",        ".speedyz",      XrmoptionSepArg, 0 }
+};
 
-	static argtype vars[] =
-	{
-	  { &mode,       "displayMode",  "DisplayMode",  DEF_DISPLAY_MODE,  t_String },
-	  { &appear,     "appearance",   "Appearance",   DEF_APPEARANCE,    t_String },
-	  { &color_mode, "colors",       "Colors",       DEF_COLORS,        t_String },
-	  { &proj_3d,    "projection3d", "Projection3d", DEF_PROJECTION_3D, t_String },
-	  { &proj_4d,    "projection4d", "Projection4d", DEF_PROJECTION_4D, t_String },
-	  { &speed_wx,   "speedwx",      "Speedwx",      DEF_SPEEDWX,       t_Float},
-	  { &speed_wy,   "speedwy",      "Speedwy",      DEF_SPEEDWY,       t_Float},
-	  { &speed_wz,   "speedwz",      "Speedwz",      DEF_SPEEDWZ,       t_Float},
-	  { &speed_xy,   "speedxy",      "Speedxy",      DEF_SPEEDXY,       t_Float},
-	  { &speed_xz,   "speedxz",      "Speedxz",      DEF_SPEEDXZ,       t_Float},
-	  { &speed_yz,   "speedyz",      "Speedyz",      DEF_SPEEDYZ,       t_Float}
-	};
+static argtype vars[] =
+{
+  { &mode,       "displayMode",  "DisplayMode",  DEF_DISPLAY_MODE,  t_String },
+  { &appear,     "appearance",   "Appearance",   DEF_APPEARANCE,    t_String },
+  { &color_mode, "colors",       "Colors",       DEF_COLORS,        t_String },
+  { &proj_3d,    "projection3d", "Projection3d", DEF_PROJECTION_3D, t_String },
+  { &proj_4d,    "projection4d", "Projection4d", DEF_PROJECTION_4D, t_String },
+  { &speed_wx,   "speedwx",      "Speedwx",      DEF_SPEEDWX,       t_Float},
+  { &speed_wy,   "speedwy",      "Speedwy",      DEF_SPEEDWY,       t_Float},
+  { &speed_wz,   "speedwz",      "Speedwz",      DEF_SPEEDWZ,       t_Float},
+  { &speed_xy,   "speedxy",      "Speedxy",      DEF_SPEEDXY,       t_Float},
+  { &speed_xz,   "speedxz",      "Speedxz",      DEF_SPEEDXZ,       t_Float},
+  { &speed_yz,   "speedyz",      "Speedyz",      DEF_SPEEDYZ,       t_Float}
+};
 
-	static OptionStruct desc[] =
-	{
-	  { "-wireframe",       "display the torus as a wireframe mesh" },
-	  { "-surface",         "display the torus as a solid surface" },
-	  { "-transparent",     "display the torus as a transparent surface" },
-	  { "-solid",           "display the torus as a solid object" },
-	  { "-bands",           "display the torus as see-through bands" },
-	  { "-spirals-{1,2,4,8,16}", "display the torus as see-through spirals" },
-	  { "-twosided",        "display the torus with two colors" },
-	  { "-colorwheel",      "display the torus with a smooth color wheel" },
-	  { "-perspective-3d",  "project the torus perspectively from 3d to 2d" },
-	  { "-orthographic-3d", "project the torus orthographically from 3d to 2d" },
-	  { "-perspective-4d",  "project the torus perspectively from 4d to 3d" },
-	  { "-orthographic-4d", "project the torus orthographically from 4d to 3d" },
-	  { "-speed-wx <arg>",  "rotation speed around the wx plane" },
-	  { "-speed-wy <arg>",  "rotation speed around the wy plane" },
-	  { "-speed-wz <arg>",  "rotation speed around the wz plane" },
-	  { "-speed-xy <arg>",  "rotation speed around the xy plane" },
-	  { "-speed-xz <arg>",  "rotation speed around the xz plane" },
-	  { "-speed-yz <arg>",  "rotation speed around the yz plane" }
-	};
+static OptionStruct desc[] =
+{
+  { "-wireframe",       "display the torus as a wireframe mesh" },
+  { "-surface",         "display the torus as a solid surface" },
+  { "-transparent",     "display the torus as a transparent surface" },
+  { "-solid",           "display the torus as a solid object" },
+  { "-bands",           "display the torus as see-through bands" },
+  { "-spirals-{1,2,4,8,16}", "display the torus as see-through spirals" },
+  { "-twosided",        "display the torus with two colors" },
+  { "-colorwheel",      "display the torus with a smooth color wheel" },
+  { "-perspective-3d",  "project the torus perspectively from 3d to 2d" },
+  { "-orthographic-3d", "project the torus orthographically from 3d to 2d" },
+  { "-perspective-4d",  "project the torus perspectively from 4d to 3d" },
+  { "-orthographic-4d", "project the torus orthographically from 4d to 3d" },
+  { "-speed-wx <arg>",  "rotation speed around the wx plane" },
+  { "-speed-wy <arg>",  "rotation speed around the wy plane" },
+  { "-speed-wz <arg>",  "rotation speed around the wz plane" },
+  { "-speed-xy <arg>",  "rotation speed around the xy plane" },
+  { "-speed-xz <arg>",  "rotation speed around the xz plane" },
+  { "-speed-yz <arg>",  "rotation speed around the yz plane" }
+};
 
-	ENTRYPOINT ModeSpecOpt hypertorus_opts =
-	{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
-#endif
+ENTRYPOINT ModeSpecOpt hypertorus_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 typedef struct {
   GLint      WindH, WindW;

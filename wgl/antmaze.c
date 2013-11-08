@@ -53,7 +53,7 @@ static const char sccsid[] = "@(#)antmaze.c	5.01 2001/03/01 xlockmore";
 #include "sphere.h"
 #include "tube.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #define DEF_SOLIDANTMAZE  "False"
 #define DEF_NOANTS  "False"
@@ -61,37 +61,35 @@ static const char sccsid[] = "@(#)antmaze.c	5.01 2001/03/01 xlockmore";
 static int  solidantmaze = False;
 static int  noants = False;
 
-#if 0
-	static XrmOptionDescRec opts[] =
-	{
-	  {"-solidantmaze", ".antmaze.solidantmaze", XrmoptionNoArg, "on"},
-	  {"+solidantmaze", ".antmaze.solidantmaze", XrmoptionNoArg, "off"},
-	  {"-noants", ".antmaze.noants", XrmoptionNoArg, "on"},
-	  {"+noants", ".antmaze.noants", XrmoptionNoArg, "off"}
-	};
-	static argtype vars[] =
-	{
-	  {&solidantmaze, "solidantmaze", "Solidantmaze", DEF_SOLIDANTMAZE, t_Bool},
-	  {&noants, "noants", "Noants", DEF_NOANTS, t_Bool}
-	};
+static XrmOptionDescRec opts[] =
+{
+  {"-solidantmaze", ".antmaze.solidantmaze", XrmoptionNoArg, "on"},
+  {"+solidantmaze", ".antmaze.solidantmaze", XrmoptionNoArg, "off"},
+  {"-noants", ".antmaze.noants", XrmoptionNoArg, "on"},
+  {"+noants", ".antmaze.noants", XrmoptionNoArg, "off"}
+};
 
-	static OptionStruct desc[] =
-	{
-		{"-/+solidantmaze", "select between a SOLID or a NET Antmaze Strip"},
-		{"-/+noants", "turn on/off walking ants"}
-	};
+static argtype vars[] =
+{
+  {&solidantmaze, "solidantmaze", "Solidantmaze", DEF_SOLIDANTMAZE, t_Bool},
+  {&noants, "noants", "Noants", DEF_NOANTS, t_Bool}
+};
 
-	ENTRYPOINT ModeSpecOpt antmaze_opts =
-	{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
+static OptionStruct desc[] =
+{
+	{"-/+solidantmaze", "select between a SOLID or a NET Antmaze Strip"},
+	{"-/+noants", "turn on/off walking ants"}
+};
 
-	#ifdef USE_MODULES
-	ModStruct   antmaze_description =
-	{"antmaze", "init_antmaze", "draw_antmaze", "release_antmaze",
-	 "draw_antmaze", "change_antmaze", NULL, &antmaze_opts,
-	 1000, 1, 1, 1, 4, 1.0, "",
-	 "draws some ants", 0, NULL};
+ENTRYPOINT ModeSpecOpt antmaze_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
-	#endif
+#ifdef USE_MODULES
+ModStruct   antmaze_description =
+{"antmaze", "init_antmaze", "draw_antmaze", "release_antmaze",
+ "draw_antmaze", "change_antmaze", NULL, &antmaze_opts,
+ 1000, 1, 1, 1, 4, 1.0, "",
+ "draws some ants", 0, NULL};
 #endif
 
 #define Scale4Window               0.3

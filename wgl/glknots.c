@@ -28,7 +28,7 @@
 #include "colors.h"
 #include "tube.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
 #ifdef USE_GL /* whole file */
@@ -70,29 +70,27 @@ static GLfloat thickness = 0.3;
 static unsigned int segments = 800;
 static int duration = 8;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",   ".spin",   XrmoptionSepArg, 0 },
-	  { "+spin",   ".spin",   XrmoptionNoArg, "" },
-	  { "-wander", ".wander", XrmoptionNoArg, "True" },
-	  { "+wander", ".wander", XrmoptionNoArg, "False" },
-	  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
-	  { "-thickness", ".thickness",  XrmoptionSepArg, 0 },
-	  { "-segments",  ".segments",   XrmoptionSepArg, 0 },
-	  { "-duration",  ".duration",   XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",   ".spin",   XrmoptionSepArg, 0 },
+  { "+spin",   ".spin",   XrmoptionNoArg, "" },
+  { "-wander", ".wander", XrmoptionNoArg, "True" },
+  { "+wander", ".wander", XrmoptionNoArg, "False" },
+  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
+  { "-thickness", ".thickness",  XrmoptionSepArg, 0 },
+  { "-segments",  ".segments",   XrmoptionSepArg, 0 },
+  { "-duration",  ".duration",   XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-	  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_String},
-	  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
-	  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
-	  {&thickness, "thickness", "Thickness",  DEF_THICKNESS, t_Float},
-	  {&segments,  "segments",  "Segments",   DEF_SEGMENTS,  t_Int},
-	  {&duration,  "duration",  "Duration",   DEF_DURATION,  t_Int},
-	};
+static argtype vars[] = {
+  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_String},
+  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
+  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
+  {&thickness, "thickness", "Thickness",  DEF_THICKNESS, t_Float},
+  {&segments,  "segments",  "Segments",   DEF_SEGMENTS,  t_Int},
+  {&duration,  "duration",  "Duration",   DEF_DURATION,  t_Int},
+};
 
-	ENTRYPOINT ModeSpecOpt knot_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt knot_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 static void
 make_knot (ModeInfo *mi)

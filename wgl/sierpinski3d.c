@@ -52,7 +52,7 @@ static const char sccsid[] = "@(#)sierpinski3D.c	00.01 99/11/04 xlockmore";
 #define DEF_MAX_DEPTH		        "5"
 
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
@@ -62,33 +62,30 @@ static int speed = 150;
 static Bool do_spin = True;
 static Bool do_wander = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"-depth", ".sierpinski3d.maxDepth", XrmoptionSepArg, 0 },
-	  {"-speed", ".sierpinski3d.speed",    XrmoptionSepArg, 0 },
-	  { "-spin",   ".spin",   XrmoptionNoArg, "True" },
-	  { "+spin",   ".spin",   XrmoptionNoArg, "False" },
-	  { "-wander", ".wander", XrmoptionNoArg, "True" },
-	  { "+wander", ".wander", XrmoptionNoArg, "False" },
-	};
+static XrmOptionDescRec opts[] = {
+  {"-depth", ".sierpinski3d.maxDepth", XrmoptionSepArg, 0 },
+  {"-speed", ".sierpinski3d.speed",    XrmoptionSepArg, 0 },
+  { "-spin",   ".spin",   XrmoptionNoArg, "True" },
+  { "+spin",   ".spin",   XrmoptionNoArg, "False" },
+  { "-wander", ".wander", XrmoptionNoArg, "True" },
+  { "+wander", ".wander", XrmoptionNoArg, "False" },
+};
 
-	static argtype vars[] = {
-	  {&do_spin,   "spin",     "Spin",     DEF_SPIN,      t_Bool},
-	  {&do_wander, "wander",   "Wander",   DEF_WANDER,    t_Bool},
-	  {&speed,     "speed",    "Speed",    DEF_SPEED,     t_Int},
-	  {&max_depth, "maxDepth", "MaxDepth", DEF_MAX_DEPTH, t_Int},
-	};
+static argtype vars[] = {
+  {&do_spin,   "spin",     "Spin",     DEF_SPIN,      t_Bool},
+  {&do_wander, "wander",   "Wander",   DEF_WANDER,    t_Bool},
+  {&speed,     "speed",    "Speed",    DEF_SPEED,     t_Int},
+  {&max_depth, "maxDepth", "MaxDepth", DEF_MAX_DEPTH, t_Int},
+};
 
-	ENTRYPOINT ModeSpecOpt gasket_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt gasket_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   gasket_description =
-	{"gasket", "init_gasket", "draw_gasket", "release_gasket",
-	 "draw_gasket", "init_gasket", NULL, &gasket_opts,
-	 1000, 1, 2, 1, 4, 1.0, "",
-	 "Shows GL's Sierpinski gasket", 0, NULL};
-
-	#endif
+#ifdef USE_MODULES
+ModStruct   gasket_description =
+{"gasket", "init_gasket", "draw_gasket", "release_gasket",
+ "draw_gasket", "init_gasket", NULL, &gasket_opts,
+ 1000, 1, 2, 1, 4, 1.0, "",
+ "Shows GL's Sierpinski gasket", 0, NULL};
 #endif
 
 typedef struct {

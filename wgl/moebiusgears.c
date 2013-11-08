@@ -10,6 +10,7 @@
  */
 
 #define DELAY 30000
+#define COUNT 17
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*count:        17          \n" \
 			"*showFPS:      False       \n" \
@@ -26,11 +27,9 @@
 #include "involute.h"
 #include "normals.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 17
 
 #ifdef USE_GL /* whole file */
 
@@ -69,28 +68,26 @@ static Bool do_wander = True;
 static Bool do_roll = True;
 static int teeth_arg = 15;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",   ".spin",   XrmoptionNoArg, "True"  },
-	  { "+spin",   ".spin",   XrmoptionNoArg, "False" },
-	  { "-speed",  ".speed",  XrmoptionSepArg, 0      },
-	  { "-wander", ".wander", XrmoptionNoArg, "True"  },
-	  { "+wander", ".wander", XrmoptionNoArg, "False" },
-	  { "-roll",   ".roll",   XrmoptionNoArg, "True"  },
-	  { "+roll",   ".roll",   XrmoptionNoArg, "False" },
-	  { "-teeth",  ".teeth",  XrmoptionSepArg, 0      },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",   ".spin",   XrmoptionNoArg, "True"  },
+  { "+spin",   ".spin",   XrmoptionNoArg, "False" },
+  { "-speed",  ".speed",  XrmoptionSepArg, 0      },
+  { "-wander", ".wander", XrmoptionNoArg, "True"  },
+  { "+wander", ".wander", XrmoptionNoArg, "False" },
+  { "-roll",   ".roll",   XrmoptionNoArg, "True"  },
+  { "+roll",   ".roll",   XrmoptionNoArg, "False" },
+  { "-teeth",  ".teeth",  XrmoptionSepArg, 0      },
+};
 
-	static argtype vars[] = {
-	  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_Bool},
-	  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
-	  {&do_roll,   "roll",   "Roll",   DEF_ROLL,   t_Bool},
-	  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
-	  {&teeth_arg, "teeth",  "Teeth",  DEF_TEETH,  t_Int},
-	};
+static argtype vars[] = {
+  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_Bool},
+  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
+  {&do_roll,   "roll",   "Roll",   DEF_ROLL,   t_Bool},
+  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
+  {&teeth_arg, "teeth",  "Teeth",  DEF_TEETH,  t_Int},
+};
 
-	ENTRYPOINT ModeSpecOpt mgears_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt mgears_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 /* Window management, etc
  */

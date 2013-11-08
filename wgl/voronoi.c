@@ -69,28 +69,26 @@ static int npoints = 25;
 static GLfloat point_size = 9.0, point_speed = 1.0, point_delay = 0.05;
 static GLfloat zoom_speed = 1.0, zoom_delay = 15.0;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-points",       ".points",      XrmoptionSepArg, 0 },
-	  { "-point-size",   ".pointSize",   XrmoptionSepArg, 0 },
-	  { "-point-speed",  ".pointSpeed",  XrmoptionSepArg, 0 },
-	  { "-point-delay",  ".pointDelay",  XrmoptionSepArg, 0 },
-	  { "-zoom-speed",   ".zoomSpeed",   XrmoptionSepArg, 0 },
-	  { "-zoom-delay",   ".zoomDelay",   XrmoptionSepArg, 0 },
-	};
+static argtype vars[] = {
+  {&npoints,      "points",      "Points",      DEF_POINTS,       t_Int},
+  {&point_size,   "pointSize",   "PointSize",   DEF_POINT_SIZE,   t_Float},
+  {&point_speed,  "pointSpeed",  "PointSpeed",  DEF_POINT_SPEED,  t_Float},
+  {&point_delay,  "pointDelay",  "PointDelay",  DEF_POINT_DELAY,  t_Float},
+  {&zoom_speed,   "zoomSpeed",   "ZoomSpeed",   DEF_ZOOM_SPEED,   t_Float},
+  {&zoom_delay,   "zoomDelay",   "ZoomDelay",   DEF_ZOOM_DELAY,   t_Float},
+};
 
-	static argtype vars[] = {
-	  {&npoints,      "points",      "Points",      DEF_POINTS,       t_Int},
-	  {&point_size,   "pointSize",   "PointSize",   DEF_POINT_SIZE,   t_Float},
-	  {&point_speed,  "pointSpeed",  "PointSpeed",  DEF_POINT_SPEED,  t_Float},
-	  {&point_delay,  "pointDelay",  "PointDelay",  DEF_POINT_DELAY,  t_Float},
-	  {&zoom_speed,   "zoomSpeed",   "ZoomSpeed",   DEF_ZOOM_SPEED,   t_Float},
-	  {&zoom_delay,   "zoomDelay",   "ZoomDelay",   DEF_ZOOM_DELAY,   t_Float},
-	};
+static XrmOptionDescRec opts[] = {
+  { "-points",       ".points",      XrmoptionSepArg, 0 },
+  { "-point-size",   ".pointSize",   XrmoptionSepArg, 0 },
+  { "-point-speed",  ".pointSpeed",  XrmoptionSepArg, 0 },
+  { "-point-delay",  ".pointDelay",  XrmoptionSepArg, 0 },
+  { "-zoom-speed",   ".zoomSpeed",   XrmoptionSepArg, 0 },
+  { "-zoom-delay",   ".zoomDelay",   XrmoptionSepArg, 0 },
+};
 
-	ENTRYPOINT ModeSpecOpt voronoi_opts =
-	  {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt voronoi_opts =
+  {countof(opts), opts, countof(vars), vars, NULL};
 
 /* Returns the current time in seconds as a double.
  */

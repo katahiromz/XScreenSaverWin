@@ -70,6 +70,7 @@
 */
 
 #define DELAY 20000
+#define SIZE_ 0
 # define DEFAULTS \
 		"*delay:		20000		\n"	\
 		"*showFPS:		False		\n"	\
@@ -92,10 +93,7 @@
 
 #include "colors.h"
 #include "xpm-ximage.h"
-//#include "grab-ximage.h"
-
-#undef MI_SIZE
-#define MI_SIZE(mi) 0
+#include "grab-ximage.h"
 
 #ifdef GRAB
 void grab_frame(Display *display, Window window);
@@ -136,63 +134,61 @@ static int		duration = 30;		/* length of time to display grabbed image */
 #define DEF_IMAGE	"DEFAULT"
 #define DEF_DURATION	"30"
 
-#if 0
-	static XrmOptionDescRec opts[] =
-	{
-	#ifdef GRAB
-		{"-grab",		".gleidescope.grab",		XrmoptionNoArg,		"true"},
-	#endif
-		{"-move",		".gleidescope.move",		XrmoptionNoArg,		"true"},
-		{"-no-move",	".gleidescope.nomove",		XrmoptionNoArg,		"true"},
-		{"-rotate",		".gleidescope.rotate",		XrmoptionNoArg,		"true"},
-		{"-no-rotate",	".gleidescope.norotate",	XrmoptionNoArg,		"true"},
-		{"-zoom",		".gleidescope.zoom",		XrmoptionNoArg,		"true"},
-		{"-no-zoom",	".gleidescope.nozoom",		XrmoptionNoArg,		"true"},
-		{"-image",		".gleidescope.image",		XrmoptionSepArg,	"DEFAULT"},
-		{"-duration",	".gleidescope.duration",	XrmoptionSepArg,	"30"},
-	};
+static XrmOptionDescRec opts[] =
+{
+#ifdef GRAB
+	{"-grab",		".gleidescope.grab",		XrmoptionNoArg,		"true"},
+#endif
+	{"-move",		".gleidescope.move",		XrmoptionNoArg,		"true"},
+	{"-no-move",	".gleidescope.nomove",		XrmoptionNoArg,		"true"},
+	{"-rotate",		".gleidescope.rotate",		XrmoptionNoArg,		"true"},
+	{"-no-rotate",	".gleidescope.norotate",	XrmoptionNoArg,		"true"},
+	{"-zoom",		".gleidescope.zoom",		XrmoptionNoArg,		"true"},
+	{"-no-zoom",	".gleidescope.nozoom",		XrmoptionNoArg,		"true"},
+	{"-image",		".gleidescope.image",		XrmoptionSepArg,	"DEFAULT"},
+	{"-duration",	".gleidescope.duration",	XrmoptionSepArg,	"30"},
+};
 
-	static argtype vars[] = {
-	#ifdef GRAB
-		{&grab,			"grab",		"Grab",		DEF_GRAB,	t_Bool},
-	#endif
-		{&move,			"move",		"Move",		DEF_MOVE,	t_Bool},
-		{&nomove,		"nomove",	"noMove",	DEF_NOMOVE,	t_Bool},
-		{&rotate,		"rotate",	"Rotate",	DEF_ROTATE,	t_Bool},
-		{&norotate,		"norotate",	"noRotate",	DEF_NOROTATE,	t_Bool},
-		{&zoom,			"zoom",		"Zoom",		DEF_ZOOM,	t_Bool},
-		{&nozoom,		"nozoom",	"noZoom",	DEF_NOZOOM,	t_Bool},
-		{&image,		"image",	"Image",	DEF_IMAGE,	t_String},
-		{&duration,		"duration",	"Duration",	DEF_DURATION,		t_Int},
-	};
+static argtype vars[] = {
+#ifdef GRAB
+	{&grab,			"grab",		"Grab",		DEF_GRAB,	t_Bool},
+#endif
+	{&move,			"move",		"Move",		DEF_MOVE,	t_Bool},
+	{&nomove,		"nomove",	"noMove",	DEF_NOMOVE,	t_Bool},
+	{&rotate,		"rotate",	"Rotate",	DEF_ROTATE,	t_Bool},
+	{&norotate,		"norotate",	"noRotate",	DEF_NOROTATE,	t_Bool},
+	{&zoom,			"zoom",		"Zoom",		DEF_ZOOM,	t_Bool},
+	{&nozoom,		"nozoom",	"noZoom",	DEF_NOZOOM,	t_Bool},
+	{&image,		"image",	"Image",	DEF_IMAGE,	t_String},
+	{&duration,		"duration",	"Duration",	DEF_DURATION,		t_Int},
+};
 
-	static OptionStruct desc[] = {
-	#ifdef GRAB
-		{"-grab",		"grab images to create animation"},
-	#endif
-		{"-move",		"camera will move"},
-		{"-no-move",	"camera won't move"},
-		{"-rotate",		"camera will rotate"},
-		{"-no-rotate",	"camera won't rotate"},
-		{"-zoom",		"camera will zoom"},
-		{"-no-zoom",	"camera won't zoom"},
-		{"-image",		"xpm / xbm image file to use for texture"},
-		{"-duration",	"length of time texture will be used"},
-	};
+static OptionStruct desc[] = {
+#ifdef GRAB
+	{"-grab",		"grab images to create animation"},
+#endif
+	{"-move",		"camera will move"},
+	{"-no-move",	"camera won't move"},
+	{"-rotate",		"camera will rotate"},
+	{"-no-rotate",	"camera won't rotate"},
+	{"-zoom",		"camera will zoom"},
+	{"-no-zoom",	"camera won't zoom"},
+	{"-image",		"xpm / xbm image file to use for texture"},
+	{"-duration",	"length of time texture will be used"},
+};
 
-	ENTRYPOINT ModeSpecOpt gleidescope_opts = {
-		sizeof opts / sizeof opts[0], opts,
-		sizeof vars / sizeof vars[0], vars,
-		desc
-	};
+ENTRYPOINT ModeSpecOpt gleidescope_opts = {
+	sizeof opts / sizeof opts[0], opts,
+	sizeof vars / sizeof vars[0], vars,
+	desc
+};
 
-	#ifdef USE_MODULES
-	ModStruct   gleidescope_description = { 
-	     "gleidescope", "init_gleidescope", "draw_gleidescope", "release_gleidescope",
-	     "draw_gleidescope", "init_gleidescope", NULL, &gleidescope_opts,
-	     1000, 1, 2, 1, 4, 1.0, "",
-	     "GL Kaleidescope", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   gleidescope_description = { 
+     "gleidescope", "init_gleidescope", "draw_gleidescope", "release_gleidescope",
+     "draw_gleidescope", "init_gleidescope", NULL, &gleidescope_opts,
+     1000, 1, 2, 1, 4, 1.0, "",
+     "GL Kaleidescope", 0, NULL};
 #endif
 
 /*
@@ -272,8 +268,6 @@ typedef struct {
 #define	YOFFSET	(1.5000000f)	/* cos 60' + 1 */
 
 #if 0
-
-#define	SIZE	3
 
 /* generates a grid with edges of given size */
 /* acd TODO - replace hex[] with this and allow size and distance as parameters */

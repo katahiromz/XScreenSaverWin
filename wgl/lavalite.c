@@ -65,6 +65,8 @@
  */
 
 #define DELAY 30000
+#define COUNT 3
+#define DEF_COUNT       "3"
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*showFPS:      False       \n" \
 			"*wireframe:    False       \n" \
@@ -93,12 +95,9 @@
 //#include "xlockmore.h"
 #include "marching.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include "xpm-ximage.h"
 #include <ctype.h>
-
-#undef MI_COUNT
-#define MI_COUNT(mi) 3
 
 #ifdef USE_GL /* whole file */
 
@@ -108,7 +107,6 @@
 #define DEF_SPEED       "0.003"
 #define DEF_RESOLUTION  "40"
 #define DEF_SMOOTH      "True"
-#define DEF_COUNT       "3"
 #define DEF_STYLE       "random"
 #define DEF_IMPATIENT   "False"
 #define DEF_LCOLOR	"#FF0000" /* lava */
@@ -253,51 +251,50 @@ static const GLfloat light1_pos[4] = { 1.0, 0.0, 0.2, 0.0};
 static const GLfloat light2_pos[4] = { 0.6, 0.0, 1.0, 0.0};
 
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-style",  ".style",  XrmoptionSepArg, 0 },
-	  { "-spin",   ".spin",   XrmoptionSepArg, 0 },
-	  { "+spin",   ".spin",   XrmoptionNoArg, "" },
-	  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
-	  { "-wander", ".wander", XrmoptionNoArg, "True" },
-	  { "+wander", ".wander", XrmoptionNoArg, "False" },
-	  { "-resolution", ".resolution", XrmoptionSepArg, 0 },
-	  { "-smooth", ".smooth", XrmoptionNoArg, "True" },
-	  { "+smooth", ".smooth", XrmoptionNoArg, "False" },
-	  { "-impatient", ".impatient", XrmoptionNoArg, "True" },
-	  { "+impatient", ".impatient", XrmoptionNoArg, "False" },
+static XrmOptionDescRec opts[] = {
+  { "-style",  ".style",  XrmoptionSepArg, 0 },
+  { "-spin",   ".spin",   XrmoptionSepArg, 0 },
+  { "+spin",   ".spin",   XrmoptionNoArg, "" },
+  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
+  { "-wander", ".wander", XrmoptionNoArg, "True" },
+  { "+wander", ".wander", XrmoptionNoArg, "False" },
+  { "-resolution", ".resolution", XrmoptionSepArg, 0 },
+  { "-smooth", ".smooth", XrmoptionNoArg, "True" },
+  { "+smooth", ".smooth", XrmoptionNoArg, "False" },
+  { "-impatient", ".impatient", XrmoptionNoArg, "True" },
+  { "+impatient", ".impatient", XrmoptionNoArg, "False" },
 
-	  { "-lava-color",   ".lavaColor",   XrmoptionSepArg, 0 },
-	  { "-fluid-color",  ".fluidColor",  XrmoptionSepArg, 0 },
-	  { "-base-color",   ".baseColor",   XrmoptionSepArg, 0 },
-	  { "-table-color",  ".tableColor",  XrmoptionSepArg, 0 },
+  { "-lava-color",   ".lavaColor",   XrmoptionSepArg, 0 },
+  { "-fluid-color",  ".fluidColor",  XrmoptionSepArg, 0 },
+  { "-base-color",   ".baseColor",   XrmoptionSepArg, 0 },
+  { "-table-color",  ".tableColor",  XrmoptionSepArg, 0 },
 
-	  { "-fluid-texture",".fluidTexture",  XrmoptionSepArg, 0 },
-	  { "-base-texture", ".baseTexture",   XrmoptionSepArg, 0 },
-	  { "-table-texture",".tableTexture",  XrmoptionSepArg, 0 },
-	};
+  { "-fluid-texture",".fluidTexture",  XrmoptionSepArg, 0 },
+  { "-base-texture", ".baseTexture",   XrmoptionSepArg, 0 },
+  { "-table-texture",".tableTexture",  XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-	  {&do_style,     "style",      "Style",      DEF_STYLE,      t_String},
-	  {&do_spin,      "spin",       "Spin",       DEF_SPIN,       t_String},
-	  {&do_wander,    "wander",     "Wander",     DEF_WANDER,     t_Bool},
-	  {&speed,        "speed",      "Speed",      DEF_SPEED,      t_Float},
-	  {&resolution,   "resolution", "Resolution", DEF_RESOLUTION, t_Int},
-	  {&do_smooth,    "smooth",     "Smooth",     DEF_SMOOTH,     t_Bool},
-	  {&do_impatient, "impatient",  "Impatient",  DEF_IMPATIENT,  t_Bool},
+static argtype vars[] = {
+  {&do_style,     "style",      "Style",      DEF_STYLE,      t_String},
+  {&do_spin,      "spin",       "Spin",       DEF_SPIN,       t_String},
+  {&do_wander,    "wander",     "Wander",     DEF_WANDER,     t_Bool},
+  {&speed,        "speed",      "Speed",      DEF_SPEED,      t_Float},
+  {&resolution,   "resolution", "Resolution", DEF_RESOLUTION, t_Int},
+  {&do_smooth,    "smooth",     "Smooth",     DEF_SMOOTH,     t_Bool},
+  {&do_impatient, "impatient",  "Impatient",  DEF_IMPATIENT,  t_Bool},
 
-	  {&lava_color_str,  "lavaColor",    "LavaColor",  DEF_LCOLOR, t_String},
-	  {&fluid_color_str, "fluidColor",   "FluidColor", DEF_FCOLOR, t_String},
-	  {&base_color_str,  "baseColor",    "BaseColor",  DEF_BCOLOR, t_String},
-	  {&table_color_str, "tableColor",   "TableColor", DEF_TCOLOR, t_String},
+  {&lava_color_str,  "lavaColor",    "LavaColor",  DEF_LCOLOR, t_String},
+  {&fluid_color_str, "fluidColor",   "FluidColor", DEF_FCOLOR, t_String},
+  {&base_color_str,  "baseColor",    "BaseColor",  DEF_BCOLOR, t_String},
+  {&table_color_str, "tableColor",   "TableColor", DEF_TCOLOR, t_String},
 
-	  {&fluid_tex,       "fluidTexture", "FluidTexture", DEF_FTEX, t_String},
-	  {&base_tex,        "baseTexture",  "BaseTexture",  DEF_BTEX, t_String},
-	  {&table_tex,       "tableTexture", "BaseTexture",  DEF_TTEX, t_String},
-	};
+  {&fluid_tex,       "fluidTexture", "FluidTexture", DEF_FTEX, t_String},
+  {&base_tex,        "baseTexture",  "BaseTexture",  DEF_BTEX, t_String},
+  {&table_tex,       "tableTexture", "BaseTexture",  DEF_TTEX, t_String},
+};
 
-	ENTRYPOINT ModeSpecOpt lavalite_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt lavalite_opts = {countof(opts), opts, countof(vars), vars, NULL};
+
 
 /* Window management, etc
  */

@@ -58,39 +58,34 @@ static const char sccsid[] = "@(#)flurry.c	4.07 97/11/24 xlockmore";
 
 static char *preset_str = "random";
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	    { "-preset",     ".preset",     XrmoptionSepArg, 0 }
-	};
+static XrmOptionDescRec opts[] = {
+    { "-preset",     ".preset",     XrmoptionSepArg, 0 }
+};
 
-	static argtype vars[] = {
-	    {&preset_str, "preset",     "Preset",     DEF_PRESET,     t_String},
-	};
-#endif
+static argtype vars[] = {
+    {&preset_str, "preset",     "Preset",     DEF_PRESET,     t_String},
+};
 
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-#if 0
-	ENTRYPOINT ModeSpecOpt flurry_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt flurry_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   flurry_description = {
-	    "flurry",
-	    "init_flurry",
-	    "draw_flurry",
-	    "release_flurry",
-	    "draw_flurry",
-	    "init_flurry",
-	    NULL,
-	    &flurry_opts,
-	    1000, 1, 2, 1, 4, 1.0,
-	    "",
-	    "Flurry",
-	    0,
-	    NULL
-	};
-
-	#endif
+#ifdef USE_MODULES
+ModStruct   flurry_description = {
+    "flurry",
+    "init_flurry",
+    "draw_flurry",
+    "release_flurry",
+    "draw_flurry",
+    "init_flurry",
+    NULL,
+    &flurry_opts,
+    1000, 1, 2, 1, 4, 1.0,
+    "",
+    "Flurry",
+    0,
+    NULL
+};
 #endif
 
 global_info_t *flurry_info = NULL;

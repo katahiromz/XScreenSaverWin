@@ -66,7 +66,7 @@
 #define DEF_SPEED        "300"
 
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
@@ -79,46 +79,44 @@ static int speed = 3000;
 static Bool do_spin = True;
 static Bool do_wander = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-surface",        ".surface", XrmoptionSepArg, 0 },
-	  { "-random-surface", ".surface", XrmoptionNoArg,  "random" },
-	  { "-dini",           ".surface", XrmoptionNoArg,  "dini" },
-	  { "-enneper",        ".surface", XrmoptionNoArg,  "enneper" },
-	  { "-kuen",           ".surface", XrmoptionNoArg,  "kuen" },
-	  { "-moebius",        ".surface", XrmoptionNoArg,  "moebius" },
-	  { "-seashell",       ".surface", XrmoptionNoArg,  "seashell" },
-	  { "-swallowtail",    ".surface", XrmoptionNoArg,  "swallowtail" },
-	  { "-bohemian",       ".surface", XrmoptionNoArg,  "bohemian" },
-	  { "-whitney",        ".surface", XrmoptionNoArg,  "whitney" },
-	  { "-pluecker",       ".surface", XrmoptionNoArg,  "pluecker" },
-	  { "-henneberg",      ".surface", XrmoptionNoArg,  "henneberg" },
-	  { "-catalan",        ".surface", XrmoptionNoArg,  "catalan" },
-	  { "-corkscrew",      ".surface", XrmoptionNoArg,  "corkscrew" },
-	  { "-mode",           ".mode",    XrmoptionSepArg, 0 },
-	  { "-random-mode",    ".mode",    XrmoptionNoArg,  "random" },
-	  { "-points",         ".mode",    XrmoptionNoArg,  "points" },
-	  { "-lines",          ".mode",    XrmoptionNoArg,  "lines" },
-	  { "-line-loops",     ".mode",    XrmoptionNoArg,  "line-loops" },
-	  { "-speed",          ".speed",   XrmoptionSepArg, 0 },
-	  { "-spin",           ".spin",    XrmoptionNoArg, "True" },
-	  { "+spin",           ".spin",    XrmoptionNoArg, "False" },
-	  { "-wander",         ".wander",  XrmoptionNoArg, "True" },
-	  { "+wander",         ".wander",  XrmoptionNoArg, "False" },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-surface",        ".surface", XrmoptionSepArg, 0 },
+  { "-random-surface", ".surface", XrmoptionNoArg,  "random" },
+  { "-dini",           ".surface", XrmoptionNoArg,  "dini" },
+  { "-enneper",        ".surface", XrmoptionNoArg,  "enneper" },
+  { "-kuen",           ".surface", XrmoptionNoArg,  "kuen" },
+  { "-moebius",        ".surface", XrmoptionNoArg,  "moebius" },
+  { "-seashell",       ".surface", XrmoptionNoArg,  "seashell" },
+  { "-swallowtail",    ".surface", XrmoptionNoArg,  "swallowtail" },
+  { "-bohemian",       ".surface", XrmoptionNoArg,  "bohemian" },
+  { "-whitney",        ".surface", XrmoptionNoArg,  "whitney" },
+  { "-pluecker",       ".surface", XrmoptionNoArg,  "pluecker" },
+  { "-henneberg",      ".surface", XrmoptionNoArg,  "henneberg" },
+  { "-catalan",        ".surface", XrmoptionNoArg,  "catalan" },
+  { "-corkscrew",      ".surface", XrmoptionNoArg,  "corkscrew" },
+  { "-mode",           ".mode",    XrmoptionSepArg, 0 },
+  { "-random-mode",    ".mode",    XrmoptionNoArg,  "random" },
+  { "-points",         ".mode",    XrmoptionNoArg,  "points" },
+  { "-lines",          ".mode",    XrmoptionNoArg,  "lines" },
+  { "-line-loops",     ".mode",    XrmoptionNoArg,  "line-loops" },
+  { "-speed",          ".speed",   XrmoptionSepArg, 0 },
+  { "-spin",           ".spin",    XrmoptionNoArg, "True" },
+  { "+spin",           ".spin",    XrmoptionNoArg, "False" },
+  { "-wander",         ".wander",  XrmoptionNoArg, "True" },
+  { "+wander",         ".wander",  XrmoptionNoArg, "False" },
+};
 
-	static argtype vars[] = {
-	  {&surface_type, "surface", "Surface", DEF_SURFACE, t_String },
-	  {&render_mode,  "mode",    "Mode",    DEF_MODE,    t_String },
-	  {&do_spin,      "spin",    "Spin",    DEF_SPIN,    t_Bool },
-	  {&do_wander,    "wander",  "Wander",  DEF_WANDER,  t_Bool },
-	  {&speed,        "speed",   "Speed",   DEF_SPEED,   t_Int },
-	};
+static argtype vars[] = {
+  {&surface_type, "surface", "Surface", DEF_SURFACE, t_String },
+  {&render_mode,  "mode",    "Mode",    DEF_MODE,    t_String },
+  {&do_spin,      "spin",    "Spin",    DEF_SPIN,    t_Bool },
+  {&do_wander,    "wander",  "Wander",  DEF_WANDER,  t_Bool },
+  {&speed,        "speed",   "Speed",   DEF_SPEED,   t_Int },
+};
 
 
-	ENTRYPOINT ModeSpecOpt surface_opts =
-	{countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt surface_opts =
+{countof(opts), opts, countof(vars), vars, NULL};
 
 
 typedef struct {

@@ -91,46 +91,46 @@ static float star_spin = 0.03;
 static char *imageForeground = "Green";
 static char *imageBackground = "Blue";
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"-rotate",  ".glplanet.rotate",  XrmoptionNoArg, "true" },
-	  {"+rotate",  ".glplanet.rotate",  XrmoptionNoArg, "false" },
-	  {"-roll",    ".glplanet.roll",    XrmoptionNoArg, "true" },
-	  {"+roll",    ".glplanet.roll",    XrmoptionNoArg, "false" },
-	  {"-wander",  ".glplanet.wander",  XrmoptionNoArg, "true" },
-	  {"+wander",  ".glplanet.wander",  XrmoptionNoArg, "false" },
-	  {"-texture", ".glplanet.texture", XrmoptionNoArg, "true" },
-	  {"+texture", ".glplanet.texture", XrmoptionNoArg, "false" },
-	  {"-stars",   ".glplanet.stars",   XrmoptionNoArg, "true" },
-	  {"+stars",   ".glplanet.stars",   XrmoptionNoArg, "false" },
-	  {"-spin",    ".glplanet.spin",    XrmoptionSepArg, 0 },
-	  {"-light",   ".glplanet.light",   XrmoptionNoArg, "true" },
-	  {"+light",   ".glplanet.light",   XrmoptionNoArg, "false" },
-	  {"-image",   ".glplanet.image",  XrmoptionSepArg, 0 },
-	  {"-resolution", ".glplanet.resolution", XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  {"-rotate",  ".glplanet.rotate",  XrmoptionNoArg, "true" },
+  {"+rotate",  ".glplanet.rotate",  XrmoptionNoArg, "false" },
+  {"-roll",    ".glplanet.roll",    XrmoptionNoArg, "true" },
+  {"+roll",    ".glplanet.roll",    XrmoptionNoArg, "false" },
+  {"-wander",  ".glplanet.wander",  XrmoptionNoArg, "true" },
+  {"+wander",  ".glplanet.wander",  XrmoptionNoArg, "false" },
+  {"-texture", ".glplanet.texture", XrmoptionNoArg, "true" },
+  {"+texture", ".glplanet.texture", XrmoptionNoArg, "false" },
+  {"-stars",   ".glplanet.stars",   XrmoptionNoArg, "true" },
+  {"+stars",   ".glplanet.stars",   XrmoptionNoArg, "false" },
+  {"-spin",    ".glplanet.spin",    XrmoptionSepArg, 0 },
+  {"-light",   ".glplanet.light",   XrmoptionNoArg, "true" },
+  {"+light",   ".glplanet.light",   XrmoptionNoArg, "false" },
+  {"-image",   ".glplanet.image",  XrmoptionSepArg, 0 },
+  {"-resolution", ".glplanet.resolution", XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-	  {&do_rotate,   "rotate",  "Rotate",  DEF_ROTATE,  t_Bool},
-	  {&do_roll,     "roll",    "Roll",    DEF_ROLL,    t_Bool},
-	  {&do_wander,   "wander",  "Wander",  DEF_WANDER,  t_Bool},
-	  {&do_texture,  "texture", "Texture", DEF_TEXTURE, t_Bool},
-	  {&do_stars,    "stars",   "Stars",   DEF_STARS,   t_Bool},
-	  {&do_light,    "light",   "Light",   DEF_LIGHT,   t_Bool},
-	  {&which_image, "image",   "Image",   DEF_IMAGE,   t_String},
-	  {&resolution,  "resolution","Resolution", DEF_RESOLUTION, t_Int},
-	  {&star_spin,   "spin",    "Float",   DEF_SPIN,    t_Float},
-	};
+static argtype vars[] = {
+  {&do_rotate,   "rotate",  "Rotate",  DEF_ROTATE,  t_Bool},
+  {&do_roll,     "roll",    "Roll",    DEF_ROLL,    t_Bool},
+  {&do_wander,   "wander",  "Wander",  DEF_WANDER,  t_Bool},
+  {&do_texture,  "texture", "Texture", DEF_TEXTURE, t_Bool},
+  {&do_stars,    "stars",   "Stars",   DEF_STARS,   t_Bool},
+  {&do_light,    "light",   "Light",   DEF_LIGHT,   t_Bool},
+  {&which_image, "image",   "Image",   DEF_IMAGE,   t_String},
+  {&resolution,  "resolution","Resolution", DEF_RESOLUTION, t_Int},
+  {&star_spin,   "spin",    "Float",   DEF_SPIN,    t_Float},
+  {&imageForeground, "imageForeground", "ImageForeground", "Green", t_String},
+  {&imageBackground, "imageBackground", "ImageBackground", "Blue", t_String},
+};
 
-	ENTRYPOINT ModeSpecOpt planet_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt planet_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   planet_description =
-	{"planet", "init_planet", "draw_planet", "release_planet",
-	 "draw_planet", "init_planet", NULL, &planet_opts,
-	 1000, 1, 2, 1, 4, 1.0, "",
-	 "Animates texture mapped sphere (planet)", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   planet_description =
+{"planet", "init_planet", "draw_planet", "release_planet",
+ "draw_planet", "init_planet", NULL, &planet_opts,
+ 1000, 1, 2, 1, 4, 1.0, "",
+ "Animates texture mapped sphere (planet)", 0, NULL};
 #endif
 
 # ifdef __GNUC__
@@ -142,7 +142,7 @@ static char *imageBackground = "Blue";
 
 #include "xpm-ximage.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 
 /*-

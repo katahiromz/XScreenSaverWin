@@ -355,6 +355,125 @@ decode_mask (unsigned int mask, unsigned int *pos_ret, unsigned int *size_ret)
       }
 }
 
+char *file_get_contents(const char *filename)
+{
+    HANDLE hFile;
+    DWORD cbFile, cbRead;
+    char *psz = NULL;
+    hFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, NULL,
+        OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    if (hFile == INVALID_HANDLE_VALUE)
+        return NULL;
+
+    cbFile = GetFileSize(hFile, NULL);
+    if (cbFile != 0xFFFFFFFF)
+    {
+        psz = (char *)malloc(cbFile + 1);
+        if (psz)
+        {
+            if (!ReadFile(hFile, psz, cbFile, &cbRead, NULL) ||
+                cbFile != cbRead)
+            {
+                free(psz);
+                psz = NULL;
+            }
+            else
+            {
+                psz[cbFile] = '\0';
+            }
+        }
+    }
+    CloseHandle(hFile);
+    return psz;
+}
+
+char **get_string_literals(char *contents)
+{
+    BOOL in_comment, in_quote, do_concat, in_braces;
+    int nptrs, size;
+    char *inp, *out, **ptrs;
+
+    if (contents == NULL) return NULL;
+
+    nptrs = 0; ptrs = NULL;
+    in_comment = in_quote = do_concat = in_braces = FALSE;
+    for (inp = out = contents; *inp != '\0'; inp++)
+    {
+        if (in_quote)
+        {
+            if (*inp == '\\')
+            {
+                inp++;
+                if (in_braces)
+                    *out++ = *inp;
+            }
+            else if (*inp == '"')
+            {
+                if (in_braces)
+                    *out++ = '\0';
+                in_quote = FALSE;
+                do_concat = TRUE;
+            }
+            else
+            {
+                if (in_braces)
+                    *out++ = *inp;
+            }
+        }
+        else if (in_comment)
+        {
+            if (inp[0] == '*' && inp[1] == '/')
+            {
+                in_comment = FALSE;
+                inp++;
+            }
+        }
+        else
+        {
+            while (isspace(*inp)) inp++;
+            if (*inp == ',')
+            {
+                do_concat = FALSE;
+            }
+            if (inp[0] == '/' && inp[1] == '*')
+            {
+                in_comment = TRUE;
+                inp++;
+            }
+            else if (*inp == '"')
+            {
+                in_quote = TRUE;
+                if (in_braces)
+                {
+                    if (!do_concat)
+                    {
+                        size = (nptrs + 1) * sizeof(char *);
+                        ptrs = (char **)realloc(ptrs, size);
+                        if (ptrs == NULL)
+                            return NULL;
+
+                        ptrs[nptrs++] = out;
+                    }
+                    else
+                    {
+                        out--;
+                    }
+                }
+            }
+            else if (*inp == '{')
+            {
+                in_braces = TRUE;
+            }
+            else if (*inp == '}')
+            {
+                in_braces = FALSE;
+                break;
+            }
+        }
+    }
+    *out = '\0';
+    return ptrs;
+}
 
 /* The minixpm version of this function...
  */
@@ -372,6 +491,7 @@ xpm_to_ximage_1 (Display *dpy, Visual *visual, Colormap cmap,
   unsigned long *pixels = 0;
   int npixels = 0;
   int bpl;
+  char *contents;
 
   unsigned int rpos=0, gpos=0, bpos=0, apos=0;
   unsigned int rmsk=0, gmsk=0, bmsk=0, amsk=0;
@@ -379,10 +499,8 @@ xpm_to_ximage_1 (Display *dpy, Visual *visual, Colormap cmap,
 
   if (filename)
     {
-      fprintf(stderr, 
-              "%s: no files: not compiled with XPM or Pixbuf support.\n", 
-              progname);
-      exit (1);
+      contents = file_get_contents(filename);
+      xpm_data = get_string_literals(contents);
     }
 
   if (! xpm_data) abort();
@@ -450,6 +568,12 @@ xpm_to_ximage_1 (Display *dpy, Visual *visual, Colormap cmap,
   free (data);
 
   ximage->format = RGBAPixmap;
+
+  if (filename)
+    {
+      free(xpm_data);
+      free(contents);
+    }
 
   return ximage;
 }

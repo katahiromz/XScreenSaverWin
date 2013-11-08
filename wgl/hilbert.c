@@ -15,6 +15,7 @@
  */
 
 #define DELAY 30000
+#define COUNT 30
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*count:        30          \n" \
 			"*showFPS:      False       \n" \
@@ -33,11 +34,9 @@
 #include "sphere.h"
 #include "tube.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 30
 
 #ifdef USE_GL /* whole file */
 
@@ -104,35 +103,33 @@ static char *ends_str = "random";
 static int max_depth = 5;
 static GLfloat thickness = 0.25;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",      ".spin",     XrmoptionNoArg, "True"   },
-	  { "+spin",      ".spin",     XrmoptionNoArg, "False"  },
-	  { "-speed",     ".speed",    XrmoptionSepArg, 0       },
-	  { "-wander",    ".wander",   XrmoptionNoArg, "True"   },
-	  { "+wander",    ".wander",   XrmoptionNoArg, "False"  },
-	  { "-mode",      ".mode",     XrmoptionSepArg, 0       },
-	  { "-2d",        ".mode",     XrmoptionNoArg, "2D"     },
-	  { "-3d",        ".mode",     XrmoptionNoArg, "3D"     },
-	  { "-ends",      ".ends",     XrmoptionSepArg, 0       },
-	  { "-closed",    ".ends",     XrmoptionNoArg, "closed" },
-	  { "-open",      ".ends",     XrmoptionNoArg, "open"   },
-	  { "-max-depth", ".maxDepth", XrmoptionSepArg, 0       },
-	  { "-thickness", ".thickness",XrmoptionSepArg, 0       },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",      ".spin",     XrmoptionNoArg, "True"   },
+  { "+spin",      ".spin",     XrmoptionNoArg, "False"  },
+  { "-speed",     ".speed",    XrmoptionSepArg, 0       },
+  { "-wander",    ".wander",   XrmoptionNoArg, "True"   },
+  { "+wander",    ".wander",   XrmoptionNoArg, "False"  },
+  { "-mode",      ".mode",     XrmoptionSepArg, 0       },
+  { "-2d",        ".mode",     XrmoptionNoArg, "2D"     },
+  { "-3d",        ".mode",     XrmoptionNoArg, "3D"     },
+  { "-ends",      ".ends",     XrmoptionSepArg, 0       },
+  { "-closed",    ".ends",     XrmoptionNoArg, "closed" },
+  { "-open",      ".ends",     XrmoptionNoArg, "open"   },
+  { "-max-depth", ".maxDepth", XrmoptionSepArg, 0       },
+  { "-thickness", ".thickness",XrmoptionSepArg, 0       },
+};
 
-	static argtype vars[] = {
-	  {&do_spin,   "spin",     "Spin",     DEF_SPIN,      t_Bool},
-	  {&do_wander, "wander",   "Wander",   DEF_WANDER,    t_Bool},
-	  {&speed,     "speed",    "Speed",    DEF_SPEED,     t_Float},
-	  {&mode_str,  "mode",     "Mode",     DEF_MODE,      t_String},
-	  {&ends_str,  "ends",     "Ends",     DEF_ENDS,      t_String},
-	  {&max_depth, "maxDepth", "MaxDepth", DEF_MAX_DEPTH, t_Int},
-	  {&thickness, "thickness","Thickness",DEF_THICKNESS, t_Float},
-	};
+static argtype vars[] = {
+  {&do_spin,   "spin",     "Spin",     DEF_SPIN,      t_Bool},
+  {&do_wander, "wander",   "Wander",   DEF_WANDER,    t_Bool},
+  {&speed,     "speed",    "Speed",    DEF_SPEED,     t_Float},
+  {&mode_str,  "mode",     "Mode",     DEF_MODE,      t_String},
+  {&ends_str,  "ends",     "Ends",     DEF_ENDS,      t_String},
+  {&max_depth, "maxDepth", "MaxDepth", DEF_MAX_DEPTH, t_Int},
+  {&thickness, "thickness","Thickness",DEF_THICKNESS, t_Float},
+};
 
-	ENTRYPOINT ModeSpecOpt hilbert_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt hilbert_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 /* 2D Hilbert, and closed-loop variant.
  */

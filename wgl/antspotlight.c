@@ -14,6 +14,7 @@
  * Copyright 2003 Blair Tennessy
  */
 
+#define NOARGS
 #define DELAY 20000
 #define DEFAULTS	    "*delay:   20000   \n" \
 			    "*showFPS: False   \n" \
@@ -45,21 +46,19 @@
 #include "sphere.h"
 #include "tube.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
-#if 0
-	ENTRYPOINT ModeSpecOpt antspotlight_opts = {
-	  0, NULL, 0, NULL, NULL
-	};
+ENTRYPOINT ModeSpecOpt antspotlight_opts = {
+  0, NULL, 0, NULL, NULL
+};
 
-	#ifdef USE_MODULES
-	ModStruct   antspotlight_description = {
-	  "antspotlight", "init_antspotlight", "draw_antspotlight", 
-	  "release_antspotlight", "draw_antspotlight", "change_antspotlight", 
-	  (char *) NULL, &antspotlight_opts, 1000, 1, 1, 1, 4, 1.0, "",
-	  "draws an ant scoping the screen", 0, NULL
-	};
-	#endif
+#ifdef USE_MODULES
+ModStruct   antspotlight_description = {
+  "antspotlight", "init_antspotlight", "draw_antspotlight", 
+  "release_antspotlight", "draw_antspotlight", "change_antspotlight", 
+  (char *) NULL, &antspotlight_opts, 1000, 1, 1, 1, 4, 1.0, "",
+  "draws an ant scoping the screen", 0, NULL
+};
 #endif
 
 #define Scale4Window               0.3
@@ -72,7 +71,7 @@
 #endif
 
 #include "ants.h"
-//#include "grab-ximage.h"
+#include "grab-ximage.h"
 
 typedef struct {
   GLXContext *glx_context;

@@ -40,7 +40,7 @@
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 /*************************************************************************/
 
@@ -49,32 +49,30 @@ static float size = 20;
 static float speed = 1.0;
 static Bool bigdots = True;
 
-#if 0
-	static argtype vars[] = {
-	  { &speed,   "speed",   "Speed",   DEF_SPEED,   t_Float },
-	  { &size,    "zoom",    "Zoom",    DEF_ZOOM,    t_Float },
-	  { &ticks,   "ticks",   "Ticks",   DEF_DIV,     t_Int },
-	  { &bigdots, "bigdots", "BigDots", DEF_BIGDOTS, t_Bool },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-speed",   ".speed",   XrmoptionSepArg, 0 },
+  { "-zoom",    ".zoom",    XrmoptionSepArg, 0 },
+  { "-ticks",   ".ticks",   XrmoptionSepArg, 0 },
+  { "-bigdots", ".bigdots", XrmoptionNoArg,  "True" },
+  { "+bigdots", ".bigdots", XrmoptionNoArg,  "False" },
+};
 
-	static XrmOptionDescRec opts[] = {
-	  { "-speed",   ".speed",   XrmoptionSepArg, 0 },
-	  { "-zoom",    ".zoom",    XrmoptionSepArg, 0 },
-	  { "-ticks",   ".ticks",   XrmoptionSepArg, 0 },
-	  { "-bigdots", ".bigdots", XrmoptionNoArg,  "True" },
-	  { "+bigdots", ".bigdots", XrmoptionNoArg,  "False" },
-	};
+static argtype vars[] = {
+  { &speed,   "speed",   "Speed",   DEF_SPEED,   t_Float },
+  { &size,    "zoom",    "Zoom",    DEF_ZOOM,    t_Float },
+  { &ticks,   "ticks",   "Ticks",   DEF_DIV,     t_Int },
+  { &bigdots, "bigdots", "BigDots", DEF_BIGDOTS, t_Bool },
+};
 
-	ENTRYPOINT ModeSpecOpt cubicgrid_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt cubicgrid_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   cubicgrid_description =
-	{ "cubicgrid", "init_cubicgrid", "draw_cubicgrid", "release_cubicgrid",
-	  "draw_cubicgrid", "change_cubicgrid", NULL, &cubicgrid_opts,
-	  25000, 1, 1, 1, 1.0, 4, "",
-	  "Shows a rotating 3D lattice from inside", 0, NULL
-	};
-	#endif
+#ifdef USE_MODULES
+ModStruct   cubicgrid_description =
+{ "cubicgrid", "init_cubicgrid", "draw_cubicgrid", "release_cubicgrid",
+  "draw_cubicgrid", "change_cubicgrid", NULL, &cubicgrid_opts,
+  25000, 1, 1, 1, 1.0, 4, "",
+  "Shows a rotating 3D lattice from inside", 0, NULL
+};
 #endif
 
 typedef struct {

@@ -73,7 +73,7 @@
 #include "normals.h"
 #include "tube.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #ifdef USE_GL /* whole file */
 
@@ -151,17 +151,15 @@ typedef struct {
 
 static logo_configuration *dcs = NULL;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-speed",  ".speed",  XrmoptionSepArg, 0       },
-	  { "-mode",   ".mode",   XrmoptionSepArg, 0       },
-	  { "-pizza",  ".mode",   XrmoptionNoArg,  "pizza" },
-	  { "-helix",  ".mode",   XrmoptionNoArg,  "helix" },
-	  { "-both",   ".mode",   XrmoptionNoArg,  "both"  },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-speed",  ".speed",  XrmoptionSepArg, 0       },
+  { "-mode",   ".mode",   XrmoptionSepArg, 0       },
+  { "-pizza",  ".mode",   XrmoptionNoArg,  "pizza" },
+  { "-helix",  ".mode",   XrmoptionNoArg,  "helix" },
+  { "-both",   ".mode",   XrmoptionNoArg,  "both"  },
+};
 
-	ENTRYPOINT ModeSpecOpt logo_opts = {countof(opts), opts, 0, NULL, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt logo_opts = {countof(opts), opts, 0, NULL, NULL};
 
 #define PROBABILITY_SCALE 600
 
@@ -1913,6 +1911,34 @@ static float triangleSize = 0.045;
 static float speed = 1.0;
 static char *mode = "both";
 static char *foreground = "#00AA00";
+
+static argtype vars[] = {
+  {&doGasket, "doGasket", "DoGasket", "True", t_Bool},
+  {&doHelix, "doHelix", "DoHelix", "True", t_Bool},
+  {&doLadder, "doLadder", "DoLadder", "True", t_Bool},
+  {&doFrame, "doFrame", "DoFrame", "True", t_Bool},
+  {&wallFacets, "wallFacets", "WallFacets", "360", t_Int},
+  {&barFacets, "barFacets", "BarFacets", "90", t_Int},
+  {&clockwise, "clockwise", "Clockwise", "False", t_Bool},
+  {&turns, "turns", "Turns", "0.69", t_Float},
+  {&turnSpacing, "turnSpacing", "TurnSpacing", "2.2", t_Float},
+  {&barSpacing, "barSpacing", "BarSpacing", "0.24", t_Float},
+  {&wallHeight, "wallHeight", "WallHeight", "0.45", t_Float},
+  {&wallThickness, "wallThickness", "WallThickness", "0.12", t_Float},
+  {&barThickness, "barThickness", "BarThickness", "0.058", t_Float},
+  {&wallTaper, "wallTaper", "WallTaper", "0.95", t_Float},
+  {&gasketSize, "gasketSize", "GasketSize", "1.88", t_Float},
+  {&gasketDepth, "gasketDepth", "GasketDepth", "0.15", t_Float},
+  {&gasketThickness, "gasketThickness", "GasketThickness", "0.4", t_Float},
+  {&frameSize, "frameSize", "FrameSize", "1.20", t_Float},
+  {&frameDepth, "frameDepth", "FrameDepth", "0.01", t_Float},
+  {&frameThickness, "frameThickness", "FrameThickness", "0.03", t_Float},
+  {&triangleSize, "triangleSize", "TriangleSize", "0.045", t_Float},
+  {&speed, "speed", "Speed", "1.0", t_Float},
+  {&mode, "mode", "Mode", "both", t_String},
+  {&foreground, "foreground", "Foreground", "#00AA00", t_String},
+};
+
 
 ENTRYPOINT void 
 init_logo (ModeInfo *mi)

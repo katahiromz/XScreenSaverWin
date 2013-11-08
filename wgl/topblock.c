@@ -45,7 +45,7 @@ History
 #include "topblock.h"
 #include "sphere.h"
 #include "tube.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
 #ifdef USE_GL /* whole file */
@@ -94,27 +94,25 @@ static int size = 2;
 static int spawn = 50;
 static int resolution = 4;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-size",        ".size",        XrmoptionSepArg, 0 },
-	  { "-spawn",       ".spawn",       XrmoptionSepArg, 0 },
-	  { "-camX",        ".camX",        XrmoptionSepArg, 0 },
-	  { "-camY",        ".camY",        XrmoptionSepArg, 0 },
-	  { "-camZ",        ".camZ",        XrmoptionSepArg, 0 },
-	  { "+rotate",      ".rotate",      XrmoptionNoArg, "False" },
-	  { "-rotate",      ".rotate",      XrmoptionNoArg, "True" },
-	  { "+carpet",      ".carpet",      XrmoptionNoArg, "False" },
-	  { "+nipples",     ".nipples",     XrmoptionNoArg, "False" },
-	  { "-blob",        ".blob",        XrmoptionNoArg, "True" },
-	  { "-rotateSpeed", ".rotateSpeed", XrmoptionSepArg, 0 },
-	  { "-follow",      ".follow",      XrmoptionNoArg, "True" },
-	  { "-maxFalling",  ".maxFalling",  XrmoptionSepArg, 0 },
-	  { "-resolution",  ".resolution",  XrmoptionSepArg, 0 },
-	  { "-maxColors",   ".maxColors",   XrmoptionSepArg, 0 },
-	  { "-dropSpeed",   ".dropSpeed",   XrmoptionSepArg, 0 },
-	  { "-override",    ".override",    XrmoptionNoArg, "True" },
-	};
-#endif
+static XrmOptionDescRec opts[] = {
+  { "-size",        ".size",        XrmoptionSepArg, 0 },
+  { "-spawn",       ".spawn",       XrmoptionSepArg, 0 },
+  { "-camX",        ".camX",        XrmoptionSepArg, 0 },
+  { "-camY",        ".camY",        XrmoptionSepArg, 0 },
+  { "-camZ",        ".camZ",        XrmoptionSepArg, 0 },
+  { "+rotate",      ".rotate",      XrmoptionNoArg, "False" },
+  { "-rotate",      ".rotate",      XrmoptionNoArg, "True" },
+  { "+carpet",      ".carpet",      XrmoptionNoArg, "False" },
+  { "+nipples",     ".nipples",     XrmoptionNoArg, "False" },
+  { "-blob",        ".blob",        XrmoptionNoArg, "True" },
+  { "-rotateSpeed", ".rotateSpeed", XrmoptionSepArg, 0 },
+  { "-follow",      ".follow",      XrmoptionNoArg, "True" },
+  { "-maxFalling",  ".maxFalling",  XrmoptionSepArg, 0 },
+  { "-resolution",  ".resolution",  XrmoptionSepArg, 0 },
+  { "-maxColors",   ".maxColors",   XrmoptionSepArg, 0 },
+  { "-dropSpeed",   ".dropSpeed",   XrmoptionSepArg, 0 },
+  { "-override",    ".override",    XrmoptionNoArg, "True" },
+};
 
 #define DEF_OVERRIDE      "False"
 #define DEF_ROTATE        "True"
@@ -133,32 +131,28 @@ static int resolution = 4;
 #define DEF_CAM_Z         "25"
 #define DEF_DROP_SPEED    "4"
 
-#if 0
-	static argtype vars[] = {
-	  {&override,     "override",     "Override",     DEF_OVERRIDE,     t_Bool},
-	  {&rotate,       "rotate",       "Rotate",       DEF_ROTATE,       t_Bool},
-	  {&drawCarpet,   "carpet",       "Carpet",       DEF_CARPET,   t_Bool},
-	  {&drawNipples,  "nipples",      "Nipples",      DEF_NIPPLES,  t_Bool},
-	  {&drawBlob,     "blob",         "Blob",         DEF_BLOB,     t_Bool},
-	  {&rotateSpeed,  "rotateSpeed",  "RotateSpeed",  DEF_ROTATE_SPEED,  t_Float},
-	  {&follow,       "follow",       "Follow",       DEF_FOLLOW,       t_Bool},
-	  {&camX,         "camX",         "camX",         DEF_CAM_X,         t_Float},
-	  {&camY,         "camY",         "camY",         DEF_CAM_Y,         t_Float},
-	  {&camZ,         "camZ",         "camZ",         DEF_CAM_Z,         t_Float},
-	  {&size,         "size",         "size",         DEF_SIZE,         t_Int},
-	  {&spawn,        "spawn",        "spawn",        DEF_SPAWN,        t_Int},
-	  {&maxFalling,   "maxFalling",   "maxFalling",   DEF_MAX_FALLING,   t_Int},
-	  {&resolution,   "resolution",   "resolution",   DEF_RESOLUTION,   t_Int},
-	  {&maxColors,    "maxColors",    "maxColors",    DEF_MAX_COLORS,    t_Int},
-	  {&dropSpeed,    "dropSpeed",    "DropSpeed",    DEF_DROP_SPEED,    t_Float},
-	};
-#endif
+static argtype vars[] = {
+  {&override,     "override",     "Override",     DEF_OVERRIDE,     t_Bool},
+  {&rotate,       "rotate",       "Rotate",       DEF_ROTATE,       t_Bool},
+  {&drawCarpet,   "carpet",       "Carpet",       DEF_CARPET,   t_Bool},
+  {&drawNipples,  "nipples",      "Nipples",      DEF_NIPPLES,  t_Bool},
+  {&drawBlob,     "blob",         "Blob",         DEF_BLOB,     t_Bool},
+  {&rotateSpeed,  "rotateSpeed",  "RotateSpeed",  DEF_ROTATE_SPEED,  t_Float},
+  {&follow,       "follow",       "Follow",       DEF_FOLLOW,       t_Bool},
+  {&camX,         "camX",         "camX",         DEF_CAM_X,         t_Float},
+  {&camY,         "camY",         "camY",         DEF_CAM_Y,         t_Float},
+  {&camZ,         "camZ",         "camZ",         DEF_CAM_Z,         t_Float},
+  {&size,         "size",         "size",         DEF_SIZE,         t_Int},
+  {&spawn,        "spawn",        "spawn",        DEF_SPAWN,        t_Int},
+  {&maxFalling,   "maxFalling",   "maxFalling",   DEF_MAX_FALLING,   t_Int},
+  {&resolution,   "resolution",   "resolution",   DEF_RESOLUTION,   t_Int},
+  {&maxColors,    "maxColors",    "maxColors",    DEF_MAX_COLORS,    t_Int},
+  {&dropSpeed,    "dropSpeed",    "DropSpeed",    DEF_DROP_SPEED,    t_Float},
+};
 
 static topBlockSTATE *tbs = NULL;
 
-#if 0
-	static ModeSpecOpt topBlock_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+static ModeSpecOpt topBlock_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 /* Window management, etc */
 ENTRYPOINT void

@@ -49,7 +49,7 @@
 //#include "xlockmore.h"
 #include "win32.h"
 #include "colors.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
 #ifdef USE_GL /* whole file */
@@ -73,20 +73,20 @@ static GLfloat speed = 1.0;
 static GLfloat resolution = 100;
 static Bool ortho = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-speed",        ".speed",      XrmoptionSepArg, 0 },
-	  { "-resolution",   ".resolution", XrmoptionSepArg, 0 },
-	  { "-ortho",        ".ortho",      XrmoptionNoArg,  "True"  },
-	  { "-no-ortho",     ".ortho",      XrmoptionNoArg,  "False" },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-speed",        ".speed",      XrmoptionSepArg, 0 },
+  { "-resolution",   ".resolution", XrmoptionSepArg, 0 },
+  { "-ortho",        ".ortho",      XrmoptionNoArg,  "True"  },
+  { "-no-ortho",     ".ortho",      XrmoptionNoArg,  "False" },
+};
 
-	static argtype vars[] = {
-	  {&speed, "speed",  "Speed",  DEF_SPEED,  t_Float},
-	};
+static argtype vars[] = {
+  {&speed, "speed",  "Speed",  DEF_SPEED,  t_Float},
+  {&resolution, "resolution", "Resolution", "100", t_Float},
+  {&ortho, "ortho", "Ortho", "True", t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt unk_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt unk_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 
 /* Window management, etc

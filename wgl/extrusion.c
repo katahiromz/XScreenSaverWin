@@ -63,7 +63,7 @@
 
 #include "xpm-ximage.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include "extrusion.h"
 
 #define checkImageWidth 64
@@ -87,51 +87,47 @@ static int do_mipmap = False;
 static char *which_name = "RANDOM";
 static char *which_image = "BUILTIN";
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"-light",           ".extrusion.light",   XrmoptionNoArg, "true" },
-	  {"+light",           ".extrusion.light",   XrmoptionNoArg, "false" },
-	  {"-texture",         ".extrusion.texture", XrmoptionNoArg, "true" },
-	  {"+texture",         ".extrusion.texture", XrmoptionNoArg, "false" },
-	  {"-texture",         ".extrusion.texture", XrmoptionNoArg, "true" },
-	  {"+texture_quality", ".extrusion.texture", XrmoptionNoArg, "false" },
-	  {"-texture_quality", ".extrusion.texture", XrmoptionNoArg, "true" },
-	  {"+mipmap",          ".extrusion.mipmap",  XrmoptionNoArg, "false" },
-	  {"-mipmap",          ".extrusion.mipmap",  XrmoptionNoArg, "true" },
-	  {"-name",            ".extrusion.name",    XrmoptionSepArg, 0 },
-	  {"-image",           ".extrusion.image",   XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  {"-light",           ".extrusion.light",   XrmoptionNoArg, "true" },
+  {"+light",           ".extrusion.light",   XrmoptionNoArg, "false" },
+  {"-texture",         ".extrusion.texture", XrmoptionNoArg, "true" },
+  {"+texture",         ".extrusion.texture", XrmoptionNoArg, "false" },
+  {"-texture",         ".extrusion.texture", XrmoptionNoArg, "true" },
+  {"+texture_quality", ".extrusion.texture", XrmoptionNoArg, "false" },
+  {"-texture_quality", ".extrusion.texture", XrmoptionNoArg, "true" },
+  {"+mipmap",          ".extrusion.mipmap",  XrmoptionNoArg, "false" },
+  {"-mipmap",          ".extrusion.mipmap",  XrmoptionNoArg, "true" },
+  {"-name",            ".extrusion.name",    XrmoptionSepArg, 0 },
+  {"-image",           ".extrusion.image",   XrmoptionSepArg, 0 },
+};
 
+static argtype vars[] = {
+  {&do_light,	 "light",           "Light",           DEF_LIGHT,    t_Bool},
+  {&do_texture,	 "texture",         "Texture",         DEF_TEXTURE,  t_Bool},
+  {&do_tex_qual, "texture_quality", "Texture_Quality", DEF_TEX_QUAL, t_Bool},
+  {&do_mipmap,   "mipmap",          "Mipmap",          DEF_MIPMAP,   t_Bool},
+  {&which_name,  "name",            "Name",            DEF_NAME,     t_String},
+  {&which_image, "image",           "Image",           DEF_IMAGE,    t_String},
+};
 
-	static argtype vars[] = {
-	  {&do_light,	 "light",           "Light",           DEF_LIGHT,    t_Bool},
-	  {&do_texture,	 "texture",         "Texture",         DEF_TEXTURE,  t_Bool},
-	  {&do_tex_qual, "texture_quality", "Texture_Quality", DEF_TEX_QUAL, t_Bool},
-	  {&do_mipmap,   "mipmap",          "Mipmap",          DEF_MIPMAP,   t_Bool},
-	  {&which_name,  "name",            "Name",            DEF_NAME,     t_String},
-	  {&which_image, "image",           "Image",           DEF_IMAGE,    t_String},
-	};
+static OptionStruct desc[] =
+{
+  {"-name num", "example 'name' to draw (helix2, helix3, helix4, joinoffset, screw, taper, twistoid)"},
+  {"-/+ light", "whether to do enable lighting (slower)"},
+  {"-/+ texture", "whether to apply a texture (slower)"},
+  {"-image <filename>", "texture image to load"},
+  {"-/+ texture_quality", "whether to use texture smoothing (slower)"},
+  {"-/+ mipmap", "whether to use texture mipmap (slower)"},
+};
 
+ENTRYPOINT ModeSpecOpt extrusion_opts = {countof(opts), opts, countof(vars), vars, desc};
 
-	static OptionStruct desc[] =
-	{
-	  {"-name num", "example 'name' to draw (helix2, helix3, helix4, joinoffset, screw, taper, twistoid)"},
-	  {"-/+ light", "whether to do enable lighting (slower)"},
-	  {"-/+ texture", "whether to apply a texture (slower)"},
-	  {"-image <filename>", "texture image to load"},
-	  {"-/+ texture_quality", "whether to use texture smoothing (slower)"},
-	  {"-/+ mipmap", "whether to use texture mipmap (slower)"},
-	};
-
-	ENTRYPOINT ModeSpecOpt extrusion_opts = {countof(opts), opts, countof(vars), vars, desc};
-
-	#ifdef USE_MODULES
-	ModStruct   extrusion_description =
-	{"extrusion", "init_extrusion", "draw_extrusion", "release_extrusion",
-	 "draw_extrusion", "init_extrusion", NULL, &extrusion_opts,
-	 1000, 1, 2, 1, 4, 1.0, "",
-	 "OpenGL extrusion", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   extrusion_description =
+{"extrusion", "init_extrusion", "draw_extrusion", "release_extrusion",
+ "draw_extrusion", "init_extrusion", NULL, &extrusion_opts,
+ 1000, 1, 2, 1, 4, 1.0, "",
+ "OpenGL extrusion", 0, NULL};
 #endif
 
 /* structure for holding the extrusion data */

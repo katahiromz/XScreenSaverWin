@@ -37,7 +37,7 @@
 #define BOARDSIZE 8
 #define WHITES 5
 
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include "chessmodels.h"
 #include "chessgames.h"
 
@@ -50,42 +50,37 @@
 #define DEF_SMOOTH      "True"
 #define DEF_CLASSIC     "False"
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"+rotate", ".chess.rotate", XrmoptionNoArg, "false" },
-	  {"-rotate", ".chess.rotate", XrmoptionNoArg, "true" },
-	  {"+reflections", ".chess.reflections", XrmoptionNoArg, "false" },
-	  {"-reflections", ".chess.reflections", XrmoptionNoArg, "true" },
-	  {"+shadows", ".chess.shadows", XrmoptionNoArg, "false" },
-	  {"-shadows", ".chess.shadows", XrmoptionNoArg, "true" },
-	  {"+smooth", ".chess.smooth", XrmoptionNoArg, "false" },
-	  {"-smooth", ".chess.smooth", XrmoptionNoArg, "true" },
-	  {"+classic", ".chess.classic", XrmoptionNoArg, "false" },
-	  {"-classic", ".chess.classic", XrmoptionNoArg, "true" },
-	};
-#endif
+static XrmOptionDescRec opts[] = {
+  {"+rotate", ".chess.rotate", XrmoptionNoArg, "false" },
+  {"-rotate", ".chess.rotate", XrmoptionNoArg, "true" },
+  {"+reflections", ".chess.reflections", XrmoptionNoArg, "false" },
+  {"-reflections", ".chess.reflections", XrmoptionNoArg, "true" },
+  {"+shadows", ".chess.shadows", XrmoptionNoArg, "false" },
+  {"-shadows", ".chess.shadows", XrmoptionNoArg, "true" },
+  {"+smooth", ".chess.smooth", XrmoptionNoArg, "false" },
+  {"-smooth", ".chess.smooth", XrmoptionNoArg, "true" },
+  {"+classic", ".chess.classic", XrmoptionNoArg, "false" },
+  {"-classic", ".chess.classic", XrmoptionNoArg, "true" },
+};
 
 static int rotate = True, reflections = True, smooth = True, shadows = True, classic = False;
 
-#if 0
-	static argtype vars[] = {
-	  {&rotate,      "rotate",      "Rotate",      DEF_ROTATE, t_Bool},
-	  {&reflections, "reflections", "Reflections", DEF_REFLECTIONS, t_Bool},
-	  {&shadows,	 "shadows",	 "Shadows",    DEF_SHADOWS, t_Bool},
-	  {&smooth,      "smooth",      "Smooth",      DEF_SMOOTH, t_Bool},
-	  {&classic,     "classic",     "Classic",     DEF_CLASSIC, t_Bool},
-	};
+static argtype vars[] = {
+  {&rotate,      "rotate",      "Rotate",      DEF_ROTATE, t_Bool},
+  {&reflections, "reflections", "Reflections", DEF_REFLECTIONS, t_Bool},
+  {&shadows,	 "shadows",	 "Shadows",    DEF_SHADOWS, t_Bool},
+  {&smooth,      "smooth",      "Smooth",      DEF_SMOOTH, t_Bool},
+  {&classic,     "classic",     "Classic",     DEF_CLASSIC, t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt chess_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt chess_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   chess_description =
-	{"chess", "init_chess", "draw_chess", "release_chess",
-	 "draw_chess", "init_chess", NULL, &chess_opts,
-	 1000, 1, 2, 1, 4, 1.0, "",
-	 "Chess", 0, NULL};
-
-	#endif
+#ifdef USE_MODULES
+ModStruct   chess_description =
+{"chess", "init_chess", "draw_chess", "release_chess",
+ "draw_chess", "init_chess", NULL, &chess_opts,
+ 1000, 1, 2, 1, 4, 1.0, "",
+ "Chess", 0, NULL};
 #endif
 
 #define checkImageWidth 16

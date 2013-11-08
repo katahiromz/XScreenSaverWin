@@ -143,74 +143,72 @@ static float speed_yz = 2.1;
 static const float offset4d[4] = {  0.0,  0.0,  0.0,  3.0 };
 static const float offset3d[4] = {  0.0,  0.0, -2.0,  0.0 };
 
-#if 0
-	static XrmOptionDescRec opts[] =
-	{
-	  {"-mode",            ".displayMode",  XrmoptionSepArg, 0 },
-	  {"-wireframe",       ".displayMode",  XrmoptionNoArg,  "wireframe" },
-	  {"-surface",         ".displayMode",  XrmoptionNoArg,  "surface" },
-	  {"-transparent",     ".displayMode",  XrmoptionNoArg,  "transparent" },
-	  {"-polytope",        ".polytope",     XrmoptionSepArg, 0 },
-	  {"-random",          ".polytope",     XrmoptionNoArg,  "random" },
-	  {"-5-cell",          ".polytope",     XrmoptionNoArg,  "5-cell" },
-	  {"-8-cell",          ".polytope",     XrmoptionNoArg,  "8-cell" },
-	  {"-16-cell",         ".polytope",     XrmoptionNoArg,  "16-cell" },
-	  {"-24-cell",         ".polytope",     XrmoptionNoArg,  "24-cell" },
-	  {"-120-cell",        ".polytope",     XrmoptionNoArg,  "120-cell" },
-	  {"-600-cell",        ".polytope",     XrmoptionNoArg,  "600-cell" },
-	  {"-single-color",    ".colors",       XrmoptionNoArg,  "single" },
-	  {"-depth-colors",    ".colors",       XrmoptionNoArg,  "depth" },
-	  {"-perspective-3d",  ".projection3d", XrmoptionNoArg,  "perspective" },
-	  {"-orthographic-3d", ".projection3d", XrmoptionNoArg,  "orthographic" },
-	  {"-perspective-4d",  ".projection4d", XrmoptionNoArg,  "perspective" },
-	  {"-orthographic-4d", ".projection4d", XrmoptionNoArg,  "orthographic" },
-	  {"-speed-wx",        ".speedwx",      XrmoptionSepArg, 0 },
-	  {"-speed-wy",        ".speedwy",      XrmoptionSepArg, 0 },
-	  {"-speed-wz",        ".speedwz",      XrmoptionSepArg, 0 },
-	  {"-speed-xy",        ".speedxy",      XrmoptionSepArg, 0 },
-	  {"-speed-xz",        ".speedxz",      XrmoptionSepArg, 0 },
-	  {"-speed-yz",        ".speedyz",      XrmoptionSepArg, 0 }
-	};
+static XrmOptionDescRec opts[] =
+{
+  {"-mode",            ".displayMode",  XrmoptionSepArg, 0 },
+  {"-wireframe",       ".displayMode",  XrmoptionNoArg,  "wireframe" },
+  {"-surface",         ".displayMode",  XrmoptionNoArg,  "surface" },
+  {"-transparent",     ".displayMode",  XrmoptionNoArg,  "transparent" },
+  {"-polytope",        ".polytope",     XrmoptionSepArg, 0 },
+  {"-random",          ".polytope",     XrmoptionNoArg,  "random" },
+  {"-5-cell",          ".polytope",     XrmoptionNoArg,  "5-cell" },
+  {"-8-cell",          ".polytope",     XrmoptionNoArg,  "8-cell" },
+  {"-16-cell",         ".polytope",     XrmoptionNoArg,  "16-cell" },
+  {"-24-cell",         ".polytope",     XrmoptionNoArg,  "24-cell" },
+  {"-120-cell",        ".polytope",     XrmoptionNoArg,  "120-cell" },
+  {"-600-cell",        ".polytope",     XrmoptionNoArg,  "600-cell" },
+  {"-single-color",    ".colors",       XrmoptionNoArg,  "single" },
+  {"-depth-colors",    ".colors",       XrmoptionNoArg,  "depth" },
+  {"-perspective-3d",  ".projection3d", XrmoptionNoArg,  "perspective" },
+  {"-orthographic-3d", ".projection3d", XrmoptionNoArg,  "orthographic" },
+  {"-perspective-4d",  ".projection4d", XrmoptionNoArg,  "perspective" },
+  {"-orthographic-4d", ".projection4d", XrmoptionNoArg,  "orthographic" },
+  {"-speed-wx",        ".speedwx",      XrmoptionSepArg, 0 },
+  {"-speed-wy",        ".speedwy",      XrmoptionSepArg, 0 },
+  {"-speed-wz",        ".speedwz",      XrmoptionSepArg, 0 },
+  {"-speed-xy",        ".speedxy",      XrmoptionSepArg, 0 },
+  {"-speed-xz",        ".speedxz",      XrmoptionSepArg, 0 },
+  {"-speed-yz",        ".speedyz",      XrmoptionSepArg, 0 }
+};
 
-	static argtype vars[] =
-	{
-	  { &mode,      "displayMode",  "DisplayMode", DEF_DISPLAY_MODE,  t_String },
-	  { &poly_str,  "polytope",     "Polytope",    DEF_POLYTOPE,      t_String },
-	  { &color_str, "colors",       "Colors",      DEF_COLORS,        t_String },
-	  { &proj_3d,   "projection3d", "Projection3d",DEF_PROJECTION_3D, t_String },
-	  { &proj_4d,   "projection4d", "Projection4d",DEF_PROJECTION_4D, t_String },
-	  { &speed_wx,  "speedwx",      "Speedwx",     DEF_SPEEDWX,       t_Float},
-	  { &speed_wy,  "speedwy",      "Speedwy",     DEF_SPEEDWY,       t_Float},
-	  { &speed_wz,  "speedwz",      "Speedwz",     DEF_SPEEDWZ,       t_Float},
-	  { &speed_xy,  "speedxy",      "Speedxy",     DEF_SPEEDXY,       t_Float},
-	  { &speed_xz,  "speedxz",      "Speedxz",     DEF_SPEEDXZ,       t_Float},
-	  { &speed_yz,  "speedyz",      "Speedyz",     DEF_SPEEDYZ,       t_Float}
-	};
+static argtype vars[] =
+{
+  { &mode,      "displayMode",  "DisplayMode", DEF_DISPLAY_MODE,  t_String },
+  { &poly_str,  "polytope",     "Polytope",    DEF_POLYTOPE,      t_String },
+  { &color_str, "colors",       "Colors",      DEF_COLORS,        t_String },
+  { &proj_3d,   "projection3d", "Projection3d",DEF_PROJECTION_3D, t_String },
+  { &proj_4d,   "projection4d", "Projection4d",DEF_PROJECTION_4D, t_String },
+  { &speed_wx,  "speedwx",      "Speedwx",     DEF_SPEEDWX,       t_Float},
+  { &speed_wy,  "speedwy",      "Speedwy",     DEF_SPEEDWY,       t_Float},
+  { &speed_wz,  "speedwz",      "Speedwz",     DEF_SPEEDWZ,       t_Float},
+  { &speed_xy,  "speedxy",      "Speedxy",     DEF_SPEEDXY,       t_Float},
+  { &speed_xz,  "speedxz",      "Speedxz",     DEF_SPEEDXZ,       t_Float},
+  { &speed_yz,  "speedyz",      "Speedyz",     DEF_SPEEDYZ,       t_Float}
+};
 
-	static OptionStruct desc[] =
-	{
-	  { "-wireframe",       "display the polytope as a wireframe mesh" },
-	  { "-surface",         "display the polytope as a solid surface" },
-	  { "-transparent",     "display the polytope as a transparent surface" },
-	  { "-solid",           "display the polytope as a solid object" },
-	  { "-bands",           "display the polytope as see-through bands" },
-	  { "-twosided",        "display the polytope with two colors" },
-	  { "-colorwheel",      "display the polytope with a smooth color wheel" },
-	  { "-perspective-3d",  "project the polytope perspectively from 3d to 2d" },
-	  { "-orthographic-3d", "project the polytope orthographically from 3d to 2d"},
-	  { "-perspective-4d",  "project the polytope perspectively from 4d to 3d" },
-	  { "-orthographic-4d", "project the polytope orthographically from 4d to 3d"},
-	  { "-speed-wx <arg>",  "rotation speed around the wx plane" },
-	  { "-speed-wy <arg>",  "rotation speed around the wy plane" },
-	  { "-speed-wz <arg>",  "rotation speed around the wz plane" },
-	  { "-speed-xy <arg>",  "rotation speed around the xy plane" },
-	  { "-speed-xz <arg>",  "rotation speed around the xz plane" },
-	  { "-speed-yz <arg>",  "rotation speed around the yz plane" }
-	};
+static OptionStruct desc[] =
+{
+  { "-wireframe",       "display the polytope as a wireframe mesh" },
+  { "-surface",         "display the polytope as a solid surface" },
+  { "-transparent",     "display the polytope as a transparent surface" },
+  { "-solid",           "display the polytope as a solid object" },
+  { "-bands",           "display the polytope as see-through bands" },
+  { "-twosided",        "display the polytope with two colors" },
+  { "-colorwheel",      "display the polytope with a smooth color wheel" },
+  { "-perspective-3d",  "project the polytope perspectively from 3d to 2d" },
+  { "-orthographic-3d", "project the polytope orthographically from 3d to 2d"},
+  { "-perspective-4d",  "project the polytope perspectively from 4d to 3d" },
+  { "-orthographic-4d", "project the polytope orthographically from 4d to 3d"},
+  { "-speed-wx <arg>",  "rotation speed around the wx plane" },
+  { "-speed-wy <arg>",  "rotation speed around the wy plane" },
+  { "-speed-wz <arg>",  "rotation speed around the wz plane" },
+  { "-speed-xy <arg>",  "rotation speed around the xy plane" },
+  { "-speed-xz <arg>",  "rotation speed around the xz plane" },
+  { "-speed-yz <arg>",  "rotation speed around the yz plane" }
+};
 
-	ENTRYPOINT ModeSpecOpt polytopes_opts =
-	{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
-#endif
+ENTRYPOINT ModeSpecOpt polytopes_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 /* 5-cell {3,3,3} */
 #define NUM_VERT_5 5

@@ -108,70 +108,66 @@ static int do_mipmap = False;
 static int do_depth = False;
 static char *which_image = "BUILTIN";
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"-quads",   ".pulsar.quads",   XrmoptionSepArg, 0 },
-	  {"-light",   ".pulsar.light",   XrmoptionNoArg, "true" },
-	  {"+light",   ".pulsar.light",   XrmoptionNoArg, "false" },
-	  {"-wire",   ".pulsar.wire",   XrmoptionNoArg, "true" },
-	  {"+wire",   ".pulsar.wire",   XrmoptionNoArg, "false" },
-	  {"-blend",   ".pulsar.blend",   XrmoptionNoArg, "true" },
-	  {"+blend",   ".pulsar.blend",   XrmoptionNoArg, "false" },
-	  {"-fog",   ".pulsar.fog",   XrmoptionNoArg, "true" },
-	  {"+fog",   ".pulsar.fog",   XrmoptionNoArg, "false" },
-	  {"-antialias",   ".pulsar.antialias",   XrmoptionNoArg, "true" },
-	  {"+antialias",   ".pulsar.antialias",   XrmoptionNoArg, "false" },
-	  {"-texture",   ".pulsar.texture",   XrmoptionNoArg, "true" },
-	  {"+texture",   ".pulsar.texture",   XrmoptionNoArg, "false" },
-	  {"-texture_quality",   ".pulsar.textureQuality",   XrmoptionNoArg, "true" },
-	  {"+texture_quality",   ".pulsar.textureQuality",   XrmoptionNoArg, "false" },
-	  {"-mipmap",   ".pulsar.mipmap",   XrmoptionNoArg, "true" },
-	  {"+mipmap",   ".pulsar.mipmap",   XrmoptionNoArg, "false" },
-	  {"-do_depth",   ".pulsar.doDepth",   XrmoptionNoArg, "true" },
-	  {"+do_depth",   ".pulsar.doDepth",   XrmoptionNoArg, "false" },
-	  {"-image",   ".pulsar.image",  XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  {"-quads",   ".pulsar.quads",   XrmoptionSepArg, 0 },
+  {"-light",   ".pulsar.light",   XrmoptionNoArg, "true" },
+  {"+light",   ".pulsar.light",   XrmoptionNoArg, "false" },
+  {"-wire",   ".pulsar.wire",   XrmoptionNoArg, "true" },
+  {"+wire",   ".pulsar.wire",   XrmoptionNoArg, "false" },
+  {"-blend",   ".pulsar.blend",   XrmoptionNoArg, "true" },
+  {"+blend",   ".pulsar.blend",   XrmoptionNoArg, "false" },
+  {"-fog",   ".pulsar.fog",   XrmoptionNoArg, "true" },
+  {"+fog",   ".pulsar.fog",   XrmoptionNoArg, "false" },
+  {"-antialias",   ".pulsar.antialias",   XrmoptionNoArg, "true" },
+  {"+antialias",   ".pulsar.antialias",   XrmoptionNoArg, "false" },
+  {"-texture",   ".pulsar.texture",   XrmoptionNoArg, "true" },
+  {"+texture",   ".pulsar.texture",   XrmoptionNoArg, "false" },
+  {"-texture_quality",   ".pulsar.textureQuality",   XrmoptionNoArg, "true" },
+  {"+texture_quality",   ".pulsar.textureQuality",   XrmoptionNoArg, "false" },
+  {"-mipmap",   ".pulsar.mipmap",   XrmoptionNoArg, "true" },
+  {"+mipmap",   ".pulsar.mipmap",   XrmoptionNoArg, "false" },
+  {"-do_depth",   ".pulsar.doDepth",   XrmoptionNoArg, "true" },
+  {"+do_depth",   ".pulsar.doDepth",   XrmoptionNoArg, "false" },
+  {"-image",   ".pulsar.image",  XrmoptionSepArg, 0 },
+};
 
+static argtype vars[] = {
+  {&num_quads,    "quads",     "Quads",     DEF_QUADS,     t_Int},
+  {&do_light,     "light",     "Light",     DEF_LIGHT,     t_Bool},
+  {&do_wire,      "wire",      "Wire",      DEF_WIRE,      t_Bool},
+  {&do_blend,     "blend",     "Blend",     DEF_BLEND,     t_Bool},
+  {&do_fog,       "fog",       "Fog",       DEF_FOG,       t_Bool},
+  {&do_antialias, "antialias", "Antialias", DEF_ANTIALIAS, t_Bool},
+  {&do_texture,   "texture",   "Texture",   DEF_TEXTURE,   t_Bool},
+  {&do_texture_quality, "textureQuality", "TextureQuality", DEF_TEXTURE_QUALITY,   t_Bool},
+  {&do_mipmap,    "mipmap",    "Mipmap",    DEF_MIPMAP,    t_Bool},
+  {&do_depth,    "doDepth",    "DoDepth",   DEF_DO_DEPTH,  t_Bool},
+  {&which_image, "image",      "Image",     DEF_IMAGE,     t_String},
+};
 
-	static argtype vars[] = {
-	  {&num_quads,    "quads",     "Quads",     DEF_QUADS,     t_Int},
-	  {&do_light,     "light",     "Light",     DEF_LIGHT,     t_Bool},
-	  {&do_wire,      "wire",      "Wire",      DEF_WIRE,      t_Bool},
-	  {&do_blend,     "blend",     "Blend",     DEF_BLEND,     t_Bool},
-	  {&do_fog,       "fog",       "Fog",       DEF_FOG,       t_Bool},
-	  {&do_antialias, "antialias", "Antialias", DEF_ANTIALIAS, t_Bool},
-	  {&do_texture,   "texture",   "Texture",   DEF_TEXTURE,   t_Bool},
-	  {&do_texture_quality, "textureQuality", "TextureQuality", DEF_TEXTURE_QUALITY,   t_Bool},
-	  {&do_mipmap,    "mipmap",    "Mipmap",    DEF_MIPMAP,    t_Bool},
-	  {&do_depth,    "doDepth",    "DoDepth",   DEF_DO_DEPTH,  t_Bool},
-	  {&which_image, "image",      "Image",     DEF_IMAGE,     t_String},
-	};
+static OptionStruct desc[] =
+{
+	{"-quads num", "how many quads to draw"},
+	{"-/+ light", "whether to do enable lighting (slower)"},
+	{"-/+ wire", "whether to do use wireframe instead of filled (faster)"},
+	{"-/+ blend", "whether to do enable blending (slower)"},
+	{"-/+ fog", "whether to do enable fog (?)"},
+	{"-/+ antialias", "whether to do enable antialiased lines (slower)"},
+	{"-/+ texture", "whether to do enable texturing (much slower)"},
+	{"-/+ texture_quality", "whether to do enable linear/mipmap filtering (much much slower)"},
+	{"-/+ mipmap", "whether to do enable mipmaps (much slower)"},
+	{"-/+ depth", "whether to do enable depth buffer checking (slower)"},
+	{"-image <filename>", "texture image to load"},
+};
 
+ENTRYPOINT ModeSpecOpt pulsar_opts = {countof(opts), opts, countof(vars), vars, desc};
 
-	static OptionStruct desc[] =
-	{
-		{"-quads num", "how many quads to draw"},
-		{"-/+ light", "whether to do enable lighting (slower)"},
-		{"-/+ wire", "whether to do use wireframe instead of filled (faster)"},
-		{"-/+ blend", "whether to do enable blending (slower)"},
-		{"-/+ fog", "whether to do enable fog (?)"},
-		{"-/+ antialias", "whether to do enable antialiased lines (slower)"},
-		{"-/+ texture", "whether to do enable texturing (much slower)"},
-		{"-/+ texture_quality", "whether to do enable linear/mipmap filtering (much much slower)"},
-		{"-/+ mipmap", "whether to do enable mipmaps (much slower)"},
-		{"-/+ depth", "whether to do enable depth buffer checking (slower)"},
-		{"-image <filename>", "texture image to load"},
-	};
-
-	ENTRYPOINT ModeSpecOpt pulsar_opts = {countof(opts), opts, countof(vars), vars, desc};
-
-	#ifdef USE_MODULES
-	ModStruct   pulsar_description =
-	{"pulsar", "init_pulsar", "draw_pulsar", "release_pulsar",
-	 "draw_pulsar", "init_pulsar", NULL, &pulsar_opts,
-	 1000, 1, 2, 1, 4, 1.0, "",
-	 "OpenGL pulsar", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   pulsar_description =
+{"pulsar", "init_pulsar", "draw_pulsar", "release_pulsar",
+ "draw_pulsar", "init_pulsar", NULL, &pulsar_opts,
+ 1000, 1, 2, 1, 4, 1.0, "",
+ "OpenGL pulsar", 0, NULL};
 #endif
 
 struct quad

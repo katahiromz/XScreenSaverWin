@@ -53,6 +53,8 @@ static const char sccsid[] = "@(#)morph3d.c	5.01 2001/03/01 xlockmore";
 
 # define MODE_moebius
 #define DELAY 40000
+#define COUNT 0
+#define NOARGS
 # define DEFAULTS		"*delay:		40000	\n"		\
 						"*showFPS:      False   \n"		\
 						"*count: 		0		\n"
@@ -71,22 +73,17 @@ static const char sccsid[] = "@(#)morph3d.c	5.01 2001/03/01 xlockmore";
 
 #ifdef MODE_moebius
 
-#if 0
-	ENTRYPOINT ModeSpecOpt morph3d_opts =
-	{0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
+ENTRYPOINT ModeSpecOpt morph3d_opts =
+{0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   morph3d_description =
-	{"morph3d", "init_morph3d", "draw_morph3d", "release_morph3d",
-	 "draw_morph3d", "change_morph3d", (char *) NULL, &morph3d_opts,
-	 1000, 0, 1, 1, 4, 1.0, "",
-	 "Shows GL morphing polyhedra", 0, NULL};
+#ifdef USE_MODULES
+ModStruct   morph3d_description =
+{"morph3d", "init_morph3d", "draw_morph3d", "release_morph3d",
+ "draw_morph3d", "change_morph3d", (char *) NULL, &morph3d_opts,
+ 1000, 0, 1, 1, 4, 1.0, "",
+ "Shows GL morphing polyhedra", 0, NULL};
 #endif
 
-#endif
-
-#undef MI_COUNT
-#define MI_COUNT(mi) 0
 
 #define Scale4Window               0.3
 #define Scale4Iconic               1.0
@@ -135,7 +132,6 @@ typedef struct {
 	const float *MaterialColor[20];
 	GLXContext *glx_context;
     int         arrayninit;
-
 } morph3dstruct;
 
 static const GLfloat front_shininess[] = {60.0};

@@ -29,7 +29,7 @@
 #include "win32.h"
 
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #ifdef USE_GL
 
@@ -60,45 +60,43 @@
 static Bool spin = True, wander = True, rndstart = False, tex = True;
 static float spinspeed = 0.1, tspeed = 3.0, wspeed = 0.005, twait = 40.0, size = 1.0;
 
-#if 0
-	static argtype vars[] = {
-	  { &spin,      "spin",        "Spin",        DEF_SPIN,        t_Bool},
-	  { &wander,    "wander",      "Wander",      DEF_WANDER,      t_Bool},
-	  { &rndstart,  "randomize",   "Randomize",   DEF_RANDOMIZE,   t_Bool},
-	  { &tex,       "texture",     "Texture",     DEF_TEXTURE,     t_Bool},
-	  { &spinspeed, "spinspeed",   "SpinSpeed",   DEF_SPINSPEED,   t_Float},
-	  { &tspeed,    "rotspeed",    "RotSpeed",    DEF_ROTSPEED,    t_Float},
-	  { &wspeed,    "wanderspeed", "WanderSpeed", DEF_WANDERSPEED, t_Float},
-	  { &twait,     "wait",        "Wait",        DEF_WAIT,        t_Float},
-	  { &size,      "cubesize",    "CubeSize",    DEF_CUBESIZE,    t_Float},
-	};
+static argtype vars[] = {
+  { &spin,      "spin",        "Spin",        DEF_SPIN,        t_Bool},
+  { &wander,    "wander",      "Wander",      DEF_WANDER,      t_Bool},
+  { &rndstart,  "randomize",   "Randomize",   DEF_RANDOMIZE,   t_Bool},
+  { &tex,       "texture",     "Texture",     DEF_TEXTURE,     t_Bool},
+  { &spinspeed, "spinspeed",   "SpinSpeed",   DEF_SPINSPEED,   t_Float},
+  { &tspeed,    "rotspeed",    "RotSpeed",    DEF_ROTSPEED,    t_Float},
+  { &wspeed,    "wanderspeed", "WanderSpeed", DEF_WANDERSPEED, t_Float},
+  { &twait,     "wait",        "Wait",        DEF_WAIT,        t_Float},
+  { &size,      "cubesize",    "CubeSize",    DEF_CUBESIZE,    t_Float},
+};
 
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",        ".spin",        XrmoptionNoArg,  "True" },
-	  { "+spin",        ".spin",        XrmoptionNoArg,  "False" },
-	  { "-wander",      ".wander",      XrmoptionNoArg,  "True" },
-	  { "+wander",      ".wander",      XrmoptionNoArg,  "False" },
-	  { "-randomize",   ".randomize",   XrmoptionNoArg,  "True" },
-	  { "+randomize",   ".randomize",   XrmoptionNoArg,  "False" },
-	  { "-texture",     ".texture",     XrmoptionNoArg,  "True" },
-	  { "+texture",     ".texture",     XrmoptionNoArg,  "False" },
-	  { "-spinspeed",   ".spinspeed",   XrmoptionSepArg, 0 },
-	  { "-wanderspeed", ".wanderspeed", XrmoptionSepArg, 0 },
-	  { "-rotspeed",    ".rotspeed",    XrmoptionSepArg, 0 },
-	  { "-wait",        ".wait",        XrmoptionSepArg, 0 },
-	  { "-cubesize",    ".cubesize",    XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",        ".spin",        XrmoptionNoArg,  "True" },
+  { "+spin",        ".spin",        XrmoptionNoArg,  "False" },
+  { "-wander",      ".wander",      XrmoptionNoArg,  "True" },
+  { "+wander",      ".wander",      XrmoptionNoArg,  "False" },
+  { "-randomize",   ".randomize",   XrmoptionNoArg,  "True" },
+  { "+randomize",   ".randomize",   XrmoptionNoArg,  "False" },
+  { "-texture",     ".texture",     XrmoptionNoArg,  "True" },
+  { "+texture",     ".texture",     XrmoptionNoArg,  "False" },
+  { "-spinspeed",   ".spinspeed",   XrmoptionSepArg, 0 },
+  { "-wanderspeed", ".wanderspeed", XrmoptionSepArg, 0 },
+  { "-rotspeed",    ".rotspeed",    XrmoptionSepArg, 0 },
+  { "-wait",        ".wait",        XrmoptionSepArg, 0 },
+  { "-cubesize",    ".cubesize",    XrmoptionSepArg, 0 },
+};
 
-	ENTRYPOINT ModeSpecOpt rubikblocks_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt rubikblocks_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   rubikblocks_description =
-	{ "rubikblocks", "init_rubikblocks", "draw_rubikblocks", "release_rubikblocks",
-	  "draw_rubikblocks", "change_rubikblocks", NULL, &rubikblocks_opts,
-	  25000, 1, 1, 1, 1.0, 4, "",
-	  "Shows randomly shuffling Rubik's Mirror Blocks puzzle", 0, NULL
-	};
-	#endif
+#ifdef USE_MODULES
+ModStruct   rubikblocks_description =
+{ "rubikblocks", "init_rubikblocks", "draw_rubikblocks", "release_rubikblocks",
+  "draw_rubikblocks", "change_rubikblocks", NULL, &rubikblocks_opts,
+  25000, 1, 1, 1, 1.0, 4, "",
+  "Shows randomly shuffling Rubik's Mirror Blocks puzzle", 0, NULL
+};
 #endif
 
 typedef struct {

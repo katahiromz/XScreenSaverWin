@@ -10,6 +10,7 @@
  */
 
 #define DELAY 30000
+#define COUNT 9
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*count:        9           \n" \
 			"*showFPS:      False       \n" \
@@ -25,14 +26,12 @@
 #include "colors.h"
 #include "normals.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
 #include "xpm-ximage.h"
 #include "../images/scales.xpm"
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 9
 
 static char *grey_texture[] = {
   "16 1 3 1",
@@ -122,48 +121,46 @@ static char *arg_color = "#305A30", *arg_stripe = "#451A30", *arg_sucker = "#453
 /* we can only have one light when doing cel shading */
 static GLfloat light_pos[4] = {1.0, 1.0, 1.0, 0.0};
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-speed",        ".speed",         XrmoptionSepArg, 0 },
-	  { "-no-smooth",    ".smooth",        XrmoptionNoArg, "False" },
-	  { "-texture",      ".texture",       XrmoptionNoArg, "True" },
-	  { "-no-texture",   ".texture",       XrmoptionNoArg, "False" },
-	  { "-cel",          ".cel",           XrmoptionNoArg, "True" },
-	  { "-no-cel",       ".cel",           XrmoptionNoArg, "False" },
-	  { "-intersect",    ".intersect",     XrmoptionNoArg, "True" },
-	  { "-no-intersect", ".intersect",     XrmoptionNoArg, "False" },
-	  { "-slices",       ".slices",        XrmoptionSepArg, 0 },
-	  { "-segments",     ".segments",      XrmoptionSepArg, 0 },
-	  { "-thickness",    ".thickness",     XrmoptionSepArg, 0 },
-	  { "-length",       ".length",        XrmoptionSepArg, 0 },
-	  { "-wiggliness",   ".wiggliness",    XrmoptionSepArg, 0 },
-	  { "-flexibility",  ".flexibility",   XrmoptionSepArg, 0 },
-	  { "-color",        ".tentacleColor", XrmoptionSepArg, 0 },
-	  { "-stripe-color", ".stripeColor",   XrmoptionSepArg, 0 },
-	  { "-sucker-color", ".suckerColor",   XrmoptionSepArg, 0 },
-	  { "-debug",        ".debug",         XrmoptionNoArg, "True" },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-speed",        ".speed",         XrmoptionSepArg, 0 },
+  { "-no-smooth",    ".smooth",        XrmoptionNoArg, "False" },
+  { "-texture",      ".texture",       XrmoptionNoArg, "True" },
+  { "-no-texture",   ".texture",       XrmoptionNoArg, "False" },
+  { "-cel",          ".cel",           XrmoptionNoArg, "True" },
+  { "-no-cel",       ".cel",           XrmoptionNoArg, "False" },
+  { "-intersect",    ".intersect",     XrmoptionNoArg, "True" },
+  { "-no-intersect", ".intersect",     XrmoptionNoArg, "False" },
+  { "-slices",       ".slices",        XrmoptionSepArg, 0 },
+  { "-segments",     ".segments",      XrmoptionSepArg, 0 },
+  { "-thickness",    ".thickness",     XrmoptionSepArg, 0 },
+  { "-length",       ".length",        XrmoptionSepArg, 0 },
+  { "-wiggliness",   ".wiggliness",    XrmoptionSepArg, 0 },
+  { "-flexibility",  ".flexibility",   XrmoptionSepArg, 0 },
+  { "-color",        ".tentacleColor", XrmoptionSepArg, 0 },
+  { "-stripe-color", ".stripeColor",   XrmoptionSepArg, 0 },
+  { "-sucker-color", ".suckerColor",   XrmoptionSepArg, 0 },
+  { "-debug",        ".debug",         XrmoptionNoArg, "True" },
+};
 
-	static argtype vars[] = {
-	  {&arg_speed,       "speed",         "Speed",       DEF_SPEED,       t_Float},
-	  {&smooth_p,        "smooth",        "Smooth",      DEF_SMOOTH,      t_Bool},
-	  {&texture_p,       "texture",       "Texture",     DEF_TEXTURE,     t_Bool},
-	  {&cel_p,           "cel",           "Cel",         DEF_CEL,         t_Bool},
-	  {&intersect_p,     "intersect",     "Intersect",   DEF_INTERSECT,   t_Bool},
-	  {&arg_slices,      "slices",        "Slices",      DEF_SLICES,      t_Int},
-	  {&arg_segments,    "segments",      "Segments",    DEF_SEGMENTS,    t_Int},
-	  {&arg_thickness,   "thickness",     "Thickness",   DEF_THICKNESS,   t_Float},
-	  {&arg_length,      "length",        "Length",      DEF_LENGTH,      t_Float},
-	  {&arg_wiggliness,  "wiggliness",    "Wiggliness",  DEF_WIGGLINESS,  t_Float},
-	  {&arg_flexibility, "flexibility",   "Flexibility", DEF_FLEXIBILITY, t_Float},
-	  {&arg_color,       "tentacleColor", "Color",       DEF_COLOR,       t_String},
-	  {&arg_stripe,      "stripeColor",   "Color",       DEF_STRIPE,      t_String},
-	  {&arg_sucker,      "suckerColor",   "Color",       DEF_SUCKER,      t_String},
-	  {&debug_p,         "debug",         "Debug",       DEF_DEBUG,       t_Bool},
-	};
+static argtype vars[] = {
+  {&arg_speed,       "speed",         "Speed",       DEF_SPEED,       t_Float},
+  {&smooth_p,        "smooth",        "Smooth",      DEF_SMOOTH,      t_Bool},
+  {&texture_p,       "texture",       "Texture",     DEF_TEXTURE,     t_Bool},
+  {&cel_p,           "cel",           "Cel",         DEF_CEL,         t_Bool},
+  {&intersect_p,     "intersect",     "Intersect",   DEF_INTERSECT,   t_Bool},
+  {&arg_slices,      "slices",        "Slices",      DEF_SLICES,      t_Int},
+  {&arg_segments,    "segments",      "Segments",    DEF_SEGMENTS,    t_Int},
+  {&arg_thickness,   "thickness",     "Thickness",   DEF_THICKNESS,   t_Float},
+  {&arg_length,      "length",        "Length",      DEF_LENGTH,      t_Float},
+  {&arg_wiggliness,  "wiggliness",    "Wiggliness",  DEF_WIGGLINESS,  t_Float},
+  {&arg_flexibility, "flexibility",   "Flexibility", DEF_FLEXIBILITY, t_Float},
+  {&arg_color,       "tentacleColor", "Color",       DEF_COLOR,       t_String},
+  {&arg_stripe,      "stripeColor",   "Color",       DEF_STRIPE,      t_String},
+  {&arg_sucker,      "suckerColor",   "Color",       DEF_SUCKER,      t_String},
+  {&debug_p,         "debug",         "Debug",       DEF_DEBUG,       t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt tentacles_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt tentacles_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 /* Window management, etc
  */

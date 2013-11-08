@@ -85,39 +85,37 @@ static GLint changetime = 200;
 static int do_texture = True;
 static int do_fog = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	    { "-holdtime",  ".holdtime",  XrmoptionSepArg, 0 },
-	    { "-changetime",  ".changetime",  XrmoptionSepArg, 0 },
-	    {"-texture",     ".texture",   XrmoptionNoArg, "True" },
-	    {"+texture",     ".texture",   XrmoptionNoArg, "False" },
-	    {"-fog",         ".fog",       XrmoptionNoArg, "True" },
-	    {"+fog",         ".fog",       XrmoptionNoArg, "False" },
-	};
+static XrmOptionDescRec opts[] = {
+    { "-holdtime",  ".holdtime",  XrmoptionSepArg, 0 },
+    { "-changetime",  ".changetime",  XrmoptionSepArg, 0 },
+    {"-texture",     ".texture",   XrmoptionNoArg, "True" },
+    {"+texture",     ".texture",   XrmoptionNoArg, "False" },
+    {"-fog",         ".fog",       XrmoptionNoArg, "True" },
+    {"+fog",         ".fog",       XrmoptionNoArg, "False" },
+};
 
-	static argtype vars[] = {
-	    {&holdtime, "holdtime",  "Hold Time",  DEF_HOLDTIME,  t_Int},
-	    {&changetime, "changetime",  "Change Time",  DEF_CHANGETIME, \
-	     t_Int},
-	    {&do_texture, "texture",    "Texture", DEF_TEXTURE,   t_Bool},
-	    {&do_fog,     "fog",        "Fog",     DEF_FOG,       t_Bool},
-	};
+static argtype vars[] = {
+    {&holdtime, "holdtime",  "Hold Time",  DEF_HOLDTIME,  t_Int},
+    {&changetime, "changetime",  "Change Time",  DEF_CHANGETIME, \
+     t_Int},
+    {&do_texture, "texture",    "Texture", DEF_TEXTURE,   t_Bool},
+    {&do_fog,     "fog",        "Fog",     DEF_FOG,       t_Bool},
+};
 
-	static OptionStruct desc[] = {
-	    {"-holdtime", "how long to stay on the same color"},
-	    {"-changetime", "how long it takes to fade to a new color"},
-	};
+static OptionStruct desc[] = {
+    {"-holdtime", "how long to stay on the same color"},
+    {"-changetime", "how long it takes to fade to a new color"},
+};
 
-	ENTRYPOINT ModeSpecOpt blocktube_opts = {countof(opts), opts, countof(vars), vars, desc};
+ENTRYPOINT ModeSpecOpt blocktube_opts = {countof(opts), opts, countof(vars), vars, desc};
 
-	#ifdef USE_MODULES
-	ModStruct blocktube_description =
-	    {"blocktube", "init_blocktube", "draw_blocktube", "release_blocktube",
-	     "draw_blocktube", "init_blocktube", (char *)NULL, &blocktube_opts,
-	     40000, 30, 1, 1, 64, 1.0, "",
-	     "A shifting tunnel of reflective blocks", 0, NULL};
-	#endif /* USE_MODULES */
-#endif
+#ifdef USE_MODULES
+ModStruct blocktube_description =
+    {"blocktube", "init_blocktube", "draw_blocktube", "release_blocktube",
+     "draw_blocktube", "init_blocktube", (char *)NULL, &blocktube_opts,
+     40000, 30, 1, 1, 64, 1.0, "",
+     "A shifting tunnel of reflective blocks", 0, NULL};
+#endif /* USE_MODULES */
 
 #if defined( I_HAVE_XPM )
 static Bool LoadGLTextures(ModeInfo *mi)

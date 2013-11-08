@@ -57,26 +57,24 @@
 
 #ifdef USE_GL
 
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	    {"-sticks",         ".mode",            XrmoptionNoArg,  "sticks"},
-	    {"-tiles",          ".mode",            XrmoptionNoArg,  "tiles" },
-	    {"-mode",           ".mode",            XrmoptionSepArg, 0       },
-	    {"-size",           ".size",            XrmoptionSepArg, 0       },
-	    {"-size-x",         ".sizex",           XrmoptionSepArg, 0       },
-	    {"-size-y",         ".sizey",           XrmoptionSepArg, 0       },
-	    {"-count",          ".numsquares",      XrmoptionSepArg, 0       },
-	    {"-free",           ".freesquares",     XrmoptionSepArg, 0       },
-	    {"-spin",           ".spin",            XrmoptionSepArg, 0       },
-	    {"-texture",        ".textured",        XrmoptionNoArg,  "True"  },
-	    {"+texture",        ".textured",        XrmoptionNoArg,  "False" },
-	};
-#endif
+static XrmOptionDescRec opts[] = {
+    {"-sticks",         ".mode",            XrmoptionNoArg,  "sticks"},
+    {"-tiles",          ".mode",            XrmoptionNoArg,  "tiles" },
+    {"-mode",           ".mode",            XrmoptionSepArg, 0       },
+    {"-size",           ".size",            XrmoptionSepArg, 0       },
+    {"-size-x",         ".sizex",           XrmoptionSepArg, 0       },
+    {"-size-y",         ".sizey",           XrmoptionSepArg, 0       },
+    {"-count",          ".numsquares",      XrmoptionSepArg, 0       },
+    {"-free",           ".freesquares",     XrmoptionSepArg, 0       },
+    {"-spin",           ".spin",            XrmoptionSepArg, 0       },
+    {"-texture",        ".textured",        XrmoptionNoArg,  "True"  },
+    {"+texture",        ".textured",        XrmoptionNoArg,  "False" },
+};
 
 static int wire, clearbits;
 static int board_x_size = 9, board_y_size = 9, board_avg_size = 0;
@@ -86,28 +84,27 @@ static float spin = 0.1;
 static char* flipflopmode_str = "tiles";
 static int textured = False;
 
-#if 0
-	static argtype vars[] = {
-	    { &flipflopmode_str, "mode",        "Mode",     DEF_MODE,  t_String},
-	    { &board_avg_size,   "size",        "Integer",  DEF_BOARD_SIZE,     t_Int},
-	    { &board_x_size,     "sizex",       "Integer",  DEF_SIZEX,   t_Int},
-	    { &board_y_size,     "sizey",       "Integer",  DEF_SIZEY,   t_Int},
-	    { &numsquares,       "numsquares",  "Integer",  DEF_NUMSQUARES,     t_Int},
-	    { &freesquares,      "freesquares", "Integer",  DEF_NUMSQUARES,     t_Int},
-	    { &spin,             "spin",        "Float",    DEF_SPIN,           t_Float},
-	    { &textured,         "textured",    "Bool",     DEF_TEXTURED,       t_Bool},
-	};
+static argtype vars[] = {
+    { &flipflopmode_str, "mode",        "Mode",     DEF_MODE,  t_String},
+    { &board_avg_size,   "size",        "Integer",  DEF_BOARD_SIZE,     t_Int},
+    { &board_x_size,     "sizex",       "Integer",  DEF_SIZEX,   t_Int},
+    { &board_y_size,     "sizey",       "Integer",  DEF_SIZEY,   t_Int},
+    { &numsquares,       "numsquares",  "Integer",  DEF_NUMSQUARES,     t_Int},
+    { &freesquares,      "freesquares", "Integer",  DEF_NUMSQUARES,     t_Int},
+    { &spin,             "spin",        "Float",    DEF_SPIN,           t_Float},
+    { &textured,         "textured",    "Bool",     DEF_TEXTURED,       t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt flipflop_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt flipflop_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   flipflop_description =
-	    {"flipflop", "init_flipflop", "draw_flipflop", "release_flipflop",
-	     "draw_flipflop", "init_flipflop", NULL, &flipflop_opts,
-	     1000, 1, 2, 1, 4, 1.0, "",
-	     "Flipflop", 0, NULL};
-	#endif /* USE_MODULES */
-#endif
+#ifdef USE_MODULES
+ModStruct   flipflop_description =
+    {"flipflop", "init_flipflop", "draw_flipflop", "release_flipflop",
+     "draw_flipflop", "init_flipflop", NULL, &flipflop_opts,
+     1000, 1, 2, 1, 4, 1.0, "",
+     "Flipflop", 0, NULL};
+#endif /* USE_MODULES */
+
 
 typedef struct {
     /* array specifying which squares are where (to avoid collisions) */
@@ -167,7 +164,7 @@ typedef struct {
 
 static Flipflopcreen *qs = NULL;
 
-//#include "grab-ximage.h"
+#include "grab-ximage.h"
 
 static void randsheet_create( randsheet *rs );
 static void randsheet_initialize( randsheet *rs );

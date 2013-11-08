@@ -36,7 +36,7 @@
 #ifdef USE_GL /* whole file */
 
 #include "stonerview.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #define DEF_TRANSPARENT "True"
 
@@ -51,18 +51,16 @@ static stonerview_configuration *bps = NULL;
 
 static Bool transparent_p = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-transparent",   ".transparent",   XrmoptionNoArg, "True" },
-	  { "+transparent",   ".transparent",   XrmoptionNoArg, "False" },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-transparent",   ".transparent",   XrmoptionNoArg, "True" },
+  { "+transparent",   ".transparent",   XrmoptionNoArg, "False" },
+};
 
-	static argtype vars[] = {
-	  {&transparent_p, "transparent", "Transparent", DEF_TRANSPARENT, t_Bool},
-	};
+static argtype vars[] = {
+  {&transparent_p, "transparent", "Transparent", DEF_TRANSPARENT, t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt stonerview_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt stonerview_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 ENTRYPOINT void
 reshape_stonerview (ModeInfo *mi, int width, int height)

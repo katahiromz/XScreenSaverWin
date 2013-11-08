@@ -76,8 +76,8 @@
 
 #include <math.h>
 
-//#include "grab-ximage.h"
-//#include "gltrackball.h"
+#include "grab-ximage.h"
+#include "gltrackball.h"
 
 static char *mode = "light";
 static enum {wire=0,solid,light,checker,grab} _draw;
@@ -117,68 +117,67 @@ static float _waveFreq = 3.0;
 #define WIDTH 320
 #define HEIGHT 240
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	    {"-squares", ".gflux.squares", XrmoptionSepArg, 0},
-	    {"-resolution", ".gflux.resolution", XrmoptionSepArg, 0},
-	/*    {"-draw", ".gflux.draw", XrmoptionSepArg, 0},*/
-	    {"-mode", ".gflux.mode", XrmoptionSepArg, 0},
-	    {"-wireframe", ".gflux.mode", XrmoptionNoArg, "wire"},
-	    {"-flat", ".gflux.flat", XrmoptionSepArg, 0},
-	    {"-speed", ".gflux.speed", XrmoptionSepArg, 0},
-	    {"-rotationx", ".gflux.rotationx", XrmoptionSepArg, 0},
-	    {"-rotationy", ".gflux.rotationy", XrmoptionSepArg, 0},
-	    {"-rotationz", ".gflux.rotationz", XrmoptionSepArg, 0},
-	    {"-waves", ".gflux.waves", XrmoptionSepArg, 0},
-	    {"-waveChange", ".gflux.waveChange", XrmoptionSepArg, 0},
-	    {"-waveHeight", ".gflux.waveHeight", XrmoptionSepArg, 0},
-	    {"-waveFreq", ".gflux.waveFreq", XrmoptionSepArg, 0},
-	    {"-zoom", ".gflux.zoom", XrmoptionSepArg, 0},
-	};
+static XrmOptionDescRec opts[] = {
+    {"-squares", ".gflux.squares", XrmoptionSepArg, 0},
+    {"-resolution", ".gflux.resolution", XrmoptionSepArg, 0},
+/*    {"-draw", ".gflux.draw", XrmoptionSepArg, 0},*/
+    {"-mode", ".gflux.mode", XrmoptionSepArg, 0},
+    {"-wireframe", ".gflux.mode", XrmoptionNoArg, "wire"},
+    {"-flat", ".gflux.flat", XrmoptionSepArg, 0},
+    {"-speed", ".gflux.speed", XrmoptionSepArg, 0},
+    {"-rotationx", ".gflux.rotationx", XrmoptionSepArg, 0},
+    {"-rotationy", ".gflux.rotationy", XrmoptionSepArg, 0},
+    {"-rotationz", ".gflux.rotationz", XrmoptionSepArg, 0},
+    {"-waves", ".gflux.waves", XrmoptionSepArg, 0},
+    {"-waveChange", ".gflux.waveChange", XrmoptionSepArg, 0},
+    {"-waveHeight", ".gflux.waveHeight", XrmoptionSepArg, 0},
+    {"-waveFreq", ".gflux.waveFreq", XrmoptionSepArg, 0},
+    {"-zoom", ".gflux.zoom", XrmoptionSepArg, 0},
+};
 
-	static argtype vars[] = {
-	    {&_squares, "squares", "Squares", DEF_SQUARES, t_Int},
-	    {&_resolution, "resolution", "Resolution", DEF_RESOLUTION, t_Int},
-	/*    {&_draw, "draw", "Draw", DEF_DRAW, t_Int},*/
-	    {&_flat, "flat", "Flat", DEF_FLAT, t_Int},
-	    {&_speed, "speed", "Speed", DEF_SPEED, t_Float},
-	    {&_rotationx, "rotationx", "Rotationx", DEF_ROTATIONX, t_Float},
-	    {&_rotationy, "rotationy", "Rotationy", DEF_ROTATIONY, t_Float},
-	    {&_rotationz, "rotationz", "Rotationz", DEF_ROTATIONZ, t_Float},
-	    {&_waves, "waves", "Waves", DEF_WAVES, t_Int},
-	    {&_waveChange, "waveChange", "WaveChange", DEF_WAVE_CHANGE, t_Int},
-	    {&_waveHeight, "waveHeight", "WaveHeight", DEF_WAVE_HEIGHT, t_Float},
-	    {&_waveFreq, "waveFreq", "WaveFreq", DEF_WAVE_FREQ, t_Float},
-	    {&_zoom, "zoom", "Zoom", DEF_ZOOM, t_Float},
-	};
+static argtype vars[] = {
+    {&_squares, "squares", "Squares", DEF_SQUARES, t_Int},
+    {&_resolution, "resolution", "Resolution", DEF_RESOLUTION, t_Int},
+/*    {&_draw, "draw", "Draw", DEF_DRAW, t_Int},*/
+    {&_flat, "flat", "Flat", DEF_FLAT, t_Int},
+    {&_speed, "speed", "Speed", DEF_SPEED, t_Float},
+    {&_rotationx, "rotationx", "Rotationx", DEF_ROTATIONX, t_Float},
+    {&_rotationy, "rotationy", "Rotationy", DEF_ROTATIONY, t_Float},
+    {&_rotationz, "rotationz", "Rotationz", DEF_ROTATIONZ, t_Float},
+    {&_waves, "waves", "Waves", DEF_WAVES, t_Int},
+    {&_waveChange, "waveChange", "WaveChange", DEF_WAVE_CHANGE, t_Int},
+    {&_waveHeight, "waveHeight", "WaveHeight", DEF_WAVE_HEIGHT, t_Float},
+    {&_waveFreq, "waveFreq", "WaveFreq", DEF_WAVE_FREQ, t_Float},
+    {&_zoom, "zoom", "Zoom", DEF_ZOOM, t_Float},
+};
 
-	static OptionStruct desc[] =
-	{
-	    {"-squares num", "size of grid in squares (19)"},
-	    {"-resolution num", "detail of lines making grid, wireframe only (4)"},
-	/*    {"-draw num", "draw method to use: 0=wireframe 1=solid 2=lit (0)"},*/
-	    {"-flat num", "shading method, not wireframe: 0=smooth 1=flat (0)"},
-	    {"-speed num", "speed of waves (0.05)"},
-	    {"-rotationx num", "speed of xrotation (0.01)"},
-	    {"-rotationy num", "speed of yrotation (0.00)"},
-	    {"-rotationz num", "speed of zrotation (0.10)"},
-	    {"-waves num", "number of simultanious waves (3)"},
-	    {"-waveChange num", "number of cyles for a wave to change (50)"},
-	    {"-waveHeight num", "height of waves (1.0)"},
-	    {"-waveFreq num", "max frequency of a wave (3.0)"},
-	    {"-zoom num", "camera control (1.0)"},
-	};
+static OptionStruct desc[] =
+{
+    {"-squares num", "size of grid in squares (19)"},
+    {"-resolution num", "detail of lines making grid, wireframe only (4)"},
+/*    {"-draw num", "draw method to use: 0=wireframe 1=solid 2=lit (0)"},*/
+    {"-flat num", "shading method, not wireframe: 0=smooth 1=flat (0)"},
+    {"-speed num", "speed of waves (0.05)"},
+    {"-rotationx num", "speed of xrotation (0.01)"},
+    {"-rotationy num", "speed of yrotation (0.00)"},
+    {"-rotationz num", "speed of zrotation (0.10)"},
+    {"-waves num", "number of simultanious waves (3)"},
+    {"-waveChange num", "number of cyles for a wave to change (50)"},
+    {"-waveHeight num", "height of waves (1.0)"},
+    {"-waveFreq num", "max frequency of a wave (3.0)"},
+    {"-zoom num", "camera control (1.0)"},
+};
 
-	ENTRYPOINT ModeSpecOpt gflux_opts = {countof(opts), opts, countof(vars), vars, desc};
+ENTRYPOINT ModeSpecOpt gflux_opts = {countof(opts), opts, countof(vars), vars, desc};
 
-	#ifdef USE_MODULES
-	ModStruct   gflux_description =
-	{"gflux", "init_gflux", "draw_gflux", "release_gflux",
-	 "draw_gflux", "init_gflux", NULL, &gflux_opts,
-	 1000, 1, 2, 1, 4, 1.0, "",
-	 "GFlux: an OpenGL gflux", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   gflux_description =
+{"gflux", "init_gflux", "draw_gflux", "release_gflux",
+ "draw_gflux", "init_gflux", NULL, &gflux_opts,
+ 1000, 1, 2, 1, 4, 1.0, "",
+ "GFlux: an OpenGL gflux", 0, NULL};
 #endif
+
 
 /* structure for holding the gflux data */
 typedef struct gfluxstruct {

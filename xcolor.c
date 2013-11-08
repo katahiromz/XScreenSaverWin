@@ -1164,7 +1164,8 @@ Status XAllocColorCells(
     unsigned long*  pixels_return,
     unsigned int    npixels)
 {
-    int i, pixel;
+    unsigned int i;
+	unsigned long pixel;
 
     if (colormaps[cmap].num_items + npixels > 256)
         return False;
@@ -1257,7 +1258,7 @@ int XFlush(Display *d)
 
 int visual_cells(Screen *screen, Visual *visual)
 {
-    Colormap cmap = 0;
+    Colormap cmap = DefaultColormap(DisplayOfScreen(screen), screen);
     return colormaps[cmap].num_items;
 }
 
@@ -1274,5 +1275,29 @@ int XQueryColor(Display *dpy, Colormap cmap, XColor *def)
         def->flags = DoRed | DoGreen | DoBlue;
         return 1;
     }
+    return 0;
+}
+
+unsigned long load_color(Display *dpy, Colormap cmap, const char *name)
+{
+    XColor color;
+    XParseColor(dpy, cmap, name, &color);
+    XAllocColor(dpy, cmap, &color);
+    return color.pixel;
+}
+
+int XSetForeground(Display *dpy, GC gc, unsigned long foreground)
+{
+    XColor color;
+    XGCValues *values;
+
+    values = XGetGCValues0(gc);
+    if (values == NULL)
+        return BadGC;
+
+    values->foreground = foreground;
+    color.pixel = foreground;
+    XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
+    values->foreground_rgb = RGB(color.red / 256, color.green / 256, color.blue / 256);
     return 0;
 }

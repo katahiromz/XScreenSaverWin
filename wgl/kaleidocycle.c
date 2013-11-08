@@ -15,6 +15,7 @@
  */
 
 #define DELAY 30000
+#define COUNT 16
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*count:        16          \n" \
 			"*showFPS:      False       \n" \
@@ -30,11 +31,9 @@
 #include "colors.h"
 #include "normals.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 16
 
 #ifdef USE_GL /* whole file */
 
@@ -70,23 +69,21 @@ static char *do_spin = "Z";
 static GLfloat speed = 1.0;
 static Bool do_wander = False;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",   ".spin",   XrmoptionSepArg, 0 },
-	  { "+spin",   ".spin",   XrmoptionNoArg, "" },
-	  { "-wander", ".wander", XrmoptionNoArg, "True" },
-	  { "+wander", ".wander", XrmoptionNoArg, "False" },
-	  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",   ".spin",   XrmoptionSepArg, 0 },
+  { "+spin",   ".spin",   XrmoptionNoArg, "" },
+  { "-wander", ".wander", XrmoptionNoArg, "True" },
+  { "+wander", ".wander", XrmoptionNoArg, "False" },
+  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-	  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_String},
-	  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
-	  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
-	};
+static argtype vars[] = {
+  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_String},
+  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
+  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
+};
 
-	ENTRYPOINT ModeSpecOpt kaleidocycle_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt kaleidocycle_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 /* Window management, etc
  */

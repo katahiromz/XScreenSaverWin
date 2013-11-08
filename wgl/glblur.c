@@ -41,7 +41,7 @@
 #include "win32.h"
 #include "colors.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
 #ifdef USE_GL /* whole file */
@@ -90,23 +90,22 @@ static char *do_spin = "XYZ";
 static Bool do_wander = True;
 static int blursize = 15;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",   ".spin",   XrmoptionSepArg, 0 },
-	  { "+spin",   ".spin",   XrmoptionNoArg, "" },
-	  { "-blursize", ".blurSize", XrmoptionSepArg, 0 },
-	  { "-wander", ".wander", XrmoptionNoArg, "True" },
-	  { "+wander", ".wander", XrmoptionNoArg, "False" },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",   ".spin",   XrmoptionSepArg, 0 },
+  { "+spin",   ".spin",   XrmoptionNoArg, "" },
+  { "-blursize", ".blurSize", XrmoptionSepArg, 0 },
+  { "-wander", ".wander", XrmoptionNoArg, "True" },
+  { "+wander", ".wander", XrmoptionNoArg, "False" },
+};
 
-	static argtype vars[] = {
-	  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_String},
-	  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
-	  {&blursize,  "blurSize","BlurSize", DEF_BLUR_SIZE,  t_Int},
-	};
+static argtype vars[] = {
+  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_String},
+  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
+  {&blursize,  "blurSize","BlurSize", DEF_BLUR_SIZE,  t_Int},
+};
 
-	ENTRYPOINT ModeSpecOpt glblur_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt glblur_opts = {countof(opts), opts, countof(vars), vars, NULL};
+
 
 /* Window management, etc
  */

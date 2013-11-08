@@ -149,42 +149,40 @@ static int		g_blinkdwell_min = 100,
 #define DEF_BLINKDWELLMIN	"100"
 #define DEF_BLINKDWELLMAX	"600"
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-		{ "-blink",	".blink",  XrmoptionNoArg, "on" },
-		{ "+blink",	".blink",  XrmoptionNoArg, "off" },
-		{ "-rotateidle-min",	".rotateidlemin",	XrmoptionSepArg,	0 },
-		{ "-rotateidle-max",	".rotateidlemax",	XrmoptionSepArg,	0 },
-		{ "-blinkidle-min",	".blinkidlemin",	XrmoptionSepArg,	0 },
-		{ "-blinkidle-max",	".blinkidlemax",	XrmoptionSepArg,	0 },
-		{ "-blinkdwell-min",	".blinkdwellmin",	XrmoptionSepArg,	0 },
-		{ "-blinkdwell-max",	".blinkdwellmax",	XrmoptionSepArg,	0 },
-	};
+static XrmOptionDescRec opts[] = {
+	{ "-blink",	".blink",  XrmoptionNoArg, "on" },
+	{ "+blink",	".blink",  XrmoptionNoArg, "off" },
+	{ "-rotateidle-min",	".rotateidlemin",	XrmoptionSepArg,	0 },
+	{ "-rotateidle-max",	".rotateidlemax",	XrmoptionSepArg,	0 },
+	{ "-blinkidle-min",	".blinkidlemin",	XrmoptionSepArg,	0 },
+	{ "-blinkidle-max",	".blinkidlemax",	XrmoptionSepArg,	0 },
+	{ "-blinkdwell-min",	".blinkdwellmin",	XrmoptionSepArg,	0 },
+	{ "-blinkdwell-max",	".blinkdwellmax",	XrmoptionSepArg,	0 },
+};
 
-	static argtype vars[] = {
-		{ &g_blink_p, "blink",	"Blink", DEF_BLINK, t_Bool	},
-		{ &g_rotateidle_min, "rotateidlemin",	"Rotateidlemin", DEF_ROTATEIDLEMIN, t_Int	},
-		{ &g_rotateidle_max, "rotateidlemax",	"Rotateidlemax", DEF_ROTATEIDLEMAX, t_Int	},
-		{ &g_blinkidle_min, "blinkidlemin", "Blinkidlemin", DEF_BLINKIDLEMIN, t_Int },
-		{ &g_blinkidle_max, "blinkidlemax", "Blinkidlemax", DEF_BLINKIDLEMAX, t_Int },
-		{ &g_blinkdwell_min, "blinkdwellmin", "Blinkdwellmin", DEF_BLINKDWELLMIN, t_Int },
-		{ &g_blinkdwell_max, "blinkdwellmax", "Blinkdwellmax", DEF_BLINKDWELLMAX, t_Int },
-	};
+static argtype vars[] = {
+	{ &g_blink_p, "blink",	"Blink", DEF_BLINK, t_Bool	},
+	{ &g_rotateidle_min, "rotateidlemin",	"Rotateidlemin", DEF_ROTATEIDLEMIN, t_Int	},
+	{ &g_rotateidle_max, "rotateidlemax",	"Rotateidlemax", DEF_ROTATEIDLEMAX, t_Int	},
+	{ &g_blinkidle_min, "blinkidlemin", "Blinkidlemin", DEF_BLINKIDLEMIN, t_Int },
+	{ &g_blinkidle_max, "blinkidlemax", "Blinkidlemax", DEF_BLINKIDLEMAX, t_Int },
+	{ &g_blinkdwell_min, "blinkdwellmin", "Blinkdwellmin", DEF_BLINKDWELLMIN, t_Int },
+	{ &g_blinkdwell_max, "blinkdwellmax", "Blinkdwellmax", DEF_BLINKDWELLMAX, t_Int },
+};
 
-	static OptionStruct desc[] = {
-		{ "-/+blink", "Turn on/off blinking effects." },
-		{ "-rotateidle-min", "Minimum idle time for rotators, in milliseconds." },
-		{ "-rotateidle-max", "Maximum idle time for rotators, in milliseconds." },
-		{ "-blinkidle-min", "Minimum idle time between blink effects, in milliseconds." },
-		{ "-blinkidle-max", "Maximum idle time between blink effects, in milliseconds." },
-		{ "-blinkdwell-min", "Minimum dwell time for blink effects, in milliseconds." },
-		{ "-blinkdwell-max", "Maximum dwell time for blink effects, in milliseconds." },
-	};
+static OptionStruct desc[] = {
+	{ "-/+blink", "Turn on/off blinking effects." },
+	{ "-rotateidle-min", "Minimum idle time for rotators, in milliseconds." },
+	{ "-rotateidle-max", "Maximum idle time for rotators, in milliseconds." },
+	{ "-blinkidle-min", "Minimum idle time between blink effects, in milliseconds." },
+	{ "-blinkidle-max", "Maximum idle time between blink effects, in milliseconds." },
+	{ "-blinkdwell-min", "Minimum dwell time for blink effects, in milliseconds." },
+	{ "-blinkdwell-max", "Maximum dwell time for blink effects, in milliseconds." },
+};
 
-	ENTRYPOINT ModeSpecOpt lockward_opts = {
-		NUMOF(opts), opts, NUMOF(vars), vars, desc
-	};
-#endif
+ENTRYPOINT ModeSpecOpt lockward_opts = {
+	NUMOF(opts), opts, NUMOF(vars), vars, desc
+};
 
 /***************************************************************************
  * Window management.

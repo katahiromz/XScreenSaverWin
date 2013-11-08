@@ -14,6 +14,7 @@
  */
 
 #define DELAY 30000
+#define COUNT 17
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*spin:         True        \n" \
 			"*wander:       True        \n" \
@@ -28,14 +29,11 @@
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-//#include "xlockmore.h"
 #include "win32.h"
+//#include "xlockmore.h"
 #include "colors.h"
 #include "rotator.h"
 #include <ctype.h>
-
-#undef MI_COUNT
-#define MI_COUNT(mi) 17
 
 #ifdef USE_GL /* whole file */
 
@@ -61,30 +59,33 @@ typedef struct {
 
 static quasicrystal_configuration *bps = NULL;
 
+static GLfloat speed = 1.0;
 static Bool spin = True;
 static Bool wander = True;
-static GLfloat speed = 1.0;
 static Bool symmetric = True;
-static float contrast = 30.0;
+static GLfloat contrast = 30.0;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",         ".spin",      XrmoptionNoArg, "True"  },
-	  { "+spin",         ".spin",      XrmoptionNoArg, "False" },
-	  { "-wander",       ".wander",    XrmoptionNoArg, "True"  },
-	  { "+wander",       ".wander",    XrmoptionNoArg, "False" },
-	  { "-symmetry",     ".symmetric", XrmoptionNoArg, "True"   },
-	  { "-no-symmetry",  ".symmetric", XrmoptionNoArg, "False"  },
-	  { "-speed",        ".speed",     XrmoptionSepArg, 0 },
-	  { "-contrast",     ".contrast",  XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",         ".spin",      XrmoptionNoArg, "True"  },
+  { "+spin",         ".spin",      XrmoptionNoArg, "False" },
+  { "-wander",       ".wander",    XrmoptionNoArg, "True"  },
+  { "+wander",       ".wander",    XrmoptionNoArg, "False" },
+  { "-symmetry",     ".symmetric", XrmoptionNoArg, "True"   },
+  { "-no-symmetry",  ".symmetric", XrmoptionNoArg, "False"  },
+  { "-speed",        ".speed",     XrmoptionSepArg, 0 },
+  { "-contrast",     ".contrast",  XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-	  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
-	};
+static argtype vars[] = {
+  {&speed,     "speed",     "Speed",    DEF_SPEED,  t_Float},
+  {&spin,      "spin",      "Spin",     "True", t_Bool},
+  {&wander,    "wander",    "Wander",   "True", t_Bool},
+  {&symmetric, "symmetric", "Symmetry", "True", t_Bool},
+  {&contrast,  "contrast",  "Contrast", "30.0", t_Float},
+};
 
-	ENTRYPOINT ModeSpecOpt quasicrystal_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt quasicrystal_opts = {countof(opts), opts, countof(vars), vars, NULL};
+
 
 
 /* Window management, etc
@@ -154,7 +155,6 @@ reshape_quasicrystal (ModeInfo *mi, int width, int height)
 	}
 #endif
 
-
 ENTRYPOINT void 
 init_quasicrystal (ModeInfo *mi)
 {
@@ -203,7 +203,7 @@ init_quasicrystal (ModeInfo *mi)
 
   //bp->symmetric_p =
   //  get_boolean_resource (MI_DISPLAY (mi), "symmetry", "Symmetry");
-  bp->symmetric_p = symmetric;
+  bp->symmetric_p = False;
 
   //bp->contrast = get_float_resource (MI_DISPLAY (mi), "contrast", "Contrast");
   bp->contrast = contrast;
@@ -253,8 +253,8 @@ init_quasicrystal (ModeInfo *mi)
             glTexImage1D (GL_TEXTURE_1D, 0, GL_RGBA,
                           tex_width, 0,
                           GL_RGBA,
-                          GL_UNSIGNED_BYTE,
-                          //GL_UNSIGNED_INT_8_8_8_8_REV,
+                          /* GL_UNSIGNED_BYTE, */
+                          GL_UNSIGNED_INT_8_8_8_8_REV,
                           tex_data);
             check_gl_error("texture");
 

@@ -11,6 +11,7 @@
  */
 
 #define DELAY 20000
+#define COUNT 5
 #define DEFAULTS	"*delay:	20000       \n" \
 			"*count:        5           \n" \
 			"*showFPS:      False       \n" \
@@ -25,11 +26,8 @@
 #include "win32.h"
 #include "colors.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
-
-#undef MI_COUNT
-#define MI_COUNT(mi) 5
 
 #ifdef USE_GL /* whole file */
 
@@ -98,30 +96,28 @@ static int wave_speed = 80;
 static int wave_radius = 512;
 static int texture_size = 256;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",   ".spin",   XrmoptionSepArg, 0 },
-	  { "+spin",   ".spin",   XrmoptionNoArg, "" },
-	  { "-wander", ".wander", XrmoptionNoArg, "True" },
-	  { "+wander", ".wander", XrmoptionNoArg, "False" },
-	  {"-texture", ".texture", XrmoptionNoArg, "true" },
-	  {"+texture", ".texture", XrmoptionNoArg, "false" },
-	  {"-waves",       ".waves",      XrmoptionSepArg, 0 },
-	  {"-wave-speed",  ".waveSpeed",  XrmoptionSepArg, 0 },
-	  {"-wave-radius", ".waveRadius", XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",   ".spin",   XrmoptionSepArg, 0 },
+  { "+spin",   ".spin",   XrmoptionNoArg, "" },
+  { "-wander", ".wander", XrmoptionNoArg, "True" },
+  { "+wander", ".wander", XrmoptionNoArg, "False" },
+  {"-texture", ".texture", XrmoptionNoArg, "true" },
+  {"+texture", ".texture", XrmoptionNoArg, "false" },
+  {"-waves",       ".waves",      XrmoptionSepArg, 0 },
+  {"-wave-speed",  ".waveSpeed",  XrmoptionSepArg, 0 },
+  {"-wave-radius", ".waveRadius", XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-	  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_String},
-	  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
-	  {&do_texture, "texture", "Texture", DEF_TEXTURE, t_Bool},
-	  {&wave_count, "waves",     "Waves",      DEF_WAVES, t_Int},
-	  {&wave_speed, "waveSpeed", "WaveSpeed",  DEF_WAVE_SPEED, t_Int},
-	  {&wave_radius,"waveRadius","WaveRadius", DEF_WAVE_RADIUS,t_Int},
-	};
+static argtype vars[] = {
+  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_String},
+  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
+  {&do_texture, "texture", "Texture", DEF_TEXTURE, t_Bool},
+  {&wave_count, "waves",     "Waves",      DEF_WAVES, t_Int},
+  {&wave_speed, "waveSpeed", "WaveSpeed",  DEF_WAVE_SPEED, t_Int},
+  {&wave_radius,"waveRadius","WaveRadius", DEF_WAVE_RADIUS,t_Int},
+};
 
-	ENTRYPOINT ModeSpecOpt cube_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt cube_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 static int
 unit_cube (Bool wire)

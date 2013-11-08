@@ -120,7 +120,7 @@ static const char sccsid[] = "@(#)moebius.c	5.01 2001/03/01 xlockmore";
 #include "tube.h"
 
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #define DEF_SOLIDMOEBIUS  "False"
 #define DEF_DRAWANTS  "True"
@@ -128,36 +128,34 @@ static const char sccsid[] = "@(#)moebius.c	5.01 2001/03/01 xlockmore";
 static int  solidmoebius = False;
 static int  drawants = True;
 
-#if 0
-	static XrmOptionDescRec opts[] =
-	{
-	  {"-solidmoebius", ".moebius.solidmoebius", XrmoptionNoArg, "on"},
-	  {"+solidmoebius", ".moebius.solidmoebius", XrmoptionNoArg, "off"},
-	  {"-ants", ".moebius.drawants", XrmoptionNoArg, "on"},
-	  {"+ants", ".moebius.drawants", XrmoptionNoArg, "off"}
-	};
-	static argtype vars[] =
-	{
-	  {&solidmoebius, "solidmoebius", "Solidmoebius", DEF_SOLIDMOEBIUS, t_Bool},
-	  {&drawants, "drawants", "Drawants", DEF_DRAWANTS, t_Bool}
+static XrmOptionDescRec opts[] =
+{
+  {"-solidmoebius", ".moebius.solidmoebius", XrmoptionNoArg, "on"},
+  {"+solidmoebius", ".moebius.solidmoebius", XrmoptionNoArg, "off"},
+  {"-ants", ".moebius.drawants", XrmoptionNoArg, "on"},
+  {"+ants", ".moebius.drawants", XrmoptionNoArg, "off"}
+};
+static argtype vars[] =
+{
+  {&solidmoebius, "solidmoebius", "Solidmoebius", DEF_SOLIDMOEBIUS, t_Bool},
+  {&drawants, "drawants", "Drawants", DEF_DRAWANTS, t_Bool}
 
-	};
-	static OptionStruct desc[] =
-	{
-		{"-/+solidmoebius", "select between a SOLID or a NET Moebius Strip"},
-		{"-/+drawants", "turn on/off walking ants"}
-	};
+};
+static OptionStruct desc[] =
+{
+	{"-/+solidmoebius", "select between a SOLID or a NET Moebius Strip"},
+	{"-/+drawants", "turn on/off walking ants"}
+};
 
-	ENTRYPOINT ModeSpecOpt moebius_opts =
-	{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
+ENTRYPOINT ModeSpecOpt moebius_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
-	#ifdef USE_MODULES
-	ModStruct   moebius_description =
-	{"moebius", "init_moebius", "draw_moebius", "release_moebius",
-	 "draw_moebius", "change_moebius", (char *) NULL, &moebius_opts,
-	 1000, 1, 1, 1, 4, 1.0, "",
-	 "Shows Moebius Strip II, an Escher-like GL scene with ants", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   moebius_description =
+{"moebius", "init_moebius", "draw_moebius", "release_moebius",
+ "draw_moebius", "change_moebius", (char *) NULL, &moebius_opts,
+ 1000, 1, 1, 1, 4, 1.0, "",
+ "Shows Moebius Strip II, an Escher-like GL scene with ants", 0, NULL};
 #endif
 
 #define Scale4Window               0.3

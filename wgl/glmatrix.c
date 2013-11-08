@@ -190,42 +190,40 @@ static Bool do_rotate = True;
 static Bool do_texture = True;
 static char *mode_str = "Matrix";
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-speed",       ".speed",     XrmoptionSepArg, 0 },
-	  { "-density",     ".density",   XrmoptionSepArg, 0 },
-	  { "-mode",        ".mode",      XrmoptionSepArg, 0 },
-	  { "-binary",      ".mode",      XrmoptionNoArg, "binary"      },
-	  { "-hexadecimal", ".mode",      XrmoptionNoArg, "hexadecimal" },
-	  { "-decimal",     ".mode",      XrmoptionNoArg, "decimal"     },
-	  { "-dna",         ".mode",      XrmoptionNoArg, "dna"         },
-	  { "-clock",       ".clock",     XrmoptionNoArg, "True"  },
-	  { "+clock",       ".clock",     XrmoptionNoArg, "False" },
-	  { "-timefmt",     ".timefmt",   XrmoptionSepArg, 0  },
-	  { "-fog",         ".fog",       XrmoptionNoArg, "True"  },
-	  { "+fog",         ".fog",       XrmoptionNoArg, "False" },
-	  { "-waves",       ".waves",     XrmoptionNoArg, "True"  },
-	  { "+waves",       ".waves",     XrmoptionNoArg, "False" },
-	  { "-rotate",      ".rotate",    XrmoptionNoArg, "True"  },
-	  { "+rotate",      ".rotate",    XrmoptionNoArg, "False" },
-	  {"-texture",      ".texture",   XrmoptionNoArg, "True"  },
-	  {"+texture",      ".texture",   XrmoptionNoArg, "False" },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-speed",       ".speed",     XrmoptionSepArg, 0 },
+  { "-density",     ".density",   XrmoptionSepArg, 0 },
+  { "-mode",        ".mode",      XrmoptionSepArg, 0 },
+  { "-binary",      ".mode",      XrmoptionNoArg, "binary"      },
+  { "-hexadecimal", ".mode",      XrmoptionNoArg, "hexadecimal" },
+  { "-decimal",     ".mode",      XrmoptionNoArg, "decimal"     },
+  { "-dna",         ".mode",      XrmoptionNoArg, "dna"         },
+  { "-clock",       ".clock",     XrmoptionNoArg, "True"  },
+  { "+clock",       ".clock",     XrmoptionNoArg, "False" },
+  { "-timefmt",     ".timefmt",   XrmoptionSepArg, 0  },
+  { "-fog",         ".fog",       XrmoptionNoArg, "True"  },
+  { "+fog",         ".fog",       XrmoptionNoArg, "False" },
+  { "-waves",       ".waves",     XrmoptionNoArg, "True"  },
+  { "+waves",       ".waves",     XrmoptionNoArg, "False" },
+  { "-rotate",      ".rotate",    XrmoptionNoArg, "True"  },
+  { "+rotate",      ".rotate",    XrmoptionNoArg, "False" },
+  {"-texture",      ".texture",   XrmoptionNoArg, "True"  },
+  {"+texture",      ".texture",   XrmoptionNoArg, "False" },
+};
 
-	static argtype vars[] = {
-	  {&mode_str,   "mode",       "Mode",    DEF_MODE,      t_String},
-	  {&speed,      "speed",      "Speed",   DEF_SPEED,     t_Float},
-	  {&density,    "density",    "Density", DEF_DENSITY,   t_Float},
-	  {&do_clock,   "clock",      "Clock",   DEF_CLOCK,     t_Bool},
-	  {&timefmt,    "timefmt",    "Timefmt", DEF_TIMEFMT,   t_String},
-	  {&do_fog,     "fog",        "Fog",     DEF_FOG,       t_Bool},
-	  {&do_waves,   "waves",      "Waves",   DEF_WAVES,     t_Bool},
-	  {&do_rotate,  "rotate",     "Rotate",  DEF_ROTATE,    t_Bool},
-	  {&do_texture, "texture",    "Texture", DEF_TEXTURE,   t_Bool},
-	};
+static argtype vars[] = {
+  {&mode_str,   "mode",       "Mode",    DEF_MODE,      t_String},
+  {&speed,      "speed",      "Speed",   DEF_SPEED,     t_Float},
+  {&density,    "density",    "Density", DEF_DENSITY,   t_Float},
+  {&do_clock,   "clock",      "Clock",   DEF_CLOCK,     t_Bool},
+  {&timefmt,    "timefmt",    "Timefmt", DEF_TIMEFMT,   t_String},
+  {&do_fog,     "fog",        "Fog",     DEF_FOG,       t_Bool},
+  {&do_waves,   "waves",      "Waves",   DEF_WAVES,     t_Bool},
+  {&do_rotate,  "rotate",     "Rotate",  DEF_ROTATE,    t_Bool},
+  {&do_texture, "texture",    "Texture", DEF_TEXTURE,   t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt matrix_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt matrix_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 /* Re-randomize the state of one strip.
  */
@@ -263,9 +261,13 @@ reset_strip (ModeInfo *mi, strip *s)
 	!(random() % (GRID_SIZE-5)*5))
       {
 	int j;
-	char text[80];
+	char text[80], *p;
         time_t now = time ((time_t *) 0);
         struct tm *tm = localtime (&now);
+#if 1	// hacked by katahiromz
+	for(p = timefmt; *p; p++)
+	  if (p[0] == '%' && p[1] == 'l') p[1] = 'I';
+#endif
 	strftime (text, sizeof(text)-1, timefmt, tm);
 
 	/* render time into the strip */

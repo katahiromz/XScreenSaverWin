@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -117,6 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -217,15 +219,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\win32screensaver.c"
+				RelativePath=".\wgl.c"
 				>
 			</File>
 			<File
-				RelativePath=".\xcolor.c"
+				RelativePath="..\win32screensaver.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ximage.c"
+				RelativePath="..\xcolor.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ximage.c"
 				>
 			</File>
 			<File
@@ -233,7 +239,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\yarandom.c"
+				RelativePath="..\yarandom.c"
 				>
 			</File>
 		</Filter>
@@ -251,7 +257,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\resource.h"
+				RelativePath="..\resource.h"
 				>
 			</File>
 			<File
@@ -259,7 +265,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\win32.h"
+				RelativePath="..\win32.h"
 				>
 			</File>
 			<File
@@ -267,7 +273,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\yarandom.h"
+				RelativePath="..\yarandom.h"
 				>
 			</File>
 		</Filter>
@@ -277,7 +283,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\win32screensaver.rc"
+				RelativePath="..\win32screensaver.rc"
 				>
 			</File>
 		</Filter>

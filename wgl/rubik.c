@@ -105,6 +105,9 @@ static const char sccsid[] = "@(#)rubik.c	5.01 2001/03/01 xlockmore";
 
 # define MODE_rubik
 #define DELAY 20000
+#define COUNT -30
+#define CYCLES 20
+#define SIZE_ -6
 # define DEFAULTS	"*delay: 20000 \n"		\
 					"*count: -30 \n"		\
 					"*showFPS: False \n"	\
@@ -123,14 +126,8 @@ static const char sccsid[] = "@(#)rubik.c	5.01 2001/03/01 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
-#undef MI_COUNT
-#define MI_COUNT(mi) -30
-#undef MI_CYCLES
-#define MI_CYCLES(mi) 20
-#undef MI_SIZE
-#define MI_SIZE(mi) -6
 
 #ifdef MODE_rubik
 
@@ -144,42 +141,40 @@ static int sizey = 0;
 static int sizez = 0;
 static Bool hideshuffling = False;
 
-#if 0
-	static XrmOptionDescRec opts[] =
-	{
-	        {"-sizex", ".rubik.sizex", XrmoptionSepArg, 0},
-	        {"-sizey", ".rubik.sizey", XrmoptionSepArg, 0},
-	        {"-sizez", ".rubik.sizez", XrmoptionSepArg, 0},
-		{"-hideshuffling", ".rubik.hideshuffling", XrmoptionNoArg, "on"},
-		{"+hideshuffling", ".rubik.hideshuffling", XrmoptionNoArg, "off"}
-	};
+static XrmOptionDescRec opts[] =
+{
+        {"-sizex", ".rubik.sizex", XrmoptionSepArg, 0},
+        {"-sizey", ".rubik.sizey", XrmoptionSepArg, 0},
+        {"-sizez", ".rubik.sizez", XrmoptionSepArg, 0},
+	{"-hideshuffling", ".rubik.hideshuffling", XrmoptionNoArg, "on"},
+	{"+hideshuffling", ".rubik.hideshuffling", XrmoptionNoArg, "off"}
+};
 
-	static argtype vars[] =
-	{
-		{&sizex, "sizex", "SizeX", DEF_SIZEX, t_Int},
-		{&sizey, "sizey", "SizeY", DEF_SIZEY, t_Int},
-		{&sizez, "sizez", "SizeZ", DEF_SIZEZ, t_Int},
-		{&hideshuffling, "hideshuffling", "Hideshuffling", DEF_HIDESHUFFLING, t_Bool}
-	};
+static argtype vars[] =
+{
+	{&sizex, "sizex", "SizeX", DEF_SIZEX, t_Int},
+	{&sizey, "sizey", "SizeY", DEF_SIZEY, t_Int},
+	{&sizez, "sizez", "SizeZ", DEF_SIZEZ, t_Int},
+	{&hideshuffling, "hideshuffling", "Hideshuffling", DEF_HIDESHUFFLING, t_Bool}
+};
 
-	static OptionStruct desc[] =
-	{
-		{"-sizex num", "number of cubies along x axis (overrides size)"},
-		{"-sizey num", "number of cubies along y axis (overrides size)"},
-		{"-sizez num", "number of cubies along z axis (overrides size)"},
-		{"-/+hideshuffling", "turn on/off hidden shuffle phase"}
-	};
+static OptionStruct desc[] =
+{
+	{"-sizex num", "number of cubies along x axis (overrides size)"},
+	{"-sizey num", "number of cubies along y axis (overrides size)"},
+	{"-sizez num", "number of cubies along z axis (overrides size)"},
+	{"-/+hideshuffling", "turn on/off hidden shuffle phase"}
+};
 
-	ENTRYPOINT ModeSpecOpt rubik_opts =
-	{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
+ENTRYPOINT ModeSpecOpt rubik_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
-	#ifdef USE_MODULES
-	ModStruct   rubik_description =
-	{"rubik", "init_rubik", "draw_rubik", "release_rubik",
-	 "draw_rubik", "change_rubik", (char *) NULL, &rubik_opts,
-	 10000, -30, 5, -6, 64, 1.0, "",
-	 "Shows an auto-solving Rubik's Cube", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   rubik_description =
+{"rubik", "init_rubik", "draw_rubik", "release_rubik",
+ "draw_rubik", "change_rubik", (char *) NULL, &rubik_opts,
+ 10000, -30, 5, -6, 64, 1.0, "",
+ "Shows an auto-solving Rubik's Cube", 0, NULL};
 #endif
 
 #define VectMul(X1,Y1,Z1,X2,Y2,Z2) (Y1)*(Z2)-(Z1)*(Y2),(Z1)*(X2)-(X1)*(Z2),(X1)*(Y2)-(Y1)*(X2)

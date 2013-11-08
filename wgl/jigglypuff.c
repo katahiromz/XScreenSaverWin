@@ -60,7 +60,7 @@
 #endif
 
 #include "xpm-ximage.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include "../images/jigglymap.xpm"
 
 #ifdef USE_GL
@@ -131,42 +131,40 @@ typedef struct {
 
 static jigglystruct *jss = NULL;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-		{"-random", ".Jigglypuff.random", XrmoptionNoArg, "true"},
-		{"+random", ".Jigglypuff.random", XrmoptionNoArg, "false"},
-		{"-tetra", ".Jigglypuff.tetra", XrmoptionNoArg, "true"},
-		{"+tetra", ".Jigglypuff.tetra", XrmoptionNoArg, "false"},
-		{"-spooky", ".Jigglypuff.spooky", XrmoptionSepArg, "0"},
-		{"-color", ".Jigglypuff.color", XrmoptionSepArg, DEF_COLOR},
-		{"-shininess", ".Jigglypuff.shininess", XrmoptionSepArg, DEF_SHININESS},
-		{"-complexity", ".Jigglypuff.complexity", XrmoptionSepArg, DEF_COMPLEXITY},
-		{"-speed", ".Jigglypuff.speed", XrmoptionSepArg, DEF_SPEED},
-		{"-spherism", ".Jigglypuff.spherism", XrmoptionSepArg, DEF_SPHERISM},
-		{"-hold", ".Jigglypuff.hold", XrmoptionSepArg, DEF_HOLD},
-		{"-distance", "Jigglypuff.distance", XrmoptionSepArg, DEF_DISTANCE},
-		{"-damping", "Jigglypuff.damping", XrmoptionSepArg, DEF_DAMPING}
-	};
+static XrmOptionDescRec opts[] = {
+	{"-random", ".Jigglypuff.random", XrmoptionNoArg, "true"},
+	{"+random", ".Jigglypuff.random", XrmoptionNoArg, "false"},
+	{"-tetra", ".Jigglypuff.tetra", XrmoptionNoArg, "true"},
+	{"+tetra", ".Jigglypuff.tetra", XrmoptionNoArg, "false"},
+	{"-spooky", ".Jigglypuff.spooky", XrmoptionSepArg, "0"},
+	{"-color", ".Jigglypuff.color", XrmoptionSepArg, DEF_COLOR},
+	{"-shininess", ".Jigglypuff.shininess", XrmoptionSepArg, DEF_SHININESS},
+	{"-complexity", ".Jigglypuff.complexity", XrmoptionSepArg, DEF_COMPLEXITY},
+	{"-speed", ".Jigglypuff.speed", XrmoptionSepArg, DEF_SPEED},
+	{"-spherism", ".Jigglypuff.spherism", XrmoptionSepArg, DEF_SPHERISM},
+	{"-hold", ".Jigglypuff.hold", XrmoptionSepArg, DEF_HOLD},
+	{"-distance", "Jigglypuff.distance", XrmoptionSepArg, DEF_DISTANCE},
+	{"-damping", "Jigglypuff.damping", XrmoptionSepArg, DEF_DAMPING}
+};
 
-	static argtype vars[] = {
-		{&random_parms, "random", "Random", DEF_RANDOM, t_Bool},
-		{&do_tetrahedron, "tetra", "Tetra", DEF_TETRA, t_Bool},
-		{&spooky, "spooky", "Spooky", DEF_SPOOKY, t_Int},
-		{&color, "color", "Color", DEF_COLOR, t_String},
-		{&shininess, "shininess", "Shininess", DEF_SHININESS, t_Int},
-		{&complexity, "complexity", "Complexity", DEF_COMPLEXITY, t_Int},
-		{&speed, "speed", "Speed", DEF_SPEED, t_Int},
-		{&spherism, "spherism", "Spherism", DEF_SPHERISM, t_Int},
-		{&hold, "hold", "Hold", DEF_HOLD, t_Int},
-		{&distance, "distance", "Distance", DEF_DISTANCE, t_Int},
-		{&damping, "damping", "Damping", DEF_DAMPING, t_Int}
-	};
+static argtype vars[] = {
+	{&random_parms, "random", "Random", DEF_RANDOM, t_Bool},
+	{&do_tetrahedron, "tetra", "Tetra", DEF_TETRA, t_Bool},
+	{&spooky, "spooky", "Spooky", DEF_SPOOKY, t_Int},
+	{&color, "color", "Color", DEF_COLOR, t_String},
+	{&shininess, "shininess", "Shininess", DEF_SHININESS, t_Int},
+	{&complexity, "complexity", "Complexity", DEF_COMPLEXITY, t_Int},
+	{&speed, "speed", "Speed", DEF_SPEED, t_Int},
+	{&spherism, "spherism", "Spherism", DEF_SPHERISM, t_Int},
+	{&hold, "hold", "Hold", DEF_HOLD, t_Int},
+	{&distance, "distance", "Distance", DEF_DISTANCE, t_Int},
+	{&damping, "damping", "Damping", DEF_DAMPING, t_Int}
+};
 
-	#undef countof
-	#define countof(x) ((int)(sizeof(x)/sizeof(*(x))))
+#undef countof
+#define countof(x) ((int)(sizeof(x)/sizeof(*(x))))
 
-	ENTRYPOINT ModeSpecOpt jigglypuff_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt jigglypuff_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 #define COLOR_STYLE_NORMAL    0
 #define COLOR_STYLE_CYCLE     1

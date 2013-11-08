@@ -14,9 +14,6 @@
 
 #include <assert.h>
 
-#include "win32.h"
-#include "rotator.h"
-
 #define DEF_LIGHT     "True"
 #define DEF_FOG       "False"
 #define DEF_TEXTURE   "True"
@@ -25,6 +22,7 @@
 #define DEF_TRAILS	  "2"
 
 #define DELAY 15000
+#define COUNT 0
 #define DEFAULTS "*delay:     15000\n" \
 				 "*count:     0\n" \
 				 "*showFPS:   False\n" \
@@ -32,8 +30,8 @@
 				 
 # define refresh_glhanoi 0
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 0
+#include "win32.h"
+#include "rotator.h"
 
 /* polygon resolution of poles and disks */
 #define NSLICE 32
@@ -208,49 +206,45 @@ static GLfloat trails = 2;
 static int poles = 0;
 static GLfloat speed = 1;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-		{"-light", ".glhanoi.light", XrmoptionNoArg, "true"},
-		{"+light", ".glhanoi.light", XrmoptionNoArg, "false"},
-		{"-fog", ".glhanoi.fog", XrmoptionNoArg, "true"},
-		{"+fog", ".glhanoi.fog", XrmoptionNoArg, "false"},
-		{"-texture", ".glhanoi.texture", XrmoptionNoArg, "true"},
-		{"+texture", ".glhanoi.texture", XrmoptionNoArg, "false"},
-		{"-trails", ".glhanoi.trails", XrmoptionSepArg, 0},
-		{"-poles", ".glhanoi.poles", XrmoptionSepArg, 0 },
-		{"-speed", ".glhanoi.speed", XrmoptionSepArg, 0 }
-	};
+static XrmOptionDescRec opts[] = {
+	{"-light", ".glhanoi.light", XrmoptionNoArg, "true"},
+	{"+light", ".glhanoi.light", XrmoptionNoArg, "false"},
+	{"-fog", ".glhanoi.fog", XrmoptionNoArg, "true"},
+	{"+fog", ".glhanoi.fog", XrmoptionNoArg, "false"},
+	{"-texture", ".glhanoi.texture", XrmoptionNoArg, "true"},
+	{"+texture", ".glhanoi.texture", XrmoptionNoArg, "false"},
+	{"-trails", ".glhanoi.trails", XrmoptionSepArg, 0},
+	{"-poles", ".glhanoi.poles", XrmoptionSepArg, 0 },
+	{"-speed", ".glhanoi.speed", XrmoptionSepArg, 0 }
+};
 
-	static argtype vars[] = {
-		{&light, "light", "Light", DEF_LIGHT, t_Bool},
-		{&fog, "fog", "Fog", DEF_FOG, t_Bool},
-		{&texture, "texture", "Texture", DEF_TEXTURE, t_Bool},
-		{&trails, "trails", "Trails", DEF_TRAILS, t_Float},
-		{&poles, "poles", "Poles", DEF_POLES, t_Int},
-		{&speed, "speed", "Speed", DEF_SPEED, t_Float}
-	};
+static argtype vars[] = {
+	{&light, "light", "Light", DEF_LIGHT, t_Bool},
+	{&fog, "fog", "Fog", DEF_FOG, t_Bool},
+	{&texture, "texture", "Texture", DEF_TEXTURE, t_Bool},
+	{&trails, "trails", "Trails", DEF_TRAILS, t_Float},
+	{&poles, "poles", "Poles", DEF_POLES, t_Int},
+	{&speed, "speed", "Speed", DEF_SPEED, t_Float}
+};
 
-	static OptionStruct desc[] = {
-		{"+/-light", "whether to light the scene"},
-		{"+/-fog", "whether to apply fog to the scene"},
-		{"+/-texture", "whether to apply texture to the scene"},
-		{"-trails t", "how long of disk trails to show (sec.)"},
-		{"-poles r", "number of poles to move disks between"},
-		{"-speed s", "speed multiplier"}
-	};
+static OptionStruct desc[] = {
+	{"+/-light", "whether to light the scene"},
+	{"+/-fog", "whether to apply fog to the scene"},
+	{"+/-texture", "whether to apply texture to the scene"},
+	{"-trails t", "how long of disk trails to show (sec.)"},
+	{"-poles r", "number of poles to move disks between"},
+	{"-speed s", "speed multiplier"}
+};
 
-	ENTRYPOINT ModeSpecOpt glhanoi_opts = { countof(opts), opts, countof(vars), vars, desc };
-#endif
+ENTRYPOINT ModeSpecOpt glhanoi_opts = { countof(opts), opts, countof(vars), vars, desc };
 
-#if 0
-	#ifdef USE_MODULES
-	ModStruct glhanoi_description = {
-		"glhanoi", "init_glhanoi", "draw_glhanoi", "release_glhanoi",
-		"draw_glhanoi", "init_glhanoi", NULL, &glhanoi_opts,
-		1000, 1, 2, 1, 4, 1.0, "",
-		"Towers of Hanoi", 0, NULL
-	};
-	#endif
+#ifdef USE_MODULES
+ModStruct glhanoi_description = {
+	"glhanoi", "init_glhanoi", "draw_glhanoi", "release_glhanoi",
+	"draw_glhanoi", "init_glhanoi", NULL, &glhanoi_opts,
+	1000, 1, 2, 1, 4, 1.0, "",
+	"Towers of Hanoi", 0, NULL
+};
 #endif
 
 static const GLfloat cBlack[] = { 0.0, 0.0, 0.0, 1.0 };

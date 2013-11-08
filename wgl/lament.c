@@ -78,23 +78,21 @@
 
 static int do_texture = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"-texture", ".lament.texture", XrmoptionNoArg, "true" },
-	  {"+texture", ".lament.texture", XrmoptionNoArg, "false" },
-	};
+static XrmOptionDescRec opts[] = {
+  {"-texture", ".lament.texture", XrmoptionNoArg, "true" },
+  {"+texture", ".lament.texture", XrmoptionNoArg, "false" },
+};
 
-	static argtype vars[] = {
-	  {&do_texture, "texture", "Texture", DEF_TEXTURE, t_Bool},
-	};
+static argtype vars[] = {
+  {&do_texture, "texture", "Texture", DEF_TEXTURE, t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt lament_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt lament_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 #include "normals.h"
 #include "xpm-ximage.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #if 0
 # include "../images/lament128.xpm"
 #else

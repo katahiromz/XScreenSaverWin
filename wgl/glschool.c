@@ -61,50 +61,49 @@ static float		MinRadius = 30.0;
 static float		Momentum = 0.9;
 static float		DistComp = 10.0;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-		{ "-nfish",		".nfish",		XrmoptionSepArg, 0 },
-		{ "-fog",		".fog",			XrmoptionNoArg, "True" },
-		{ "+fog",		".fog",			XrmoptionNoArg, "False" },
-		{ "-drawgoal",	".drawgoal",	XrmoptionNoArg, "True" },
-		{ "+drawgoal",	".drawgoal",	XrmoptionNoArg, "False" },
-		{ "-drawbbox",	".drawbbox",	XrmoptionNoArg, "True" },
-		{ "+drawbbox",	".drawbbox",	XrmoptionNoArg, "False" },
-		{ "-goalchgf",	".goalchgf",	XrmoptionSepArg, 0 },
-		{ "-maxvel",	".maxvel",		XrmoptionSepArg, 0 },
-		{ "-minvel",	".minvel",		XrmoptionSepArg, 0 },
-		{ "-acclimit",	".acclimit",	XrmoptionSepArg, 0 },
-		{ "-distexp",	".distexp",		XrmoptionSepArg, 0 },
-		{ "-avoidfact",	".avoidfact",	XrmoptionSepArg, 0 },
-		{ "-matchfact",	".matchfact",	XrmoptionSepArg, 0 },
-		{ "-centerfact",".centerfact",	XrmoptionSepArg, 0 },
-		{ "-targetfact",".targetfact",	XrmoptionSepArg, 0 },
-		{ "-minradius",	".minradius",	XrmoptionSepArg, 0 },
-		{ "-distcomp",	".distcomp",	XrmoptionSepArg, 0 },
-		{ "-momentum",	".momentum",	XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+	{ "-nfish",		".nfish",		XrmoptionSepArg, 0 },
+	{ "-fog",		".fog",			XrmoptionNoArg, "True" },
+	{ "+fog",		".fog",			XrmoptionNoArg, "False" },
+	{ "-drawgoal",	".drawgoal",	XrmoptionNoArg, "True" },
+	{ "+drawgoal",	".drawgoal",	XrmoptionNoArg, "False" },
+	{ "-drawbbox",	".drawbbox",	XrmoptionNoArg, "True" },
+	{ "+drawbbox",	".drawbbox",	XrmoptionNoArg, "False" },
+	{ "-goalchgf",	".goalchgf",	XrmoptionSepArg, 0 },
+	{ "-maxvel",	".maxvel",		XrmoptionSepArg, 0 },
+	{ "-minvel",	".minvel",		XrmoptionSepArg, 0 },
+	{ "-acclimit",	".acclimit",	XrmoptionSepArg, 0 },
+	{ "-distexp",	".distexp",		XrmoptionSepArg, 0 },
+	{ "-avoidfact",	".avoidfact",	XrmoptionSepArg, 0 },
+	{ "-matchfact",	".matchfact",	XrmoptionSepArg, 0 },
+	{ "-centerfact",".centerfact",	XrmoptionSepArg, 0 },
+	{ "-targetfact",".targetfact",	XrmoptionSepArg, 0 },
+	{ "-minradius",	".minradius",	XrmoptionSepArg, 0 },
+	{ "-distcomp",	".distcomp",	XrmoptionSepArg, 0 },
+	{ "-momentum",	".momentum",	XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-		{&NFish,		"nfish",		"NFish",		DEF_NFISH, t_Int},
-		{&DoFog,		"fog",			"DoFog",		DEF_FOG, t_Bool},
-		{&DoDrawBBox,	"drawbbox",		"DoDrawBBox",	DEF_DRAWBBOX, t_Bool},
-		{&DoDrawGoal,	"drawgoal",		"DoDrawGoal",	DEF_DRAWGOAL, t_Bool},
-		{&GoalChgFreq,	"goalchgf",		"GoalChgFreq",	DEF_GOALCHGF,  t_Int},
-		{&MaxVel,		"maxvel",		"MaxVel",		DEF_MAXVEL,  t_Float},
-		{&MinVel,		"minvel",		"MinVel",		DEF_MINVEL,	t_Float},
-		{&AccLimit,		"acclimit",		"AccLimit",		DEF_ACCLIMIT,  t_Float},
-		{&DistExp,		"distexp",		"DistExp",		DEF_DISTEXP,  t_Float},
-		{&AvoidFact,	"avoidfact",	"AvoidFact",	DEF_AVOIDFACT,  t_Float},
-		{&MatchFact,	"matchfact",	"MatchFact",	DEF_MATCHFACT,  t_Float},
-		{&CenterFact,	"centerfact",	"CenterFact",	DEF_CENTERFACT,  t_Float},
-		{&TargetFact,	"targetfact",	"TargetFact",	DEF_TARGETFACT,  t_Float},
-		{&MinRadius,	"minradius",	"MinRadius",	DEF_MINRADIUS,  t_Float},
-		{&Momentum,		"momentum",		"Momentum",		DEF_MOMENTUM,  t_Float},
-		{&DistComp,		"distcomp",		"DistComp",		DEF_DISTCOMP,  t_Float},
-	};
+static argtype vars[] = {
+	{&NFish,		"nfish",		"NFish",		DEF_NFISH, t_Int},
+	{&DoFog,		"fog",			"DoFog",		DEF_FOG, t_Bool},
+	{&DoDrawBBox,	"drawbbox",		"DoDrawBBox",	DEF_DRAWBBOX, t_Bool},
+	{&DoDrawGoal,	"drawgoal",		"DoDrawGoal",	DEF_DRAWGOAL, t_Bool},
+	{&GoalChgFreq,	"goalchgf",		"GoalChgFreq",	DEF_GOALCHGF,  t_Int},
+	{&MaxVel,		"maxvel",		"MaxVel",		DEF_MAXVEL,  t_Float},
+	{&MinVel,		"minvel",		"MinVel",		DEF_MINVEL,	t_Float},
+	{&AccLimit,		"acclimit",		"AccLimit",		DEF_ACCLIMIT,  t_Float},
+	{&DistExp,		"distexp",		"DistExp",		DEF_DISTEXP,  t_Float},
+	{&AvoidFact,	"avoidfact",	"AvoidFact",	DEF_AVOIDFACT,  t_Float},
+	{&MatchFact,	"matchfact",	"MatchFact",	DEF_MATCHFACT,  t_Float},
+	{&CenterFact,	"centerfact",	"CenterFact",	DEF_CENTERFACT,  t_Float},
+	{&TargetFact,	"targetfact",	"TargetFact",	DEF_TARGETFACT,  t_Float},
+	{&MinRadius,	"minradius",	"MinRadius",	DEF_MINRADIUS,  t_Float},
+	{&Momentum,		"momentum",		"Momentum",		DEF_MOMENTUM,  t_Float},
+	{&DistComp,		"distcomp",		"DistComp",		DEF_DISTCOMP,  t_Float},
+};
 
-	ENTRYPOINT ModeSpecOpt glschool_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt glschool_opts = {countof(opts), opts, countof(vars), vars, NULL};
+
 
 typedef struct {
 	int			nColors;

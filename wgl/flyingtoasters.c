@@ -48,7 +48,7 @@
 
 #include "win32.h"
 //#include "xlockmore.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include "xpm-ximage.h"
 #include <ctype.h>
 
@@ -135,24 +135,22 @@ static int ntoasters = 20;
 static int nslices = 25;
 static int do_texture = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
-	  { "-ntoasters",  ".ntoasters", XrmoptionSepArg, 0 },
-	  { "-nslices",    ".nslices",   XrmoptionSepArg, 0 },
-	  {"-texture",     ".texture",   XrmoptionNoArg, "True" },
-	  {"+texture",     ".texture",   XrmoptionNoArg, "False" },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
+  { "-ntoasters",  ".ntoasters", XrmoptionSepArg, 0 },
+  { "-nslices",    ".nslices",   XrmoptionSepArg, 0 },
+  {"-texture",     ".texture",   XrmoptionNoArg, "True" },
+  {"+texture",     ".texture",   XrmoptionNoArg, "False" },
+};
 
-	static argtype vars[] = {
-	  {&speed,      "speed",      "Speed",   DEF_SPEED,     t_Float},
-	  {&ntoasters,  "ntoasters",  "Count",   DEF_NTOASTERS, t_Int},
-	  {&nslices,    "nslices",    "Count",   DEF_NSLICES,   t_Int},
-	  {&do_texture, "texture",    "Texture", DEF_TEXTURE,   t_Bool},
-	};
+static argtype vars[] = {
+  {&speed,      "speed",      "Speed",   DEF_SPEED,     t_Float},
+  {&ntoasters,  "ntoasters",  "Count",   DEF_NTOASTERS, t_Int},
+  {&nslices,    "nslices",    "Count",   DEF_NSLICES,   t_Int},
+  {&do_texture, "texture",    "Texture", DEF_TEXTURE,   t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt toasters_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt toasters_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 static void
 reset_floater (ModeInfo *mi, floater *f)

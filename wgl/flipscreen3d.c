@@ -57,25 +57,23 @@ static int rotate = True;
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"+rotate", ".screenflip.rotate", XrmoptionNoArg, "false" },
-	  {"-rotate", ".screenflip.rotate", XrmoptionNoArg, "true" },
-	};
+static XrmOptionDescRec opts[] = {
+  {"+rotate", ".screenflip.rotate", XrmoptionNoArg, "false" },
+  {"-rotate", ".screenflip.rotate", XrmoptionNoArg, "true" },
+};
 
-	static argtype vars[] = {
-	  {&rotate, "rotate", "Rotate", DEF_ROTATE, t_Bool},
-	};
+static argtype vars[] = {
+  {&rotate, "rotate", "Rotate", DEF_ROTATE, t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt screenflip_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt screenflip_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   screenflip_description =
-	{"screenflip", "init_screenflip", "draw_screenflip", "release_screenflip",
-	 "draw_screenflip", "init_screenflip", NULL, &screenflip_opts,
-	 1000, 1, 2, 1, 4, 1.0, "",
-	 "Screenflips", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   screenflip_description =
+{"screenflip", "init_screenflip", "draw_screenflip", "release_screenflip",
+ "draw_screenflip", "init_screenflip", NULL, &screenflip_opts,
+ 1000, 1, 2, 1, 4, 1.0, "",
+ "Screenflips", 0, NULL};
 #endif
 
 typedef struct {
@@ -115,7 +113,7 @@ typedef struct {
 
 static Screenflip *screenflip = NULL;
 
-//#include "grab-ximage.h"
+#include "grab-ximage.h"
 
 static const GLfloat viewer[] = {0.0, 0.0, 15.0};
 

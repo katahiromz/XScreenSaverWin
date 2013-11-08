@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "yarandom.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 typedef struct _global_info_t global_info_t;
 typedef struct _flurry_info_t flurry_info_t;

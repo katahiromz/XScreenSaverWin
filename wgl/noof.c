@@ -14,6 +14,7 @@
  */
 
 #define DELAY 10000
+#define NOARGS
 #define DEFAULTS	"*delay:	10000       \n" \
 			"*showFPS:      False       \n" \
 			"*fpsSolid:     True        \n" \

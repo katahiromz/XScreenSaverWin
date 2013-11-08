@@ -41,6 +41,8 @@ static const char sccsid[] = "@(#)sballs.c	5.02 2001/03/10 xlockmore";
  */
 
 #define DELAY 30000
+#define SIZE_ 0
+#define CYCLES 4
 #define DEFAULTS 	"*delay: 	30000 \n" \
  			"*size: 	    0 \n" \
 			"*cycles:	    4 \n" \
@@ -61,10 +63,6 @@ static const char sccsid[] = "@(#)sballs.c	5.02 2001/03/10 xlockmore";
 	#endif				/* !STANDALONE */
 #endif
 
-#undef MI_SIZE
-#define MI_SIZE(mi) 0
-#undef MI_CYCLES
-#define MI_CYCLES(mi) 4
 
 #ifdef MODE_sballs
 
@@ -103,42 +101,40 @@ static Bool do_texture = True;
 static int  object = 0;
 static int  spheres;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	    {"-texture", ".sballs.texture", XrmoptionNoArg, "on"},
-	    {"+texture", ".sballs.texture", XrmoptionNoArg, "off"},
-	    {"-object", ".sballs.object", XrmoptionSepArg, 0},
+static XrmOptionDescRec opts[] = {
+    {"-texture", ".sballs.texture", XrmoptionNoArg, "on"},
+    {"+texture", ".sballs.texture", XrmoptionNoArg, "off"},
+    {"-object", ".sballs.object", XrmoptionSepArg, 0},
 
-	};
+};
 
-	static argtype vars[] = {
-	    {&do_texture,    "texture",    "Texture",    DEF_TEXTURE,    t_Bool},
-	    {&object,        "object",     "Object",     DEF_OBJECT,     t_Int},
+static argtype vars[] = {
+    {&do_texture,    "texture",    "Texture",    DEF_TEXTURE,    t_Bool},
+    {&object,        "object",     "Object",     DEF_OBJECT,     t_Int},
 
-	};
+};
 
-	static OptionStruct desc[] = {
-	    /*{"-count spheres", "set number of spheres"},*/
-	    /*{"-cycles speed", "set ball speed value"},*/
-	    {"-/+texture", "turn on/off texturing"},
-	    {"-object num", "number of the 3D object (0 means random)"},
-	};
+static OptionStruct desc[] = {
+    /*{"-count spheres", "set number of spheres"},*/
+    /*{"-cycles speed", "set ball speed value"},*/
+    {"-/+texture", "turn on/off texturing"},
+    {"-object num", "number of the 3D object (0 means random)"},
+};
 
-	ENTRYPOINT ModeSpecOpt sballs_opts =
-	 { sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc };
+ENTRYPOINT ModeSpecOpt sballs_opts =
+ { sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc };
 
-	#ifdef USE_MODULES
-	ModStruct sballs_description =
-	    { "sballs", "init_sballs", "draw_sballs", "release_sballs",
-	    "draw_sballs", "change_sballs", (char *) NULL, &sballs_opts,
-	    /*
-	    delay,count,cycles,size,ncolors,sat
-	     */
-	    10000, 0, 10, 400, 64, 1.0, "",
-	    "balls spinning like crazy in GL", 0, NULL
-	};
-	#endif /* USE_MODULES */
-#endif
+#ifdef USE_MODULES
+ModStruct sballs_description =
+    { "sballs", "init_sballs", "draw_sballs", "release_sballs",
+    "draw_sballs", "change_sballs", (char *) NULL, &sballs_opts,
+    /*
+    delay,count,cycles,size,ncolors,sat
+     */
+    10000, 0, 10, 400, 64, 1.0, "",
+    "balls spinning like crazy in GL", 0, NULL
+};
+#endif /* USE_MODULES */
 
 /* misc types and defines */
 #define vinit(a,i,j,k) {\

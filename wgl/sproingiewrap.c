@@ -46,6 +46,8 @@ static const char sccsid[] = "@(#)sproingiewrap.c	4.07 97/11/24 xlockmore";
  */
 
 #define DELAY 30000
+#define COUNT 8
+#define SIZE_ 0
 # define DEFAULTS	"*delay:		30000   \n"			\
 					"*count:		8       \n"			\
 					"*size:			0       \n"			\
@@ -67,11 +69,6 @@ static const char sccsid[] = "@(#)sproingiewrap.c	4.07 97/11/24 xlockmore";
 #include "win32.h"
 
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 8
-#undef MI_SIZE
-#define MI_SIZE(mi) 0
-
 #ifdef USE_GL
 
 #define DEF_SMART_SPROINGIES "True" /* Smart sproingies do not fall down the edge */
@@ -81,30 +78,26 @@ static const char sccsid[] = "@(#)sproingiewrap.c	4.07 97/11/24 xlockmore";
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	    {"-fall",     ".smartSproingies",  XrmoptionNoArg,  "False"},
-	    {"-no-fall",  ".smartSproingies",  XrmoptionNoArg,  "True"},
-	};
-#endif
+static XrmOptionDescRec opts[] = {
+    {"-fall",     ".smartSproingies",  XrmoptionNoArg,  "False"},
+    {"-no-fall",  ".smartSproingies",  XrmoptionNoArg,  "True"},
+};
 
 static int smrt_spr = True;
 
-#if 0
-	static argtype vars[] = {
-	    {&smrt_spr,  "smartSproingies",  "Boolean",  DEF_SMART_SPROINGIES,  t_Bool},
-	};
+static argtype vars[] = {
+    {&smrt_spr,  "smartSproingies",  "Boolean",  DEF_SMART_SPROINGIES,  t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt sproingies_opts =
-	{countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt sproingies_opts =
+{countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   sproingies_description =
-	{"sproingies", "init_sproingies", "draw_sproingies", "release_sproingies",
-	 "refresh_sproingies", "init_sproingies", NULL, &sproingies_opts,
-	 1000, 5, 0, 400, 4, 1.0, "",
-	 "Shows Sproingies!  Nontoxic.  Safe for pets and small children", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   sproingies_description =
+{"sproingies", "init_sproingies", "draw_sproingies", "release_sproingies",
+ "refresh_sproingies", "init_sproingies", NULL, &sproingies_opts,
+ 1000, 5, 0, 400, 4, 1.0, "",
+ "Shows Sproingies!  Nontoxic.  Safe for pets and small children", 0, NULL};
 #endif
 
 #define MINSIZE 32

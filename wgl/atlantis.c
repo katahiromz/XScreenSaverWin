@@ -106,6 +106,9 @@ static const char sccsid[] = "@(#)atlantis.c	5.08 2003/04/09 xlockmore";
 #define DEF_WHALESPEED  "250"
 
 #define DELAY 25000
+#define COUNT 4
+#define CYCLES 100
+#define SIZE_ 6000
 # define DEFAULTS	"*delay:       25000 \n" \
 			 "*count:          4 \n" \
 			 "*showFPS:    False \n" \
@@ -125,13 +128,6 @@ static const char sccsid[] = "@(#)atlantis.c	5.08 2003/04/09 xlockmore";
 
 #include "win32.h"
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 4
-#undef MI_CYCLES
-#define MI_CYCLES(mi) 100
-#undef MI_SIZE
-#define MI_SIZE(mi) 6000
-
 #ifdef USE_GL
 
 #include "atlantis.h"
@@ -141,40 +137,38 @@ static int whalespeed = 250;
 static int do_texture = True;
 static int do_gradient = True;
 
-#if 0
-	static XrmOptionDescRec opts[] =
-	{
-	     {"-whalespeed", ".atlantis.whalespeed", XrmoptionSepArg, 0},
-	     {"-texture",    ".atlantis.texture",    XrmoptionNoArg, "true"},
-	     {"+texture",    ".atlantis.texture",    XrmoptionNoArg, "false"},
-	     {"-gradient",   ".atlantis.gradient",   XrmoptionNoArg, "true"},
-	     {"+gradient",   ".atlantis.gradient",   XrmoptionNoArg, "false"},
-	};
+static XrmOptionDescRec opts[] =
+{
+     {"-whalespeed", ".atlantis.whalespeed", XrmoptionSepArg, 0},
+     {"-texture",    ".atlantis.texture",    XrmoptionNoArg, "true"},
+     {"+texture",    ".atlantis.texture",    XrmoptionNoArg, "false"},
+     {"-gradient",   ".atlantis.gradient",   XrmoptionNoArg, "true"},
+     {"+gradient",   ".atlantis.gradient",   XrmoptionNoArg, "false"},
+};
 
-	static argtype vars[] =
-	{
-	 {&whalespeed, "whalespeed", "WhaleSpeed", DEF_WHALESPEED, t_Int},
-	 {&do_texture,  "texture",    "Texture",    DEF_TEXTURE,   t_Bool},
-	 {&do_gradient, "gradient",   "Gradient",   DEF_GRADIENT,  t_Bool},
-	};
+static argtype vars[] =
+{
+ {&whalespeed, "whalespeed", "WhaleSpeed", DEF_WHALESPEED, t_Int},
+ {&do_texture,  "texture",    "Texture",    DEF_TEXTURE,   t_Bool},
+ {&do_gradient, "gradient",   "Gradient",   DEF_GRADIENT,  t_Bool},
+};
 
-	static OptionStruct desc[] =
-	{
-		{"-whalespeed num", "speed of whales and the dolphin"},
-		{"-texture",        "whether to introduce water-like distortion"},
-		{"-gradient",       "whether to introduce gradient-filled background"},
-	};
+static OptionStruct desc[] =
+{
+	{"-whalespeed num", "speed of whales and the dolphin"},
+	{"-texture",        "whether to introduce water-like distortion"},
+	{"-gradient",       "whether to introduce gradient-filled background"},
+};
 
-	ENTRYPOINT ModeSpecOpt atlantis_opts =
-	{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
+ENTRYPOINT ModeSpecOpt atlantis_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
-	#ifdef USE_MODULES
-	ModStruct   atlantis_description =
-	{"atlantis", "init_atlantis", "draw_atlantis", "release_atlantis",
-	 "refresh_atlantis", "change_atlantis", NULL, &atlantis_opts,
-	 1000, NUM_SHARKS, SHARKSPEED, SHARKSIZE, 64, 1.0, "",
-	 "Shows moving sharks/whales/dolphin", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   atlantis_description =
+{"atlantis", "init_atlantis", "draw_atlantis", "release_atlantis",
+ "refresh_atlantis", "change_atlantis", NULL, &atlantis_opts,
+ 1000, NUM_SHARKS, SHARKSPEED, SHARKSIZE, 64, 1.0, "",
+ "Shows moving sharks/whales/dolphin", 0, NULL};
 #endif
 
 static atlantisstruct *atlantis = NULL;

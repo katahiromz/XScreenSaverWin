@@ -12,6 +12,7 @@
  */
 
 #define DELAY 30000
+#define COUNT 1
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*count:        1           \n" \
 			"*showFPS:      False       \n" \
@@ -33,12 +34,9 @@
 #include "win32.h"
 //#include "xlockmore.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include "xpm-ximage.h"
 #include <ctype.h>
-
-#undef MI_COUNT
-#define MI_COUNT(mi) 1
 
 #ifdef USE_GL /* whole file */
 
@@ -83,22 +81,20 @@ typedef struct {
 static cow_configuration *bps = NULL;
 
 static GLfloat speed = 1.0;
-static const char *do_texture = "(none)";
+static char *do_texture = "(none)";
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-speed",      ".speed",     XrmoptionSepArg, 0 },
-	  {"-texture",     ".texture",   XrmoptionSepArg, 0 },
-	  {"+texture",     ".texture",   XrmoptionNoArg, "(none)" },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-speed",      ".speed",     XrmoptionSepArg, 0 },
+  {"-texture",     ".texture",   XrmoptionSepArg, 0 },
+  {"+texture",     ".texture",   XrmoptionNoArg, "(none)" },
+};
 
-	static argtype vars[] = {
-	  {&speed,      "speed",      "Speed",   DEF_SPEED,     t_Float},
-	  {&do_texture, "texture",    "Texture", DEF_TEXTURE,   t_String},
-	};
+static argtype vars[] = {
+  {&speed,      "speed",      "Speed",   DEF_SPEED,     t_Float},
+  {&do_texture, "texture",    "Texture", DEF_TEXTURE,   t_String},
+};
 
-	ENTRYPOINT ModeSpecOpt cow_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt cow_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 #define BOTTOM 28.0
 

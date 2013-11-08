@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -116,6 +117,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -211,7 +213,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\win32screensaver.c"
+				RelativePath=".\wgl.c"
+				>
+			</File>
+			<File
+				RelativePath="..\win32screensaver.c"
 				>
 			</File>
 			<File
@@ -233,11 +239,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\resource.h"
+				RelativePath="..\resource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\win32.h"
+				RelativePath="..\win32.h"
 				>
 			</File>
 			<File
@@ -251,7 +257,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\win32screensaver.rc"
+				RelativePath="..\win32screensaver.rc"
 				>
 			</File>
 		</Filter>

@@ -43,39 +43,37 @@
 
 #include "win32.h"
 #include "sphere.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #define DEF_SHADOWS  "True"
 
 static int shadows = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"-shadows", ".antinspect.shadows", XrmoptionNoArg, "on"},
-	  {"+shadows", ".antinspect.shadows", XrmoptionNoArg, "off"}
-	};
+static XrmOptionDescRec opts[] = {
+  {"-shadows", ".antinspect.shadows", XrmoptionNoArg, "on"},
+  {"+shadows", ".antinspect.shadows", XrmoptionNoArg, "off"}
+};
 
-	static argtype vars[] = {
-	  {&shadows, "shadows", "Shadows", DEF_SHADOWS, t_Bool}
-	};
+static argtype vars[] = {
+  {&shadows, "shadows", "Shadows", DEF_SHADOWS, t_Bool}
+};
 
-	static OptionStruct desc[] = {
-	  {"-/+shadows", "turn on/off ant shadows"}
-	};
+static OptionStruct desc[] = {
+  {"-/+shadows", "turn on/off ant shadows"}
+};
 
-	ENTRYPOINT ModeSpecOpt antinspect_opts = {sizeof opts / sizeof opts[0], 
-				    opts, 
-				    sizeof vars / sizeof vars[0], 
-				    vars, 
-				    desc};
+ENTRYPOINT ModeSpecOpt antinspect_opts = {sizeof opts / sizeof opts[0], 
+			    opts, 
+			    sizeof vars / sizeof vars[0], 
+			    vars, 
+			    desc};
 
-	#ifdef USE_MODULES
-	ModStruct   antinspect_description =
-	  {"antinspect", "init_antinspect", "draw_antinspect", "release_antinspect",
-	   "draw_antinspect", "change_antinspect", (char *) NULL, &antinspect_opts,
-	   1000, 1, 1, 1, 4, 1.0, "",
-	   "draws some ants", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   antinspect_description =
+  {"antinspect", "init_antinspect", "draw_antinspect", "release_antinspect",
+   "draw_antinspect", "change_antinspect", (char *) NULL, &antinspect_opts,
+   1000, 1, 1, 1, 4, 1.0, "",
+   "draws some ants", 0, NULL};
 #endif
 
 #define Scale4Window               0.3

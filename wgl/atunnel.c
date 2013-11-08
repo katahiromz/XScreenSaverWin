@@ -98,38 +98,36 @@ static Bool do_light = True;
 static Bool do_wire = False;
 static Bool do_texture = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"-light",   ".atunnel.light",      XrmoptionNoArg, "true" },
-	  {"+light",   ".atunnel.light",      XrmoptionNoArg, "false" },
-	  {"-wireframe",".atunnel.wire",       XrmoptionNoArg, "true" },
-	  {"+wireframe",".atunnel.wire",       XrmoptionNoArg, "false" },
-	  {"-texture", ".atunnel.texture",    XrmoptionNoArg, "true" },
-	  {"+texture", ".atunnel.texture",    XrmoptionNoArg, "false" },
-	};
+static XrmOptionDescRec opts[] = {
+  {"-light",   ".atunnel.light",      XrmoptionNoArg, "true" },
+  {"+light",   ".atunnel.light",      XrmoptionNoArg, "false" },
+  {"-wireframe",".atunnel.wire",       XrmoptionNoArg, "true" },
+  {"+wireframe",".atunnel.wire",       XrmoptionNoArg, "false" },
+  {"-texture", ".atunnel.texture",    XrmoptionNoArg, "true" },
+  {"+texture", ".atunnel.texture",    XrmoptionNoArg, "false" },
+};
 
-	static argtype vars[] = {
-	  {&do_light,   "light",   "Light",   DEF_LIGHT,   t_Bool},
-	  {&do_wire,    "wire",    "Wire",    DEF_WIRE,    t_Bool},
-	  {&do_texture, "texture", "Texture", DEF_TEXTURE, t_Bool},
-	};
+static argtype vars[] = {
+  {&do_light,   "light",   "Light",   DEF_LIGHT,   t_Bool},
+  {&do_wire,    "wire",    "Wire",    DEF_WIRE,    t_Bool},
+  {&do_texture, "texture", "Texture", DEF_TEXTURE, t_Bool},
+};
 
-	static OptionStruct desc[] =
-	{
-	  {"-/+ light",   "whether to do enable lighting (slower)"},
-	  {"-/+ wire",    "whether to do use wireframe instead of filled (faster)"},
-	  {"-/+ texture", "whether to apply a texture (slower)"},
-	};
+static OptionStruct desc[] =
+{
+  {"-/+ light",   "whether to do enable lighting (slower)"},
+  {"-/+ wire",    "whether to do use wireframe instead of filled (faster)"},
+  {"-/+ texture", "whether to apply a texture (slower)"},
+};
 
-	ENTRYPOINT ModeSpecOpt atunnel_opts = {countof(opts), opts, countof(vars), vars, desc};
+ENTRYPOINT ModeSpecOpt atunnel_opts = {countof(opts), opts, countof(vars), vars, desc};
 
-	#ifdef USE_MODULES
-	ModStruct   atunnel_description =
-	{"atunnel", "init_atunnel", "draw_atunnel", "release_atunnel",
-	 "draw_atunnel", "init_atunnel", NULL, &atunnel_opts,
-	 1000, 1, 2, 1, 4, 1.0, "",
-	 "OpenGL advanced tunnel screensaver", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   atunnel_description =
+{"atunnel", "init_atunnel", "draw_atunnel", "release_atunnel",
+ "draw_atunnel", "init_atunnel", NULL, &atunnel_opts,
+ 1000, 1, 2, 1, 4, 1.0, "",
+ "OpenGL advanced tunnel screensaver", 0, NULL};
 #endif
 
 /* structure for holding the screensaver data */

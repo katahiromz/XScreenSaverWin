@@ -112,27 +112,24 @@ static Bool do_fade = True;
 static Bool do_blur = True;
 static float bscale_wh = 2;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-boxsize",  ".boxsize",  XrmoptionSepArg, 0      },
-	  { "-dissolve", ".dissolve", XrmoptionNoArg, "True"  },
-	  { "+dissolve", ".dissolve", XrmoptionNoArg, "False" },
-	  { "-fade",     ".fade",     XrmoptionNoArg, "True"  },
-	  { "+fade",     ".fade",     XrmoptionNoArg, "False" },
-	  { "-blur",     ".blur",     XrmoptionNoArg, "True"  },
-	  { "+blur",     ".blur",     XrmoptionNoArg, "False" }
+static XrmOptionDescRec opts[] = {
+  { "-boxsize",  ".boxsize",  XrmoptionSepArg, 0      },
+  { "-dissolve", ".dissolve", XrmoptionNoArg, "True"  },
+  { "+dissolve", ".dissolve", XrmoptionNoArg, "False" },
+  { "-fade",     ".fade",     XrmoptionNoArg, "True"  },
+  { "+fade",     ".fade",     XrmoptionNoArg, "False" },
+  { "-blur",     ".blur",     XrmoptionNoArg, "True"  },
+  { "+blur",     ".blur",     XrmoptionNoArg, "False" }
+};
 
-	};
+static argtype vars[] = {
+  {&bscale_wh,   "boxsize",   "Boxsize",  DEF_BOXSIZE,  t_Float},
+  {&do_dissolve, "dissolve",  "Dissolve", DEF_DISSOLVE, t_Bool},
+  {&do_fade,     "fade",      "Fade",     DEF_FADE,     t_Bool},
+  {&do_blur,     "blur",      "Blur",     DEF_BLUR,     t_Bool},
+};
 
-	static argtype vars[] = {
-	  {&bscale_wh,   "boxsize",   "Boxsize",  DEF_BOXSIZE,  t_Float},
-	  {&do_dissolve, "dissolve",  "Dissolve", DEF_DISSOLVE, t_Bool},
-	  {&do_fade,     "fade",      "Fade",     DEF_FADE,     t_Bool},
-	  {&do_blur,     "blur",      "Blur",     DEF_BLUR,     t_Bool},
-	};
-
-	ENTRYPOINT ModeSpecOpt ball_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt ball_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 static void
 swap(GLfloat *a, GLfloat *b)

@@ -56,6 +56,7 @@ static const char sccsid[] = "@(#)stairs.c	4.07 97/11/24 xlockmore";
  */
 
 #define DELAY 20000
+#define NOARGS
 # define DEFAULTS			"*delay:		20000   \n" \
 							"*showFPS:      False   \n"
 
@@ -81,19 +82,17 @@ static const char sccsid[] = "@(#)stairs.c	4.07 97/11/24 xlockmore";
 #endif
 
 #include "sphere.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
-#if 0
-	ENTRYPOINT ModeSpecOpt stairs_opts =
-	{0, NULL, 0, NULL, NULL};
+ENTRYPOINT ModeSpecOpt stairs_opts =
+{0, NULL, 0, NULL, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   stairs_description =
-	{"stairs", "init_stairs", "draw_stairs", "release_stairs",
-	 "draw_stairs", "change_stairs", NULL, &stairs_opts,
-	 1000, 1, 1, 1, 4, 1.0, "",
-	 "Shows Infinite Stairs, an Escher-like scene", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   stairs_description =
+{"stairs", "init_stairs", "draw_stairs", "release_stairs",
+ "draw_stairs", "change_stairs", NULL, &stairs_opts,
+ 1000, 1, 1, 1, 4, 1.0, "",
+ "Shows Infinite Stairs, an Escher-like scene", 0, NULL};
 #endif
 
 #define Scale4Window               0.3

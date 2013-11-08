@@ -74,6 +74,8 @@ static const char sccsid[] = "@(#)fire.c	5.02 2001/09/26 xlockmore";
  */
 
 #define DELAY 10000
+#define COUNT 800
+#define SIZE_ 0
 #define DEFAULTS "*delay:     10000 \n" \
 		"*count: 	800 \n" \
 		"*size:           0 \n" \
@@ -94,10 +96,6 @@ static const char sccsid[] = "@(#)fire.c	5.02 2001/09/26 xlockmore";
 #endif
 #include "win32.h"
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 800
-#undef MI_SIZE
-#define MI_SIZE(mi) 0
 
 #ifdef MODE_fire
 
@@ -173,49 +171,47 @@ static Bool do_wander = True;
 static int num_trees = 5;
 //static XFontStruct *mode_font = None;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	    {"-texture", ".fire.texture", XrmoptionNoArg, "on"},
-	    {"+texture", ".fire.texture", XrmoptionNoArg, "off"},
-	    {"-fog", ".fire.fog", XrmoptionNoArg, "on"},
-	    {"+fog", ".fire.fog", XrmoptionNoArg, "off"},
-	    {"-shadows", ".fire.shadows", XrmoptionNoArg, "on"},
-	    {"+shadows", ".fire.shadows", XrmoptionNoArg, "off"},
-	    {"-wander", ".fire.wander", XrmoptionNoArg, "on"},
-	    {"+wander", ".fire.wander", XrmoptionNoArg, "off"},
-	    {"-trees", ".fire.trees", XrmoptionSepArg, 0},
-	    {"-rain", ".fire.count", XrmoptionNoArg, "0"},
+static XrmOptionDescRec opts[] = {
+    {"-texture", ".fire.texture", XrmoptionNoArg, "on"},
+    {"+texture", ".fire.texture", XrmoptionNoArg, "off"},
+    {"-fog", ".fire.fog", XrmoptionNoArg, "on"},
+    {"+fog", ".fire.fog", XrmoptionNoArg, "off"},
+    {"-shadows", ".fire.shadows", XrmoptionNoArg, "on"},
+    {"+shadows", ".fire.shadows", XrmoptionNoArg, "off"},
+    {"-wander", ".fire.wander", XrmoptionNoArg, "on"},
+    {"+wander", ".fire.wander", XrmoptionNoArg, "off"},
+    {"-trees", ".fire.trees", XrmoptionSepArg, 0},
+    {"-rain", ".fire.count", XrmoptionNoArg, "0"},
 
-	};
+};
 
-	static argtype vars[] = {
-	    {&do_texture,    "texture",    "Texture",    DEF_TEXTURE,    t_Bool},
-	    {&do_fog,        "fog",        "Fog",        DEF_FOG,        t_Bool},
-	    {&do_shadows,    "shadows",    "Shadows",    DEF_SHADOWS,    t_Bool},
-	    {&do_wander,     "wander",     "Wander",     DEF_WANDER,     t_Bool},
-	    {&num_trees,     "trees",      "Trees",      DEF_TREES,      t_Int},
-	};
+static argtype vars[] = {
+    {&do_texture,    "texture",    "Texture",    DEF_TEXTURE,    t_Bool},
+    {&do_fog,        "fog",        "Fog",        DEF_FOG,        t_Bool},
+    {&do_shadows,    "shadows",    "Shadows",    DEF_SHADOWS,    t_Bool},
+    {&do_wander,     "wander",     "Wander",     DEF_WANDER,     t_Bool},
+    {&num_trees,     "trees",      "Trees",      DEF_TREES,      t_Int},
+};
 
-	static OptionStruct desc[] = {
-	    {"-/+texture", "turn on/off texturing"},
-	    {"-/+fog", "turn on/off fog"},
-	    {"-/+shadows", "turn on/off shadows"},
-	    {"-/+wander", "turn on/off wandering"},
-	    {"-trees num", "number of trees (0 disables)"},
-	};
+static OptionStruct desc[] = {
+    {"-/+texture", "turn on/off texturing"},
+    {"-/+fog", "turn on/off fog"},
+    {"-/+shadows", "turn on/off shadows"},
+    {"-/+wander", "turn on/off wandering"},
+    {"-trees num", "number of trees (0 disables)"},
+};
 
-	ENTRYPOINT ModeSpecOpt fire_opts =
-	 { sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc };
+ENTRYPOINT ModeSpecOpt fire_opts =
+ { sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc };
 
-	#ifdef USE_MODULES
-	ModStruct fire_description =
-	    { "fire", "init_fire", "draw_fire", "release_fire",
-	    "draw_fire", "change_fire", (char *) NULL, &fire_opts,
-	    10000, 800, 1, 400, 64, 1.0, "",
-	    "Shows a 3D fire-like image", 0, NULL
-	};
-	#endif /* USE_MODULES */
-#endif
+#ifdef USE_MODULES
+ModStruct fire_description =
+    { "fire", "init_fire", "draw_fire", "release_fire",
+    "draw_fire", "change_fire", (char *) NULL, &fire_opts,
+    10000, 800, 1, 400, 64, 1.0, "",
+    "Shows a 3D fire-like image", 0, NULL
+};
+#endif /* USE_MODULES */
 
 
 /* misc defines */

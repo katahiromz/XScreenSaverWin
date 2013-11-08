@@ -18,6 +18,7 @@
  */
 
 #define DELAY 30000
+#define COUNT 3
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*showFPS:      False       \n" \
 			"*count:        3           \n" \
@@ -43,12 +44,9 @@
 #include "win32.h"
 //#include "xlockmore.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include "xpm-ximage.h"
 #include <ctype.h>
-
-#undef MI_COUNT
-#define MI_COUNT(mi) 3
 
 #ifdef USE_GL /* whole file */
 
@@ -94,23 +92,22 @@ static GLfloat speed = 1.0;
 static Bool do_spin = False;
 static Bool do_wander = False;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-speed",      ".speed",    XrmoptionSepArg, 0       },
-	  { "-spin",       ".spin",     XrmoptionNoArg,  "True"  },
-	  { "+spin",       ".spin",     XrmoptionNoArg,  "False" },
-	  { "-wander",     ".wander",   XrmoptionNoArg,  "True"  },
-	  { "+wander",     ".wander",   XrmoptionNoArg,  "False" },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-speed",      ".speed",    XrmoptionSepArg, 0       },
+  { "-spin",       ".spin",     XrmoptionNoArg,  "True"  },
+  { "+spin",       ".spin",     XrmoptionNoArg,  "False" },
+  { "-wander",     ".wander",   XrmoptionNoArg,  "True"  },
+  { "+wander",     ".wander",   XrmoptionNoArg,  "False" },
+};
 
-	static argtype vars[] = {
-	  {&speed,     "speed",    "Speed",   DEF_SPEED,    t_Float},
-	  {&do_spin,   "spin",     "Spin",    DEF_SPIN,     t_Bool},
-	  {&do_wander, "wander",   "Wander",  DEF_WANDER,   t_Bool},
-	};
+static argtype vars[] = {
+  {&speed,     "speed",    "Speed",   DEF_SPEED,    t_Float},
+  {&do_spin,   "spin",     "Spin",    DEF_SPIN,     t_Bool},
+  {&do_wander, "wander",   "Wander",  DEF_WANDER,   t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt cube_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt cube_opts = {countof(opts), opts, countof(vars), vars, NULL};
+
 
 #define BOTTOM 28.0
 

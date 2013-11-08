@@ -31,40 +31,38 @@
 
 #include "win32.h"
 
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #define DEF_SOLIDPROVIDENCE  "False"
 #define DEF_EYE  "True"
 
 static int eye = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"-eye", ".providence.eye", XrmoptionNoArg, "on"},
-	  {"+eye", ".providence.eye", XrmoptionNoArg, "off"}
-	};
+static XrmOptionDescRec opts[] = {
+  {"-eye", ".providence.eye", XrmoptionNoArg, "on"},
+  {"+eye", ".providence.eye", XrmoptionNoArg, "off"}
+};
 
-	static argtype vars[] = {
-	  {&eye, "eye", "Eye", DEF_EYE, t_Bool}
-	};
+static argtype vars[] = {
+  {&eye, "eye", "Eye", DEF_EYE, t_Bool}
+};
 
-	static OptionStruct desc[] = {
-	  {"-/+eye", "turn on/off eye of providence"}
-	};
+static OptionStruct desc[] = {
+  {"-/+eye", "turn on/off eye of providence"}
+};
 
-	ENTRYPOINT ModeSpecOpt providence_opts = {
-	  sizeof opts / sizeof opts[0], opts, 
-	  sizeof vars / sizeof vars[0], vars, desc
-	};
+ENTRYPOINT ModeSpecOpt providence_opts = {
+  sizeof opts / sizeof opts[0], opts, 
+  sizeof vars / sizeof vars[0], vars, desc
+};
 
-	#ifdef USE_MODULES
-	ModStruct   providence_description = {
-	  "providence", "init_providence", "draw_providence", 
-	  "release_providence", "draw_providence", "change_providence", 
-	  (char *) NULL, &providence_opts, 1000, 1, 1, 1, 4, 1.0, "",
-	  "draws pyramid with glory", 0, NULL
-	};
-	#endif
+#ifdef USE_MODULES
+ModStruct   providence_description = {
+  "providence", "init_providence", "draw_providence", 
+  "release_providence", "draw_providence", "change_providence", 
+  (char *) NULL, &providence_opts, 1000, 1, 1, 1, 4, 1.0, "",
+  "draws pyramid with glory", 0, NULL
+};
 #endif
 
 #define Scale4Window               0.3

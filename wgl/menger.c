@@ -65,7 +65,7 @@
 #include "win32.h"
 #include "colors.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
 #ifdef USE_GL /* whole file */
@@ -105,24 +105,22 @@ static Bool do_wander = True;
 static int speed = 150;
 static int max_depth = 3;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-wander", ".wander",   XrmoptionNoArg, "True"  },
-	  { "+wander", ".wander",   XrmoptionNoArg, "False" },
-	  { "-spin",   ".spin",     XrmoptionSepArg, 0 },
-	  { "-speed",  ".speed",    XrmoptionSepArg, 0 },
-	  { "-depth",  ".maxDepth", XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-wander", ".wander",   XrmoptionNoArg, "True"  },
+  { "+wander", ".wander",   XrmoptionNoArg, "False" },
+  { "-spin",   ".spin",     XrmoptionSepArg, 0 },
+  { "-speed",  ".speed",    XrmoptionSepArg, 0 },
+  { "-depth",  ".maxDepth", XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-	  {&do_spin,     "spin",     "Spin",     DEF_SPIN,      t_Bool},
-	  {&do_wander,   "wander",   "Wander",   DEF_WANDER,    t_Bool},
-	  {&speed,       "speed",    "Speed",    DEF_SPEED,     t_Int},
-	  {&max_depth,   "maxDepth", "MaxDepth", DEF_MAX_DEPTH, t_Int},
-	};
+static argtype vars[] = {
+  {&do_spin,     "spin",     "Spin",     DEF_SPIN,      t_Bool},
+  {&do_wander,   "wander",   "Wander",   DEF_WANDER,    t_Bool},
+  {&speed,       "speed",    "Speed",    DEF_SPEED,     t_Int},
+  {&max_depth,   "maxDepth", "MaxDepth", DEF_MAX_DEPTH, t_Int},
+};
 
-	ENTRYPOINT ModeSpecOpt sponge_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt sponge_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 /* Window management, etc
  */

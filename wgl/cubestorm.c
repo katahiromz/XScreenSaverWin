@@ -10,6 +10,7 @@
  */
 
 #define DELAY 30000
+#define COUNT 4
 #define DEF_COUNT       "4"
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*count:      " DEF_COUNT   "\n" \
@@ -27,11 +28,8 @@
 //#include "xlockmore.h"
 #include "colors.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
-
-#undef MI_COUNT
-#define MI_COUNT(mi) 4
 
 #ifdef USE_GL /* whole file */
 
@@ -69,28 +67,26 @@ static GLfloat speed = 1.0;
 static GLfloat thickness = 0.06;
 static Bool dbuf_p = False;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",   ".spin",   XrmoptionNoArg, "True" },
-	  { "+spin",   ".spin",   XrmoptionNoArg, "False" },
-	  { "-wander", ".wander", XrmoptionNoArg, "True" },
-	  { "+wander", ".wander", XrmoptionNoArg, "False" },
-	  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
-	  { "-db",     ".doubleBuffer", XrmoptionNoArg, "True"},
-	  { "+db",     ".doubleBuffer", XrmoptionNoArg, "False"},
-	  { "-thickness", ".thickness", XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",   ".spin",   XrmoptionNoArg, "True" },
+  { "+spin",   ".spin",   XrmoptionNoArg, "False" },
+  { "-wander", ".wander", XrmoptionNoArg, "True" },
+  { "+wander", ".wander", XrmoptionNoArg, "False" },
+  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
+  { "-db",     ".doubleBuffer", XrmoptionNoArg, "True"},
+  { "+db",     ".doubleBuffer", XrmoptionNoArg, "False"},
+  { "-thickness", ".thickness", XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-	  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_Bool},
-	  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
-	  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
-	  {&thickness, "thickness", "Thickness",  DEF_THICKNESS,  t_Float},
-	  {&dbuf_p, "doubleBuffer", "DoubleBuffer", DEF_DBUF, t_Bool},
-	};
+static argtype vars[] = {
+  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_Bool},
+  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
+  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
+  {&thickness, "thickness", "Thickness",  DEF_THICKNESS,  t_Float},
+  {&dbuf_p, "doubleBuffer", "DoubleBuffer", DEF_DBUF, t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt cube_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt cube_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 static void
 draw_face (ModeInfo *mi)

@@ -148,7 +148,7 @@ static const char sccsid[] = "@(#)klein.c  1.1 08/10/04 xlockmore";
 	#endif
 #endif
 
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #if 0
 	#ifdef USE_MODULES
@@ -185,68 +185,66 @@ static float speed_yz = 2.1;
 static float walk_direction = 7.0;
 static float walk_speed = 20.0;
 
-#if 0
-	static XrmOptionDescRec opts[] =
-	{
-	  {"-klein-bottle",      ".kleinBottle",   XrmoptionSepArg, 0 },
-	  {"-figure-8",          ".kleinBottle",   XrmoptionNoArg,  "figure-8" },
-	  {"-lawson",            ".kleinBottle",   XrmoptionNoArg,  "lawson" },
-	  {"-mode",              ".displayMode",   XrmoptionSepArg, 0 },
-	  {"-wireframe",         ".displayMode",   XrmoptionNoArg,  "wireframe" },
-	  {"-surface",           ".displayMode",   XrmoptionNoArg,  "surface" },
-	  {"-transparent",       ".displayMode",   XrmoptionNoArg,  "transparent" },
-	  {"-appearance",        ".appearance",    XrmoptionSepArg, 0 },
-	  {"-solid",             ".appearance",    XrmoptionNoArg,  "solid" },
-	  {"-bands",             ".appearance",    XrmoptionNoArg,  "bands" },
-	  {"-colors",            ".colors",        XrmoptionSepArg, 0 },
-	  {"-twosided",          ".colors",        XrmoptionNoArg,  "two-sided" },
-	  {"-rainbow",           ".colors",        XrmoptionNoArg,  "rainbow" },
-	  {"-depth",             ".colors",        XrmoptionNoArg,  "depth" },
-	  {"-view-mode",         ".viewMode",      XrmoptionSepArg, 0 },
-	  {"-walk",              ".viewMode",      XrmoptionNoArg,  "walk" },
-	  {"-turn",              ".viewMode",      XrmoptionNoArg,  "turn" },
-	  {"-walk-turn",         ".viewMode",      XrmoptionNoArg,  "walk-turn" },
-	  {"-orientation-marks", ".marks",         XrmoptionNoArg, "on"},
-	  {"+orientation-marks", ".marks",         XrmoptionNoArg, "off"},
-	  {"-projection-3d",     ".projection3d",  XrmoptionSepArg, 0 },
-	  {"-perspective-3d",    ".projection3d",  XrmoptionNoArg,  "perspective" },
-	  {"-orthographic-3d",   ".projection3d",  XrmoptionNoArg,  "orthographic" },
-	  {"-projection-4d",     ".projection4d",  XrmoptionSepArg, 0 },
-	  {"-perspective-4d",    ".projection4d",  XrmoptionNoArg,  "perspective" },
-	  {"-orthographic-4d",   ".projection4d",  XrmoptionNoArg,  "orthographic" },
-	  {"-speed-wx",          ".speedwx",       XrmoptionSepArg, 0 },
-	  {"-speed-wy",          ".speedwy",       XrmoptionSepArg, 0 },
-	  {"-speed-wz",          ".speedwz",       XrmoptionSepArg, 0 },
-	  {"-speed-xy",          ".speedxy",       XrmoptionSepArg, 0 },
-	  {"-speed-xz",          ".speedxz",       XrmoptionSepArg, 0 },
-	  {"-speed-yz",          ".speedyz",       XrmoptionSepArg, 0 },
-	  {"-walk-direction",    ".walkDirection", XrmoptionSepArg, 0 },
-	  {"-walk-speed",        ".walkSpeed",     XrmoptionSepArg, 0 }
-	};
+static XrmOptionDescRec opts[] =
+{
+  {"-klein-bottle",      ".kleinBottle",   XrmoptionSepArg, 0 },
+  {"-figure-8",          ".kleinBottle",   XrmoptionNoArg,  "figure-8" },
+  {"-lawson",            ".kleinBottle",   XrmoptionNoArg,  "lawson" },
+  {"-mode",              ".displayMode",   XrmoptionSepArg, 0 },
+  {"-wireframe",         ".displayMode",   XrmoptionNoArg,  "wireframe" },
+  {"-surface",           ".displayMode",   XrmoptionNoArg,  "surface" },
+  {"-transparent",       ".displayMode",   XrmoptionNoArg,  "transparent" },
+  {"-appearance",        ".appearance",    XrmoptionSepArg, 0 },
+  {"-solid",             ".appearance",    XrmoptionNoArg,  "solid" },
+  {"-bands",             ".appearance",    XrmoptionNoArg,  "bands" },
+  {"-colors",            ".colors",        XrmoptionSepArg, 0 },
+  {"-twosided",          ".colors",        XrmoptionNoArg,  "two-sided" },
+  {"-rainbow",           ".colors",        XrmoptionNoArg,  "rainbow" },
+  {"-depth",             ".colors",        XrmoptionNoArg,  "depth" },
+  {"-view-mode",         ".viewMode",      XrmoptionSepArg, 0 },
+  {"-walk",              ".viewMode",      XrmoptionNoArg,  "walk" },
+  {"-turn",              ".viewMode",      XrmoptionNoArg,  "turn" },
+  {"-walk-turn",         ".viewMode",      XrmoptionNoArg,  "walk-turn" },
+  {"-orientation-marks", ".marks",         XrmoptionNoArg, "on"},
+  {"+orientation-marks", ".marks",         XrmoptionNoArg, "off"},
+  {"-projection-3d",     ".projection3d",  XrmoptionSepArg, 0 },
+  {"-perspective-3d",    ".projection3d",  XrmoptionNoArg,  "perspective" },
+  {"-orthographic-3d",   ".projection3d",  XrmoptionNoArg,  "orthographic" },
+  {"-projection-4d",     ".projection4d",  XrmoptionSepArg, 0 },
+  {"-perspective-4d",    ".projection4d",  XrmoptionNoArg,  "perspective" },
+  {"-orthographic-4d",   ".projection4d",  XrmoptionNoArg,  "orthographic" },
+  {"-speed-wx",          ".speedwx",       XrmoptionSepArg, 0 },
+  {"-speed-wy",          ".speedwy",       XrmoptionSepArg, 0 },
+  {"-speed-wz",          ".speedwz",       XrmoptionSepArg, 0 },
+  {"-speed-xy",          ".speedxy",       XrmoptionSepArg, 0 },
+  {"-speed-xz",          ".speedxz",       XrmoptionSepArg, 0 },
+  {"-speed-yz",          ".speedyz",       XrmoptionSepArg, 0 },
+  {"-walk-direction",    ".walkDirection", XrmoptionSepArg, 0 },
+  {"-walk-speed",        ".walkSpeed",     XrmoptionSepArg, 0 }
+};
 
-	static argtype vars[] =
-	{
-	  { &klein_bottle,   "kleinBottle",   "KleinBottle",   DEF_KLEIN_BOTTLE,   t_String },
-	  { &mode,           "displayMode",   "DisplayMode",   DEF_DISPLAY_MODE,   t_String },
-	  { &appear,         "appearance",    "Appearance",    DEF_APPEARANCE,     t_String },
-	  { &color_mode,     "colors",        "Colors",        DEF_COLORS,         t_String },
-	  { &view_mode,      "viewMode",      "ViewMode",      DEF_VIEW_MODE,      t_String },
-	  { &marks,          "marks",         "Marks",         DEF_MARKS,          t_Bool },
-	  { &proj_3d,        "projection3d",  "Projection3d",  DEF_PROJECTION_3D,  t_String },
-	  { &proj_4d,        "projection4d",  "Projection4d",  DEF_PROJECTION_4D,  t_String },
-	  { &speed_wx,       "speedwx",       "Speedwx",       DEF_SPEEDWX,        t_Float},
-	  { &speed_wy,       "speedwy",       "Speedwy",       DEF_SPEEDWY,        t_Float},
-	  { &speed_wz,       "speedwz",       "Speedwz",       DEF_SPEEDWZ,        t_Float},
-	  { &speed_xy,       "speedxy",       "Speedxy",       DEF_SPEEDXY,        t_Float},
-	  { &speed_xz,       "speedxz",       "Speedxz",       DEF_SPEEDXZ,        t_Float},
-	  { &speed_yz,       "speedyz",       "Speedyz",       DEF_SPEEDYZ,        t_Float},
-	  { &walk_direction, "walkDirection", "WalkDirection", DEF_WALK_DIRECTION, t_Float},
-	  { &walk_speed,     "walkSpeed",     "WalkSpeed",     DEF_WALK_SPEED,     t_Float}
-	};
+static argtype vars[] =
+{
+  { &klein_bottle,   "kleinBottle",   "KleinBottle",   DEF_KLEIN_BOTTLE,   t_String },
+  { &mode,           "displayMode",   "DisplayMode",   DEF_DISPLAY_MODE,   t_String },
+  { &appear,         "appearance",    "Appearance",    DEF_APPEARANCE,     t_String },
+  { &color_mode,     "colors",        "Colors",        DEF_COLORS,         t_String },
+  { &view_mode,      "viewMode",      "ViewMode",      DEF_VIEW_MODE,      t_String },
+  { &marks,          "marks",         "Marks",         DEF_MARKS,          t_Bool },
+  { &proj_3d,        "projection3d",  "Projection3d",  DEF_PROJECTION_3D,  t_String },
+  { &proj_4d,        "projection4d",  "Projection4d",  DEF_PROJECTION_4D,  t_String },
+  { &speed_wx,       "speedwx",       "Speedwx",       DEF_SPEEDWX,        t_Float},
+  { &speed_wy,       "speedwy",       "Speedwy",       DEF_SPEEDWY,        t_Float},
+  { &speed_wz,       "speedwz",       "Speedwz",       DEF_SPEEDWZ,        t_Float},
+  { &speed_xy,       "speedxy",       "Speedxy",       DEF_SPEEDXY,        t_Float},
+  { &speed_xz,       "speedxz",       "Speedxz",       DEF_SPEEDXZ,        t_Float},
+  { &speed_yz,       "speedyz",       "Speedyz",       DEF_SPEEDYZ,        t_Float},
+  { &walk_direction, "walkDirection", "WalkDirection", DEF_WALK_DIRECTION, t_Float},
+  { &walk_speed,     "walkSpeed",     "WalkSpeed",     DEF_WALK_SPEED,     t_Float}
+};
 
-	ENTRYPOINT ModeSpecOpt klein_opts =
-	{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt klein_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, NULL};
 
 /* Radius of the Figure 8 Klein bottle */
 #define FIGURE_8_RADIUS 2.0

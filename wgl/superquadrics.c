@@ -71,6 +71,8 @@ static const char sccsid[] = "@(#)superquadrics.c	4.07 97/11/24 xlockmore";
  */
 
 #define DELAY 40000
+#define COUNT 25
+#define CYCLES 40
 # define DEFAULTS	"*delay:		40000   \n"			\
 					"*count:		25      \n"			\
 					"*cycles:		40      \n"			\
@@ -89,10 +91,6 @@ static const char sccsid[] = "@(#)superquadrics.c	4.07 97/11/24 xlockmore";
 
 #include "win32.h"
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 25
-#undef MI_CYCLES
-#define MI_CYCLES(mi) 40
 
 #ifdef USE_GL
 
@@ -107,30 +105,28 @@ static const char sccsid[] = "@(#)superquadrics.c	4.07 97/11/24 xlockmore";
 
 static float spinspeed = 5.0;
 
-#if 0
-	static XrmOptionDescRec opts[] =
-	{
-	  {"-spinspeed", ".superquadrics.spinspeed", XrmoptionSepArg, 0}
-	};
-	static argtype vars[] =
-	{
-	  {&spinspeed, "spinspeed", "Spinspeed", DEF_SPINSPEED, t_Float}
-	};
-	static OptionStruct desc[] =
-	{
-		{"-spinspeed num", "speed of rotation, in degrees per frame"}
-	};
+static XrmOptionDescRec opts[] =
+{
+  {"-spinspeed", ".superquadrics.spinspeed", XrmoptionSepArg, 0}
+};
+static argtype vars[] =
+{
+  {&spinspeed, "spinspeed", "Spinspeed", DEF_SPINSPEED, t_Float}
+};
+static OptionStruct desc[] =
+{
+	{"-spinspeed num", "speed of rotation, in degrees per frame"}
+};
 
-	ENTRYPOINT ModeSpecOpt superquadrics_opts =
-	{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
+ENTRYPOINT ModeSpecOpt superquadrics_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
-	#ifdef USE_MODULES
-	ModStruct   superquadrics_description =
-	{"superquadrics", "init_superquadrics", "draw_superquadrics", "release_superquadrics",
-	 "refresh_superquadrics", "init_superquadrics", NULL, &superquadrics_opts,
-	 1000, 25, 40, 1, 4, 1.0, "",
-	 "Shows 3D mathematical shapes", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   superquadrics_description =
+{"superquadrics", "init_superquadrics", "draw_superquadrics", "release_superquadrics",
+ "refresh_superquadrics", "init_superquadrics", NULL, &superquadrics_opts,
+ 1000, 25, 40, 1, 4, 1.0, "",
+ "Shows 3D mathematical shapes", 0, NULL};
 #endif
 
 #define MaxRes          50

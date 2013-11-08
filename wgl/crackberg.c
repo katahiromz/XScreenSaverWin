@@ -157,37 +157,35 @@ static char *color = "random";
 
 static cberg_state *cbergs = NULL;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"-nsubdivs",   ".nsubdivs",   XrmoptionSepArg, 0},
-	  {"-boring",     ".boring",     XrmoptionNoArg,  "True"},
-	  {"-crack",      ".crack",      XrmoptionNoArg,  "True"},
-	  {"-no-crack",   ".crack",      XrmoptionNoArg,  "False"},
-	  {"-water",      ".water",      XrmoptionNoArg,  "True"},
-	  {"-no-water",   ".water",      XrmoptionNoArg,  "False"},
-	  {"-flat",       ".flat",       XrmoptionNoArg,  "True"},
-	  {"-no-flat",    ".flat",       XrmoptionNoArg,  "False"},
-	  {"-color",      ".color",      XrmoptionSepArg, 0},
-	  {"-lit",        ".lit",        XrmoptionNoArg,  "True"},
-	  {"-no-lit",     ".lit",        XrmoptionNoArg,  "False"},
-	  {"-visibility", ".visibility", XrmoptionSepArg, 0},
-	  {"-letterbox",  ".letterbox",  XrmoptionNoArg,  "True"}
-	};
+static XrmOptionDescRec opts[] = {
+  {"-nsubdivs",   ".nsubdivs",   XrmoptionSepArg, 0},
+  {"-boring",     ".boring",     XrmoptionNoArg,  "True"},
+  {"-crack",      ".crack",      XrmoptionNoArg,  "True"},
+  {"-no-crack",   ".crack",      XrmoptionNoArg,  "False"},
+  {"-water",      ".water",      XrmoptionNoArg,  "True"},
+  {"-no-water",   ".water",      XrmoptionNoArg,  "False"},
+  {"-flat",       ".flat",       XrmoptionNoArg,  "True"},
+  {"-no-flat",    ".flat",       XrmoptionNoArg,  "False"},
+  {"-color",      ".color",      XrmoptionSepArg, 0},
+  {"-lit",        ".lit",        XrmoptionNoArg,  "True"},
+  {"-no-lit",     ".lit",        XrmoptionNoArg,  "False"},
+  {"-visibility", ".visibility", XrmoptionSepArg, 0},
+  {"-letterbox",  ".letterbox",  XrmoptionNoArg,  "True"}
+};
 
-	static argtype vars[] = {
-	  {&nsubdivs,   "nsubdivs",   "nsubdivs",   DEF_NSUBDIVS,   t_Int},
-	  {&boring,     "boring",     "boring",     DEF_BORING,     t_Bool},
-	  {&crack,      "crack",      "crack",      DEF_CRACK,      t_Bool},
-	  {&do_water,   "water",      "water",      DEF_WATER,      t_Bool},
-	  {&flat,       "flat",       "flat",       DEF_FLAT,       t_Bool},
-	  {&color,      "color",      "color",      DEF_COLOR,      t_String},
-	  {&lit,        "lit",        "lit",        DEF_LIT,        t_Bool},
-	  {&visibility, "visibility", "visibility", DEF_VISIBILITY, t_Float},
-	  {&letterbox,  "letterbox",  "letterbox",  DEF_LETTERBOX,  t_Bool}
-	};
+static argtype vars[] = {
+  {&nsubdivs,   "nsubdivs",   "nsubdivs",   DEF_NSUBDIVS,   t_Int},
+  {&boring,     "boring",     "boring",     DEF_BORING,     t_Bool},
+  {&crack,      "crack",      "crack",      DEF_CRACK,      t_Bool},
+  {&do_water,   "water",      "water",      DEF_WATER,      t_Bool},
+  {&flat,       "flat",       "flat",       DEF_FLAT,       t_Bool},
+  {&color,      "color",      "color",      DEF_COLOR,      t_String},
+  {&lit,        "lit",        "lit",        DEF_LIT,        t_Bool},
+  {&visibility, "visibility", "visibility", DEF_VISIBILITY, t_Float},
+  {&letterbox,  "letterbox",  "letterbox",  DEF_LETTERBOX,  t_Bool}
+};
 
-	ENTRYPOINT ModeSpecOpt crackberg_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt crackberg_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 /***************************
  ** Trile functions. 

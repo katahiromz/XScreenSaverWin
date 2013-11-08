@@ -48,38 +48,34 @@
 
 #ifdef USE_GL
 
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include "chessmodels.h"
 
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"+rotate", ".queens.rotate", XrmoptionNoArg, "false" },
-	  {"-rotate", ".queens.rotate", XrmoptionNoArg, "true" },
-	  {"+flat", ".queens.flat", XrmoptionNoArg, "false" },
-	  {"-flat", ".queens.flat", XrmoptionNoArg, "true" },
-	};
-#endif
+static XrmOptionDescRec opts[] = {
+  {"+rotate", ".queens.rotate", XrmoptionNoArg, "false" },
+  {"-rotate", ".queens.rotate", XrmoptionNoArg, "true" },
+  {"+flat", ".queens.flat", XrmoptionNoArg, "false" },
+  {"-flat", ".queens.flat", XrmoptionNoArg, "true" },
+};
 
 static int rotate, wire, clearbits, flat;
 
-#if 0
-	static argtype vars[] = {
-	  {&rotate, "rotate", "Rotate", "True",  t_Bool},
-	  {&flat,   "flat",   "Flat",   "False", t_Bool},
-	};
+static argtype vars[] = {
+  {&rotate, "rotate", "Rotate", "True",  t_Bool},
+  {&flat,   "flat",   "Flat",   "False", t_Bool},
+};
 
-	ENTRYPOINT ModeSpecOpt queens_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt queens_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   queens_description =
-	{"queens", "init_queens", "draw_queens", "release_queens",
-	 "draw_queens", "init_queens", NULL, &queens_opts,
-	 1000, 1, 2, 1, 4, 1.0, "",
-	 "Queens", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   queens_description =
+{"queens", "init_queens", "draw_queens", "release_queens",
+ "draw_queens", "init_queens", NULL, &queens_opts,
+ 1000, 1, 2, 1, 4, 1.0, "",
+ "Queens", 0, NULL};
 #endif
 
 #define NONE 0

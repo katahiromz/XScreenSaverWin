@@ -33,7 +33,7 @@
 
 #include "win32.h"
 //#include "xlockmore.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
 #ifdef USE_GL /* whole file */
@@ -91,53 +91,52 @@ static GLfloat thickness = 0.05;
 static char *ball_color1_str = "#CC1919", *ball_color2_str = "#F2F2F2", *grid_color_str = "#991999",
   *shadow_str = "#303030", *bg_str = "#8C8C8C";
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",       ".spin",      XrmoptionNoArg,  "True"  },
-	  { "+spin",       ".spin",      XrmoptionNoArg,  "False" },
-	  { "-lighting",   ".lighting",  XrmoptionNoArg,  "True"  },
-	  { "+lighting",   ".lighting",  XrmoptionNoArg,  "False" },
-	  { "-smooth",     ".smooth",    XrmoptionNoArg,  "True"  },
-	  { "+smooth",     ".smooth",    XrmoptionNoArg,  "False" },
-	  { "-scanlines",  ".scanlines", XrmoptionNoArg,  "True"  },
-	  { "+scanlines",  ".scanlines", XrmoptionNoArg,  "False" },
-	  { "-speed",      ".speed",     XrmoptionSepArg, 0 },
-	  { "-angle",      ".angle",     XrmoptionSepArg, 0 },
-	  { "-size",       ".ballSize",  XrmoptionSepArg, 0 },
-	  { "-meridians",  ".meridians", XrmoptionSepArg, 0 },
-	  { "-parallels",  ".parallels", XrmoptionSepArg, 0 },
-	  { "-tiles",      ".tiles",     XrmoptionSepArg, 0 },
-	  { "-thickness",  ".thickness", XrmoptionSepArg, 0 },
-	  { "-ball-color1",".ballColor1",XrmoptionSepArg, 0 },
-	  { "-ball-color2",".ballColor2",XrmoptionSepArg, 0 },
-	  { "-grid-color", ".gridColor", XrmoptionSepArg, 0 },
-	  { "-shadow-color",".shadowColor",XrmoptionSepArg, 0 },
-	  { "-background",  ".boingBackground",XrmoptionSepArg, 0 },
-	  { "-bg",          ".boingBackground",XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",       ".spin",      XrmoptionNoArg,  "True"  },
+  { "+spin",       ".spin",      XrmoptionNoArg,  "False" },
+  { "-lighting",   ".lighting",  XrmoptionNoArg,  "True"  },
+  { "+lighting",   ".lighting",  XrmoptionNoArg,  "False" },
+  { "-smooth",     ".smooth",    XrmoptionNoArg,  "True"  },
+  { "+smooth",     ".smooth",    XrmoptionNoArg,  "False" },
+  { "-scanlines",  ".scanlines", XrmoptionNoArg,  "True"  },
+  { "+scanlines",  ".scanlines", XrmoptionNoArg,  "False" },
+  { "-speed",      ".speed",     XrmoptionSepArg, 0 },
+  { "-angle",      ".angle",     XrmoptionSepArg, 0 },
+  { "-size",       ".ballSize",  XrmoptionSepArg, 0 },
+  { "-meridians",  ".meridians", XrmoptionSepArg, 0 },
+  { "-parallels",  ".parallels", XrmoptionSepArg, 0 },
+  { "-tiles",      ".tiles",     XrmoptionSepArg, 0 },
+  { "-thickness",  ".thickness", XrmoptionSepArg, 0 },
+  { "-ball-color1",".ballColor1",XrmoptionSepArg, 0 },
+  { "-ball-color2",".ballColor2",XrmoptionSepArg, 0 },
+  { "-grid-color", ".gridColor", XrmoptionSepArg, 0 },
+  { "-shadow-color",".shadowColor",XrmoptionSepArg, 0 },
+  { "-background",  ".boingBackground",XrmoptionSepArg, 0 },
+  { "-bg",          ".boingBackground",XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-	  {&spin,      "spin",      "Spin",       DEF_SPIN,      t_Bool},
-	  {&lighting_p,"lighting",  "Lighting",   DEF_LIGHTING,  t_Bool},
-	  {&smooth_p,  "smooth",    "Smooth",     DEF_SMOOTH,    t_Bool},
-	  {&scanlines_p,"scanlines","Scanlines",  DEF_SCANLINES, t_Bool},
-	  {&speed,     "speed",     "Speed",      DEF_SPEED,     t_Float},
-	  {&angle,     "angle",     "Angle",      DEF_ANGLE,     t_Int},
-	  {&ball_size, "ballSize",  "BallSize",   DEF_BALL_SIZE, t_Float},
-	  {&meridians, "meridians", "meridians",  DEF_MERIDIANS, t_Int},
-	  {&parallels, "parallels", "parallels",  DEF_PARALLELS, t_Int},
-	  {&tiles,     "tiles",     "Tiles",      DEF_TILES,     t_Int},
-	  {&thickness, "thickness", "Thickness",  DEF_THICKNESS, t_Float},
-	  {&ball_color1_str, "ballColor1", "BallColor1", DEF_BALL_COLOR1, t_String},
-	  {&ball_color2_str, "ballColor2", "BallColor2", DEF_BALL_COLOR2, t_String},
-	  {&grid_color_str,  "gridColor",  "GridColor",  DEF_GRID_COLOR,  t_String},
-	  {&shadow_str,      "shadowColor","ShadowColor",DEF_SHADOW_COLOR,t_String},
-	  /* dammit, -background is too magic... */
-	  {&bg_str,        "boingBackground", "Background", DEF_BACKGROUND, t_String},
-	};
+static argtype vars[] = {
+  {&spin,      "spin",      "Spin",       DEF_SPIN,      t_Bool},
+  {&lighting_p,"lighting",  "Lighting",   DEF_LIGHTING,  t_Bool},
+  {&smooth_p,  "smooth",    "Smooth",     DEF_SMOOTH,    t_Bool},
+  {&scanlines_p,"scanlines","Scanlines",  DEF_SCANLINES, t_Bool},
+  {&speed,     "speed",     "Speed",      DEF_SPEED,     t_Float},
+  {&angle,     "angle",     "Angle",      DEF_ANGLE,     t_Int},
+  {&ball_size, "ballSize",  "BallSize",   DEF_BALL_SIZE, t_Float},
+  {&meridians, "meridians", "meridians",  DEF_MERIDIANS, t_Int},
+  {&parallels, "parallels", "parallels",  DEF_PARALLELS, t_Int},
+  {&tiles,     "tiles",     "Tiles",      DEF_TILES,     t_Int},
+  {&thickness, "thickness", "Thickness",  DEF_THICKNESS, t_Float},
+  {&ball_color1_str, "ballColor1", "BallColor1", DEF_BALL_COLOR1, t_String},
+  {&ball_color2_str, "ballColor2", "BallColor2", DEF_BALL_COLOR2, t_String},
+  {&grid_color_str,  "gridColor",  "GridColor",  DEF_GRID_COLOR,  t_String},
+  {&shadow_str,      "shadowColor","ShadowColor",DEF_SHADOW_COLOR,t_String},
+  /* dammit, -background is too magic... */
+  {&bg_str,        "boingBackground", "Background", DEF_BACKGROUND, t_String},
+};
 
-	ENTRYPOINT ModeSpecOpt boing_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt boing_opts = {countof(opts), opts, countof(vars), vars, NULL};
+
 
 static void
 parse_color (ModeInfo *mi, const char *name, const char *s, GLfloat *a)

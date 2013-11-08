@@ -77,6 +77,7 @@ static const char sccsid[] = "@(#)cage.c	5.01 2001/03/01 xlockmore";
 
 # define MODE_cage
 #define DELAY 25000
+#define NOARGS
 # define DEFAULTS			"*delay:		25000   \n"			\
 							"*showFPS:      False   \n"			\
 							"*wireframe:	False	\n"
@@ -104,17 +105,15 @@ static const char sccsid[] = "@(#)cage.c	5.01 2001/03/01 xlockmore";
 #include "../images/wood.xpm"
 #endif
 
-#if 0
-	ENTRYPOINT ModeSpecOpt cage_opts =
-	{0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
+ENTRYPOINT ModeSpecOpt cage_opts =
+{0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
-	#ifdef USE_MODULES
-	ModStruct   cage_description =
-	{"cage", "init_cage", "draw_cage", "release_cage",
-	 "draw_cage", "change_cage", (char *) NULL, &cage_opts,
-	 25000, 1, 1, 1, 1.0, 4, "",
-	 "Shows the Impossible Cage, an Escher-like GL scene", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   cage_description =
+{"cage", "init_cage", "draw_cage", "release_cage",
+ "draw_cage", "change_cage", (char *) NULL, &cage_opts,
+ 25000, 1, 1, 1, 1.0, 4, "",
+ "Shows the Impossible Cage, an Escher-like GL scene", 0, NULL};
 #endif
 
 #define Scale4Window               0.3

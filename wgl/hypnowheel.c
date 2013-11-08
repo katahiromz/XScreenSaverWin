@@ -18,6 +18,7 @@
  */
 
 #define DELAY 20000
+#define COUNT 13
 #define DEFAULTS	"*delay:	20000       \n" \
 			"*count:        13          \n" \
 			"*showFPS:      False       \n" \
@@ -37,8 +38,6 @@
 #include "rotator.h"
 #include <ctype.h>
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 13
 
 #ifdef USE_GL /* whole file */
 
@@ -73,28 +72,26 @@ static GLint nlayers = 4;
 static Bool do_wander = False;
 static Bool do_symmetric = False;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-speed",      ".speed",      XrmoptionSepArg, 0 },
-	  { "-twistiness", ".twistiness", XrmoptionSepArg, 0 },
-	  { "-layers",     ".layers",     XrmoptionSepArg, 0 },
-	  { "-wander",     ".wander",     XrmoptionNoArg, "True" },
-	  { "+wander",     ".wander",     XrmoptionNoArg, "False" },
-	  { "-symmetric",  ".symmetric",  XrmoptionNoArg, "True" },
-	  { "+symmetric",  ".symmetric",  XrmoptionNoArg, "False" },
-	};
+static XrmOptionDescRec opts[] = {
+  { "-speed",      ".speed",      XrmoptionSepArg, 0 },
+  { "-twistiness", ".twistiness", XrmoptionSepArg, 0 },
+  { "-layers",     ".layers",     XrmoptionSepArg, 0 },
+  { "-wander",     ".wander",     XrmoptionNoArg, "True" },
+  { "+wander",     ".wander",     XrmoptionNoArg, "False" },
+  { "-symmetric",  ".symmetric",  XrmoptionNoArg, "True" },
+  { "+symmetric",  ".symmetric",  XrmoptionNoArg, "False" },
+};
 
-	static argtype vars[] = {
-	  {&do_wander,	  "wander",     "Wander",     DEF_WANDER,     t_Bool},
-	  {&do_symmetric, "symmetric",  "Symmetric",  DEF_SYMMETRIC,  t_Bool},
-	  {&speed,	  "speed",      "Speed",      DEF_SPEED,      t_Float},
-	  {&twistiness,	  "twistiness", "Twistiness", DEF_TWISTINESS, t_Float},
-	  {&nlayers,	  "layers",     "Layers",     DEF_LAYERS,     t_Int},
-	};
+static argtype vars[] = {
+  {&do_wander,	  "wander",     "Wander",     DEF_WANDER,     t_Bool},
+  {&do_symmetric, "symmetric",  "Symmetric",  DEF_SYMMETRIC,  t_Bool},
+  {&speed,	  "speed",      "Speed",      DEF_SPEED,      t_Float},
+  {&twistiness,	  "twistiness", "Twistiness", DEF_TWISTINESS, t_Float},
+  {&nlayers,	  "layers",     "Layers",     DEF_LAYERS,     t_Int},
+};
 
-	ENTRYPOINT ModeSpecOpt hypnowheel_opts = {
-	  countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt hypnowheel_opts = {
+  countof(opts), opts, countof(vars), vars, NULL};
 
 static void
 draw_spiral (ModeInfo *mi, disc *d)

@@ -155,20 +155,18 @@ typedef struct    /* hacks state */
  
 static State *sstate = NULL;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-maxcells",   ".maxcells",   XrmoptionSepArg, 0 },
-	  { "-radius",     ".radius",     XrmoptionSepArg, 0 },
-	  { "-seeds",      ".seeds",      XrmoptionSepArg, 0 },
-	  { "-quality",    ".quality",    XrmoptionSepArg, 0 },
-	  { "-minfood",    ".minfood",    XrmoptionSepArg, 0 },
-	  { "-maxfood",    ".maxfood",    XrmoptionSepArg, 0 },
-	  { "-divideage",  ".divideage",  XrmoptionSepArg, 0 },
-	  { "-mindist",    ".mindist",    XrmoptionSepArg, 0 },
-	  { "-pause",      ".pause",      XrmoptionSepArg, 0 },
-	  { "-keepold",    ".keepold",    XrmoptionNoArg, "True" }
-	};
-#endif
+static XrmOptionDescRec opts[] = {
+  { "-maxcells",   ".maxcells",   XrmoptionSepArg, 0 },
+  { "-radius",     ".radius",     XrmoptionSepArg, 0 },
+  { "-seeds",      ".seeds",      XrmoptionSepArg, 0 },
+  { "-quality",    ".quality",    XrmoptionSepArg, 0 },
+  { "-minfood",    ".minfood",    XrmoptionSepArg, 0 },
+  { "-maxfood",    ".maxfood",    XrmoptionSepArg, 0 },
+  { "-divideage",  ".divideage",  XrmoptionSepArg, 0 },
+  { "-mindist",    ".mindist",    XrmoptionSepArg, 0 },
+  { "-pause",      ".pause",      XrmoptionSepArg, 0 },
+  { "-keepold",    ".keepold",    XrmoptionNoArg, "True" }
+};
 
 static int  s_maxcells = 800;
 static int  s_radius = 40;
@@ -181,20 +179,18 @@ static int  s_pause = 50;
 static float s_min_dist = 1.4;
 static Bool s_keepold = False;
 
-#if 0
-	static argtype vars[] = {
-	  {&s_maxcells,  "maxcells",  "Max Cells",      DEF_MAXCELLS, t_Int},
-	  {&s_radius,    "radius",    "Radius",         DEF_RADIUS,   t_Int},
-	  {&s_seeds,     "seeds",     "Seeds",          DEF_SEEDS,    t_Int},
-	  {&s_quality,   "quality",   "Quality",        DEF_QUALITY,  t_Int},
-	  {&s_minfood,   "minfood",   "Min Food",       DEF_MINFOOD,  t_Int},
-	  {&s_maxfood,   "maxfood",   "Max Food",       DEF_MAXFOOD,  t_Int},
-	  {&s_pause,   "pause",     "Pause at end",   DEF_PAUSE,  t_Int},
-	  {&s_divideage, "divideage", "Age for duplication (Ticks)",       DEF_DIVIDEAGE,  t_Int},
-	  {&s_min_dist,  "mindist",   "Minimum preferred distance to other cells",       DEF_MINDIST,  t_Float},
-	  {&s_keepold,   "keepold",   "Keep old cells", DEF_KEEPOLD,  t_Bool}
-	};
-#endif
+static argtype vars[] = {
+  {&s_maxcells,  "maxcells",  "Max Cells",      DEF_MAXCELLS, t_Int},
+  {&s_radius,    "radius",    "Radius",         DEF_RADIUS,   t_Int},
+  {&s_seeds,     "seeds",     "Seeds",          DEF_SEEDS,    t_Int},
+  {&s_quality,   "quality",   "Quality",        DEF_QUALITY,  t_Int},
+  {&s_minfood,   "minfood",   "Min Food",       DEF_MINFOOD,  t_Int},
+  {&s_maxfood,   "maxfood",   "Max Food",       DEF_MAXFOOD,  t_Int},
+  {&s_pause,   "pause",     "Pause at end",   DEF_PAUSE,  t_Int},
+  {&s_divideage, "divideage", "Age for duplication (Ticks)",       DEF_DIVIDEAGE,  t_Int},
+  {&s_min_dist,  "mindist",   "Minimum preferred distance to other cells",       DEF_MINDIST,  t_Float},
+  {&s_keepold,   "keepold",   "Keep old cells", DEF_KEEPOLD,  t_Bool}
+};
 
 /**********************************
   PROTOTYPES

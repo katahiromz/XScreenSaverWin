@@ -87,8 +87,8 @@
 	#endif
 #endif
 
-//#include "gltrackball.h"
-//#include "grab-ximage.h"
+#include "gltrackball.h"
+#include "grab-ximage.h"
 
 #undef countof
 #define countof(x) (sizeof((x)) / sizeof((*x)))
@@ -116,78 +116,76 @@ static float zoom = 1.0;
 static Bool culling;
 static Bool load_textures;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	    {"-wire",             ".blob.wire",             XrmoptionNoArg, "true" },
-	    {"+wire",             ".blob.wire",             XrmoptionNoArg, "false" },
-	    {"-blend",            ".blob.blend",            XrmoptionSepArg, 0 },
-	    {"-fog",              ".blob.fog",              XrmoptionNoArg, "true" },
-	    {"+fog",              ".blob.fog",              XrmoptionNoArg, "false" },
-	    {"-antialias",        ".blob.antialias",        XrmoptionNoArg, "true" },
-	    {"+antialias",        ".blob.antialias",        XrmoptionNoArg, "false" },
-	    {"-walls",            ".blob.walls",            XrmoptionNoArg, "true" },
-	    {"+walls",            ".blob.walls",            XrmoptionNoArg, "false" },
-	    {"-texture",          ".blob.texture",          XrmoptionNoArg, "true" },
-	    {"+texture",          ".blob.texture",          XrmoptionNoArg, "false" },
-	    {"-colour",           ".blob.colour",           XrmoptionNoArg, "true" },
-	    {"+colour",           ".blob.colour",           XrmoptionNoArg, "false" },
-	    {"-offset-texture",   ".blob.offsetTexture",    XrmoptionNoArg, "true" },
-	    {"+offset-texture",   ".blob.offsetTexture",    XrmoptionNoArg, "false" },
-	    {"-paint-background", ".blob.paintBackground",  XrmoptionNoArg, "true" },
-	    {"+paint-background", ".blob.paintBackground",  XrmoptionNoArg, "false" },
-	    {"-resolution",       ".blob.resolution",       XrmoptionSepArg, NULL },
-	    {"-bumps",            ".blob.bumps",            XrmoptionSepArg, NULL },
-	    {"-motion-blur",      ".blob.motionBlur",       XrmoptionSepArg, 0 },
-	    {"-fade-time",        ".blob.fadeTime",         XrmoptionSepArg, 0 },
-	    {"-hold-time",        ".blob.holdTime",         XrmoptionSepArg, 0 },
-	    {"-zoom",             ".blob.zoom",             XrmoptionSepArg, 0 },
-	};
+static XrmOptionDescRec opts[] = {
+    {"-wire",             ".blob.wire",             XrmoptionNoArg, "true" },
+    {"+wire",             ".blob.wire",             XrmoptionNoArg, "false" },
+    {"-blend",            ".blob.blend",            XrmoptionSepArg, 0 },
+    {"-fog",              ".blob.fog",              XrmoptionNoArg, "true" },
+    {"+fog",              ".blob.fog",              XrmoptionNoArg, "false" },
+    {"-antialias",        ".blob.antialias",        XrmoptionNoArg, "true" },
+    {"+antialias",        ".blob.antialias",        XrmoptionNoArg, "false" },
+    {"-walls",            ".blob.walls",            XrmoptionNoArg, "true" },
+    {"+walls",            ".blob.walls",            XrmoptionNoArg, "false" },
+    {"-texture",          ".blob.texture",          XrmoptionNoArg, "true" },
+    {"+texture",          ".blob.texture",          XrmoptionNoArg, "false" },
+    {"-colour",           ".blob.colour",           XrmoptionNoArg, "true" },
+    {"+colour",           ".blob.colour",           XrmoptionNoArg, "false" },
+    {"-offset-texture",   ".blob.offsetTexture",    XrmoptionNoArg, "true" },
+    {"+offset-texture",   ".blob.offsetTexture",    XrmoptionNoArg, "false" },
+    {"-paint-background", ".blob.paintBackground",  XrmoptionNoArg, "true" },
+    {"+paint-background", ".blob.paintBackground",  XrmoptionNoArg, "false" },
+    {"-resolution",       ".blob.resolution",       XrmoptionSepArg, NULL },
+    {"-bumps",            ".blob.bumps",            XrmoptionSepArg, NULL },
+    {"-motion-blur",      ".blob.motionBlur",       XrmoptionSepArg, 0 },
+    {"-fade-time",        ".blob.fadeTime",         XrmoptionSepArg, 0 },
+    {"-hold-time",        ".blob.holdTime",         XrmoptionSepArg, 0 },
+    {"-zoom",             ".blob.zoom",             XrmoptionSepArg, 0 },
+};
 
-	static argtype vars[] = {
-	    {&wireframe,    "wire",         "Wire",      DEF_WIRE,      t_Bool},
-	    {&blend,        "blend",        "Blend",     DEF_BLEND,     t_Float},
-	    {&do_fog,       "fog",          "Fog",       DEF_FOG,       t_Bool},
-	    {&do_antialias, "antialias",    "Antialias", DEF_ANTIALIAS, t_Bool},
-	    {&do_walls,     "walls",        "Walls",     DEF_WALLS,     t_Bool},
-	    {&do_texture,   "texture",      "Texture",   DEF_TEXTURE,   t_Bool},
-	    {&do_colour,    "colour",       "Colour",    DEF_COLOUR,   t_Bool},
-	    {&offset_texture, "offsetTexture","OffsetTexture", DEF_OFFSET_TEXTURE, t_Bool},
-	    {&do_paint_background,"paintBackground","PaintBackground", DEF_PAINT_BACKGROUND, t_Bool},
-	    {&resolution,   "resolution",   "Resolution",   DEF_RESOLUTION,   t_Int},
-	    {&bumps,        "bumps",        "Bump",         DEF_BUMPS, t_Int},
-	    {&motion_blur,  "motionBlur",   "MotionBlur",   DEF_MOTION_BLUR,  t_Float},
-	    {&fade_time,    "fadeTime",     "FadeTime",     DEF_FADE_TIME,    t_Float},
-	    {&hold_time,    "holdTime",     "HoldTime",     DEF_HOLD_TIME,    t_Float},
-	    {&zoom,         "zoom",         "Zoom",         DEF_ZOOM,         t_Float},
-	};
+static argtype vars[] = {
+    {&wireframe,    "wire",         "Wire",      DEF_WIRE,      t_Bool},
+    {&blend,        "blend",        "Blend",     DEF_BLEND,     t_Float},
+    {&do_fog,       "fog",          "Fog",       DEF_FOG,       t_Bool},
+    {&do_antialias, "antialias",    "Antialias", DEF_ANTIALIAS, t_Bool},
+    {&do_walls,     "walls",        "Walls",     DEF_WALLS,     t_Bool},
+    {&do_texture,   "texture",      "Texture",   DEF_TEXTURE,   t_Bool},
+    {&do_colour,    "colour",       "Colour",    DEF_COLOUR,   t_Bool},
+    {&offset_texture, "offsetTexture","OffsetTexture", DEF_OFFSET_TEXTURE, t_Bool},
+    {&do_paint_background,"paintBackground","PaintBackground", DEF_PAINT_BACKGROUND, t_Bool},
+    {&resolution,   "resolution",   "Resolution",   DEF_RESOLUTION,   t_Int},
+    {&bumps,        "bumps",        "Bump",         DEF_BUMPS, t_Int},
+    {&motion_blur,  "motionBlur",   "MotionBlur",   DEF_MOTION_BLUR,  t_Float},
+    {&fade_time,    "fadeTime",     "FadeTime",     DEF_FADE_TIME,    t_Float},
+    {&hold_time,    "holdTime",     "HoldTime",     DEF_HOLD_TIME,    t_Float},
+    {&zoom,         "zoom",         "Zoom",         DEF_ZOOM,         t_Float},
+};
 
-	static OptionStruct desc[] =
-	{
-	    {"-/+ wire", "whether to do use wireframe instead of filled (faster)"},
-	    {"-/+ blend", "whether to do enable blending (slower)"},
-	    {"-/+ fog", "whether to do enable fog (slower)"},
-	    {"-/+ antialias", "whether to do enable antialiased lines (slower)"},
-	    {"-/+ walls", "whether to add walls to the blob space (slower)"},
-	    {"-/+ texture", "whether to add a texture to the blob (slower)"},
-	    {"-/+ colour", "whether to colour the blob"},
-	    {"-/+ offset_texture", "whether to offset texture co-ordinates"},
-	    {"-/+ paint_background", "whether to display a background texture (slower)"},
-	    {"-resolution", "Resolution of blob tesselation"},
-	    {"-bumps", "Number of bumps used to disturb blob"},
-	    {"-motion_blur", "Fade blob images (higher number = faster fade)"},
-	    {"-fade_time", "Number of frames to transistion to next image"},
-	    {"-hold_time", "Number of frames before next image"},
-	};
+static OptionStruct desc[] =
+{
+    {"-/+ wire", "whether to do use wireframe instead of filled (faster)"},
+    {"-/+ blend", "whether to do enable blending (slower)"},
+    {"-/+ fog", "whether to do enable fog (slower)"},
+    {"-/+ antialias", "whether to do enable antialiased lines (slower)"},
+    {"-/+ walls", "whether to add walls to the blob space (slower)"},
+    {"-/+ texture", "whether to add a texture to the blob (slower)"},
+    {"-/+ colour", "whether to colour the blob"},
+    {"-/+ offset_texture", "whether to offset texture co-ordinates"},
+    {"-/+ paint_background", "whether to display a background texture (slower)"},
+    {"-resolution", "Resolution of blob tesselation"},
+    {"-bumps", "Number of bumps used to disturb blob"},
+    {"-motion_blur", "Fade blob images (higher number = faster fade)"},
+    {"-fade_time", "Number of frames to transistion to next image"},
+    {"-hold_time", "Number of frames before next image"},
+};
 
-	ENTRYPOINT ModeSpecOpt mirrorblob_opts = {countof(opts), opts, countof(vars), vars, desc};
+ENTRYPOINT ModeSpecOpt mirrorblob_opts = {countof(opts), opts, countof(vars), vars, desc};
 
-	#ifdef USE_MODULES
-	ModStruct   mirrorblob_description =
-	{"mirrorblob", "init_mirrorblob", "draw_mirrorblob", "release_mirrorblob",
-	 "draw_mirrorblob", "init_mirrorblob", "handle_event", &mirrorblob_opts,
-	 1000, 1, 2, 1, 4, 1.0, "",
-	 "OpenGL mirrorblob", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   mirrorblob_description =
+{"mirrorblob", "init_mirrorblob", "draw_mirrorblob", "release_mirrorblob",
+ "draw_mirrorblob", "init_mirrorblob", "handle_event", &mirrorblob_opts,
+ 1000, 1, 2, 1, 4, 1.0, "",
+ "OpenGL mirrorblob", 0, NULL};
 #endif
 
 /*****************************************************************************

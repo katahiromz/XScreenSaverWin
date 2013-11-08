@@ -16,6 +16,7 @@
 //#include <math.h> /* for log2 */
 
 #define DELAY 30000
+#define COUNT 30
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*count:        30          \n" \
 			"*showFPS:      False       \n" \
@@ -34,10 +35,8 @@
 #include "win32.h"
 #include "colors.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 30
 
 #define DEF_START	"0.00"
 #define DEF_DILATE	"1.00"
@@ -55,51 +54,49 @@ static float start = 0.00, end = 27.79, dilate = 1.00;
 static Bool do_texture = True, drawlogo = True, wire, reverse = False, do_fog = True;
 static const char *do_tx1 = "(none)", *do_tx2 = "(none)", *do_tx3 = "(none)", *do_tun1 = "(none)", *do_tun2 = "(none)", *do_tun3 = "(none)";
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  {"-texture"	, ".texture",   XrmoptionNoArg, "true" },
-	  {"+texture"	, ".texture",   XrmoptionNoArg, "false" },
-	  {"-start"	, ".start",    	XrmoptionSepArg, 0 },
-	  {"-end"	, ".end",    	XrmoptionSepArg, 0 },
-	  {"-dilate"	, ".dilate",   XrmoptionSepArg, 0 },
-	  {"+logo"	, ".drawlogo",   XrmoptionNoArg, "false" },
-	  {"-reverse"	, ".reverse",   XrmoptionNoArg, "true" },
-	  {"+fog"	, ".fog",  	XrmoptionNoArg, "false" },
-	  {"-marquee"   , ".marquee", XrmoptionSepArg, 0},
-	  /* {"+marquee"   , ".marquee", XrmoptionNoArg, "(none)"}, */
-	  {"-tardis"   , ".tardis", XrmoptionSepArg, 0},
-	  /* {"+tardis"   , ".tardis", XrmoptionNoArg, "(none)"}, */
-	  {"-head"   , ".head", XrmoptionSepArg, 0},
-	  /* {"+head"   , ".head", XrmoptionNoArg, "(none)"}, */
-	  {"-tun1"   , ".tun1", XrmoptionSepArg, 0},
-	  /* {"+tun1"   , ".tun1", XrmoptionNoArg, "(none)"}, */
-	  {"-tun2"   , ".tun2", XrmoptionSepArg, 0},
-	  /* {"+tun2"   , ".tun2", XrmoptionNoArg, "(none)"}, */
-	  {"-tun3"   , ".tun3", XrmoptionSepArg, 0},
-	  /* {"+tun3"   , ".tun3", XrmoptionNoArg, "(none)"}, */
-	};
+static XrmOptionDescRec opts[] = {
+  {"-texture"	, ".texture",   XrmoptionNoArg, "true" },
+  {"+texture"	, ".texture",   XrmoptionNoArg, "false" },
+  {"-start"	, ".start",    	XrmoptionSepArg, 0 },
+  {"-end"	, ".end",    	XrmoptionSepArg, 0 },
+  {"-dilate"	, ".dilate",   XrmoptionSepArg, 0 },
+  {"+logo"	, ".drawlogo",   XrmoptionNoArg, "false" },
+  {"-reverse"	, ".reverse",   XrmoptionNoArg, "true" },
+  {"+fog"	, ".fog",  	XrmoptionNoArg, "false" },
+  {"-marquee"   , ".marquee", XrmoptionSepArg, 0},
+  /* {"+marquee"   , ".marquee", XrmoptionNoArg, "(none)"}, */
+  {"-tardis"   , ".tardis", XrmoptionSepArg, 0},
+  /* {"+tardis"   , ".tardis", XrmoptionNoArg, "(none)"}, */
+  {"-head"   , ".head", XrmoptionSepArg, 0},
+  /* {"+head"   , ".head", XrmoptionNoArg, "(none)"}, */
+  {"-tun1"   , ".tun1", XrmoptionSepArg, 0},
+  /* {"+tun1"   , ".tun1", XrmoptionNoArg, "(none)"}, */
+  {"-tun2"   , ".tun2", XrmoptionSepArg, 0},
+  /* {"+tun2"   , ".tun2", XrmoptionNoArg, "(none)"}, */
+  {"-tun3"   , ".tun3", XrmoptionSepArg, 0},
+  /* {"+tun3"   , ".tun3", XrmoptionNoArg, "(none)"}, */
+};
 
-	static argtype vars[] = {
-	  {&do_texture, "texture", "Texture", DEF_TEXTURE, t_Bool},
-	  {&start, "start", "Start", DEF_START, t_Float},
-	  {&end,     "end",   "End", DEF_END  , t_Float},
-	  {&dilate,     "dilate",   "Dilate", DEF_DILATE  , t_Float},
-	  {&drawlogo,     "drawlogo",   "DrawLogo", DEF_DRAWLOGO  , t_Bool},
-	  {&reverse,     "reverse",   "Reverse", DEF_REVERSE  , t_Bool},
-	  {&do_fog,     "fog",  "Fog", DEF_FOG  , t_Bool},
-	  {&do_tx1,	"marquee", "Marquee", "(none)", t_String},
-	  {&do_tx2,	"tardis", "Tardis", "(none)", t_String},
-	  {&do_tx3,	"head",	"Head", "(none)", t_String},
-	  {&do_tun1,	"tun1",	"Tunnel 1", "(none)", t_String},
-	  {&do_tun2,	"tun2",	"Tunnel 2", "(none)", t_String},
-	  {&do_tun3,	"tun3",	"Tunnel 3", "(none)", t_String},
-	};
+static argtype vars[] = {
+  {&do_texture, "texture", "Texture", DEF_TEXTURE, t_Bool},
+  {&start, "start", "Start", DEF_START, t_Float},
+  {&end,     "end",   "End", DEF_END  , t_Float},
+  {&dilate,     "dilate",   "Dilate", DEF_DILATE  , t_Float},
+  {&drawlogo,     "drawlogo",   "DrawLogo", DEF_DRAWLOGO  , t_Bool},
+  {&reverse,     "reverse",   "Reverse", DEF_REVERSE  , t_Bool},
+  {&do_fog,     "fog",  "Fog", DEF_FOG  , t_Bool},
+  {&do_tx1,	"marquee", "Marquee", "(none)", t_String},
+  {&do_tx2,	"tardis", "Tardis", "(none)", t_String},
+  {&do_tx3,	"head",	"Head", "(none)", t_String},
+  {&do_tun1,	"tun1",	"Tunnel 1", "(none)", t_String},
+  {&do_tun2,	"tun2",	"Tunnel 2", "(none)", t_String},
+  {&do_tun3,	"tun3",	"Tunnel 3", "(none)", t_String},
+};
 
-	ENTRYPOINT ModeSpecOpt tunnel_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt tunnel_opts = {countof(opts), opts, countof(vars), vars, NULL};
 
 #include "xpm-ximage.h"
-#include "images/logo-180.xpm"
+#include "../images/logo-180.xpm"
 #include "../images/tunnelstar.xpm"
 #include "../images/timetunnel0.xpm"
 #include "../images/timetunnel1.xpm"

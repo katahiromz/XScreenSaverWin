@@ -10,6 +10,7 @@
  */
 
 #define DELAY 30000
+#define COUNT 30
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*count:        30          \n" \
 			"*showFPS:      False       \n" \
@@ -26,11 +27,9 @@
 #include "sphere.h"
 #include "tube.h"
 #include "rotator.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 #include <ctype.h>
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 30
 
 #ifdef USE_GL /* whole file */
 
@@ -70,23 +69,22 @@ static Bool do_spin = True;
 static GLfloat speed = 0.05;
 static Bool do_wander = True;
 
-#if 0
-	static XrmOptionDescRec opts[] = {
-	  { "-spin",   ".spin",   XrmoptionNoArg, "True" },
-	  { "+spin",   ".spin",   XrmoptionNoArg, "False" },
-	  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
-	  { "-wander", ".wander", XrmoptionNoArg, "True" },
-	  { "+wander", ".wander", XrmoptionNoArg, "False" }
-	};
+static XrmOptionDescRec opts[] = {
+  { "-spin",   ".spin",   XrmoptionNoArg, "True" },
+  { "+spin",   ".spin",   XrmoptionNoArg, "False" },
+  { "-speed",  ".speed",  XrmoptionSepArg, 0 },
+  { "-wander", ".wander", XrmoptionNoArg, "True" },
+  { "+wander", ".wander", XrmoptionNoArg, "False" }
+};
 
-	static argtype vars[] = {
-	  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_Bool},
-	  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
-	  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
-	};
+static argtype vars[] = {
+  {&do_spin,   "spin",   "Spin",   DEF_SPIN,   t_Bool},
+  {&do_wander, "wander", "Wander", DEF_WANDER, t_Bool},
+  {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
+};
 
-	ENTRYPOINT ModeSpecOpt ball_opts = {countof(opts), opts, countof(vars), vars, NULL};
-#endif
+ENTRYPOINT ModeSpecOpt ball_opts = {countof(opts), opts, countof(vars), vars, NULL};
+
 
 /* Window management, etc
  */

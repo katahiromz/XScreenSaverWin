@@ -59,6 +59,9 @@ static const char sccsid[] = "@(#)pipes.c	4.07 97/11/24 xlockmore";
  */
 
 #define DELAY 10000
+#define COUNT 2
+#define CYCLES 5
+#define SIZE_ 500
 # define DEFAULTS	"*delay:		10000   \n"			\
 					"*count:		2       \n"			\
 					"*cycles:		5       \n"			\
@@ -79,12 +82,6 @@ static const char sccsid[] = "@(#)pipes.c	4.07 97/11/24 xlockmore";
 
 #include "win32.h"
 
-#undef MI_COUNT
-#define MI_COUNT(mi) 2
-#undef MI_CYCLES
-#define MI_CYCLES(mi) 5
-#undef MI_SIZE
-#define MI_SIZE(mi) 500
 
 #ifdef USE_GL
 
@@ -105,7 +102,7 @@ static const char sccsid[] = "@(#)pipes.c	4.07 97/11/24 xlockmore";
 #include "sphere.h"
 #include "buildlwo.h"
 #include "teapot.h"
-//#include "gltrackball.h"
+#include "gltrackball.h"
 
 #define DEF_FACTORY     "2"
 #define DEF_FISHEYE     "True"
@@ -116,43 +113,41 @@ static const char sccsid[] = "@(#)pipes.c	4.07 97/11/24 xlockmore";
 static int  factory = 2;
 static Bool fisheye = True, tightturns = False, rotatepipes = True;
 
-#if 0
-	static XrmOptionDescRec opts[] =
-	{
-		{"-factory", ".pipes.factory", XrmoptionSepArg, 0},
-		{"-fisheye", ".pipes.fisheye", XrmoptionNoArg, "on"},
-		{"+fisheye", ".pipes.fisheye", XrmoptionNoArg, "off"},
-		{"-tightturns", ".pipes.tightturns", XrmoptionNoArg, "on"},
-		{"+tightturns", ".pipes.tightturns", XrmoptionNoArg, "off"},
-	      {"-rotatepipes", ".pipes.rotatepipes", XrmoptionNoArg, "on"},
-	      {"+rotatepipes", ".pipes.rotatepipes", XrmoptionNoArg, "off"},
-	};
-	static argtype vars[] =
-	{
-		{&factory, "factory", "Factory", DEF_FACTORY, t_Int},
-		{&fisheye, "fisheye", "Fisheye", DEF_FISHEYE, t_Bool},
-		{&tightturns, "tightturns", "Tightturns", DEF_TIGHTTURNS, t_Bool},
-		{&rotatepipes, "rotatepipes", "Rotatepipes", DEF_ROTATEPIPES, t_Bool},
-	};
-	static OptionStruct desc[] =
-	{
-		{"-factory num", "how much extra equipment in pipes (0 for none)"},
-		{"-/+fisheye", "turn on/off zoomed-in view of pipes"},
-		{"-/+tightturns", "turn on/off tight turns"},
-		{"-/+rotatepipes", "turn on/off pipe system rotation per screenful"},
-	};
+static XrmOptionDescRec opts[] =
+{
+	{"-factory", ".pipes.factory", XrmoptionSepArg, 0},
+	{"-fisheye", ".pipes.fisheye", XrmoptionNoArg, "on"},
+	{"+fisheye", ".pipes.fisheye", XrmoptionNoArg, "off"},
+	{"-tightturns", ".pipes.tightturns", XrmoptionNoArg, "on"},
+	{"+tightturns", ".pipes.tightturns", XrmoptionNoArg, "off"},
+      {"-rotatepipes", ".pipes.rotatepipes", XrmoptionNoArg, "on"},
+      {"+rotatepipes", ".pipes.rotatepipes", XrmoptionNoArg, "off"},
+};
+static argtype vars[] =
+{
+	{&factory, "factory", "Factory", DEF_FACTORY, t_Int},
+	{&fisheye, "fisheye", "Fisheye", DEF_FISHEYE, t_Bool},
+	{&tightturns, "tightturns", "Tightturns", DEF_TIGHTTURNS, t_Bool},
+	{&rotatepipes, "rotatepipes", "Rotatepipes", DEF_ROTATEPIPES, t_Bool},
+};
+static OptionStruct desc[] =
+{
+	{"-factory num", "how much extra equipment in pipes (0 for none)"},
+	{"-/+fisheye", "turn on/off zoomed-in view of pipes"},
+	{"-/+tightturns", "turn on/off tight turns"},
+	{"-/+rotatepipes", "turn on/off pipe system rotation per screenful"},
+};
 
-	ENTRYPOINT ModeSpecOpt pipes_opts =
-	{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
+ENTRYPOINT ModeSpecOpt pipes_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
-	#ifdef USE_MODULES
-	ModStruct   pipes_description =
-	{"pipes", "init_pipes", "draw_pipes", "release_pipes",
-	 "draw_pipes",
-	 "change_pipes", NULL, &pipes_opts,
-	 1000, 2, 5, 500, 4, 1.0, "",
-	 "Shows a selfbuilding pipe system", 0, NULL};
-	#endif
+#ifdef USE_MODULES
+ModStruct   pipes_description =
+{"pipes", "init_pipes", "draw_pipes", "release_pipes",
+ "draw_pipes",
+ "change_pipes", NULL, &pipes_opts,
+ 1000, 2, 5, 500, 4, 1.0, "",
+ "Shows a selfbuilding pipe system", 0, NULL};
 #endif
 
 #define Scale4Window               0.1
