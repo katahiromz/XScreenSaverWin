@@ -28,6 +28,12 @@
 	#endif
 #endif
 
+#ifdef NDEBUG
+	#pragma comment(lib, "gle.lib")
+#else
+	#pragma comment(lib, "gled.lib")
+#endif
+
 #define DELAY 20000
 #define	DEFAULTS	"*delay:	 20000	\n" \
 					"*showFPS:	 False	\n" \

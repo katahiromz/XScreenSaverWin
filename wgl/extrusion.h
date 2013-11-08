@@ -40,6 +40,7 @@
 #endif
 
 #include "xws2win.h"
+#include <GL/gle.h>
 
 extern void InitStuff_helix2(void);
 extern void DrawStuff_helix2(void);
