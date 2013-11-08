@@ -70,7 +70,7 @@ static const char sccsid[] = "@(#)stairs.c	4.07 97/11/24 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 #ifdef USE_GL
 

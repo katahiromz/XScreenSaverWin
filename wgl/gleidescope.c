@@ -87,7 +87,7 @@
 	#endif /* !STANDALONE */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 #ifdef USE_GL
 

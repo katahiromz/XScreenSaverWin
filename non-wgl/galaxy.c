@@ -59,7 +59,7 @@ static const char sccsid[] = "@(#)galaxy.c 4.04 97/07/28 xlockmore";
 	# include "xlock.h"     /* from the xlockmore distribution */
 	#endif /* !STANDALONE */
 #endif
-#include "win32.h"
+#include "xws2win.h"
 
 static Bool tracks = True;
 static Bool spin = True;

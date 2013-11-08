@@ -41,7 +41,7 @@ static const char sccsid[] = "@(#)sierpinski3D.c	00.01 99/11/04 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 #include "colors.h"
 
 #ifdef USE_GL

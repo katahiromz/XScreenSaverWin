@@ -15,7 +15,7 @@
  *   PURPOSE. (I.e.: Use in any way, but at your own risk!)
  */
 
-#include "win32.h"
+#include "xws2win.h"
 //#include "utils.h"
 #include "yarandom.h"
 #include "usleep.h"

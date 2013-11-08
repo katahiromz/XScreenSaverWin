@@ -38,7 +38,7 @@
 #define SIGNOF(n) ((n)<0?-1:1)
 
 //#include "xlockmore.h"
-#include "win32.h"
+#include "xws2win.h"
 #include "colors.h"
 #include "rotator.h"
 #include "gltrackball.h"

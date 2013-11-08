@@ -1,4 +1,4 @@
-#include "win32.h"
+#include "xws2win.h"
 #include <scrnsave.h>
 #include "resource.h"
 

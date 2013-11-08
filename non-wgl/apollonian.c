@@ -86,7 +86,7 @@ static const char sccsid[] = "@(#)apollonian.c	5.02 2001/07/01 xlockmore";
 	#endif /* STANDALONE */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 # include "erase.h"
 
 char *background = "black";

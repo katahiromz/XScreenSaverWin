@@ -50,7 +50,7 @@ OpenGL(TM) is a trademark of Silicon Graphics, Inc.
 	#endif
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 #include "teapot.h"
 
 #if 0

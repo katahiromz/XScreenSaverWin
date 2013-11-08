@@ -68,7 +68,7 @@
 # define cone      dxf_cone
 #endif /* DXF_OUTPUT_HACK */
 
-#include "win32.h"
+#include "xws2win.h"
 //#include "xlockmore.h"
 #include "normals.h"
 #include "tube.h"

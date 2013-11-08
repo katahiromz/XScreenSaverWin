@@ -92,7 +92,7 @@ static const char sccsid[] = "@(#)crystal.c	4.12 98/09/10 xlockmore";
 	#endif /* STANDALONE */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 #include "colors.h"
 
 #define DEF_CELL "True"		/* Draw unit cell */

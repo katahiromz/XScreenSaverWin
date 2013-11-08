@@ -28,7 +28,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 #include "involute.h"
 #include "normals.h"
 

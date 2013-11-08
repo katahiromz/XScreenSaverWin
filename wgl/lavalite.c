@@ -91,7 +91,7 @@
 #undef SIGNOF
 #define SIGNOF(n) ((n)<0?-1:1)
 
-#include "win32.h"
+#include "xws2win.h"
 //#include "xlockmore.h"
 #include "marching.h"
 #include "rotator.h"

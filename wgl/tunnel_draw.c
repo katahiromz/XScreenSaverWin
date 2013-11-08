@@ -40,7 +40,7 @@ static const char sccsid[] = "@(#)tunnel_draw.c	5.13 2004/05/25 xlockmore";
 	#endif
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 #ifdef USE_GL /* whole file */
 

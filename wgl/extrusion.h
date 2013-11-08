@@ -39,7 +39,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 extern void InitStuff_helix2(void);
 extern void DrawStuff_helix2(void);

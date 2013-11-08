@@ -98,7 +98,7 @@ static const char sccsid[] = "@(#)hypertorus.c  1.2 05/09/28 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 #ifdef USE_GL
 

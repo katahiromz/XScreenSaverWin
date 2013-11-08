@@ -26,7 +26,7 @@
  
 //#include <sys/time.h> /* gettimeofday */
 
-#include "win32.h"
+#include "xws2win.h"
 
 //#include "xlockmore.h"
 

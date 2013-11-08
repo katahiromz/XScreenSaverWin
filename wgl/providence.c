@@ -29,7 +29,7 @@
 	#endif
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 #include "gltrackball.h"
 

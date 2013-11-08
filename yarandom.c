@@ -62,7 +62,7 @@
 	#include <sys/time.h> /* for gettimeofday() */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 #include "yarandom.h"
 # undef ya_rand_init

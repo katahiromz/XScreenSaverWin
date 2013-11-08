@@ -81,7 +81,7 @@ static const char sccsid[] = "@(#)ant.c	5.00 2000/11/01 xlockmore";
 	#endif /* STANDALONE */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 #include "erase.h"
 #include "automata.h"
 

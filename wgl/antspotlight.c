@@ -42,7 +42,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 #include "sphere.h"
 #include "tube.h"
 #include "rotator.h"

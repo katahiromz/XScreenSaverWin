@@ -31,7 +31,7 @@
 	#endif /* !STANDALONE */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 /* lifted from lament.c */
 #define RAND(n) ((long) ((random() & 0x7fffffff) % ((long) (n))))

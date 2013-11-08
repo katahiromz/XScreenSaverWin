@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 #include "yarandom.h"
 #include "rotator.h"

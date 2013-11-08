@@ -33,7 +33,7 @@
  *
  */
 
-#include "win32.h"
+#include "xws2win.h"
 #include <math.h>
 
 #define DEFAULTS "*delay:             " DEF_DELAY "\n"                      \

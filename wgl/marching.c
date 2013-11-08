@@ -19,7 +19,7 @@
 	#endif
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>

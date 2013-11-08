@@ -21,7 +21,7 @@
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-#include "win32.h"
+#include "xws2win.h"
 
 //#include "xlockmore.h"
 #include "involute.h"

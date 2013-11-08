@@ -89,7 +89,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 #define RAD 57.295
 #define RRAD 0.01745

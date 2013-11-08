@@ -66,7 +66,7 @@
 			"*wireframe:	False	\n"
 # define refresh_lament 0
 # define release_lament 0
-#include "win32.h"
+#include "xws2win.h"
 //#include "xlockmore.h"
 
 #ifdef USE_GL /* whole file */

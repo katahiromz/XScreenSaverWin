@@ -25,7 +25,7 @@
 # define noof_handle_event 0
 //#include "xlockmore.h"
 
-#include "win32.h"
+#include "xws2win.h"
 
 #ifdef USE_GL /* whole file */
 

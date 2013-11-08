@@ -138,7 +138,7 @@ static const char sccsid[] = "@(#)klein.c  1.1 08/10/04 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include "win32.h"
+#include "xws2win.h"
 
 #ifdef USE_GL
 

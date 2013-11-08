@@ -9,7 +9,7 @@
  * implied warranty.
  */
 
-#include "win32.h"
+#include "xws2win.h"
 
 #if 0
 	#ifdef HAVE_CONFIG_H

@@ -30,7 +30,7 @@
 				 
 # define refresh_glhanoi 0
 
-#include "win32.h"
+#include "xws2win.h"
 #include "rotator.h"
 
 /* polygon resolution of poles and disks */

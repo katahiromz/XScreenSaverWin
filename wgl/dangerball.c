@@ -22,7 +22,7 @@
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
 //#include "xlockmore.h"
-#include "win32.h"
+#include "xws2win.h"
 #include "colors.h"
 #include "sphere.h"
 #include "tube.h"
