@@ -1,5 +1,5 @@
-#ifndef __XSCREENSAVER_WIN32_H__
-#define __XSCREENSAVER_WIN32_H__
+#ifndef __XWS2WIN_H__
+#define __XWS2WIN_H__
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -9,8 +9,6 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,12 +17,18 @@
 #include <time.h>
 #include <assert.h>
 
+#undef min
+#undef max
+#undef far
+#undef hyper
+
 //////////////////////////////////////////////////////////////////////////////
 
 #define USE_GL 1
-#define HAVE_GLBINDTEXTURE
-#define inline
-#define ENTRYPOINT static
+#define XWS2WIN_SPEED 1
+
+#define HAVE_GLBINDTEXTURE 1
+#define HAVE_DOUBLE_BUFFER_EXTENSION 1
 
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
@@ -34,41 +38,15 @@
 #define Xrealloc realloc
 #define Xfree free
 
+#define XFree free
+
 typedef BYTE CARD8;
 typedef WORD CARD16;
 typedef DWORD CARD32;
 
-#define GL_UNSIGNED_INT_8_8_8_8_REV GL_UNSIGNED_BYTE
-
-#ifndef  GL_TEXTURE_MAX_ANISOTROPY_EXT
-# define GL_TEXTURE_MAX_ANISOTROPY_EXT      0x84FE
-#endif
-#ifndef  GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
-# define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT  0x84FF
-#endif
-
-#ifndef GL_LIGHT_MODEL_COLOR_CONTROL
-# define GL_LIGHT_MODEL_COLOR_CONTROL       0x81F8
-#endif
-#ifndef GL_SEPARATE_SPECULAR_COLOR
-# define GL_SEPARATE_SPECULAR_COLOR         0x81FA
-#endif
-
 #define None NULL
 
-#ifdef MSGBOXOUTPUT
-    int __cdecl win32_fprintf(FILE *fp, const char *fmt, ...);
-    void __cdecl win32_abort(void);
-    int __cdecl win32_exit(int n);
-    #define fprintf win32_fprintf
-    #define abort win32_abort
-    #define exit win32_exit
-#endif
-
-enum { CoordModeOrigin, CoordModePrevious };
-enum { Convex };
-enum { OK = 0, BadAlloc, BadGC, BadValue, BadFont, BadMatch, BadPixmap };
-enum { GXcopy = R2_COPYPEN, GXxor = R2_XORPEN };
+#define rint(e) ((int)(e + 0.5))
 
 //////////////////////////////////////////////////////////////////////////////
 // Bool
@@ -78,28 +56,32 @@ typedef BOOL Bool;
 #define True TRUE
 
 //////////////////////////////////////////////////////////////////////////////
-// Drawable
 
-typedef INT Drawable;
-typedef INT Pixmap;
-typedef INT Window;
+typedef struct
+{
+    HBITMAP hbm;
+    LPBYTE pbBits;
+    HBITMAP hbmOld;
+} DrawableData;
 
-//////////////////////////////////////////////////////////////////////////////
-// Visual
-
-#define Visual int
-
-//////////////////////////////////////////////////////////////////////////////
-// Colormap
-
+typedef DrawableData* Drawable;
+typedef DrawableData* Pixmap;
+typedef DrawableData* Window;
+typedef int Visual;
 typedef unsigned long Colormap;
+
+DrawableData* XGetDrawableData_(Drawable d);
 
 //////////////////////////////////////////////////////////////////////////////
 // XPoint, XSegment, XRectangle, XArc
 
-typedef struct {
-    short x, y;
-} XPoint;
+#if XWS2WIN_SPEED
+    typedef POINT XPoint;
+#else
+    typedef struct {
+        short x, y;
+    } XPoint;
+#endif
 
 typedef struct {
      short x1, y1, x2, y2;
@@ -122,18 +104,18 @@ typedef int Status;
 
 #ifdef STRICT
     #define Display struct HDC__
-    #define Screen struct HWND__
 #else
     #define Display void
-    #define Screen void
 #endif
 
+typedef int Screen;
 typedef HGLRC GLXContext;
 
 //////////////////////////////////////////////////////////////////////////////
 // XWindowAttributes
 
-typedef struct {
+typedef struct
+{
     int width;
     int height;
     int depth;
@@ -141,6 +123,14 @@ typedef struct {
     Colormap colormap;
     Screen *screen;
 } XWindowAttributes;
+
+//////////////////////////////////////////////////////////////////////////////
+
+typedef struct
+{
+    int depth;
+    int bits_per_pixel;
+} XPixmapFormatValues;
 
 //////////////////////////////////////////////////////////////////////////////
 // XrmOptionDescRec, argtype, OptionStruct, ModeSpecOpt, ModStruct
@@ -159,68 +149,34 @@ typedef struct
     char *def;
 } XrmOptionDescRec;
 
-typedef enum
-{
-    t_Bool, t_Int, t_Float, t_String
-} argdatatype;
+//////////////////////////////////////////////////////////////////////////////
 
-typedef struct
-{
-    void *data;
-    char *name;
-    char *text;
-    char *def;
-    argdatatype type;
-} argtype;
-
-typedef struct
-{
-    char *opt;
-    char *desc;
-} OptionStruct;
-
-typedef struct
-{
-    int nopts;
-    XrmOptionDescRec *opts;
-    int nargs;
-    argtype *args;
-    OptionStruct *desc;
-} ModeSpecOpt;
-
-typedef struct
-{
-    char *ignore0;
-    char *ignore1;
-    char *ignore2;
-    char *ignore3;
-    char *ignore4;
-    char *ignore5;
-    char *ignore6;
-    void *ignore7;
-    int ignore8;
-    int ignore9;
-    int ignore10;
-    int ignore11;
-    int ignore12;
-    float ignore13;
-    char *ignore14;
-    char *ignore15;
-    int ignore16;
-    void *ignore17;
-} ModStruct;
+enum { CoordModeOrigin, CoordModePrevious };
+enum { Convex };
+enum { BadAlloc = 1, BadGC, BadValue, BadFont, BadMatch, BadPixmap };
+enum {
+    GXcopy = R2_COPYPEN, GXor = R2_MERGEPEN, GXxor = R2_XORPEN,
+    GXandInverted = R2_NOTMASKPEN
+};
 
 //////////////////////////////////////////////////////////////////////////////
 // GC
 
-#define GCForeground 0
-#define GCBackground 1
+#define GCForeground (1 << 0)
+#define GCBackground (1 << 1)
+#define GCFillStyle  (1 << 2)
+#define GCFunction   (1 << 3)
+#define GCStipple    (1 << 4)
+#define GCLineWidth  (1 << 5)
+#define GCCapStyle   (1 << 6)
+#define GCJoinStyle  (1 << 7)
+#define GCLineStyle  (1 << 8)
+#define GCFillRule   (1 << 9)
 
 enum    // line_style
 {
     LineSolid = PS_SOLID,
     LineOnOffDash = PS_DASH,
-    LineDoubleDash = PS_DASHDOT
 };
 
 enum    // cap_style
@@ -228,7 +184,7 @@ enum    // cap_style
     CapNotLast = PS_ENDCAP_FLAT,
     CapButt = PS_ENDCAP_SQUARE,
     CapRound = PS_ENDCAP_ROUND,
-    CapProjecting
+    CapProjecting = CapButt
 };
 
 enum    // join_style
@@ -238,7 +194,11 @@ enum    // join_style
     JoinBevel = PS_JOIN_BEVEL
 };
 
-typedef unsigned long GC;
+enum    // fill_style
+{
+    FillSolid = BS_SOLID, FillStippled = BS_DIBPATTERN,
+    FillOpaqueStippled = BS_DIBPATTERN
+};
 
 typedef struct
 {
@@ -250,31 +210,32 @@ typedef struct
     int line_style;
     int cap_style;
     int join_style;
+    int function;
+    int fill_style;
+    Pixmap stipple;
+    int fill_rule;
+    HBITMAP hbmOld;
 } XGCValues;
 
-#define MAX_GC_BUFFER 32
+typedef XGCValues *GC;
 
-XGCValues *XGetGCValues0(GC gc);
+#define XGetGCValues_(gc) gc
+HDC XCreateDrawableDC_(Display *dpy, Drawable d);
+int XDeleteDrawableDC_(Display *dpy, Drawable d, HDC hdc);
 
-Status XGetGCValues(
-    Display *dpy,
-    GC gc,
-    unsigned long valuemask,
-    XGCValues *values_return);
-
-GC XCreateGC(
-     Display *dpy, 
-     Drawable d,
+GC XCreateGC(Display *dpy, Drawable d,
      unsigned long valuemask, 
      XGCValues *values);
+int XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values);
 
 int XFreeGC(Display *dpy, GC gc);
 
 HPEN XCreateWinPen(XGCValues *values);
 HBRUSH XCreateWinBrush(XGCValues *values);
 HFONT XCreateWinFont(XGCValues *values);
-
 int XSetForeground(Display *dpy, GC gc, unsigned long foreground);
+int XSetBackground(Display *dpy, GC gc, unsigned long background);
+int XSetWindowBackground(Display *dpy, Window w, unsigned long pixel);
 
 int XCopyArea(
      Display *dpy,
@@ -286,9 +247,9 @@ int XCopyArea(
 //////////////////////////////////////////////////////////////////////////////
 // XColor
 
-#define DoRed           (1<<0)
-#define DoGreen         (1<<1)
-#define DoBlue          (1<<2)
+#define DoRed    (1 << 0)
+#define DoGreen  (1 << 1)
+#define DoBlue   (1 << 2)
 
 typedef struct
 {
@@ -299,6 +260,11 @@ typedef struct
 } XColor;
 
 Bool XAllocColor(Display *d, Colormap cmap, XColor *color);
+
+Bool XAllocNamedColor(
+    Display *d, Colormap cmap, const char *name,
+    XColor *near_color, XColor *true_color);
+
 Status XAllocColorCells(
     Display*        d,
     Colormap        cmap,
@@ -307,294 +273,30 @@ Status XAllocColorCells(
     unsigned int    nplanes,
     unsigned long*  pixels_return,
     unsigned int    npixels);
+
 int XFreeColors(
     Display*        d,
     Colormap        cmap,
     unsigned long*  pixels,
     int             npixels,
     unsigned long   planes);
+
 int XStoreColors(
     Display*    display,
     Colormap    cmap,
     XColor*     color,
     int         ncolors);
-int XFlush(Display *d);
+
 int XQueryColor(Display *dpy, Colormap cmap, XColor *def);
 int XParseColor(Display *d, Colormap cmap, const char *name, XColor *c);
+
 unsigned long load_color(Display *dpy, Colormap cmap, const char *name);
-
-//////////////////////////////////////////////////////////////////////////////
-// ModeInfo
-
-typedef struct
-{
-    Display *dpy;
-    Window window;
-    GC gc;
-    int num_screen;
-    int screen_number;
-    int width;
-    int height;
-    int polygon_count;
-    int recursion_depth;
-    Bool fps_p;
-    Bool is_drawn;
-    int pause;
-    int count;
-    int cycles;
-    int size;
-    XWindowAttributes xgwa;
-    int npixels;
-    XColor *colors;
-    unsigned long *pixels;
-    Bool writable_p;
-} ModeInfo;
-
-#define MI_DISPLAY(mi) (mi)->dpy
-#define MI_WINDOW(mi) 0
-#define MI_GC(mi) (mi)->gc
-#define MI_NUM_SCREENS(mi) 1
-#define MI_SCREEN(mi) 0
-#define MI_WIDTH(mi) (mi)->width
-#define MI_HEIGHT(mi) (mi)->height
-#define MI_WIN_WIDTH(mi) (mi)->width
-#define MI_WIN_HEIGHT(mi) (mi)->height
-#define MI_NCOLORS(mi) (256 - 20)
-#define MI_IS_DRAWN(mi) (mi)->is_drawn
-#define MI_IS_FPS(mi) FALSE
-#define MI_IS_MONO(mi) FALSE
-#define MI_CLEARWINDOW(mi) ss_clear(MI_DISPLAY(mi))
-#define MI_IS_WIREFRAME(mi) FALSE
-#define MI_COUNT(MI) (mi)->count
-#define MI_BATCHCOUNT(MI) MI_COUNT(MI)
-#define MI_IS_ICONIC(mi) FALSE
-#define MI_CYCLES(mi) (mi)->cycles
-#define MI_SIZE(mi) (mi)->size
-#ifdef NDEBUG
-    #define MI_IS_DEBUG(mi) FALSE
-    #define MI_IS_VERBOSE(mi) FALSE
-#else
-    #define MI_IS_DEBUG(mi) TRUE
-    #define MI_IS_VERBOSE(mi) TRUE
-#endif
-#define MI_NAME(mi) progname
-#define MI_DELAY(mi) DELAY
-#define MI_VISUAL(mi) NULL
-#define MI_COLORMAP(mi) 0
-#define MI_WIN_BLACK_PIXEL(mi) 0
-#define MI_PIXEL(mi,n) ((mi)->pixels[n])
-#define MI_BLACK_PIXEL(mi) 0
-#define MI_WHITE_PIXEL(mi) 255
-#define MI_NPIXELS(mi) (mi)->npixels
-#define MI_IS_FULLRANDOM(mi) TRUE
-#define MI_IS_INSTALL(mi) TRUE
-
-#define FreeAllGL(mi) /**/
-
-//////////////////////////////////////////////////////////////////////////////
-
-#define SINF(n)         ((float)sin((double)(n)))
-#define COSF(n)         ((float)cos((double)(n)))
-#define FABSF(n)        ((float)fabs((double)(n)))
-
-#undef MAX
-#undef MIN
-#undef ABS
-#define MAX(a,b) ((a)>(b)?(a):(b))
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#define ABS(a) ((a)<0 ? -(a) : (a))
-
-//////////////////////////////////////////////////////////////////////////////
-
-#undef NUMCOLORS
-#define NUMCOLORS 256
-
-//////////////////////////////////////////////////////////////////////////////
-
-#include "yarandom.h"
-
-#define LRAND()         ((long) (random() & 0x7fffffff))
-#define NRAND(n)        ((int) (LRAND() % (n)))
-#define MAXRAND         (2147483648.0) /* unsigned 1<<31 as a float */
-#define SRAND(n)        /* already seeded by screenhack.c */
-
-//////////////////////////////////////////////////////////////////////////////
-
-typedef enum COLOR_SCHEME {
-    color_scheme_default, color_scheme_uniform, 
-    color_scheme_smooth, color_scheme_bright
-};
-
-#ifdef WRITABLE_COLORS
-# undef WRITABLE_COLORS
-# define WRITABLE_COLORS 1
-#else
-# define WRITABLE_COLORS 0
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
-
-#define MAX_COLORS 0x1000
-
-# define XSCREENSAVER_LINK(NAME) \
-   struct xscreensaver_function_table *xscreensaver_function_table = &NAME;
-
-#if defined(UNIFORM_COLORS)
-# define XLOCKMORE_COLOR_SCHEME color_scheme_uniform
-#elif defined(SMOOTH_COLORS)
-# define XLOCKMORE_COLOR_SCHEME color_scheme_smooth
-#elif defined(BRIGHT_COLORS)
-# define XLOCKMORE_COLOR_SCHEME color_scheme_bright
-#else
-# define XLOCKMORE_COLOR_SCHEME color_scheme_default
-#endif
-
-typedef void (*HACK_INIT)(ModeInfo *);
-typedef void (*HACK_DRAW)(ModeInfo *);
-typedef void (*HACK_REFRESH)(ModeInfo *);
-typedef void (*HACK_FREE)(ModeInfo *);
-
-extern char *progname;
-extern DWORD hack_delay;
-extern int hack_count;
-extern int hack_count_enabled;
-extern int hack_cycles;
-extern int hack_cycles_enabled;
-extern int hack_size;
-extern int hack_size_enabled;
-extern int hack_ncolors;
-extern int hack_ncolors_enabled;
-extern int hack_color_scheme;
-
-extern int hack_argcount;
-extern argtype *hack_arginfo;
-
-#ifdef COUNT
-    #define HACK_COUNT \
-        int hack_count = COUNT; \
-        int hack_count_enabled = True
-#else
-    #define HACK_COUNT \
-        int hack_count = 0; \
-        int hack_count_enabled = False
-#endif
-#ifdef CYCLES
-    #define HACK_CYCLES \
-        int hack_cycles = CYCLES; \
-        int hack_cycles_enabled = True
-#else
-    #define HACK_CYCLES \
-        int hack_cycles = 0; \
-        int hack_cycles_enabled = False
-#endif
-#ifdef SIZE_
-    #define HACK_SIZE \
-        int hack_size = SIZE_; \
-        int hack_size_enabled = True
-#else
-    #define HACK_SIZE \
-        int hack_size = 0; \
-        int hack_size_enabled = False
-#endif
-#ifdef NCOLORS
-    #define HACK_NCOLORS \
-        int hack_ncolors = NCOLORS; \
-        int hack_ncolors_enabled = True
-#else
-    #define HACK_NCOLORS \
-        int hack_ncolors = 0; \
-        int hack_ncolors_enabled = False
-#endif
-
-#ifdef NOARGS
-    #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) \
-        HACK_INIT hack_init = init_ ## PREFIX; \
-        HACK_DRAW hack_draw = draw_ ## PREFIX; \
-        HACK_REFRESH hack_refresh = refresh_ ## PREFIX; \
-        HACK_FREE hack_free = release_ ## PREFIX; \
-        DWORD hack_delay = DELAY; \
-        char *progname = CLASS; \
-        HACK_COUNT; \
-        HACK_CYCLES; \
-        HACK_SIZE; \
-        HACK_NCOLORS; \
-        argtype *hack_arginfo = NULL; \
-        int hack_argcount = 0; \
-        int hack_color_scheme = XLOCKMORE_COLOR_SCHEME;
-#else
-    #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) \
-        HACK_INIT hack_init = init_ ## PREFIX; \
-        HACK_DRAW hack_draw = draw_ ## PREFIX; \
-        HACK_REFRESH hack_refresh = refresh_ ## PREFIX; \
-        HACK_FREE hack_free = release_ ## PREFIX; \
-        DWORD hack_delay = DELAY; \
-        char *progname = CLASS; \
-        HACK_COUNT; \
-        HACK_CYCLES; \
-        HACK_SIZE; \
-        HACK_NCOLORS; \
-        argtype *hack_arginfo = vars; \
-        int hack_argcount = sizeof(vars) / sizeof(vars[0]); \
-        int hack_color_scheme = XLOCKMORE_COLOR_SCHEME;
-#endif
-
-#define XSCREENSAVER_MODULE(CLASS,PREFIX) \
-    XSCREENSAVER_MODULE_2(CLASS,PREFIX,PREFIX)
-
-extern HACK_INIT hack_init;
-extern HACK_DRAW hack_draw;
-extern HACK_REFRESH hack_refresh;
-extern HACK_FREE hack_free;
-
-//////////////////////////////////////////////////////////////////////////////
-// OpenGL-related
-
-HGLRC *init_GL(ModeInfo *mi);
-void glXMakeCurrent(Display *d, Window w, GLXContext context);
-void glXSwapBuffers(Display *d, Window w);
-void check_gl_error(const char *name);
-void clear_gl_error(void);
-
-//////////////////////////////////////////////////////////////////////////////
-// trackball
-
-#define trackball_state char*   // Not implemented yet
-
-trackball_state *gltrackball_init(void);
-void gltrackball_rotate(trackball_state *trackball);
-void gltrackball_get_quaternion(char **ppch, float q[4]);
-void gltrackball_start(trackball_state* trackball, int n1, int n2, int n3, int n4);
-void gltrackball_track(trackball_state* trackball, int n1, int n2, int n3, int n4);
-
-//////////////////////////////////////////////////////////////////////////////
-// misc
-
-void do_fps(ModeInfo *mi);
-extern Bool has_writable_cells(Screen *s, Visual *v);
-float current_device_rotation(void);
-int ffs(int i);
-int visual_cells(Screen *screen, Visual *visual);
-int visual_depth(Screen *screen, Visual *visual);
-void
-load_texture_async(Screen *screen, Window window,
-                   GLXContext glx_context,
-                   int desired_width, int desired_height,
-                   Bool mipmap_p,
-                   GLuint texid,
-                   void (*callback) (const char *filename,
-                                     XRectangle *geometry,
-                                     int image_width,
-                                     int image_height,
-                                     int texture_width,
-                                     int texture_height,
-                                     void *closure),
-                   void *closure);
 
 //////////////////////////////////////////////////////////////////////////////
 // XImage
 
 // format
-enum { XYBitmap, XYPixmap, ZPixmap, RGBAPixmap };
+enum { XYBitmap, XYPixmap, ZPixmap, RGBAPixmap_ };
 
 // byte_order/bitmap_bit_order
 enum { MSBFirst, LSBFirst };
@@ -630,26 +332,40 @@ unsigned long XGetPixel(XImage *image, int x, int y);
 int XPutPixel(XImage *ximage, int x, int y, unsigned long pixel);
 
 Pixmap XCreatePixmap(
-    Display *dpy,
-    Drawable d,
-    unsigned int width,
-    unsigned int height,
+    Display* dpy, Drawable d,
+    unsigned int width, unsigned int height,
+    unsigned int depth);
+Pixmap XCreateBitmapFromData(
+    Display* dpy, Drawable d,
+    const char* data,
+    unsigned int width, unsigned int height);
+Pixmap XCreatePixmapFromBitmapData(
+    Display* dpy, Drawable d,
+    char* data,
+    unsigned int width, unsigned int height,
+    unsigned long fg, unsigned long bg,
     unsigned int depth);
 int XFreePixmap(Display *dpy, Pixmap pixmap);
+
 int XSync(Display *dpy, Bool b);
+
+XPixmapFormatValues *XListPixmapFormats(Display *dpy, int *count);
 
 //////////////////////////////////////////////////////////////////////////////
 // X Window
 
 Display *DisplayOfScreen(Screen *s);
-#define DefaultScreenOfDisplay(dpy) dpy
+#define DefaultScreenOfDisplay(dpy) 0
+#define DefaultScreen(dpy) 0
 #define BlackPixelOfScreen(s) 0
+#define WhitePixelOfScreen(s) 255
 #define DefaultColormap(dpy,scr) 0
+#define BlackPixel(dpy,scr) 0
+#define WhitePixel(dpy,scr) 255
+#define BitmapPad(dpy) 32
+#define ImageByteOrder(dpy) LSBFirst
 
-Status XGetWindowAttributes(
-    Display *dpy,
-    Window w,
-    XWindowAttributes *attr);
+Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr);
 int XSetLineAttributes(Display *dpy, GC gc,
     unsigned int line_width, int line_style,
     int cap_style, int join_style);
@@ -658,7 +374,7 @@ int XClearWindow(Display *dpy, Window w);
 
 int XDrawPoint(Display *dpy, Drawable d, GC gc,
     int x, int y);
-int XDrawPoints(Display *dpy, Drawable w, GC gc,
+int XDrawPoints(Display *dpy, Drawable d, GC gc,
     XPoint *points, int npoints, int CoordMode);
 
 int XDrawLine(Display *dpy, Drawable d, GC gc,
@@ -666,12 +382,18 @@ int XDrawLine(Display *dpy, Drawable d, GC gc,
 int XDrawLines(Display *dpy, Drawable d, GC gc,
     XPoint *points, int npoints, int mode);
 
+int XDrawRectangle(
+    Display *dpy, Drawable d, GC gc,
+    int x, int y, unsigned int width, unsigned int height);
+
 int XDrawSegments(Display *dpy, Drawable d, GC gc,
     XSegment *segments, int nsegments);
 
 int XDrawArc(Display *dpy, Drawable d, GC gc,
     int x, int y, unsigned int width, unsigned int height,
     int angle1, int angle2);
+int XDrawArcs(Display *dpy, Drawable d, GC gc,
+    XArc *arcs, int n_arcs);
 
 int XDrawString(Display *dpy, Drawable d, GC gc,
     int x, int y, const char *string, int length);
@@ -696,29 +418,17 @@ int XFillArc(Display *dpy, Drawable d, GC gc,
 int XFillArcs(Display *dpy, Drawable d, GC gc,
     XArc *arcs, int n_arcs);
 
-//////////////////////////////////////////////////////////////////////////////
-// screen saver
+int XSetFunction(Display *dpy, GC gc, int function);
+int XSetFillStyle(Display *dpy, GC gc, int fill);
 
-typedef struct SCREENSAVER
-{
-    HWND hwnd;
-    HDC hdc;
-    HGLRC hglrc;
-    UINT x0, y0;
-    UINT w, h;
-    ModeInfo modeinfo;
-    HBITMAP hbmScreenShot;
-} SCREENSAVER;
+int XPutImage(Display *dpy, Drawable d, GC gc,
+    XImage *image, int req_xoffset, int req_yoffset,
+    int x, int y, unsigned int req_width, unsigned int req_height);
 
-extern SCREENSAVER ss;
+int XFlush(Display *d);
 
-BOOL InitPixelFormat(SCREENSAVER *ss);
-VOID MakeCurrent(SCREENSAVER *ss);
-XImage *GetScreenShotXImage(void);
-void CreateTextureFromImage(XImage *ximage, GLuint texid);
-void ss_term(void);
-void ss_clear(Display *d);
+#define XMaxRequestSize(dpy) 100
 
 //////////////////////////////////////////////////////////////////////////////
 
-#endif  // ndef __XSCREENSAVER_WIN32_H__
+#endif  // ndef __XWS2WIN_H__

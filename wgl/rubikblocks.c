@@ -26,7 +26,7 @@
 
 //#include "xlockmore.h"
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #include "rotator.h"
 #include "gltrackball.h"

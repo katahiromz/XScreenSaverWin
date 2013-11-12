@@ -60,15 +60,17 @@ static const char sccsid[] = "@(#)galaxy.c 4.04 97/07/28 xlockmore";
 	# include "xlock.h"     /* from the xlockmore distribution */
 	#endif /* !STANDALONE */
 #endif
-#include "xws2win.h"
+#include "xlockmore.h"
 
 static Bool tracks = True;
 static Bool spin = True;
-static Bool dbufp = False;
+//static Bool dbufp = False;
+static Bool dbufp = True;
 
 #define DEF_TRACKS "True"
 #define DEF_SPIN   "True"
-#define DEF_DBUF   "False"
+//#define DEF_DBUF   "False"
+#define DEF_DBUF   "True"
 
 static XrmOptionDescRec opts[] =
 {

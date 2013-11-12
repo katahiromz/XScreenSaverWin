@@ -1,5 +1,4 @@
-#include "xws2win.h"
-#include <scrnsave.h>
+#include "screenhack.h"
 #include "resource.h"
 
 #ifdef _UNICODE
@@ -11,6 +10,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 SCREENSAVER ss;
+Bool mono_p = False;
 
 static LPCSTR pszCompany = "Software\\Katayama Hirofumi MZ";
 
@@ -79,7 +79,7 @@ VOID CenterDialog(HWND hwnd)
 //////////////////////////////////////////////////////////////////////////////
 // setting
 
-VOID LoadSetting(ModeInfo *mi)
+VOID LoadSetting(VOID)
 {
     HKEY hCompanyKey, hSoftwareKey;
     LONG result;
@@ -96,24 +96,6 @@ VOID LoadSetting(ModeInfo *mi)
         KEY_READ, &hSoftwareKey);
     if (result == ERROR_SUCCESS)
     {
-        // load count
-        cb = 256 * sizeof(CHAR);
-        result = RegQueryValueExA(hSoftwareKey,
-            "count", NULL, NULL, szValue, &cb);
-        if (result == ERROR_SUCCESS)
-            mi->count = strtol(szValue, NULL, 10);
-        // load cycles
-        cb = 256 * sizeof(CHAR);
-        result = RegQueryValueExA(hSoftwareKey,
-            "cycles", NULL, NULL, szValue, &cb);
-        if (result == ERROR_SUCCESS)
-            mi->cycles = strtol(szValue, NULL, 10);
-        // load size
-        cb = 256 * sizeof(CHAR);
-        result = RegQueryValueExA(hSoftwareKey,
-            "size", NULL, NULL, szValue, &cb);
-        if (result == ERROR_SUCCESS)
-            mi->size = strtol(szValue, NULL, 10);
         // load args
         for (i = 0; i < hack_argcount; i++)
         {
@@ -180,24 +162,6 @@ VOID GetSetting(HWND hwnd)
             break;
         }
     }
-    if (hack_count_enabled)
-    {
-        GetDlgItemTextA(hwnd, IDC_COUNTVAL, buf, 256);
-        sz_trim(buf);
-        ss.modeinfo.count = strtol(buf, NULL, 10);
-    }
-    if (hack_cycles_enabled)
-    {
-        GetDlgItemTextA(hwnd, IDC_CYCLESVAL, buf, 256);
-        sz_trim(buf);
-        ss.modeinfo.cycles = strtol(buf, NULL, 10);
-    }
-    if (hack_size_enabled)
-    {
-        GetDlgItemTextA(hwnd, IDC_SIZEVAL, buf, 256);
-        sz_trim(buf);
-        ss.modeinfo.size = strtol(buf, NULL, 10);
-    }
 }
 
 VOID ResetSetting(HWND hwnd)
@@ -214,7 +178,7 @@ VOID ResetSetting(HWND hwnd)
     RegCloseKey(hCompanyKey);
 }
 
-VOID SaveSetting(ModeInfo *mi)
+VOID SaveSetting(VOID)
 {
     HKEY hCompanyKey, hSoftwareKey;
     LONG result;
@@ -259,27 +223,6 @@ VOID SaveSetting(ModeInfo *mi)
             }
             dwSize = (strlen(szValue) + 1) * sizeof(CHAR);
             RegSetValueExA(hSoftwareKey, hack_arginfo[i].name,
-                0, REG_SZ, (LPBYTE)szValue, dwSize);
-        }
-        if (hack_count_enabled)
-        {
-            sprintf(szValue, "%d", ss.modeinfo.count);
-            dwSize = (strlen(szValue) + 1) * sizeof(CHAR);
-            RegSetValueExA(hSoftwareKey, "count",
-                0, REG_SZ, (LPBYTE)szValue, dwSize);
-        }
-        if (hack_cycles_enabled)
-        {
-            sprintf(szValue, "%d", ss.modeinfo.cycles);
-            dwSize = (strlen(szValue) + 1) * sizeof(CHAR);
-            RegSetValueExA(hSoftwareKey, "cycles",
-                0, REG_SZ, (LPBYTE)szValue, dwSize);
-        }
-        if (hack_size_enabled)
-        {
-            sprintf(szValue, "%d", ss.modeinfo.size);
-            dwSize = (strlen(szValue) + 1) * sizeof(CHAR);
-            RegSetValueExA(hSoftwareKey, "size",
                 0, REG_SZ, (LPBYTE)szValue, dwSize);
         }
         RegCloseKey(hSoftwareKey);
@@ -357,7 +300,7 @@ typedef struct tagBITMAPINFOEX
 {
     BITMAPINFOHEADER bmiHeader;
     RGBQUAD          bmiColors[256];
-} BITMAPINFOEX, FAR * LPBITMAPINFOEX;
+} BITMAPINFOEX, *LPBITMAPINFOEX;
 
 BOOL SaveBitmapToFile(LPCTSTR pszFileName, HBITMAP hbm)
 {
@@ -453,12 +396,14 @@ BOOL ss_init(HWND hwnd)
     GetClientRect(hwnd, &rc);
     ss.x0 = rc.left;
     ss.y0 = rc.top;
-    ss.w  = rc.right  - ss.x0;
-    ss.h  = rc.bottom - ss.y0;
-    if (ss.w == 0 || ss.h == 0)
+    assert(ss.x0 == 0);
+    assert(ss.y0 == 0);
+    ss.width = rc.right - rc.left;
+    ss.height = rc.bottom - rc.top;
+    if (ss.width == 0 || ss.height == 0)
         return FALSE;
 
-    ss.hdc = GetDC(hwnd);
+    ss.hdc = GetWindowDC(hwnd);
     if (ss.hdc == NULL)
         return FALSE;
 
@@ -477,32 +422,20 @@ BOOL ss_init(HWND hwnd)
     //SaveBitmapToFile("screenshot.bmp", ss.hbmScreenShot);
 
     MakeCurrent(&ss);
+    ss.dpy = ss.hdc;
+    ss.window = 0;
+    ss.xgwa.width = ss.width;
+    ss.xgwa.height = ss.height;
+    ss.xgwa.depth = 32;
+    ss.xgwa.visual = NULL;
+    ss.xgwa.colormap = 0;
+    ss.xgwa.screen = 0;
 
-    ss.modeinfo.dpy = ss.hdc;
-    ss.modeinfo.window = 0;
-    ss.modeinfo.gc = XCreateGC(ss.hdc, 0, 0, NULL);
-    ss.modeinfo.num_screen = 1;
-    ss.modeinfo.screen_number = 0;
-    ss.modeinfo.width = ss.w;
-    ss.modeinfo.height = ss.h;
-    ss.modeinfo.polygon_count = 0;
-    ss.modeinfo.fps_p = False;
-    ss.modeinfo.is_drawn = True;
-    ss.modeinfo.count = hack_count;
-    ss.modeinfo.cycles = hack_cycles;
-    ss.modeinfo.size = hack_size;
-    ss.modeinfo.xgwa.width = ss.w;
-    ss.modeinfo.xgwa.height = ss.h;
-    ss.modeinfo.xgwa.depth = 32;
-    ss.modeinfo.xgwa.visual = NULL;
-    ss.modeinfo.xgwa.colormap = 0;
-    ss.modeinfo.xgwa.screen = hwnd;
-
-    LoadSetting(&ss.modeinfo);
+    LoadSetting();
 
 #undef ya_rand_init
     ya_rand_init(0);
-    hack_init(&ss.modeinfo);
+    ss.closure = hack_init(ss.dpy, ss.window);
 
     return TRUE;
 }
@@ -526,6 +459,8 @@ VOID OnInitDialog(HWND hwnd)
     hIcon = (HICON)LoadImageA(GetModuleHandleA(NULL), MAKEINTRESOURCEA(1),
         IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), 0);
     SendMessageA(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+    // set window title
+    SetWindowText(hwnd, progname);
 
     for (i = 0; i < hack_argcount; i++)
     {
@@ -564,38 +499,12 @@ VOID OnInitDialog(HWND hwnd)
         ShowWindow(GetDlgItem(hwnd, IDC_ARGVAL00 + i), SW_HIDE);
     }
 
-    if (hack_count_enabled)
-    {
-        n = ss.modeinfo.count;
-        SetDlgItemInt(hwnd, IDC_COUNTVAL, n, TRUE);
-    }
-    else
-    {
-        ShowWindow(GetDlgItem(hwnd, IDC_COUNTNAME), SW_HIDE);
-        ShowWindow(GetDlgItem(hwnd, IDC_COUNTVAL), SW_HIDE);
-    }
-
-    if (hack_cycles_enabled)
-    {
-        n = ss.modeinfo.cycles;
-        SetDlgItemInt(hwnd, IDC_CYCLESVAL, n, TRUE);
-    }
-    else
-    {
-        ShowWindow(GetDlgItem(hwnd, IDC_CYCLESNAME), SW_HIDE);
-        ShowWindow(GetDlgItem(hwnd, IDC_CYCLESVAL), SW_HIDE);
-    }
-
-    if (hack_size_enabled)
-    {
-        n = ss.modeinfo.size;
-        SetDlgItemInt(hwnd, IDC_SIZEVAL, n, TRUE);
-    }
-    else
-    {
-        ShowWindow(GetDlgItem(hwnd, IDC_SIZENAME), SW_HIDE);
-        ShowWindow(GetDlgItem(hwnd, IDC_SIZEVAL), SW_HIDE);
-    }
+    ShowWindow(GetDlgItem(hwnd, IDC_COUNTNAME), SW_HIDE);
+    ShowWindow(GetDlgItem(hwnd, IDC_COUNTVAL), SW_HIDE);
+    ShowWindow(GetDlgItem(hwnd, IDC_CYCLESNAME), SW_HIDE);
+    ShowWindow(GetDlgItem(hwnd, IDC_CYCLESVAL), SW_HIDE);
+    ShowWindow(GetDlgItem(hwnd, IDC_SIZENAME), SW_HIDE);
+    ShowWindow(GetDlgItem(hwnd, IDC_SIZEVAL), SW_HIDE);
 
     CenterDialog(hwnd);
 }
@@ -605,10 +514,7 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     switch(uMsg)
     {
     case WM_INITDIALOG:
-        ss.modeinfo.count = hack_count;
-        ss.modeinfo.cycles = hack_cycles;
-        ss.modeinfo.size = hack_size;
-        LoadSetting(&ss.modeinfo);
+        LoadSetting();
         OnInitDialog(hWnd);
         return TRUE;
 
@@ -621,7 +527,7 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         {
         case IDOK:
             GetSetting(hWnd);
-            SaveSetting(&ss.modeinfo);
+            SaveSetting();
             EndDialog(hWnd, 0);
             break;
 
@@ -641,13 +547,14 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    unsigned long ul;
     switch(uMsg)
     {
     case WM_CREATE:
         if (ss_init(hWnd) == 0)
             return -1;
 
-        SetTimer(hWnd, 999, hack_delay / 1000, NULL);
+        SetTimer(hWnd, 999, 0, NULL);
         break;
 
     case WM_DESTROY:
@@ -656,7 +563,9 @@ LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         break;
 
     case WM_TIMER:
-        hack_draw(&ss.modeinfo);
+        KillTimer(hWnd, 999);
+        ul = hack_draw(ss.dpy, ss.window, ss.closure);
+        SetTimer(hWnd, 999, ul / 1000, NULL);
         break;
 
     default:
@@ -667,113 +576,40 @@ LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// X Window-related
 
 Display *DisplayOfScreen(Screen *s)
 {
-    return GetWindowDC(s);
+    return ss.dpy;
 }
+
+extern unsigned long window_background;
 
 int XClearWindow(Display *dpy, Window w)
 {
     RECT rc;
     HDC hdc = (HDC)dpy;
     HWND hwnd = WindowFromDC(hdc);
+    XColor color;
+    HBRUSH hbr;
+
     GetClientRect(hwnd, &rc);
-    return FillRect(hdc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
-}
+    color.pixel = window_background;
+    XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
+    hbr = CreateSolidBrush(RGB(color.red / 255, color.green / 255, color.blue / 255));
+    FillRect(hdc, &rc, hbr);
+    DeleteObject(hbr);
 
-static int gc_count = 0;
-static XGCValues *gc_buffer[MAX_GC_BUFFER] = {NULL};
-
-XGCValues *XGetGCValues0(GC gc)
-{
-    assert(gc_buffer[gc] != NULL);
-    return gc_buffer[gc];
-}
-
-Status XGetGCValues(
-    Display *dpy,
-    GC gc,
-    unsigned long valuemask,
-    XGCValues *values_return)
-{
-    XGCValues *values = XGetGCValues0(gc);
-    CopyMemory(values_return, values, sizeof(XGCValues));
-    return 1;
-}
-
-GC XCreateGC(
-     Display *dpy, 
-     Drawable d,
-     unsigned long valuemask, 
-     XGCValues *values)
-{
-    int i;
-
-    if (gc_count < MAX_GC_BUFFER)
-    {
-        values = (XGCValues *)calloc(1, sizeof(XGCValues));
-        if (values != NULL)
-        {
-            for (i = 0; i < MAX_GC_BUFFER; i++)
-            {
-                if (gc_buffer[i] == NULL)
-                {
-                    gc_buffer[i] = values;
-                    gc_count++;
-                    return i;
-                }
-            }
-            assert(0);
-        }
-        assert(0);
-    }
-    assert(0);
     return 0;
-}
-
-int XFreeGC(Display *dpy, GC gc)
-{
-    assert(gc_buffer[gc] != NULL);
-    free(gc_buffer[gc]);
-    gc_buffer[gc] = NULL;
-    gc_count--;
-    assert(gc_count >= 0);
-    return 0;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// trackball
-
-trackball_state *gltrackball_init(void)
-{
-    return NULL;
-}
-
-void gltrackball_rotate(trackball_state *trackball)
-{
-}
-
-void gltrackball_get_quaternion(char **ppch, float q[4])
-{
-    q[0] = q[1] = q[2] = q[3] = 0.0;
-}
-
-void gltrackball_start(trackball_state* trackball, int n1, int n2, int n3, int n4)
-{
-}
-
-void gltrackball_track(trackball_state* trackball, int n1, int n2, int n3, int n4)
-{
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // misc
 
-void do_fps(ModeInfo *mi)
-{
-}
+#if 0
+	void do_fps(ModeInfo *mi)
+	{
+	}
+#endif
 
 float current_device_rotation(void)
 {
@@ -802,9 +638,45 @@ int visual_depth(Screen *screen, Visual *visual)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+
+BOOL InitPixelFormat(SCREENSAVER *ss)
+{
+    return TRUE;
+}
+
+VOID MakeCurrent(SCREENSAVER *ss)
+{
+}
+
+void ss_term(void)
+{
+    hack_free(ss.dpy, ss.window, ss.closure);
+    ReleaseDC(ss.hwnd, ss.hdc);
+    DeleteObject(ss.hbmScreenShot);
+}
+
+void ss_clear(Display *d)
+{
+    XClearWindow(d, 0);
+}
+
+Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr)
+{
+    *attr = ss.xgwa;
+    return 0;
+}
+
+void gettimeofday(timeval *t, timezone *tz)
+{
+    DWORD dwTick = GetTickCount();
+    t->tv_sec = dwTick / 1000;
+    t->tv_usec = (dwTick % 1000) * 1000;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // message box output
 
-#ifdef MSGBOXOUTPUT
+#ifndef NOMSGBOXOUTPUT
     #undef fprintf
     #undef abort
     #undef exit
@@ -825,12 +697,18 @@ int visual_depth(Screen *screen, Visual *visual)
 
     void __cdecl win32_abort(void)
     {
+        keybd_event(VK_SHIFT, 0, 0, 0);
+        keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
+
         MessageBoxA(NULL, s_szBuffer, progname, MB_ICONERROR);
         exit(-1);
     }
 
     int __cdecl win32_exit(int n)
     {
+        keybd_event(VK_SHIFT, 0, 0, 0);
+        keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
+
         MessageBoxA(NULL, s_szBuffer, progname, MB_ICONERROR);
         exit(n);
     }

@@ -1,4 +1,4 @@
-#include "xws2win.h"
+#include "xlockmore.h"
 
 PIXELFORMATDESCRIPTOR pfd =
 {
@@ -37,13 +37,11 @@ VOID MakeCurrent(SCREENSAVER *ss)
 
 void ss_term(void)
 {
-    XFreeGC(ss.modeinfo.dpy, ss.modeinfo.gc);
+    free(ss.modeinfo.colors);
+    free(ss.modeinfo.pixels);
     hack_free(&ss.modeinfo);
-    wglMakeCurrent(NULL, NULL);
     ReleaseDC(ss.hwnd, ss.hdc);
-    wglDeleteContext(ss.hglrc);
     DeleteObject(ss.hbmScreenShot);
-    ss.hbmScreenShot = NULL;
 }
 
 void ss_clear(Display *d)
@@ -62,7 +60,7 @@ XImage *GetScreenShotXImage(void)
     cx = bm.bmWidth;
     cy = bm.bmHeight;
 
-    image = XCreateImage(NULL, NULL, 32, RGBAPixmap, 0, NULL, cx, cy, 32, 0);
+    image = XCreateImage(NULL, NULL, 32, RGBAPixmap_, 0, NULL, cx, cy, 32, 0);
     if (image)
     {
         size = image->bytes_per_line * image->height;
@@ -81,7 +79,7 @@ XImage *GetScreenShotXImage(void)
 
 void CreateTextureFromImage(XImage *ximage, GLuint texid)
 {
-    assert(ximage->format == RGBAPixmap);
+    assert(ximage->format == RGBAPixmap_);
     glBindTexture(GL_TEXTURE_2D, texid);
     glPixelStorei(GL_UNPACK_ALIGNMENT, ximage->bitmap_pad / 8);
 

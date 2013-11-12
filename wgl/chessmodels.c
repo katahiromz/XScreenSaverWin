@@ -44,7 +44,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #include "chessmodels.h"
 
 /* End of Data */

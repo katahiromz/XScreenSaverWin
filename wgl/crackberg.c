@@ -19,7 +19,7 @@
 
 //#include "xlockmore.h"
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #ifdef USE_GL /* whole file */
 

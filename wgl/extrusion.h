@@ -39,7 +39,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #include <GL/gle.h>
 
 extern void InitStuff_helix2(void);

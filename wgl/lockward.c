@@ -28,7 +28,7 @@
 //#include <strings.h>
 
 //#include "xlockmore.h"
-#include "xws2win.h"
+#include "xlockmore.h"
 #include "colors.h"
 
 

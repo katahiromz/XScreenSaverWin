@@ -21,7 +21,7 @@
 
 #define BELLRAND(n) ((frand((n)) + frand((n)) + frand((n))) / 3)
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #include "colors.h"
 
 //#include "xlockmore.h"

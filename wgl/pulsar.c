@@ -36,7 +36,7 @@
  *                                                                 
  */
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #include <math.h> 
 #include <stdio.h>
 #include <stdlib.h>

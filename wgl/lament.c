@@ -59,14 +59,13 @@
         duplicated on the "Unnatural History 2" compilation, WORLN M04699.)
  */
 
-#define HAVE_GLBINDTEXTURE
 #define DELAY 20000
 #define DEFAULTS	"*delay:	20000   \n"	\
 			"*showFPS:      False   \n"     \
 			"*wireframe:	False	\n"
 # define refresh_lament 0
 # define release_lament 0
-#include "xws2win.h"
+#include "xlockmore.h"
 //#include "xlockmore.h"
 
 #ifdef USE_GL /* whole file */

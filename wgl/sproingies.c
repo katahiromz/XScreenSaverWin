@@ -36,7 +36,7 @@ static const char sccsid[] = "@(#)sproingies.c	4.04 97/07/28 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #ifdef USE_GL
 

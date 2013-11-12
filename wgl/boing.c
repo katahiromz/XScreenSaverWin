@@ -31,7 +31,7 @@
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-#include "xws2win.h"
+#include "xlockmore.h"
 //#include "xlockmore.h"
 #include "gltrackball.h"
 #include <ctype.h>

@@ -120,7 +120,7 @@
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -223,15 +223,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\win32screensaver.c"
-				>
-			</File>
-			<File
 				RelativePath="..\xcolor.c"
 				>
 			</File>
 			<File
 				RelativePath="..\ximage.c"
+				>
+			</File>
+			<File
+				RelativePath="..\xlockmore.c"
 				>
 			</File>
 			<File
@@ -265,6 +265,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\xlockmore.h"
+				>
+			</File>
+			<File
 				RelativePath=".\xpm-ximage.h"
 				>
 			</File>
@@ -283,7 +287,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\win32screensaver.rc"
+				RelativePath="..\xlockmore.rc"
 				>
 			</File>
 		</Filter>

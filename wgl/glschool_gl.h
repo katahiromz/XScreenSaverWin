@@ -32,7 +32,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #include "glschool_alg.h"
 

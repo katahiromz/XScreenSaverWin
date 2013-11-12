@@ -41,7 +41,7 @@
 #undef RANDSIGN
 #define RANDSIGN() ((random() & 1) ? 1 : -1)
 
-#include "xws2win.h"
+#include "xlockmore.h"
 //#include "xlockmore.h"
 #include "rotator.h"
 #include "gltrackball.h"

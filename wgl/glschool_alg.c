@@ -9,7 +9,7 @@
  * implied warranty.
  */
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #if 0
 	#ifdef HAVE_CONFIG_H

@@ -14,7 +14,7 @@ static const char sccsid[] = "@(#)pipeobjs.c	4.04 97/07/28 xlockmore";
 	#endif
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #ifdef USE_GL
 

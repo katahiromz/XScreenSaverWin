@@ -94,7 +94,7 @@ static const char sccsid[] = "@(#)fire.c	5.02 2001/09/26 xlockmore";
 	#include "visgl.h"
 	#endif				/* !STANDALONE */
 #endif
-#include "xws2win.h"
+#include "xlockmore.h"
 
 
 #ifdef MODE_fire

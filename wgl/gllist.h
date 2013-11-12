@@ -15,7 +15,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 struct gllist{
 	GLenum format;

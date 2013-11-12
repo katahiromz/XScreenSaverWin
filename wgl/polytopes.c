@@ -102,7 +102,7 @@ static const char sccsid[] = "@(#)polytopes.c  1.2 05/09/28 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #ifdef USE_GL
 

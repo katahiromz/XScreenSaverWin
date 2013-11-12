@@ -55,7 +55,7 @@
 	#endif /* !STANDALONE */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #ifdef USE_GL
 

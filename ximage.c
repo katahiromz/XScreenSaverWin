@@ -1,8 +1,8 @@
-#include "xws2win.h"
+#include "xlockmore.h"
 
 void XInitImage(XImage *image)
 {
-	int width = image->width, depth = image->depth;
+    int width = image->width, depth = image->depth;
 
     assert(image != NULL);
 
@@ -72,7 +72,7 @@ XImage *XCreateImage(Display *dpy, Visual *visual, int depth, int format,
     case XYBitmap:
     case XYPixmap:
     case ZPixmap:
-    case RGBAPixmap:
+    case RGBAPixmap_:
         break;
 
     default:
@@ -163,7 +163,7 @@ unsigned long XGetPixel(XImage *ximage, int x, int y)
         }
     }
 
-    if (ximage->format == RGBAPixmap && ximage->bits_per_pixel == 32)
+    if (ximage->format == RGBAPixmap_ && ximage->bits_per_pixel == 32)
     {
         addr = &((unsigned char *)ximage->data)[y * ximage->bytes_per_line + (x << 2)];
         return addr[0] | (addr[1] << 8) | (addr[2] << 16) | (addr[2] << 24);
@@ -233,7 +233,7 @@ int XPutPixel(XImage *ximage, int x, int y, unsigned long pixel)
         return 1;
     }
 
-    if (ximage->format == RGBAPixmap && ximage->bits_per_pixel == 32)
+    if (ximage->format == RGBAPixmap_ && ximage->bits_per_pixel == 32)
     {
         addr = &((unsigned char *)ximage->data)[y * ximage->bytes_per_line + (x << 2)];
         if (ximage->byte_order == MSBFirst)
@@ -254,10 +254,5 @@ int XPutPixel(XImage *ximage, int x, int y, unsigned long pixel)
     }
 
     assert(0);
-    return 0;
-}
-
-int XFreePixmap(Display *dpy, Pixmap pixmap)
-{
     return 0;
 }

@@ -72,7 +72,7 @@ static const char sccsid[] = "@(#)dolphin.c	1.2 98/06/16 xlockmore";
  * OpenGL(TM) is a trademark of Silicon Graphics, Inc.
  */
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #ifdef USE_GL
 

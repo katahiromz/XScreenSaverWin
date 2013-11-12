@@ -10,7 +10,7 @@
  */
 //#include "xlockmore.h"
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #include "glschool.h"
 #include "colors.h"
 

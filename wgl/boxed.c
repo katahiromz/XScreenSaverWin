@@ -32,7 +32,7 @@ static const char sccsid[] = "@(#)boxed.c	0.9 01/09/26 xlockmore";
  *
  */
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #include "boxed.h"
 

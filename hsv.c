@@ -13,7 +13,7 @@
    to hack the screen with.
  */
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 //#include "utils.h"
 #include "hsv.h"

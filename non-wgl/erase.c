@@ -379,6 +379,32 @@ squaretate (eraser_state *st)
 static void
 fizzle (eraser_state *st)
 {
+#if 1	// hacked by katahiromz
+  // NOTE: XDrawPoints is too slow in Win32
+  XArc *arcs;
+  int chunk = 1000;
+  int narcs = st->width * st->height / 3;
+  narcs *= (st->ratio - st->prev_ratio);
+
+  arcs = (XArc *) calloc (chunk, sizeof(*arcs));
+  if (! arcs) return;
+
+  while (narcs > 0)
+    {
+      int remain = (chunk > narcs ? narcs : chunk);
+      int i;
+      for (i = 0; i < remain; i++)
+        {
+          int r = random();
+          arcs[i].x = r % st->width - 4;
+          arcs[i].y = (r >> 16) % st->height - 4;
+          arcs[i].width = arcs[i].height = 8;
+        }
+      XFillArcs(st->dpy, st->window, st->bg_gc, arcs, remain);
+      narcs -= remain;
+    }
+  free (arcs);
+#else
   XPoint *points;
   int chunk = 20000;
   int npoints = st->width * st->height * 4;
@@ -402,6 +428,7 @@ fizzle (eraser_state *st)
       npoints -= remain;
     }
   free (points);
+#endif
 }
 
 

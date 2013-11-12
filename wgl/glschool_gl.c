@@ -9,7 +9,7 @@
  * implied warranty.
  */
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #include "sphere.h"
 #include "glschool_gl.h"
 #include "sphere.h"

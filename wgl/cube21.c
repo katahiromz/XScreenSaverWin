@@ -48,7 +48,7 @@
 
 # define refresh_cube21 0
 
-#include "xws2win.h"
+#include "xlockmore.h"
 //#include "xlockmore.h"
 
 #include "gltrackball.h"

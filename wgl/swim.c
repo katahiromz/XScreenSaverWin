@@ -81,7 +81,7 @@ static const char sccsid[] = "@(#)swim.c	1.3 98/06/18 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #ifdef USE_GL
 

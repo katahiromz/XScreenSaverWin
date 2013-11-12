@@ -1,0 +1,227 @@
+There are 112 Goods, 9 OKs and 102 NGs of total 223 screen savers 
+in XScreenSaver.
+
+(Name)                  (Status)    (Comment)
+Abstractile             Good        
+Anemone                 Good        
+Anemotaxis              Good        
+Ant                     OK          Sometimes dirty
+AntInspect              Good        
+AntMaze                 Good        
+AntSpotlight            Good        
+Apollonian              Good        
+Apple2                  NG          
+Atlantis                Good        
+Attraction              NG          
+Atunnel                 Good        
+BSOD                    NG          
+Barcode                 NG          Bitmap broken
+Blaster                 NG          Stars not appears
+BlinkBox                Good        
+BlitSpin                NG          
+BlockTube               Good        
+Boing                   Good        
+Bouboule                OK          Colors bad
+BouncingCow             Good        
+BoxFit                  NG          
+Boxed                   Good        
+Braid                   NG          Hung up
+Bubble3D                NG          
+Bubbles                 NG          
+Bumps                   NG          
+CCurve                  Good        
+CWaves                  NG          
+Cage                    Good        
+Carousel                NG          
+Celtic                  Good        
+Circuit                 NG          
+CloudLife               Good        
+CompanionCube           Good        
+Compass                 Good        
+Coral                   Good        
+Crackberg               Good        
+Critical                Good        
+Crystal                 Good        
+Cube21                  Good        
+CubeStorm               Good        
+Cubenetic               Good        
+CubicGrid               Good        
+Cynosure                NG          Colors bad
+DNALogo                 Good        
+DangerBall              Good        
+DecayScreen             NG          
+Deco                    NG          Colors bad
+Deluxe                  NG          
+Demon                   Good        
+Discrete                NG          Colors bad
+Distort                 NG          
+Drift                   NG          Colors bad
+Endgame                 Good        
+Engine                  NG          
+Epicycle                Good        
+Eruption                Good        
+Euler2D                 OK          Colors bad
+Extrusion               Good        
+FadePlot                Good        
+Fiberlamp               NG          
+Fireworkx               NG          
+Flag                    NG          
+Flame                   NG          Colors bad
+FlipFlop                Good        
+FlipScreen3D            OK          Blur
+FlipText                NG          
+Flow                    NG          
+FluidBalls              NG          
+Flurry                  Good        
+FlyingToasters          Good        
+FontGlide               NG          
+Forest                  Good        
+FuzzyFlakes             Good        
+GFlux                   Good        
+GLBlur                  OK          Slow
+GLCells                 Good        
+GLForestFire            Good        
+GLHanoi                 Good        
+GLKnots                 Good        
+GLMatrix                Good        
+GLPlanet                Good        
+GLSchool                Good        
+GLSlideshow             NG          
+GLSnake                 NG          
+GLText                  NG          
+Galaxy                  OK          Flickers
+Gears                   Good        
+Gleidescope             OK          Slow
+Goop                    NG          
+Grav                    Good        
+Greynetic               NG          Hung up
+Halftone                Good        
+Halo                    NG          
+Helix                   Good        
+Hexadrop                Good        
+Hilbert                 Good        
+Hopalong                NG          Colors bad
+HyperBall               Good        
+HyperCube               Good        
+Hypertorus              Good        
+Hypnowheel              Good        
+IFS                     NG          
+IMSMap                  OK          Slow
+Interaggregate          NG          Hung up
+Interference            Good        
+Intermomentary          NG          Black out
+JigglyPuff              Good        
+Jigsaw                  NG          
+Juggle                  NG          
+Juggler3D               NG          
+Julia                   Good        
+Kaleidescope            NG          
+Kaleidocycle            Good        
+Klein                   Good        
+Kumppa                  NG          
+LCDscrub                NG          
+LMorph                  Good        
+Lament                  Good        
+Laser                   Good        
+Lavalite                NG          Camera position bad
+Lightning               Good        
+Lisa                    Good        
+Lissie                  NG          Colors bad
+Lockward                Good        
+Loop                    Good        
+Maze                    NG          
+MemScroller             NG          
+Menger                  Good        
+MetaBalls               Good        
+MirrorBlob              OK          Blur and slow
+Moebius                 Good        
+MoebiusGears            Good        
+Moire                   NG          
+Moire2                  NG          
+Molecule                NG          
+Morph3D                 Good        
+Mountain                NG          
+Munch                   Good        
+NerveRot                Good        
+Noof                    Good        
+NoseGuy                 NG          
+Pacman                  NG          
+Pedal                   NG          
+Penetrate               NG          
+Penrose                 Good        
+Petri                   Good        
+Phosphor                NG          
+Photopile               NG          
+Piecewise               NG          Colors bad
+Pinion                  NG          
+Pipes                   Good        
+Polyhedra               NG          
+Polyominoes             NG          
+Polytopes               Good        
+Pong                    NG          
+PopSquares              NG          
+Providence              Good        
+Pulsar                  Good        
+Pyro                    NG          
+Qix                     NG          
+QuasiCrystal            NG          
+Queens                  Good        
+RDbomb                  NG          
+Ripples                 NG          
+Rocks                   NG          
+Rorschach               Good        
+RotZoomer               NG          
+Rotor                   NG          Colors bad
+Rubik                   Good        
+RubikBlocks             Good        
+SBalls                  Good        
+ShadeBobs               Good        
+Sierpinski              Good        
+Sierpinski3D            Good        
+SkyTentacles            Good        
+SlideScreen             NG          
+Slip                    NG          
+Sonar                   NG          
+SpeedMine               NG          
+Sphere                  Good        
+Spheremonics            NG          
+Spiral                  NG          Colors bad
+Spotlight               NG          
+Sproingies              Good        
+Squiral                 Good        
+Stairs                  Good        
+StarWars                NG          
+Starfish                NG          
+StonerView              Good        
+Strange                 NG          
+Substrate               NG          Hung up
+Superquadrics           Good        
+Surfaces                Good        
+Swirl                   NG          Colors bad
+T3D                     NG          
+Tangram                 NG          
+Thornbird               Good        
+TimeTunnel              NG          
+TopBlock                Good        
+Triangle                NG          Colors bad
+TronBit                 Good        
+Truchet                 Good        
+Twang                   NG          
+UnknownPleasures        Good        
+Vermiculate             NG          
+Vines                   Good        
+Voronoi                 Good        
+Wander                  Good        
+WhirlWindWarp           Good        
+Whirlygig               Good        
+Worm                    NG          
+Wormhole                NG          
+XAnalogTV               NG          
+XFlame                  NG          
+XJack                   NG          
+XLyap                   NG          
+XMatrix                 NG          
+XRaySwarm               NG          
+XSpirograph             Good        
+Zoom                    NG          
+m6502                   NG          

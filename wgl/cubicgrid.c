@@ -27,7 +27,7 @@
 # define refresh_cubicgrid 0
 //#include "xlockmore.h"
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #ifdef USE_GL
 

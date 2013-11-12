@@ -179,7 +179,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\win32screensaver.c"
+				RelativePath=".\xlockmore.c"
 				>
 			</File>
 		</Filter>
@@ -203,7 +203,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\win32screensaver.rc"
+				RelativePath=".\xlockmore.rc"
 				>
 			</File>
 		</Filter>

@@ -73,6 +73,7 @@ static const char sccsid[] = "@(#)crystal.c	4.12 98/09/10 xlockmore";
 #define COUNT -500
 #define CYCLES 200
 #define SIZE_ -15
+#define NCOLORS 100
 # define DEFAULTS		"*delay:		60000	\n" \
 						 "*count:		 -500	\n" \
 						 "*cycles:		  200	\n" \
@@ -92,7 +93,7 @@ static const char sccsid[] = "@(#)crystal.c	4.12 98/09/10 xlockmore";
 	#endif /* STANDALONE */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #include "colors.h"
 
 #define DEF_CELL "True"		/* Draw unit cell */

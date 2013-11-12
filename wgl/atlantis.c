@@ -126,7 +126,7 @@ static const char sccsid[] = "@(#)atlantis.c	5.08 2003/04/09 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #ifdef USE_GL
 
@@ -182,15 +182,9 @@ static void
 parse_image_data(ModeInfo *mi)
 {
   atlantisstruct *ap = &atlantis[MI_SCREEN(mi)];
-#if 0
   ap->texture = xpm_to_ximage (mi->dpy,
 			       mi->xgwa.visual,
 			       mi->xgwa.colormap,
-			       sea_texture);
-#endif
-  ap->texture = xpm_to_ximage (mi->dpy,
-			       NULL,
-				   DefaultColormap(mi->dpy, mi->window),
 			       sea_texture);
 }
 

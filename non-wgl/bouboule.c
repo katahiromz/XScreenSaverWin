@@ -103,7 +103,7 @@ static const char sccsid[] = "@(#)bouboule.c	4.00 97/01/01 xlockmore";
 	#endif /* !STANDALONE */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 ENTRYPOINT ModeSpecOpt bouboule_opts = {
   0, NULL, 0, NULL, NULL };

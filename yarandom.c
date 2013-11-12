@@ -62,7 +62,7 @@
 	#include <sys/time.h> /* for gettimeofday() */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #include "yarandom.h"
 # undef ya_rand_init
@@ -129,8 +129,11 @@ ya_rand_init(unsigned int seed)
       //seed += (1003 * getpid());
       //seed = ROT (seed, 13);
 
-      seed =
-        (DWORD)(GetTickCount() ^ GetCurrentProcessId() ^ (DWORD_PTR)GetForegroundWindow());
+      seed = GetCurrentProcessId();
+      seed <<= 16;
+      seed ^= (DWORD)(DWORD_PTR)GetForegroundWindow();
+      seed <<= 8;
+      seed ^= GetTickCount();
     }
 
   a[0] += seed;

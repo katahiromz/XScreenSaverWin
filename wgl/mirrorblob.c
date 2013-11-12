@@ -33,7 +33,7 @@
  *
  */
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #include <math.h>
 
 #define DEFAULTS "*delay:             " DEF_DELAY "\n"                      \

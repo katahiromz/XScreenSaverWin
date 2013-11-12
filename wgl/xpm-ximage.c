@@ -18,7 +18,7 @@
 	#endif
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -567,7 +567,7 @@ xpm_to_ximage_1 (Display *dpy, Visual *visual, Colormap cmap,
     }
   free (data);
 
-  ximage->format = RGBAPixmap;
+  ximage->format = RGBAPixmap_;
 
   if (filename)
     {

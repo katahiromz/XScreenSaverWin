@@ -41,7 +41,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #include "sphere.h"
 #include "gltrackball.h"
 

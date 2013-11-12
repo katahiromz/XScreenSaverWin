@@ -1,4 +1,4 @@
-#include "xws2win.h"
+#include "xlockmore.h"
 
 typedef struct
 {
@@ -1076,11 +1076,8 @@ int XParseColor(Display *d, Colormap cmap, const char *name, XColor *c)
 }
 
 Bool XAllocNamedColor(
-    Display *d,
-    Colormap cmap,
-    const char *name,
-    XColor *near_color,
-    XColor *true_color)
+    Display *d, Colormap cmap, const char *name,
+    XColor *near_color, XColor *true_color)
 {
     WORD red, green, blue;
     WORD true_red, true_green, true_blue;
@@ -1286,12 +1283,28 @@ unsigned long load_color(Display *dpy, Colormap cmap, const char *name)
     return color.pixel;
 }
 
+int XSetBackground(Display *dpy, GC gc, unsigned long background)
+{
+    XColor color;
+    XGCValues *values;
+
+    values = XGetGCValues_(gc);
+    if (values == NULL)
+        return BadGC;
+
+    values->background = background;
+    color.pixel = background;
+    XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
+    values->background_rgb = RGB(color.red / 256, color.green / 256, color.blue / 256);
+    return 0;
+}
+
 int XSetForeground(Display *dpy, GC gc, unsigned long foreground)
 {
     XColor color;
     XGCValues *values;
 
-    values = XGetGCValues0(gc);
+    values = XGetGCValues_(gc);
     if (values == NULL)
         return BadGC;
 
@@ -1299,5 +1312,13 @@ int XSetForeground(Display *dpy, GC gc, unsigned long foreground)
     color.pixel = foreground;
     XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
     values->foreground_rgb = RGB(color.red / 256, color.green / 256, color.blue / 256);
+    return 0;
+}
+
+unsigned long window_background = 0;
+
+int XSetWindowBackground(Display *dpy, Window w, unsigned long pixel)
+{
+    window_background = pixel;
     return 0;
 }

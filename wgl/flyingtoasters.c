@@ -46,7 +46,7 @@
 #undef BELLRAND
 #define BELLRAND(n) ((frand((n)) + frand((n)) + frand((n))) / 3)
 
-#include "xws2win.h"
+#include "xlockmore.h"
 //#include "xlockmore.h"
 #include "gltrackball.h"
 #include "xpm-ximage.h"

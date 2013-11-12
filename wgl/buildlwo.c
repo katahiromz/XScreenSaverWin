@@ -16,7 +16,7 @@ static const char sccsid[] = "@(#)buildlwo.c	4.02 97/04/20 xlockmore";
  *
  */
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #if 0
 	#ifndef STANDALONE

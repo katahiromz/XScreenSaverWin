@@ -115,7 +115,7 @@ static const char sccsid[] = "@(#)rubik.c	5.01 2001/03/01 xlockmore";
 					"*size:  -6 \n"
 # define refresh_rubik 0
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #if 0
 	#ifdef STANDALONE

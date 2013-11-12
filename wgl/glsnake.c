@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "xws2win.h"
+#include "xlockmore.h"
 
 #if 0
 	/* HAVE_GLUT defined if we're building a standalone glsnake,

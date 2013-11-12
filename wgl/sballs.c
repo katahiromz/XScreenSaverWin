@@ -52,7 +52,7 @@ static const char sccsid[] = "@(#)sballs.c	5.02 2001/03/10 xlockmore";
 # define refresh_sballs 0
 #define MODE_sballs
 
-#include "xws2win.h"
+#include "xlockmore.h"
 #if 0
 	#ifdef STANDALONE	/* xscreensaver mode */
 	#include "xlockmore.h"		/* from the xscreensaver distribution */
