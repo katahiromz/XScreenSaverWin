@@ -220,7 +220,7 @@ int XDrawPoints(Display *dpy, Drawable d, GC gc,
     else
     {
         int x = points[0].x, y = points[0].y;
-        SetPixelV(dpy, x, y, rgb);
+        SetPixelV(hdc, x, y, rgb);
         for (i = 1; i < npoints; i++)
         {
             x += points[i].x;
@@ -721,7 +721,6 @@ int XFillArc(Display *dpy, Drawable d, GC gc,
     xEndArc = x + width / 2.0 + (width / 2.0) * cos(skewed2);
     yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
 
-
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
     hbrOld = SelectObject(hdc, hbr);
@@ -795,11 +794,20 @@ int XCopyArea(Display *dpy,
      unsigned int width, unsigned int height,
      int dst_x, int dst_y)
 {
-    HDC hdcSrc = XCreateDrawableDC_(dpy, src_drawable);
-    HDC hdcDst = XCreateDrawableDC_(dpy, dst_drawable);
-    BitBlt(hdcDst, dst_x, dst_y, width, height, hdcSrc, src_x, src_y, SRCCOPY);
-    XDeleteDrawableDC_(dpy, src_drawable, hdcSrc);
-    XDeleteDrawableDC_(dpy, dst_drawable, hdcDst);
+    if (src_drawable == dst_drawable)
+    {
+        HDC hdc = XCreateDrawableDC_(dpy, dst_drawable);
+        BitBlt(hdc, dst_x, dst_y, width, height, hdc, src_x, src_y, SRCCOPY);
+        XDeleteDrawableDC_(dpy, dst_drawable, hdc);
+    }
+    else
+    {
+        HDC hdcSrc = XCreateDrawableDC_(dpy, src_drawable);
+        HDC hdcDst = XCreateDrawableDC_(dpy, dst_drawable);
+        BitBlt(hdcDst, dst_x, dst_y, width, height, hdcSrc, src_x, src_y, SRCCOPY);
+        XDeleteDrawableDC_(dpy, src_drawable, hdcSrc);
+        XDeleteDrawableDC_(dpy, dst_drawable, hdcDst);
+    }
     return 0;
 }
 

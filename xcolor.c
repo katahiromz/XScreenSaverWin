@@ -1066,9 +1066,9 @@ int XParseColor(Display *d, Colormap cmap, const char *name, XColor *c)
     {
         if (_stricmp(named_color_entries[i].name, name) == 0)
         {
-            c->red = named_color_entries[i].red;
-            c->green = named_color_entries[i].green;
-            c->blue = named_color_entries[i].blue;
+            c->red = named_color_entries[i].red * 256;
+            c->green = named_color_entries[i].green * 256;
+            c->blue = named_color_entries[i].blue * 256;
             return 1;
         }
     }

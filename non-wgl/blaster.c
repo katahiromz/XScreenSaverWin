@@ -1126,7 +1126,6 @@ blaster_init (Display *d, Window w)
 		}
 
 		make_gc_(st->s_color,star_color);
-		
 		make_gc_(st->EXPLODE_COLOR_1,explode_color_1);
 		make_gc_(st->EXPLODE_COLOR_2,explode_color_2);
 		
