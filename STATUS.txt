@@ -1,4 +1,4 @@
-There are 130 Goods, 7 OKs and 86 NGs of total 223 screen savers 
+There are 131 Goods, 7 OKs and 85 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -27,7 +27,7 @@ BoxFit                  NG
 Boxed                   Good        
 Braid                   Good        
 Bubble3D                Good        
-Bubbles                 NG          
+Bubbles                 Good        
 Bumps                   NG          
 CCurve                  Good        
 CWaves                  Good        

@@ -74,6 +74,8 @@ typedef unsigned long Colormap;
 
 DrawableData* XGetDrawableData_(Drawable d);
 
+typedef char *XPointer;
+
 //////////////////////////////////////////////////////////////////////////////
 // XPoint, XSegment, XRectangle, XArc
 
