@@ -30,15 +30,15 @@ static const char sccsid[] = "@(#)braid.c	5.00 2000/11/01 xlockmore";
  * 29-Aug-1995: Written.  John Neil <neil@math.idbsu.edu>
  */
 
-#define NOARGS
 #define STANDALONE
+#define NOARGS
+
 # define MODE_braid
 #define DELAY 1000
 #define COUNT 15
 #define CYCLES 100
 #define SIZE_ -7
 #define NCOLORS 64
-#define COLORROUND
 # define DEFAULTS  "*delay: 1000 \n" \
 				   "*count: 15 \n" \
 				   "*cycles: 100 \n" \
@@ -50,22 +50,13 @@ static const char sccsid[] = "@(#)braid.c	5.00 2000/11/01 xlockmore";
 # define UNIFORM_COLORS
 # define braid_handle_event 0
 
-#if 0
-	#ifdef STANDALONE
-	# include "xlockmore.h"
-	#else /* STANDALONE */
-	# include "xlock.h"
-	# define ENTRYPOINT /**/
-	#endif /* STANDALONE */
-#endif
-
-#include "xlockmore.h"
+#ifdef STANDALONE
+# include "xlockmore.h"
 # include "erase.h"
-
-char *background = "black";
-char *foreground = "white";
-char *eraseMode = NULL;
-float eraseSeconds = 0;
+#else /* STANDALONE */
+# include "xlock.h"
+# define ENTRYPOINT /**/
+#endif /* STANDALONE */
 
 #ifdef MODE_braid
 
@@ -85,7 +76,7 @@ ModStruct   braid_description =
 #endif
 
 #if !defined( COLORROUND ) && !defined( COLORCOMP )
-#if 1
+#if 0
 /* to color in a circular pattern use COLORROUND */
 #define COLORROUND
 #else
@@ -93,6 +84,11 @@ ModStruct   braid_description =
 #define COLORCOMP
 #endif
 #endif
+
+char *background = "black";
+char *foreground = "white";
+float eraseSeconds = 0;
+char *eraseMode = NULL;
 
 #define MAXLENGTH  50		/* the maximum length of a braid word */
 #define MINLENGTH  8		/* the minimum length of a braid word */

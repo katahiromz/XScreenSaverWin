@@ -11,6 +11,7 @@ if exist *.idb del *.idb
 if exist *.ilk del *.ilk
 if exist *.mani* del *.mani*
 if exist *.res del *.res
+if exist *.pch del *.pch
 if exist BuildLog.htm del BuildLog.htm
 if exist mt.dep del mt.dep
 cd ..
@@ -24,6 +25,7 @@ if exist *.idb del *.idb
 if exist *.ilk del *.ilk
 if exist *.mani* del *.mani*
 if exist *.res del *.res
+if exist *.pch del *.pch
 if exist BuildLog.htm del BuildLog.htm
 if exist mt.dep del mt.dep
 cd ..

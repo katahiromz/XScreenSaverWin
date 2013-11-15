@@ -152,7 +152,7 @@ typedef struct
 //////////////////////////////////////////////////////////////////////////////
 
 enum { CoordModeOrigin, CoordModePrevious };
-enum { Convex };
+enum { Convex, Nonconvex, Complex };
 enum { BadAlloc = 1, BadGC, BadValue, BadFont, BadMatch, BadPixmap };
 enum {
     GXcopy = R2_COPYPEN, GXor = R2_MERGEPEN, GXxor = R2_XORPEN,
@@ -172,6 +172,7 @@ enum {
 #define GCJoinStyle  (1 << 7)
 #define GCLineStyle  (1 << 8)
 #define GCFillRule   (1 << 9)
+#define GCGraphicsExposures (1 << 10)
 
 enum    // line_style
 {
@@ -214,6 +215,7 @@ typedef struct
     int fill_style;
     Pixmap stipple;
     int fill_rule;
+    Bool graphics_exposures;
     HBITMAP hbmOld;
 } XGCValues;
 
@@ -420,6 +422,12 @@ int XFillArcs(Display *dpy, Drawable d, GC gc,
 
 int XSetFunction(Display *dpy, GC gc, int function);
 int XSetFillStyle(Display *dpy, GC gc, int fill);
+
+Bool XQueryPointer(Display *dpy, Window w, Window *root, Window *child,
+     int *root_x, int *root_y, int *win_x, int *win_y,
+     unsigned int *mask);
+
+int XSetGraphicsExposures(Display *dpy, GC gc, Bool graphics_exposures);
 
 int XPutImage(Display *dpy, Drawable d, GC gc,
     XImage *image, int req_xoffset, int req_yoffset,

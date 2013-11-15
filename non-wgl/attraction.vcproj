@@ -195,6 +195,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\spline.c"
+				>
+			</File>
+			<File
 				RelativePath="..\xcolor.c"
 				>
 			</File>
@@ -226,6 +230,10 @@
 			</File>
 			<File
 				RelativePath="..\screenhack.h"
+				>
+			</File>
+			<File
+				RelativePath="..\spline.h"
 				>
 			</File>
 			<File

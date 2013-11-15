@@ -393,6 +393,9 @@ BOOL ss_init(HWND hwnd)
 
     ss.hwnd = hwnd;
 
+#undef ya_rand_init
+    ya_rand_init(0);
+
     GetClientRect(hwnd, &rc);
     ss.x0 = rc.left;
     ss.y0 = rc.top;
@@ -433,8 +436,6 @@ BOOL ss_init(HWND hwnd)
 
     LoadSetting();
 
-#undef ya_rand_init
-    ya_rand_init(0);
     ss.closure = hack_init(ss.dpy, ss.window);
 
     return TRUE;

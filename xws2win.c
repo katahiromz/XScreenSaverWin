@@ -59,6 +59,7 @@ GC XCreateGC(Display *dpy, Drawable d,
     newvalues->cap_style = CapButt;
     newvalues->join_style = JoinMiter;
     newvalues->line_style = LineSolid;
+    newvalues->graphics_exposures = True;
     if (values != NULL)
         XChangeGC(dpy, newvalues, valuemask, values);
 
@@ -116,6 +117,9 @@ int XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values)
 
     if (valuemask & GCStipple)
         newvalues->stipple = values->stipple;
+
+    if (valuemask & GCGraphicsExposures)
+        newvalues->graphics_exposures = values->graphics_exposures;
 
     return 0;
 }
@@ -395,6 +399,7 @@ int XDrawRectangle(
 
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
+    SelectObject(hdc, GetStockObject(NULL_BRUSH));
     Rectangle(hdc, x, y, x + width, y + height);
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
@@ -468,6 +473,7 @@ int XDrawArc(Display *dpy, Drawable d, GC gc,
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
     hPenOld = SelectObject(hdc, hPen);
+    SelectObject(hdc, GetStockObject(NULL_BRUSH));
     Arc(hdc, x, y, x + width, y + height,
         xStartArc, yStartArc, xEndArc, yEndArc);
     SelectObject(hdc, hPenOld);
@@ -503,6 +509,7 @@ int XDrawArcs(Display *dpy, Drawable d, GC gc,
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
     hPenOld = SelectObject(hdc, hPen);
+    SelectObject(hdc, GetStockObject(NULL_BRUSH));
     for (i = 0; i < n_arcs; i++)
     {
         x = arcs[i].x; y = arcs[i].y;
@@ -515,11 +522,8 @@ int XDrawArcs(Display *dpy, Drawable d, GC gc,
         xEndArc = x + width / 2.0 + (width / 2.0) * cos(skewed2);
         yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
 
-        BeginPath(hdc);
         Arc(hdc, x, y, x + width, y + height,
             xStartArc, yStartArc, xEndArc, yEndArc);
-        EndPath(hdc);
-        FillPath(hdc);
     }
     SelectObject(hdc, hPenOld);
     SetROP2(hdc, nR2);
@@ -638,8 +642,6 @@ int XFillPolygon(Display *dpy, Drawable d, GC gc,
     LPPOINT lpPoints;
     int i, x, y;
     int nR2;
-
-    assert(shape == Convex);
 
     values = XGetGCValues_(gc);
     if (values == NULL)
@@ -829,6 +831,29 @@ int XSetFillStyle(Display *dpy, GC gc, int fill)
 
     assert(fill == FillSolid);
     values->fill_style = fill;
+    return 0;
+}
+
+Bool XQueryPointer(Display *dpy, Window w, Window *root, Window *child,
+     int *root_x, int *root_y, int *win_x, int *win_y,
+     unsigned int *mask)
+{
+    *root = *child = NULL;
+    *root_x = *root_y = 0;
+    *win_x = *win_y = 0;
+    *mask = 0;
+	return True;
+}
+
+int XSetGraphicsExposures(Display *dpy, GC gc, Bool graphics_exposures)
+{
+    XGCValues *values;
+
+    values = XGetGCValues_(gc);
+    if (values == NULL)
+        return BadGC;
+
+    values->graphics_exposures = graphics_exposures;
     return 0;
 }
 

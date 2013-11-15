@@ -12,7 +12,7 @@ AntSpotlight            Good
 Apollonian              Good        
 Apple2                  NG          
 Atlantis                Good        
-Attraction              NG          
+Attraction              Good        
 Atunnel                 Good        
 BSOD                    NG          
 Barcode                 NG          Bitmap broken
@@ -21,12 +21,12 @@ BlinkBox                Good
 BlitSpin                NG          
 BlockTube               Good        
 Boing                   Good        
-Bouboule                OK          Colors bad
+Bouboule                Good        
 BouncingCow             Good        
 BoxFit                  NG          
 Boxed                   Good        
-Braid                   NG          Hung up
-Bubble3D                NG          
+Braid                   Good        
+Bubble3D                Good        
 Bubbles                 NG          
 Bumps                   NG          
 CCurve                  Good        
@@ -46,29 +46,29 @@ Cube21                  Good
 CubeStorm               Good        
 Cubenetic               Good        
 CubicGrid               Good        
-Cynosure                NG          Colors bad
+Cynosure                Good        
 DNALogo                 Good        
 DangerBall              Good        
 DecayScreen             NG          
-Deco                    NG          Colors bad
+Deco                    Good        
 Deluxe                  NG          
 Demon                   Good        
-Discrete                NG          Colors bad
+Discrete                Good        
 Distort                 NG          
-Drift                   NG          Colors bad
+Drift                   Good        
 Endgame                 Good        
 Engine                  NG          
 Epicycle                Good        
 Eruption                Good        
-Euler2D                 OK          Colors bad
+Euler2D                 Good        
 Extrusion               Good        
 FadePlot                Good        
 Fiberlamp               NG          
 Fireworkx               NG          
 Flag                    NG          
-Flame                   NG          Colors bad
+Flame                   Good        
 FlipFlop                Good        
-FlipScreen3D            OK          Blur
+FlipScreen3D            OK          Blur and slow
 FlipText                NG          
 Flow                    NG          
 FluidBalls              NG          
@@ -100,7 +100,7 @@ Halo                    NG
 Helix                   Good        
 Hexadrop                Good        
 Hilbert                 Good        
-Hopalong                NG          Colors bad
+Hopalong                Good        
 HyperBall               Good        
 HyperCube               Good        
 Hypertorus              Good        
@@ -118,7 +118,7 @@ Julia                   Good
 Kaleidescope            NG          
 Kaleidocycle            Good        
 Klein                   Good        
-Kumppa                  NG          
+Kumppa                  Good        
 LCDscrub                NG          
 LMorph                  Good        
 Lament                  Good        
@@ -126,7 +126,7 @@ Laser                   Good
 Lavalite                NG          Camera position bad
 Lightning               Good        
 Lisa                    Good        
-Lissie                  NG          Colors bad
+Lissie                  Good        
 Lockward                Good        
 Loop                    Good        
 Maze                    NG          
@@ -152,7 +152,7 @@ Penrose                 Good
 Petri                   Good        
 Phosphor                NG          
 Photopile               NG          
-Piecewise               NG          Colors bad
+Piecewise               NG          
 Pinion                  NG          
 Pipes                   Good        
 Polyhedra               NG          
@@ -171,7 +171,7 @@ Ripples                 NG
 Rocks                   NG          
 Rorschach               Good        
 RotZoomer               NG          
-Rotor                   NG          Colors bad
+Rotor                   Good        
 Rubik                   Good        
 RubikBlocks             Good        
 SBalls                  Good        
@@ -185,7 +185,7 @@ Sonar                   NG
 SpeedMine               NG          
 Sphere                  Good        
 Spheremonics            NG          
-Spiral                  NG          Colors bad
+Spiral                  Good        
 Spotlight               NG          
 Sproingies              Good        
 Squiral                 Good        
@@ -197,13 +197,13 @@ Strange                 NG
 Substrate               NG          Hung up
 Superquadrics           Good        
 Surfaces                Good        
-Swirl                   NG          Colors bad
+Swirl                   NG          Too slow
 T3D                     NG          
 Tangram                 NG          
 Thornbird               Good        
 TimeTunnel              NG          
 TopBlock                Good        
-Triangle                NG          Colors bad
+Triangle                Good        
 TronBit                 Good        
 Truchet                 Good        
 Twang                   NG          

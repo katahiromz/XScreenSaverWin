@@ -24,6 +24,9 @@
 #include <stdlib.h>
 #include "erase.h"
 
+float eraseSeconds = 0;
+char *eraseMode = NULL;
+
 char *background = "black";
 char *foreground = "white";
 int delay = 5;
