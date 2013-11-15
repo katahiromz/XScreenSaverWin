@@ -6,7 +6,7 @@
 #endif
 #include <scrnsave.h>
 
-#define MAX_COLORS 256
+#define MAX_COLORCELLS 300
 
 #define inline  /*empty*/
 

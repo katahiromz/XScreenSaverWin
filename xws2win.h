@@ -79,27 +79,23 @@ typedef char *XPointer;
 //////////////////////////////////////////////////////////////////////////////
 // XPoint, XSegment, XRectangle, XArc
 
-#if XWS2WIN_SPEED
-    typedef POINT XPoint;
-#else
-    typedef struct {
-        short x, y;
-    } XPoint;
-#endif
+typedef struct {
+    int x, y;
+} XPoint;
 
 typedef struct {
-     short x1, y1, x2, y2;
+     int x1, y1, x2, y2;
 } XSegment;
 
 typedef struct {
-    short x, y;
-    unsigned short width, height;
+    int x, y;
+    unsigned int width, height;
 } XRectangle;
 
 typedef struct {
-    short x, y;
-    unsigned short width, height;
-    short angle1, angle2;
+    int x, y;
+    unsigned int width, height;
+    int angle1, angle2;
 } XArc;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -203,6 +199,11 @@ enum    // fill_style
 {
     FillSolid = BS_SOLID, FillStippled = BS_DIBPATTERN,
     FillOpaqueStippled = BS_DIBPATTERN
+};
+
+enum	// fill_rule
+{
+    EvenOddRule, WindingRule
 };
 
 typedef struct
@@ -432,6 +433,11 @@ Bool XQueryPointer(Display *dpy, Window w, Window *root, Window *child,
      unsigned int *mask);
 
 int XSetGraphicsExposures(Display *dpy, GC gc, Bool graphics_exposures);
+
+int XClearArea(
+    Display *dpy, Window w,
+    int x, int y, unsigned int width, unsigned int height,
+    Bool exposures);
 
 int XPutImage(Display *dpy, Drawable d, GC gc,
     XImage *image, int req_xoffset, int req_yoffset,

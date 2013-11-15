@@ -485,7 +485,17 @@ static void build_substrate(struct field *f)
 
     /* erase the crack grid */
     f->cgrid = (int *) xrealloc(f->cgrid, sizeof(int) * f->height * f->width);
+#if 1
+    {
+        int i;
+        for (i = 0; i < f->height * f->width; i++)
+        {
+            f->cgrid[i] = 10001;
+        }
+    }
+#else
     memset(f->cgrid, 10001, f->height * f->width * sizeof(int));
+#endif
 
     /* Not necessary now that make_crack ensures we have usable default
      *  values in start_crack's timeout case 
@@ -582,7 +592,17 @@ static void build_img(Display *dpy, Window window, XWindowAttributes xgwa, GC fg
     f->off_img = (unsigned long *) xrealloc(f->off_img, sizeof(unsigned long) * 
                                             f->width * f->height);
 
+#if 1
+    {
+        int i;
+        for (i = 0; i < f->width * f->height; i++)
+        {
+            f->off_img[i] = f->bgcolor;
+        }
+    }
+#else
     memset(f->off_img, f->bgcolor, sizeof(unsigned long) * f->width * f->height);
+#endif
 }
 
 

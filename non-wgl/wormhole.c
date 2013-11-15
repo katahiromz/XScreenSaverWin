@@ -186,8 +186,13 @@ static void initColorChanger( struct state *st, color_changer * ch )
 	int q;
 	XColor old_color, new_color;
 
+#if 1
+	ch->shade_max = 200;
+	ch->shade_use = 50;
+#else
 	ch->shade_max = 2048;
 	ch->shade_use = 128;
+#endif
 	ch->min = 0;
 	ch->max = ch->shade_use;
 	ch->min_want = rnd( ch->shade_max - ch->shade_use );
@@ -670,12 +675,15 @@ wormhole_init (Display *dpy, Window window)
 
 	st->dpy = dpy;
 	st->window = window;
-	//st->delay = get_integer_resource(st->dpy,  "delay", "Integer" );
-	//st->make_stars = get_integer_resource(st->dpy,  "stars", "Integer" );
-	//st->z_speed = get_integer_resource(st->dpy,  "zspeed", "Integer" );
+#if 1
 	st->delay = delay;
 	st->make_stars = stars;
 	st->z_speed = zspeed;
+#else
+	st->delay = get_integer_resource(st->dpy,  "delay", "Integer" );
+	st->make_stars = get_integer_resource(st->dpy,  "stars", "Integer" );
+	st->z_speed = get_integer_resource(st->dpy,  "zspeed", "Integer" );
+#endif
 
 	initWormhole( st, &st->worm, st->dpy, st->window );
 

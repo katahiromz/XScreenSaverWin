@@ -187,6 +187,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\non-wgl.c"
+				>
+			</File>
+			<File
 				RelativePath=".\strange.c"
 				>
 			</File>

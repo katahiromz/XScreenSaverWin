@@ -46,6 +46,7 @@ static const char sccsid[] = "@(#)pacman.c	5.00 2000/11/01 xlockmore";
 
 #define STANDALONE
 #define DEF_TRACKMOUSE "False"
+#define USE_PIXMAP
 
 #	define MODE_pacman
 #define DELAY 10000
@@ -984,7 +985,8 @@ draw_pacman_sprite (ModeInfo * mi)
     else
         XSetForeground (display, pp->stippledGC, MI_WHITE_PIXEL (mi));
 
-    XSetFillStyle (display, pp->stippledGC, FillOpaqueStippled);
+    //XSetFillStyle (display, pp->stippledGC, FillOpaqueStippled);
+    XSetFillStyle (display, pp->stippledGC, FillSolid);
 
     if (pp->xs < 2 || pp->ys < 2)
         XDrawPoint (display, window, pp->stippledGC,
@@ -1042,7 +1044,8 @@ draw_ghost_sprite (ModeInfo * mi, const unsigned ghost)
     else
         XSetForeground (display, pp->stippledGC, MI_WHITE_PIXEL (mi));
 
-    XSetFillStyle (display, pp->stippledGC, FillOpaqueStippled);
+    //XSetFillStyle (display, pp->stippledGC, FillOpaqueStippled);
+    XSetFillStyle (display, pp->stippledGC, FillSolid);
 
     if (pp->xs < 2 || pp->ys < 2)
         XDrawPoint (display, window, pp->stippledGC,

@@ -59,15 +59,18 @@ GC XCreateGC(Display *dpy, Drawable d,
     newvalues->cap_style = CapButt;
     newvalues->join_style = JoinMiter;
     newvalues->line_style = LineSolid;
+    newvalues->fill_rule = EvenOddRule;
     newvalues->graphics_exposures = True;
     if (values != NULL)
         XChangeGC(dpy, newvalues, valuemask, values);
 
+#if 0
     if (d != NULL)
     {
         DrawableData *data = XGetDrawableData_(d);
         newvalues->hbmOld = SelectObject(dpy, data->hbm);
     }
+#endif
 
     return newvalues;
 }
@@ -118,6 +121,9 @@ int XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values)
     if (valuemask & GCStipple)
         newvalues->stipple = values->stipple;
 
+    if (valuemask & GCFillRule)
+        newvalues->fill_rule = values->fill_rule;
+
     if (valuemask & GCGraphicsExposures)
         newvalues->graphics_exposures = values->graphics_exposures;
 
@@ -130,8 +136,10 @@ int XFreeGC(Display *dpy, GC gc)
     if (values == NULL)
         return BadGC;
 
+#if 0
     if (values->hbmOld)
         SelectObject(dpy, values->hbmOld);
+#endif
 
     free(gc);
     return 0;
@@ -585,6 +593,7 @@ int XFillRectangle(
 
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
+    SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
     FillRect(hdc, &rc, hbr);
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
@@ -616,6 +625,7 @@ int XFillRectangles(
 
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
+    SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
     for (i = 0; i < n_rects; i++)
     {
         x = rectangles[i].x;
@@ -682,6 +692,7 @@ int XFillPolygon(Display *dpy, Drawable d, GC gc,
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
     hbrOld = SelectObject(hdc, hbr);
+    SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
     BeginPath(hdc);
     Polygon(hdc, lpPoints, n_points);
     EndPath(hdc);
@@ -724,6 +735,7 @@ int XFillArc(Display *dpy, Drawable d, GC gc,
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
     hbrOld = SelectObject(hdc, hbr);
+    SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
     BeginPath(hdc);
     Arc(hdc, x, y, x + width, y + height,
         xStartArc, yStartArc, xEndArc, yEndArc);
@@ -762,6 +774,7 @@ int XFillArcs(Display *dpy, Drawable d, GC gc,
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
     hbrOld = SelectObject(hdc, hbr);
+    SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
     for (i = 0; i < n_arcs; i++)
     {
         x = arcs[i].x; y = arcs[i].y;
@@ -837,7 +850,6 @@ int XSetFillStyle(Display *dpy, GC gc, int fill)
     if (values == NULL)
         return BadGC;
 
-    assert(fill == FillSolid);
     values->fill_style = fill;
     return 0;
 }
@@ -850,7 +862,7 @@ Bool XQueryPointer(Display *dpy, Window w, Window *root, Window *child,
     *root_x = *root_y = 0;
     *win_x = *win_y = 0;
     *mask = 0;
-	return True;
+    return True;
 }
 
 int XSetGraphicsExposures(Display *dpy, GC gc, Bool graphics_exposures)
@@ -864,6 +876,21 @@ int XSetGraphicsExposures(Display *dpy, GC gc, Bool graphics_exposures)
     values->graphics_exposures = graphics_exposures;
     return 0;
 }
+
+int XClearArea(
+    Display *dpy, Window w,
+    int x, int y, unsigned int width, unsigned int height,
+    Bool exposures)
+{
+    RECT rc;
+    HDC hdc = XCreateDrawableDC_(dpy, w);
+    SetRect(&rc, x, y, x + width, y + height);
+    FillRect(hdc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
+    XDeleteDrawableDC_(dpy, w, hdc);
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 typedef struct tagBITMAPINFOEX
 {
@@ -958,6 +985,8 @@ HBITMAP XCreateWinBitmapFromXImage(XImage *ximage)
 
     return NULL;
 }
+
+//////////////////////////////////////////////////////////////////////////////
 
 // NOTE: too slow!!!
 int XPutImage(Display *dpy, Drawable d, GC gc,

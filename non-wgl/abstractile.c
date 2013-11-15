@@ -1513,11 +1513,11 @@ abstractile_init(Display *display, Window window)
   XGetWindowAttributes (display, window, &st->xgwa);
   //gcv.foreground = get_pixel_resource(display, st->xgwa.colormap,
   //    "foreground", "Foreground");
-  gcv.foreground = load_color(display, st->xgwa.colormap, background);
+  gcv.foreground = load_color(display, st->xgwa.colormap, foreground);
   st->fgc = XCreateGC (display, window, GCForeground, &gcv);
   //gcv.foreground = get_pixel_resource(display, st->xgwa.colormap,
   //    "background", "Background");
-  gcv.foreground = load_color(display, st->xgwa.colormap, foreground);
+  gcv.foreground = load_color(display, st->xgwa.colormap, background);
   st->bgc = XCreateGC (display, window, GCForeground, &gcv);
 
 /* Um, no. This is obscene. -jwz.

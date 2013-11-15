@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\spline.c"
+				>
+			</File>
+			<File
 				RelativePath=".\starfish.c"
 				>
 			</File>
@@ -226,6 +230,10 @@
 			</File>
 			<File
 				RelativePath="..\screenhack.h"
+				>
+			</File>
+			<File
+				RelativePath="..\spline.h"
 				>
 			</File>
 			<File

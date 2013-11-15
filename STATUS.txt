@@ -1,4 +1,4 @@
-There are 131 Goods, 7 OKs and 85 NGs of total 223 screen savers 
+There are 139 Goods, 7 OKs and 77 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -64,13 +64,13 @@ Euler2D                 Good
 Extrusion               Good        
 FadePlot                Good        
 Fiberlamp               NG          
-Fireworkx               NG          
+Fireworkx               NG          Hung up
 Flag                    NG          
 Flame                   Good        
 FlipFlop                Good        
 FlipScreen3D            OK          Blur and slow
 FlipText                NG          
-Flow                    NG          
+Flow                    NG          Hung up
 FluidBalls              NG          
 Flurry                  Good        
 FlyingToasters          Good        
@@ -109,7 +109,7 @@ IFS                     NG
 IMSMap                  OK          Slow
 Interaggregate          NG          Hung up
 Interference            Good        
-Intermomentary          NG          Black out
+Intermomentary          Good        
 JigglyPuff              Good        
 Jigsaw                  NG          
 Juggle                  NG          
@@ -119,7 +119,7 @@ Kaleidescope            NG
 Kaleidocycle            Good        
 Klein                   Good        
 Kumppa                  Good        
-LCDscrub                NG          
+LCDscrub                Good        
 LMorph                  Good        
 Lament                  Good        
 Laser                   Good        
@@ -140,29 +140,29 @@ Moire                   NG
 Moire2                  NG          
 Molecule                NG          
 Morph3D                 Good        
-Mountain                NG          
+Mountain                Good        
 Munch                   Good        
 NerveRot                Good        
 Noof                    Good        
 NoseGuy                 NG          
 Pacman                  NG          
-Pedal                   NG          
+Pedal                   Good        
 Penetrate               NG          
 Penrose                 Good        
 Petri                   Good        
 Phosphor                NG          
 Photopile               NG          
-Piecewise               NG          
+Piecewise               NG          Drawing bad
 Pinion                  NG          
 Pipes                   Good        
 Polyhedra               NG          
-Polyominoes             NG          
+Polyominoes             NG          Black out
 Polytopes               Good        
 Pong                    NG          
 PopSquares              NG          
 Providence              Good        
 Pulsar                  Good        
-Pyro                    NG          
+Pyro                    Good        
 Qix                     NG          
 QuasiCrystal            NG          
 Queens                  Good        
@@ -191,14 +191,14 @@ Sproingies              Good
 Squiral                 Good        
 Stairs                  Good        
 StarWars                NG          
-Starfish                NG          
+Starfish                Good        
 StonerView              Good        
 Strange                 NG          
 Substrate               NG          Hung up
 Superquadrics           Good        
 Surfaces                Good        
 Swirl                   NG          Too slow
-T3D                     NG          
+T3D                     NG          Black out
 Tangram                 NG          
 Thornbird               Good        
 TimeTunnel              NG          
@@ -208,20 +208,20 @@ TronBit                 Good
 Truchet                 Good        
 Twang                   NG          
 UnknownPleasures        Good        
-Vermiculate             NG          
+Vermiculate             NG          Colors bad
 Vines                   Good        
 Voronoi                 Good        
 Wander                  Good        
 WhirlWindWarp           Good        
 Whirlygig               Good        
 Worm                    NG          
-Wormhole                NG          
+Wormhole                Good        
 XAnalogTV               NG          
 XFlame                  NG          
 XJack                   NG          
 XLyap                   NG          
 XMatrix                 NG          
-XRaySwarm               NG          
+XRaySwarm               Good        
 XSpirograph             Good        
 Zoom                    NG          
 m6502                   NG          

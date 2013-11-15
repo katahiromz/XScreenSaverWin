@@ -45,10 +45,6 @@ static const char sccsid[] = "@(#)worm.c	4.04 97/07/28 xlockmore";
 #define CYCLES 10
 #define SIZE_ -3
 #define NCOLORS 150
-#undef MI_WIN_IS_USE3D
-#define MI_WIN_IS_USE3D(mi) False
-#undef MI_DELTA3D
-#define MI_DELTA3D(mi) 1.5
 
 # define DEFAULTS	"*delay:  17000 \n" 	\
 					"*count:  -20 \n"		\
@@ -72,6 +68,20 @@ static const char sccsid[] = "@(#)worm.c	4.04 97/07/28 xlockmore";
 #else /* STANDALONE */
 # include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
+
+Bool use3d = False;
+float delta3d = 1.5;
+
+static argtype vars[] = 
+{
+    {&use3d, "use3d", NULL, "False", t_Bool},
+    {&delta3d, "delta3d", NULL, "1.5", t_Float},
+};
+
+#undef MI_DELTA3D
+#define MI_DELTA3D(mi) delta3d
+#undef MI_WIN_IS_USE3D
+#define MI_WIN_IS_USE3D(mi) use3d
 
 ENTRYPOINT ModeSpecOpt worm_opts =
 {0, NULL, 0, NULL, NULL};

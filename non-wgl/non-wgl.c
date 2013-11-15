@@ -10,8 +10,8 @@ BOOL InitPixelFormat(SCREENSAVER *ss)
 
     if (hack_ncolors <= 0)
         hack_ncolors = 64;
-    else if (hack_ncolors > MAX_COLORS)
-        hack_ncolors = MAX_COLORS;
+    else if (hack_ncolors > MAX_COLORCELLS)
+        hack_ncolors = MAX_COLORCELLS;
 
     mi = &ss->modeinfo;
 

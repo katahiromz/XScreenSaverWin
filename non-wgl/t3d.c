@@ -874,6 +874,7 @@ t3d_draw (Display *d, Window w, void *closure)
 	
   if ((st->px>0)&&(st->px<st->scrnWidth)&&(st->py>0)&&(st->py<st->scrnHeight) )		
     {
+#if 0
       if ((st->px !=st->startx)&&(st->kb&Button2Mask))
         {
           /* printf("y=(%f,%f,%f)",y[0],y[1],y[2]);*/
@@ -898,9 +899,12 @@ t3d_draw (Display *d, Window w, void *closure)
           turn(st->x,st->v,-.002*st->vturn);
           turn(st->y,st->v,-.002*st->vturn);
         }
+#endif
     }
+#if 0
   if (!(st->kb&Button1Mask)&&!(st->kb&Button3Mask)) 
     st->vturn=0;
+#endif
 	
   st->speed=st->speed+st->speed*st->vspeed;
   if ((st->speed<0.0000001) &&(st->vspeed>0.000001)) st->speed=0.000001;
