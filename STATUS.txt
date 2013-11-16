@@ -1,4 +1,4 @@
-There are 139 Goods, 7 OKs and 77 NGs of total 223 screen savers 
+There are 138 Goods, 7 OKs and 78 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -70,7 +70,7 @@ Flame                   Good
 FlipFlop                Good        
 FlipScreen3D            OK          Blur and slow
 FlipText                NG          
-Flow                    NG          Hung up
+Flow                    Good        
 FluidBalls              NG          
 Flurry                  Good        
 FlyingToasters          Good        
@@ -89,7 +89,7 @@ GLSchool                Good
 GLSlideshow             NG          
 GLSnake                 NG          
 GLText                  NG          
-Galaxy                  OK          Flickers
+Galaxy                  OK          Flickers and slow
 Gears                   Good        
 Gleidescope             OK          Slow
 Goop                    NG          
@@ -146,7 +146,7 @@ NerveRot                Good
 Noof                    Good        
 NoseGuy                 NG          
 Pacman                  NG          
-Pedal                   Good        
+Pedal                   NG          Hung up
 Penetrate               NG          
 Penrose                 Good        
 Petri                   Good        
@@ -162,7 +162,7 @@ Pong                    NG
 PopSquares              NG          
 Providence              Good        
 Pulsar                  Good        
-Pyro                    Good        
+Pyro                    NG          Flickers
 Qix                     NG          
 QuasiCrystal            NG          
 Queens                  Good        
