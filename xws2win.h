@@ -156,7 +156,8 @@ enum { Convex, Nonconvex, Complex };
 enum { BadAlloc = 1, BadGC, BadValue, BadFont, BadMatch, BadPixmap };
 enum {
     GXcopy = R2_COPYPEN, GXor = R2_MERGEPEN, GXxor = R2_XORPEN,
-    GXandInverted = R2_NOTMASKPEN
+    GXandInverted = R2_NOTMASKPEN, GXset = R2_WHITE, GXclear = R2_BLACK,
+    GXand = R2_MASKPEN
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -206,6 +207,11 @@ enum	// fill_rule
     EvenOddRule, WindingRule
 };
 
+enum    // subwindow_mode
+{
+    IncludeInferiors
+};
+
 typedef struct
 {
     unsigned long foreground;
@@ -221,6 +227,7 @@ typedef struct
     Pixmap stipple;
     int fill_rule;
     Bool graphics_exposures;
+    int subwindow_mode;
     HBITMAP hbmOld;
 } XGCValues;
 
@@ -371,6 +378,9 @@ Display *DisplayOfScreen(Screen *s);
 #define WhitePixel(dpy,scr) 255
 #define BitmapPad(dpy) 32
 #define ImageByteOrder(dpy) LSBFirst
+#define XScreenNumberOfScreen(screen) 1
+int XDisplayWidth(Display *dpy, int scr);
+int XDisplayHeight(Display *dpy, int scr);
 
 Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr);
 int XSetLineAttributes(Display *dpy, GC gc,

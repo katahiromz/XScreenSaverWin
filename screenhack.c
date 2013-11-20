@@ -240,9 +240,8 @@ HBITMAP GetScreenShotBitmap(VOID)
     HBITMAP hbm;
     HGDIOBJ hbmOld;
     BITMAPINFO bi;
-    INT y, cx, cy, count;
+    INT cx, cy;
     LPVOID pvBits;
-    LPBYTE pb, pbBits;
 
     cx = GetSystemMetrics(SM_CXSCREEN);
     cy = GetSystemMetrics(SM_CYSCREEN);
@@ -261,31 +260,9 @@ HBITMAP GetScreenShotBitmap(VOID)
     if (hbm != NULL)
     {
         hbmOld = SelectObject(hdcMem, hbm);
-        SetStretchBltMode(hdcMem, COLORONCOLOR);
-        StretchBlt(hdcMem, 0, 0, cx, cy, hdc, 0, 0, cx, cy, SRCCOPY);
+        BitBlt(hdcMem, 0, 0, cx, cy, hdc, 0, 0, SRCCOPY);
         SelectObject(hdcMem, hbmOld);
         GdiFlush();
-        pbBits = (LPBYTE)pvBits;
-        count = cx * cy;
-        while (count--)
-        {
-            BYTE b = pbBits[0];
-            pbBits[0] = pbBits[2];
-            pbBits[2] = b;
-            pbBits++;
-            pbBits++;
-            pbBits++;
-            *pbBits++ = 0xFF;
-        }
-        pb = (LPBYTE)malloc(cx * 4);
-        pbBits = (LPBYTE)pvBits;
-        for (y = 0; y < cy / 2; y++)
-        {
-            memcpy(pb, &pbBits[y * cx * 4], cx * 4);
-            memcpy(&pbBits[y * cx * 4], &pbBits[(cy - y - 1) * cx * 4], cx * 4);
-            memcpy(&pbBits[(cy - y - 1) * cx * 4], pb, cx * 4);
-        }
-        free(pb);
     }
 
     DeleteDC(hdcMem);
@@ -583,6 +560,22 @@ Display *DisplayOfScreen(Screen *s)
     return ss.dpy;
 }
 
+int XDisplayWidth(Display *dpy, int scr)
+{
+	RECT rc;
+	HWND hwnd = WindowFromDC(dpy);
+	GetWindowRect(hwnd, &rc);
+	return rc.right - rc.left;
+}
+
+int XDisplayHeight(Display *dpy, int scr)
+{
+	RECT rc;
+	HWND hwnd = WindowFromDC(dpy);
+	GetWindowRect(hwnd, &rc);
+	return rc.bottom - rc.top;
+}
+
 extern unsigned long window_background;
 
 int XClearWindow(Display *dpy, Window w)
@@ -607,9 +600,9 @@ int XClearWindow(Display *dpy, Window w)
 // misc
 
 #if 0
-	void do_fps(ModeInfo *mi)
-	{
-	}
+    void do_fps(ModeInfo *mi)
+    {
+    }
 #endif
 
 float current_device_rotation(void)
@@ -672,6 +665,48 @@ void gettimeofday(timeval *t, timezone *tz)
     DWORD dwTick = GetTickCount();
     t->tv_sec = dwTick / 1000;
     t->tv_usec = (dwTick % 1000) * 1000;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+static void do_load_image(
+    async_load_state *state, Screen *screen, Window window, Drawable target)
+{
+    BITMAP bm;
+    HDC hdcSrc, hdcDst;
+    Display *dpy = DisplayOfScreen(screen);
+    HGDIOBJ hbmOld;
+    HBITMAP hbm = ss.hbmScreenShot;
+    assert(hbm != NULL);
+
+    GetObject(hbm, sizeof(BITMAP), &bm);
+    state->geom.x = state->geom.y = 0;
+    state->geom.width = bm.bmWidth;
+    state->geom.height = bm.bmHeight;
+
+    hdcSrc = CreateCompatibleDC(dpy);
+    hdcDst = XCreateDrawableDC_(dpy, target);
+    hbmOld = SelectObject(hdcSrc, hbm);
+
+    assert(hdcSrc != NULL);
+    assert(hdcDst != NULL);
+    BitBlt(hdcDst, 0, 0, bm.bmWidth, bm.bmHeight, hdcSrc, 0, 0, SRCCOPY);
+
+    SelectObject(hdcSrc, hbmOld);
+    XDeleteDrawableDC_(dpy, target, hdcDst);
+    DeleteDC(hdcSrc);
+}
+
+async_load_state *load_image_async_simple(
+    async_load_state *state, Screen *screen, Window window, Drawable target, 
+    char **filename_ret, XRectangle *geometry_ret)
+{
+	async_load_state state1;
+    assert(filename_ret == NULL);
+    assert(geometry_ret == NULL);
+
+    do_load_image(&state1, screen, window, target);
+    return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -191,11 +191,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\minixpm.c"
+				>
+			</File>
+			<File
+				RelativePath="..\pixmap.c"
+				>
+			</File>
+			<File
 				RelativePath="..\screenhack.c"
 				>
 			</File>
 			<File
 				RelativePath="..\xcolor.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ximage.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xpm-pixmap.c"
 				>
 			</File>
 			<File
@@ -221,11 +237,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\minixpm.h"
+				>
+			</File>
+			<File
 				RelativePath="..\resource.h"
 				>
 			</File>
 			<File
 				RelativePath="..\screenhack.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xpm-pixmap.h"
 				>
 			</File>
 			<File

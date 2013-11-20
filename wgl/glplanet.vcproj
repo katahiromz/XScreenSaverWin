@@ -183,7 +183,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\minixpm.c"
+				RelativePath="..\minixpm.c"
 				>
 			</File>
 			<File
@@ -225,7 +225,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\minixpm.h"
+				RelativePath="..\minixpm.h"
 				>
 			</File>
 			<File

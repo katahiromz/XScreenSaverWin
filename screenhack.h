@@ -36,7 +36,7 @@ typedef struct screenhack_timeval
 
 typedef struct screenhack_timezone
 {
-	char dummy;
+	char dummy1, dummy2;
 } screenhack_timezone;
 
 #define timeval screenhack_timeval
@@ -99,6 +99,19 @@ extern argtype *hack_arginfo;
 
 #define XSCREENSAVER_MODULE(CLASS,PREFIX) \
       XSCREENSAVER_MODULE_2(CLASS,PREFIX,PREFIX)
+
+//////////////////////////////////////////////////////////////////////////////
+
+typedef struct async_load_state
+{
+    Bool done_p;
+    char *filename;
+    XRectangle geom;
+} async_load_state;
+
+async_load_state *load_image_async_simple(
+    async_load_state *state, Screen *screen, Window window, Drawable target, 
+    char **filename_ret, XRectangle *geometry_ret);
 
 //////////////////////////////////////////////////////////////////////////////
 // screen saver

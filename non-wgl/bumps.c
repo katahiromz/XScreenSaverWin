@@ -33,8 +33,12 @@
 #include <math.h>
 //#include <stdint.h>
 
+typedef char int8_t;
 typedef unsigned char uint8_t;
+typedef short int16_t;
 typedef unsigned short uint16_t;
+typedef long int32_t;
+typedef unsigned long uint32_t;
 
 #ifdef HAVE_XSHM_EXTENSION
 #include "xshm.h"
@@ -741,11 +745,13 @@ bumps_reshape (Display *dpy, Window window, void *closure,
 {
 }
 
-static Bool
-bumps_event (Display *dpy, Window window, void *closure, XEvent *event)
-{
-  return False;
-}
+#if 0
+	static Bool
+	bumps_event (Display *dpy, Window window, void *closure, XEvent *event)
+	{
+	  return False;
+	}
+#endif
 
 static void
 bumps_free (Display *dpy, Window window, void *closure)

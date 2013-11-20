@@ -296,9 +296,8 @@ HBITMAP GetScreenShotBitmap(VOID)
     HBITMAP hbm;
     HGDIOBJ hbmOld;
     BITMAPINFO bi;
-    INT y, cx, cy, count;
+    INT cx, cy;
     LPVOID pvBits;
-    LPBYTE pb, pbBits;
 
     cx = GetSystemMetrics(SM_CXSCREEN);
     cy = GetSystemMetrics(SM_CYSCREEN);
@@ -317,31 +316,9 @@ HBITMAP GetScreenShotBitmap(VOID)
     if (hbm != NULL)
     {
         hbmOld = SelectObject(hdcMem, hbm);
-        SetStretchBltMode(hdcMem, COLORONCOLOR);
-        StretchBlt(hdcMem, 0, 0, cx, cy, hdc, 0, 0, cx, cy, SRCCOPY);
+        BitBlt(hdcMem, 0, 0, cx, cy, hdc, 0, 0, SRCCOPY);
         SelectObject(hdcMem, hbmOld);
         GdiFlush();
-        pbBits = (LPBYTE)pvBits;
-        count = cx * cy;
-        while (count--)
-        {
-            BYTE b = pbBits[0];
-            pbBits[0] = pbBits[2];
-            pbBits[2] = b;
-            pbBits++;
-            pbBits++;
-            pbBits++;
-            *pbBits++ = 0xFF;
-        }
-        pb = (LPBYTE)malloc(cx * 4);
-        pbBits = (LPBYTE)pvBits;
-        for (y = 0; y < cy / 2; y++)
-        {
-            memcpy(pb, &pbBits[y * cx * 4], cx * 4);
-            memcpy(&pbBits[y * cx * 4], &pbBits[(cy - y - 1) * cx * 4], cx * 4);
-            memcpy(&pbBits[(cy - y - 1) * cx * 4], pb, cx * 4);
-        }
-        free(pb);
     }
 
     DeleteDC(hdcMem);
