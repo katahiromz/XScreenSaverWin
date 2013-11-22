@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="fiberlamp"
-	ProjectGUID="{BE598D02-E4AC-45C3-A703-566E489AB20C}"
-	RootNamespace="fiberlamp"
+	Name="boxfit"
+	ProjectGUID="{70AE376E-2F1A-4867-A961-5276FC77E2FA}"
+	RootNamespace="boxfit"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -179,11 +179,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\colors.c"
+				RelativePath=".\boxfit.c"
 				>
 			</File>
 			<File
-				RelativePath=".\fiberlamp.c"
+				RelativePath="..\colors.c"
 				>
 			</File>
 			<File
@@ -191,11 +191,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\non-wgl.c"
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File
-				RelativePath="..\pixmap.c"
+				RelativePath="..\screenhack.c"
 				>
 			</File>
 			<File
@@ -204,10 +204,6 @@
 			</File>
 			<File
 				RelativePath="..\ximage.c"
-				>
-			</File>
-			<File
-				RelativePath="..\xlockmore.c"
 				>
 			</File>
 			<File
@@ -237,7 +233,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\xlockmore.h"
+				RelativePath="..\screenhack.h"
 				>
 			</File>
 			<File
@@ -255,7 +251,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\xlockmore.rc"
+				RelativePath="..\screenhack.rc"
 				>
 			</File>
 		</Filter>

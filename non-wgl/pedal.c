@@ -44,14 +44,16 @@ static argtype vars[] =
  * to the X server in the 2byte length field. Must be less
  * than 16k
  */
-#define MAXLINES (16 * 1024)
+//#define MAXLINES (16 * 1024)
+#define MAXLINES 256    // hacked by katahiromz
 #define MAXPOINTS MAXLINES
 
 /* 
  * If the pedal has only this many lines, it must be ugly and we dont
  * want to see it.
  */
-#define MINLINES 7
+//#define MINLINES 7
+#define MINLINES 64     // hacked by katahiromz
 
 
 struct state {

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="fiberlamp"
-	ProjectGUID="{BE598D02-E4AC-45C3-A703-566E489AB20C}"
-	RootNamespace="fiberlamp"
+	Name="xflame"
+	ProjectGUID="{5A3BD2AE-DCE5-49F0-AAF0-54CD8D1F6E07}"
+	RootNamespace="xflame"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -49,7 +49,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4244;4305"
+				DisableSpecificWarnings="4244;4305;4018"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -125,7 +125,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4244;4305"
+				DisableSpecificWarnings="4244;4305;4018"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -183,15 +183,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\fiberlamp.c"
-				>
-			</File>
-			<File
 				RelativePath="..\hsv.c"
 				>
 			</File>
 			<File
-				RelativePath=".\non-wgl.c"
+				RelativePath="..\minixpm.c"
 				>
 			</File>
 			<File
@@ -199,7 +195,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\screenhack.c"
+				>
+			</File>
+			<File
 				RelativePath="..\xcolor.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xflame.c"
 				>
 			</File>
 			<File
@@ -207,7 +211,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\xlockmore.c"
+				RelativePath=".\xpm-pixmap.c"
 				>
 			</File>
 			<File
@@ -233,11 +237,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\minixpm.h"
+				>
+			</File>
+			<File
 				RelativePath="..\resource.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xlockmore.h"
+				RelativePath="..\screenhack.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xpm-pixmap.h"
 				>
 			</File>
 			<File
@@ -255,7 +267,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\xlockmore.rc"
+				RelativePath="..\screenhack.rc"
 				>
 			</File>
 		</Filter>

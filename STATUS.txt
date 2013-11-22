@@ -1,4 +1,4 @@
-There are 138 Goods, 7 OKs and 78 NGs of total 223 screen savers 
+There are 149 Goods, 8 OKs and 66 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -18,17 +18,17 @@ BSOD                    NG
 Barcode                 NG          Bitmap broken
 Blaster                 Good        
 BlinkBox                Good        
-BlitSpin                NG          
+BlitSpin                NG          Black out
 BlockTube               Good        
 Boing                   Good        
 Bouboule                Good        
 BouncingCow             Good        
-BoxFit                  NG          
+BoxFit                  Good        
 Boxed                   Good        
 Braid                   Good        
 Bubble3D                Good        
 Bubbles                 Good        
-Bumps                   NG          
+Bumps                   Good        
 CCurve                  Good        
 CWaves                  Good        
 Cage                    Good        
@@ -63,15 +63,15 @@ Eruption                Good
 Euler2D                 Good        
 Extrusion               Good        
 FadePlot                Good        
-Fiberlamp               NG          
+Fiberlamp               Good        
 Fireworkx               NG          Hung up
-Flag                    NG          
+Flag                    Good        
 Flame                   Good        
 FlipFlop                Good        
 FlipScreen3D            OK          Blur and slow
 FlipText                NG          
-Flow                    Good        
-FluidBalls              NG          
+Flow                    NG          
+FluidBalls              OK          Slow
 Flurry                  Good        
 FlyingToasters          Good        
 FontGlide               NG          
@@ -94,9 +94,9 @@ Gears                   Good
 Gleidescope             OK          Slow
 Goop                    NG          
 Grav                    Good        
-Greynetic               NG          Hung up
+Greynetic               Good        
 Halftone                Good        
-Halo                    NG          
+Halo                    NG          Slow
 Helix                   Good        
 Hexadrop                Good        
 Hilbert                 Good        
@@ -129,14 +129,14 @@ Lisa                    Good
 Lissie                  Good        
 Lockward                Good        
 Loop                    Good        
-Maze                    NG          
-MemScroller             NG          
+Maze                    Good        
+MemScroller             Good        
 Menger                  Good        
 MetaBalls               Good        
 MirrorBlob              OK          Blur and slow
 Moebius                 Good        
 MoebiusGears            Good        
-Moire                   NG          
+Moire                   Good        
 Moire2                  NG          
 Molecule                NG          
 Morph3D                 Good        
@@ -146,7 +146,7 @@ NerveRot                Good
 Noof                    Good        
 NoseGuy                 NG          
 Pacman                  NG          
-Pedal                   NG          Hung up
+Pedal                   Good        
 Penetrate               NG          
 Penrose                 Good        
 Petri                   Good        
@@ -156,7 +156,7 @@ Piecewise               NG          Drawing bad
 Pinion                  NG          
 Pipes                   Good        
 Polyhedra               NG          
-Polyominoes             NG          Black out
+Polyominoes             NG          Colors bad
 Polytopes               Good        
 Pong                    NG          
 PopSquares              NG          
@@ -206,7 +206,7 @@ TopBlock                Good
 Triangle                Good        
 TronBit                 Good        
 Truchet                 Good        
-Twang                   NG          
+Twang                   Good        
 UnknownPleasures        Good        
 Vermiculate             NG          Colors bad
 Vines                   Good        
@@ -217,11 +217,11 @@ Whirlygig               Good
 Worm                    NG          
 Wormhole                Good        
 XAnalogTV               NG          
-XFlame                  NG          
+XFlame                  Good        
 XJack                   NG          
 XLyap                   NG          
 XMatrix                 NG          
 XRaySwarm               Good        
 XSpirograph             Good        
-Zoom                    NG          
+Zoom                    Good        
 m6502                   NG          

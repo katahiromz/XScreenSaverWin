@@ -191,7 +191,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\logo.c"
+				>
+			</File>
+			<File
 				RelativePath=".\maze.c"
+				>
+			</File>
+			<File
+				RelativePath="..\minixpm.c"
 				>
 			</File>
 			<File
@@ -234,6 +242,10 @@
 			</File>
 			<File
 				RelativePath="..\hsv.h"
+				>
+			</File>
+			<File
+				RelativePath="..\minixpm.h"
 				>
 			</File>
 			<File

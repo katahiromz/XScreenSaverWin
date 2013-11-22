@@ -402,13 +402,11 @@ display (struct state *st, Pixmap pixmap)
     XCopyArea (st->dpy, pixmap, st->window, st->gc, 0, 0, st->size, st->size,
 	       (st->xgwa.width - st->size) >> 1,
                (st->xgwa.height - st->size) >> 1);
-#if 0
   else
     XCopyPlane (st->dpy, pixmap, st->window, st->gc, 0, 0, st->size, st->size,
 		(st->xgwa.width - st->size) >> 1,
                 (st->xgwa.height - st->size) >> 1,
                 1);
-#endif
 /*
   XDrawRectangle (st->dpy, st->window, st->gc,
 		  ((st->xgwa.width - st->size) >> 1) - 1,

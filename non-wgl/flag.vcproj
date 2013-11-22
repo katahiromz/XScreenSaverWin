@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="fiberlamp"
-	ProjectGUID="{BE598D02-E4AC-45C3-A703-566E489AB20C}"
-	RootNamespace="fiberlamp"
+	Name="flag"
+	ProjectGUID="{583B71E1-2B97-4A51-9430-D0DD48D86298}"
+	RootNamespace="flag"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -183,11 +183,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\fiberlamp.c"
+				RelativePath=".\flag.c"
 				>
 			</File>
 			<File
 				RelativePath="..\hsv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\minixpm.c"
 				>
 			</File>
 			<File
@@ -208,6 +212,10 @@
 			</File>
 			<File
 				RelativePath="..\xlockmore.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xpm-pixmap.c"
 				>
 			</File>
 			<File
@@ -233,11 +241,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\minixpm.h"
+				>
+			</File>
+			<File
 				RelativePath="..\resource.h"
 				>
 			</File>
 			<File
 				RelativePath="..\xlockmore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xpm-pixmap.h"
 				>
 			</File>
 			<File

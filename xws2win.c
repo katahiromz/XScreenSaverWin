@@ -127,6 +127,9 @@ int XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values)
     if (valuemask & GCGraphicsExposures)
         newvalues->graphics_exposures = values->graphics_exposures;
 
+    if (valuemask & GCFont)
+        newvalues->font = values->font;
+
     return 0;
 }
 
@@ -243,8 +246,8 @@ int XDrawPoints(Display *dpy, Drawable d, GC gc,
 HPEN XCreateWinPen(XGCValues *values)
 {
     LOGBRUSH lb;
-    lb.lbColor = values->foreground_rgb;
     lb.lbStyle = BS_SOLID;
+    lb.lbColor = values->foreground_rgb;
     return ExtCreatePen(
         PS_GEOMETRIC | values->line_style | values->cap_style | values->join_style,
         values->line_width, &lb, 0, NULL);
@@ -289,11 +292,6 @@ HBRUSH XCreateWinBrush(XGCValues *values)
     return NULL;
 }
 
-HFONT XCreateWinFont(XGCValues *values)
-{
-    return (HFONT)GetStockObject(DEFAULT_GUI_FONT);
-}
-
 int XDrawLine(Display *dpy, Drawable d, GC gc,
     int x1, int y1, int x2, int y2)
 {
@@ -317,6 +315,8 @@ int XDrawLine(Display *dpy, Drawable d, GC gc,
     hPenOld = SelectObject(hdc, hPen);
     MoveToEx(hdc, x1, y1, NULL);
     LineTo(hdc, x2, y2);
+    if (values->line_width <= 1 && values->function == GXcopy)
+        SetPixelV(hdc, x2, y2, values->foreground_rgb);
     SelectObject(hdc, hPenOld);
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
@@ -394,6 +394,7 @@ int XDrawRectangle(
     XGCValues *values;
     HDC hdc;
     HPEN hPen;
+    HGDIOBJ hPenOld;
     int nR2;
 
     values = XGetGCValues_(gc);
@@ -407,8 +408,12 @@ int XDrawRectangle(
 
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
+    hPenOld = SelectObject(hdc, hPen);
+
     SelectObject(hdc, GetStockObject(NULL_BRUSH));
     Rectangle(hdc, x, y, x + width, y + height);
+
+    SelectObject(hdc, hPenOld);
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
@@ -482,8 +487,14 @@ int XDrawArc(Display *dpy, Drawable d, GC gc,
     nR2 = SetROP2(hdc, values->function);
     hPenOld = SelectObject(hdc, hPen);
     SelectObject(hdc, GetStockObject(NULL_BRUSH));
+
+    if (angle2 < 0)
+        SetArcDirection(hdc, AD_CLOCKWISE);
+    else
+        SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
     Arc(hdc, x, y, x + width, y + height,
         xStartArc, yStartArc, xEndArc, yEndArc);
+
     SelectObject(hdc, hPenOld);
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
@@ -530,6 +541,11 @@ int XDrawArcs(Display *dpy, Drawable d, GC gc,
         xEndArc = x + width / 2.0 + (width / 2.0) * cos(skewed2);
         yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
 
+        if (angle2 < 0)
+            SetArcDirection(hdc, AD_CLOCKWISE);
+        else
+            SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
+
         Arc(hdc, x, y, x + width, y + height,
             xStartArc, yStartArc, xEndArc, yEndArc);
     }
@@ -545,22 +561,18 @@ int XDrawString(Display *dpy, Drawable d, GC gc,
     int x, int y, const char *string, int length)
 {
     XGCValues *values;
-    HFONT hFont;
-    HGDIOBJ hFontOld;
+    HDC hdc;
 
     values = XGetGCValues_(gc);
     if (values == NULL)
         return BadGC;
 
-    hFont = XCreateWinFont(values);
-    if (hFont == NULL)
-        return BadAlloc;
-
-    hFontOld = SelectObject(dpy, hFont);
+    hdc = XCreateDrawableDC_(dpy, d);
+    SetTextColor(hdc, values->foreground_rgb);
+    SetBkColor(hdc, values->background_rgb);
     TextOut(dpy, x, y, string, length);
-    SelectObject(dpy, hFontOld);
+    XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hFont);
     return 0;
 }
 
@@ -736,11 +748,17 @@ int XFillArc(Display *dpy, Drawable d, GC gc,
     nR2 = SetROP2(hdc, values->function);
     hbrOld = SelectObject(hdc, hbr);
     SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
+
     BeginPath(hdc);
+    if (angle2 < 0)
+        SetArcDirection(hdc, AD_CLOCKWISE);
+    else
+        SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
     Arc(hdc, x, y, x + width, y + height,
         xStartArc, yStartArc, xEndArc, yEndArc);
     EndPath(hdc);
     FillPath(hdc);
+
     SelectObject(hdc, hbrOld);
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
@@ -788,6 +806,10 @@ int XFillArcs(Display *dpy, Drawable d, GC gc,
         yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
 
         BeginPath(hdc);
+        if (angle2 < 0)
+            SetArcDirection(hdc, AD_CLOCKWISE);
+        else
+            SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
         Arc(hdc, x, y, x + width, y + height,
             xStartArc, yStartArc, xEndArc, yEndArc);
         EndPath(hdc);
@@ -890,155 +912,159 @@ int XClearArea(
 	return 0;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-
-typedef struct tagBITMAPINFOEX
+int XSetSubwindowMode(Display *dpy, GC gc, int mode)
 {
-    BITMAPINFOHEADER bmiHeader;
-    RGBQUAD          bmiColors[256];
-} BITMAPINFOEX, * LPBITMAPINFOEX;
+    XGCValues *values;
 
-#define WIDTHBYTES(i) (((i) + 31) / 32 * 4)
+    values = XGetGCValues_(gc);
+    if (values == NULL)
+        return BadGC;
 
-HBITMAP XCreateWinBitmapFromXImage(XImage *ximage)
+    values->subwindow_mode = mode;
+    return 0;
+}
+
+Window RootWindow(Display *dpy, int scr)
 {
-    BITMAPINFOEX bi;
-    HBITMAP hbm;
-    LPBYTE pbBits;
-    unsigned int i, x, y, widthbytes;
-    XColor color;
+    return 0;
+}
 
-    ZeroMemory(&bi, sizeof(bi));
-    bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bi.bmiHeader.biWidth = ximage->width;
-    bi.bmiHeader.biHeight = ximage->height;
-    bi.bmiHeader.biPlanes = 1;
-    if ((ximage->bits_per_pixel | ximage->depth) == 1)
-    {
-        bi.bmiHeader.biBitCount = 1;
-        bi.bmiColors[0].rgbBlue = 0;
-        bi.bmiColors[0].rgbGreen = 0;
-        bi.bmiColors[0].rgbRed = 0;
-        bi.bmiColors[0].rgbReserved = 0;
-        bi.bmiColors[1].rgbBlue = 255;
-        bi.bmiColors[1].rgbGreen = 255;
-        bi.bmiColors[1].rgbRed = 255;
-        bi.bmiColors[1].rgbReserved = 0;
-        hbm = CreateDIBSection(NULL, (LPBITMAPINFO)&bi, DIB_RGB_COLORS, 
-                               (LPVOID *)&pbBits, NULL, 0);
-        widthbytes = WIDTHBYTES(ximage->width * 1);
-        for (y = 0; y < ximage->height; y++)
-        {
-            for (x = 0; x < (ximage->width + 7) / 8; x++)
-            {
-                pbBits[y * widthbytes + x] = ximage->data[(ximage->height - y - 1) * ximage->bytes_per_line + x];
-            }
-        }
-        return hbm;
-    }
+Bool XTranslateCoordinates(
+     Display *dpy, Window src_win, Window dest_win,
+     int src_x, int src_y, int *dst_x, int *dst_y, Window *child)
+{
+    *dst_x = src_x;
+    *dst_y = src_y;
+    *child = 0;
+    return True;
+}
 
-    if (ximage->format == ZPixmap && ximage->bits_per_pixel == 8)
-    {
-        bi.bmiHeader.biBitCount = 8;
-        for (i = 0; i < 256; i++)
-        {
-            color.pixel = i;
-            XQueryColor(NULL, 0, &color);
-            bi.bmiColors[i].rgbBlue = color.blue / 256;
-            bi.bmiColors[i].rgbGreen = color.green / 256;
-            bi.bmiColors[i].rgbRed = color.red / 256;
-            bi.bmiColors[i].rgbReserved = 0;
-        }
-        hbm = CreateDIBSection(NULL, (LPBITMAPINFO)&bi, DIB_RGB_COLORS, 
-                               (LPVOID *)&pbBits, NULL, 0);
-        widthbytes = WIDTHBYTES(ximage->width * 8);
-        for (y = 0; y < ximage->height; y++)
-        {
-            for (x = 0; x < ximage->width; x++)
-            {
-                pbBits[y * widthbytes + x] = ximage->data[(ximage->height - y - 1) * ximage->bytes_per_line + x];
-            }
-        }
-        return hbm;
-    }
+int XSetPlaneMask(Display *dpy, GC gc, unsigned long planemask)
+{
+	return 1;
+}
 
-    if (ximage->format == ZPixmap && ximage->bits_per_pixel == 32)
-    {
-        bi.bmiHeader.biBitCount = 32;
-        hbm = CreateDIBSection(NULL, (LPBITMAPINFO)&bi, DIB_RGB_COLORS, 
-                               (LPVOID *)&pbBits, NULL, 0);
-        widthbytes = WIDTHBYTES(ximage->width * 32);
-        for (y = 0; y < ximage->height; y++)
-        {
-            for (x = 0; x < ximage->width; x++)
-            {
-                color.pixel = *(LPDWORD)&ximage->data[(ximage->height - y - 1) * ximage->bytes_per_line + x * 4];
-                XQueryColor(NULL, 0, &color);
-                pbBits[y * widthbytes + x * 4 + 0] = color.blue / 256;
-                pbBits[y * widthbytes + x * 4 + 1] = color.green / 256;
-                pbBits[y * widthbytes + x * 4 + 2] = color.red / 256;
-                pbBits[y * widthbytes + x * 4 + 3] = 0xFF;
-            }
-        }
-        return hbm;
-    }
+int XSetClipOrigin(Display *dpy, GC gc, int xorig, int yorig)
+{
+	return 1;
+}
 
-    return NULL;
+int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
+{
+	return 1;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-// NOTE: too slow!!!
-int XPutImage(Display *dpy, Drawable d, GC gc,
-    XImage *image, int req_xoffset, int req_yoffset,
-    int x, int y, unsigned int req_width, unsigned int req_height)
+XFontStruct *XLoadQueryFont(Display *dpy, char *name)
 {
-    HBITMAP hbm;
-    int width = req_width, height = req_height;
+    LOGFONTA lf;
+    HDC hdc;
+    TEXTMETRICA tm;
+    ABC *pabc;
+	HGDIOBJ hFontOld;
+    int i, nCount;
+	char *p, *q;
+    XFontStruct *fs = (XFontStruct *)calloc(1, sizeof(XFontStruct));
+	assert(fs);
+    if (fs == NULL)
+        return NULL;
 
-    if (req_xoffset < 0)
+    ZeroMemory(&lf, sizeof(lf));
+    lstrcpynA(lf.lfFaceName, name, LF_FACESIZE);
+    p = strrchr(lf.lfFaceName, ' ');
+    if (p)
     {
-        width += req_xoffset;
-        req_xoffset = 0;
+        long n = strtoul(p + 1, &q, 10);
+        if (q && *q == '\0')
+        {
+            lf.lfHeight = -n;
+            *p = '\0';
+        }
     }
-    if (req_yoffset < 0)
+    lf.lfWeight = FW_NORMAL;
+    lf.lfQuality = ANTIALIASED_QUALITY;
+    fs->fid = CreateFontIndirectA(&lf);
+	assert(fs->fid);
+    if (fs->fid == NULL)
     {
-        height += req_yoffset;
-        req_yoffset = 0;
+        free(fs);
+        return NULL;
     }
+    
+    fs->min_char_or_byte2 = 0x20;
+    fs->max_char_or_byte2 = 0x7F;
+    nCount = (int)fs->max_char_or_byte2 - (int)fs->min_char_or_byte2 + 1;
+    pabc = (ABC *)calloc(nCount, sizeof(ABC));
+	assert(pabc);
+    fs->per_char = (XCharStruct *)calloc(nCount, sizeof(XCharStruct));
+	assert(fs->per_char);
 
-    if (req_xoffset + width > (int)image->width)
-        width = image->width - req_xoffset;
-    if (req_yoffset + height > (int)image->height)
-        height = image->height - req_yoffset;
-    if (width <= 0 || height <= 0)
-        return 0;
-
-    hbm = XCreateWinBitmapFromXImage(image);
-    if (hbm == NULL)
-        return 0;
-
-    if (d == 0)
+    hdc = CreateCompatibleDC(NULL);
+    hFontOld = SelectObject(hdc, fs->fid);
+    GetTextMetricsA(hdc, &tm);
+    GetCharABCWidthsA(hdc, fs->min_char_or_byte2, fs->max_char_or_byte2, pabc);
+	SelectObject(hdc, hFontOld);
+    DeleteDC(hdc);
+    
+    fs->min_bounds.lbearing = 0x7FFF;
+    fs->min_bounds.rbearing = 0x7FFF;
+    fs->min_bounds.width = 0x7FFF;
+    fs->max_bounds.lbearing = -1;
+    fs->max_bounds.rbearing = -1;
+    fs->max_bounds.width = -1;
+    for (i = 0; i < nCount; i++)
     {
-        HDC hdcSrc = CreateCompatibleDC(dpy);
-        HGDIOBJ hbmOld = SelectObject(hdcSrc, hbm);
-        BitBlt(dpy, req_xoffset, req_yoffset, width, height, hdcSrc, x, y, SRCCOPY);
-        SelectObject(hdcSrc, hbmOld);
-        DeleteDC(hdcSrc);
+        fs->per_char[i].lbearing = pabc[i].abcA;
+        fs->per_char[i].rbearing = pabc[i].abcC;
+        fs->per_char[i].width = pabc[i].abcB;
+        fs->per_char[i].ascent = tm.tmAscent;
+        fs->per_char[i].descent = tm.tmDescent;
+        if (fs->per_char[i].width < fs->min_bounds.width)
+            fs->min_bounds = fs->per_char[i];
+        if (fs->per_char[i].width > fs->max_bounds.width)
+            fs->max_bounds = fs->per_char[i];
     }
-    else
-    {
-        HDC hdc = XCreateDrawableDC_(dpy, d);
-        HDC hdcSrc = CreateCompatibleDC(dpy);
-        HGDIOBJ hbmOld = SelectObject(hdcSrc, hbm);
-        BitBlt(hdc, req_xoffset, req_yoffset, width, height, hdcSrc, x, y, SRCCOPY);
-        SelectObject(hdcSrc, hbmOld);
-        DeleteDC(hdcSrc);
-        XDeleteDrawableDC_(dpy, d, hdc);
-    }
+    free(pabc);
+    fs->ascent = tm.tmAscent;
+    fs->descent = tm.tmDescent;
+    return fs;
+}
 
-    DeleteObject(hbm);
+int XUnloadFont(Display *dpy, Font fid)
+{
+    DeleteObject(fid);
+}
+
+int XFreeFont(Display *dpy, XFontStruct *fs)
+{
+    DeleteObject(fs->fid);
+    free(fs->per_char);
+    free(fs);
     return 0;
+}
+
+int XTextExtents(XFontStruct *fs, char *string, int nchars,
+    int *dir, int *font_ascent, int *font_descent, XCharStruct *overall)
+{
+    SIZE siz;
+    TEXTMETRICA tm;
+    HDC hdc = CreateCompatibleDC(NULL);
+    SelectObject(hdc, fs->fid);
+    GetTextExtentPoint32A(hdc, string, nchars, &siz);
+    GetTextMetricsA(hdc, &tm);
+    DeleteDC(hdc);
+
+    *font_ascent = overall->ascent = tm.tmAscent;
+    *font_descent = overall->descent = tm.tmDescent;
+    overall->width = siz.cx;
+    return 1;
+}
+
+int XSetFont(Display *dpy, GC gc, Font fid)
+{
+    SelectObject(dpy, fid);
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////

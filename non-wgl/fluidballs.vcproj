@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="fiberlamp"
-	ProjectGUID="{BE598D02-E4AC-45C3-A703-566E489AB20C}"
-	RootNamespace="fiberlamp"
+	Name="fluidballs"
+	ProjectGUID="{69C7A37A-484F-4D29-BDC4-A6A0F590A1AF}"
+	RootNamespace="fluidballs"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -183,7 +183,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\fiberlamp.c"
+				RelativePath=".\fluidballs.c"
 				>
 			</File>
 			<File
@@ -191,11 +191,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\non-wgl.c"
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File
-				RelativePath="..\pixmap.c"
+				RelativePath="..\screenhack.c"
 				>
 			</File>
 			<File
@@ -203,11 +203,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\ximage.c"
+				RelativePath=".\xdbe.c"
 				>
 			</File>
 			<File
-				RelativePath="..\xlockmore.c"
+				RelativePath="..\ximage.c"
 				>
 			</File>
 			<File
@@ -237,7 +237,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\xlockmore.h"
+				RelativePath="..\screenhack.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xdbe.h"
 				>
 			</File>
 			<File
@@ -255,7 +259,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\xlockmore.rc"
+				RelativePath="..\screenhack.rc"
 				>
 			</File>
 		</Filter>

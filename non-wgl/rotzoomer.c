@@ -306,6 +306,14 @@ rotzoomer_draw (Display *disp, Window win, void *closure)
   int delay = st->delay;
   int i;
 
+#if 1
+  if (st->zoom_box == NULL)
+  {
+	st->orig_map = XGetImage (st->dpy, st->window, 0, 0, 
+                                  st->width, st->height, ~0L, ZPixmap);
+        init_hack (st);
+  }
+#else
   if (st->img_loader)   /* still loading */
     {
       st->img_loader = load_image_async_simple (st->img_loader, 0, 0, 0, 0, 0);
@@ -316,6 +324,7 @@ rotzoomer_draw (Display *disp, Window win, void *closure)
       }
       return st->delay;
     }
+#endif
 
   if (!st->img_loader &&
       st->start_time + st->duration < time ((time_t) 0)) {

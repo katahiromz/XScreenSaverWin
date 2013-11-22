@@ -476,6 +476,7 @@ static void InitBumpMap_2(Display *dpy, SBumps *pBumps)
 	XSync (pBumps->dpy, 0);
 
 	pBumps->aBumpMap = malloc( pBumps->iWinWidth * pBumps->iWinHeight * sizeof(uint16_t) );
+	assert(pBumps->aBumpMap != NULL);
 	
 	//nSoften = get_integer_resource(dpy,  "soften", "Integer" );
 	nSoften = soften;
@@ -601,6 +602,7 @@ static void Execute( SBumps *pBumps )
     /* warning: pointer targets in assignment differ in signedness
        Should pDOffset be a int8?  I can't tell.  -jwz, 22-Jul-2003 */
 		pDOffset = (int8_t *) &pBumps->pXImage->data[ (iLightY+pBumps->SpotLight.nLightRadius) * pBumps->pXImage->bytes_per_line ];
+		assert(pBumps->aBumpMap != NULL);
 		pBOffset = pBumps->aBumpMap + ( iScreenY * pBumps->iWinWidth ) + nLightXPos;
 		for( iScreenX=nLightXPos, iLightX=-pBumps->SpotLight.nLightRadius; iLightX<nLightOffsetFar; ++iScreenX, ++iLightX, ++pBOffset, pDOffset+=pBumps->bytesPerPixel )
 		{
@@ -709,6 +711,16 @@ bumps_draw (Display *dpy, Window window, void *closure)
 {
   SBumps *Bumps = (SBumps *) closure;
 
+#if 1
+  if (Bumps->start_time + Bumps->duration < time ((time_t) 0)) {
+    Bumps->img_loader = load_image_async_simple (0, Bumps->screen,
+                                                 Bumps->Win, Bumps->source, 
+                                                 0, 0);
+  }
+
+  if (Bumps->aBumpMap == NULL)
+    InitBumpMap_2(dpy, Bumps);
+#else
   if (Bumps->img_loader)   /* still loading */
     {
       Bumps->img_loader = load_image_async_simple (Bumps->img_loader, 0, 0, 0, 0, 0);
@@ -723,6 +735,7 @@ bumps_draw (Display *dpy, Window window, void *closure)
                                                  Bumps->Win, Bumps->source, 
                                                  0, 0);
   }
+#endif
 
   Execute( Bumps );
 

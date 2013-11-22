@@ -117,7 +117,8 @@ decayscreen_init (Display *dpy, Window window)
   st->window = window;
   st->random_p = 0;
 
-  s = get_string_resource(st->dpy, "mode", "Mode");
+  //s = get_string_resource(st->dpy, "mode", "Mode");
+  s = mode;
   if      (s && !strcmp(s, "shuffle")) st->mode = SHUFFLE;
   else if (s && !strcmp(s, "up")) st->mode = UP;
   else if (s && !strcmp(s, "left")) st->mode = LEFT;
@@ -139,17 +140,20 @@ decayscreen_init (Display *dpy, Window window)
     st->mode = random() % (FUZZ+1);
   }
 
-  st->delay = get_integer_resource (st->dpy, "delay", "Integer");
+  //st->delay = get_integer_resource (st->dpy, "delay", "Integer");
+  st->delay = delay;
   if (st->delay < 0) st->delay = 0;
 
-  st->duration = get_integer_resource (st->dpy, "duration", "Seconds");
+  //st->duration = get_integer_resource (st->dpy, "duration", "Seconds");
+  st->duration = duration;
   if (st->duration < 1) st->duration = 1;
 
   XGetWindowAttributes (st->dpy, st->window, &st->xgwa);
 
   gcv.function = GXcopy;
   gcv.subwindow_mode = IncludeInferiors;
-  bg = get_pixel_resource (st->dpy, st->xgwa.colormap, "background", "Background");
+  //bg = get_pixel_resource (st->dpy, st->xgwa.colormap, "background", "Background");
+  bg = load_color(st->dpy, st->xgwa.colormap, background);
   gcv.foreground = bg;
 
   gcflags = GCForeground | GCFunction;

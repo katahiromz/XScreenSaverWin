@@ -11,9 +11,10 @@
 
 #include "screenhack.h"
 
-#ifndef HAVE_COCOA
-# define DO_STIPPLE
-#endif
+//#ifndef HAVE_COCOA
+//# define DO_STIPPLE
+//#endif
+#undef DO_STIPPLE
 
 #define NBITS 12
 

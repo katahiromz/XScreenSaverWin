@@ -383,7 +383,8 @@ fizzle (eraser_state *st)
   // NOTE: XDrawPoints is too slow in Win32
   XArc *arcs;
   int chunk = 1000;
-  int narcs = st->width * st->height / 3;
+  int n = 4;
+  int narcs = st->width * st->height / 8;
   narcs *= (st->ratio - st->prev_ratio);
 
   arcs = (XArc *) calloc (chunk, sizeof(*arcs));
@@ -398,10 +399,11 @@ fizzle (eraser_state *st)
           int r = random();
           arcs[i].x = r % st->width - 4;
           arcs[i].y = (r >> 16) % st->height - 4;
-          arcs[i].width = arcs[i].height = 8;
+          arcs[i].width = arcs[i].height = n;
         }
       XFillArcs(st->dpy, st->window, st->bg_gc, arcs, remain);
       narcs -= remain;
+      n++;
     }
   free (arcs);
 #else

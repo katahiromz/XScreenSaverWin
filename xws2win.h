@@ -159,6 +159,34 @@ enum {
     GXandInverted = R2_NOTMASKPEN, GXset = R2_WHITE, GXclear = R2_BLACK,
     GXand = R2_MASKPEN
 };
+enum { AllPlanes };
+
+//////////////////////////////////////////////////////////////////////////////
+// fonts
+
+typedef struct 
+{
+    short   lbearing;
+    short   rbearing;
+    short   width;
+    short   ascent;
+    short   descent;
+    unsigned short attributes;
+} XCharStruct;
+
+typedef HFONT Font;
+
+typedef struct 
+{
+    Font        fid;
+    unsigned    min_char_or_byte2;
+    unsigned    max_char_or_byte2;
+    XCharStruct min_bounds;
+    XCharStruct max_bounds;
+    XCharStruct *per_char;
+    int     ascent;
+    int     descent;
+} XFontStruct;
 
 //////////////////////////////////////////////////////////////////////////////
 // GC
@@ -174,6 +202,8 @@ enum {
 #define GCLineStyle  (1 << 8)
 #define GCFillRule   (1 << 9)
 #define GCGraphicsExposures (1 << 10)
+#define GCSubwindowMode (1 << 11)
+#define GCFont       (1 << 12)
 
 enum    // line_style
 {
@@ -209,7 +239,7 @@ enum	// fill_rule
 
 enum    // subwindow_mode
 {
-    IncludeInferiors
+	ClipByChildren, IncludeInferiors
 };
 
 typedef struct
@@ -229,6 +259,7 @@ typedef struct
     Bool graphics_exposures;
     int subwindow_mode;
     HBITMAP hbmOld;
+    Font font;
 } XGCValues;
 
 typedef XGCValues *GC;
@@ -257,6 +288,18 @@ int XCopyArea(
      int src_x, int src_y,
      unsigned int width, unsigned int height,
      int dst_x, int dst_y);
+int XCopyPlane(Display *dpy, Drawable src_drawable, Drawable dst_drawable, GC gc,
+     int src_x, int src_y, unsigned int width, unsigned int height,
+     int dst_x, int dst_y, unsigned long bit_plane);
+
+//////////////////////////////////////////////////////////////////////////////
+
+XFontStruct *XLoadQueryFont(Display *dpy, char *name);
+int XUnloadFont(Display *dpy, Font fid);
+int XFreeFont(Display *dpy, XFontStruct *fs);
+int XTextExtents(XFontStruct *fs, char *string, int nchars,
+    int *dir, int *font_ascent, int *font_descent, XCharStruct *overall);
+int XSetFont(Display *dpy, GC gc, Font fid);
 
 //////////////////////////////////////////////////////////////////////////////
 // XColor
@@ -302,6 +345,7 @@ int XStoreColors(
     int         ncolors);
 
 int XQueryColor(Display *dpy, Colormap cmap, XColor *def);
+int XQueryColors(Display *dpy, Colormap cmap, XColor *defs, int ncolors);
 int XParseColor(Display *d, Colormap cmap, const char *name, XColor *c);
 
 unsigned long load_color(Display *dpy, Colormap cmap, const char *name);
@@ -381,6 +425,7 @@ Display *DisplayOfScreen(Screen *s);
 #define XScreenNumberOfScreen(screen) 1
 int XDisplayWidth(Display *dpy, int scr);
 int XDisplayHeight(Display *dpy, int scr);
+Window RootWindow(Display *dpy, int scr);
 
 Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr);
 int XSetLineAttributes(Display *dpy, GC gc,
@@ -449,11 +494,29 @@ int XClearArea(
     int x, int y, unsigned int width, unsigned int height,
     Bool exposures);
 
+XImage *XGetImage(Display *dpy, Drawable d,
+     int x, int y, unsigned int width, unsigned int height,
+     unsigned long plane_mask, int format);
 int XPutImage(Display *dpy, Drawable d, GC gc,
     XImage *image, int req_xoffset, int req_yoffset,
     int x, int y, unsigned int req_width, unsigned int req_height);
+XImage *XSubImage(XImage *ximage,
+    int x, int y, unsigned int width, unsigned int height);
 
 int XFlush(Display *d);
+
+int XSetSubwindowMode(Display *dpy, GC gc, int mode);
+
+Bool XTranslateCoordinates(
+     Display *dpy, Window src_win, Window dest_win,
+     int src_x, int src_y, int *dst_x, int *dst_y, Window *child);
+int XSetPlaneMask(Display *dpy, GC gc, unsigned long planemask);
+int XSetClipOrigin(Display *dpy, GC gc, int xorig, int yorig);
+int XSetClipMask(Display *dpy, GC gc, Pixmap mask);
+Status XGetGeometry(
+    Display *dpy, Drawable d, Window *root,
+    int *x, int *y, unsigned int *width, unsigned int *height,
+    unsigned int *borderWidth, unsigned int *depth);
 
 #define XMaxRequestSize(dpy) 100
 

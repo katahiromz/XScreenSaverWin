@@ -1131,6 +1131,7 @@ Bool XAllocNamedColor(
 Bool XAllocColor(Display *d, Colormap cmap, XColor *color)
 {
     WORD red, green, blue;
+    WORD true_red, true_green, true_blue;
     INT pixel;
 
     red = color->red;
@@ -1144,6 +1145,13 @@ Bool XAllocColor(Display *d, Colormap cmap, XColor *color)
         return True;
     }
     pixel = AddNewColor(cmap, red, green, blue);
+    if (pixel != -1)
+    {
+        color->pixel = pixel;
+        return True;
+    }
+    pixel = GetNearestPixel(cmap, red, green, blue,
+        &true_red, &true_green, &true_blue);
     if (pixel != -1)
     {
         color->pixel = pixel;
@@ -1263,14 +1271,33 @@ int XQueryColor(Display *dpy, Colormap cmap, XColor *def)
 {
     int pixel;
     assert(def != NULL);
-    if (def != NULL && colormaps[cmap].pixel_used[def->pixel])
+    if (def != NULL)
     {
-        pixel = def->pixel;
-        def->red = colormaps[cmap].items[pixel].red;
-        def->blue = colormaps[cmap].items[pixel].blue;
-        def->green = colormaps[cmap].items[pixel].green;
-        def->flags = DoRed | DoGreen | DoBlue;
-        return 1;
+		if (def->pixel < MAX_COLORCELLS && colormaps[cmap].pixel_used[def->pixel])
+		{
+			pixel = def->pixel;
+			def->red = colormaps[cmap].items[pixel].red;
+			def->blue = colormaps[cmap].items[pixel].blue;
+			def->green = colormaps[cmap].items[pixel].green;
+			def->flags = DoRed | DoGreen | DoBlue;
+			return 1;
+		}
+    }
+    return 0;
+}
+
+int XQueryColors(Display *dpy, Colormap cmap, XColor *defs, int ncolors)
+{
+    int i, pixel;
+    assert(defs != NULL);
+
+    for (i = 0; i < ncolors; i++)
+    {
+        pixel = defs[i].pixel;
+        defs[i].red = colormaps[cmap].items[pixel].red;
+        defs[i].blue = colormaps[cmap].items[pixel].blue;
+        defs[i].green = colormaps[cmap].items[pixel].green;
+        defs[i].flags = DoRed | DoGreen | DoBlue;
     }
     return 0;
 }

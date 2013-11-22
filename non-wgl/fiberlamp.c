@@ -175,7 +175,7 @@ init_fiberlamp(ModeInfo * mi)
   fl = &fiberlamps[MI_SCREEN(mi)];
 
   /* Create or Resize double buffer */
-#if 1 || defined(HAVE_COCOA)	/* Don't second-guess Quartz's double-buffering */
+#if defined(HAVE_COCOA)	/* Don't second-guess Quartz's double-buffering */
   fl->dbufp = False;
 #else
   fl->dbufp = True;

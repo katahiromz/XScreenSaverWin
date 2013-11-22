@@ -81,8 +81,8 @@ Bool drawCenters = False;
 
 static argtype vars[] = 
 {
-    {&background, "background", NULL, "black", t_String},
-    {&foreground, "foreground", NULL, "white", t_String},
+    {&background, "background", NULL, "white", t_String},
+    {&foreground, "foreground", NULL, "black", t_String},
     {&maxCycles, "maxCycles", NULL, "100000", t_Int},
     {&growthDelay, "growthDelay", NULL, "18000", t_Int},
     {&numCircles, "numCircles", NULL, "100", t_Int},
@@ -282,7 +282,7 @@ static inline void point2rgb(int depth, unsigned long c, int *r, int *g, int *b)
     {
     case 32:
     case 24:
-#ifdef HAVE_COCOA
+#if 1 || defined(HAVE_COCOA)
         /* This program idiotically does not go through a color map, so
            we have to hardcode in knowledge of how jwxyz.a packs pixels!
            Fix it to go through st->colors[st->ncolors] instead!
@@ -317,7 +317,7 @@ static inline unsigned long rgb2point(int depth, int r, int g, int b)
     {
     case 32:
     case 24:
-#ifdef HAVE_COCOA
+#if 1 || defined(HAVE_COCOA)
         /* This program idiotically does not go through a color map, so
            we have to hardcode in knowledge of how jwxyz.a packs pixels!
            Fix it to go through st->colors[st->ncolors] instead!
@@ -513,8 +513,18 @@ static void build_img(struct field *f)
 	exit(1);
     }
 
+#if 1
+	{
+		unsigned int i;
+		for (i = 0; i < f->width * f->height; i++)
+		{
+			f->off_img[i] = f->bgcolor;
+		}
+	}
+#else
     memset(f->off_img, f->bgcolor, 
 	   sizeof(unsigned long) * f->width * f->height);
+#endif
 }
 
 static void free_circles(struct field *f) 
@@ -905,8 +915,10 @@ interaggregate_init (Display *dpy, Window window)
     st->f->height = st->xgwa.height;
     st->f->width = st->xgwa.width;
     st->f->visdepth = st->xgwa.depth;
-    st->f->fgcolor = st->gcv.foreground;
-    st->f->bgcolor = st->gcv.background;
+    //st->f->fgcolor = st->gcv.foreground;
+    //st->f->bgcolor = st->gcv.background;
+    st->f->fgcolor = st->gcv.foreground_rgb;
+    st->f->bgcolor = st->gcv.background_rgb;
 
     /* Initialize stuff */
     build_field(st->dpy, st->window, st->xgwa, st->fgc, st->f);

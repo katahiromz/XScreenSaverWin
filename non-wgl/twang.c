@@ -139,9 +139,15 @@ grabImage_start (struct state *st, XWindowAttributes *xwa)
 {
     XFillRectangle (st->dpy, st->window, st->backgroundGC, 0, 0, 
 		    st->windowWidth, st->windowHeight);
+#if 1
+    st->backgroundImage = 
+	XGetImage (st->dpy, st->window, 0, 0, st->windowWidth, st->windowHeight,
+		   ~0L, RGBAPixmap_);
+#else
     st->backgroundImage = 
 	XGetImage (st->dpy, st->window, 0, 0, st->windowWidth, st->windowHeight,
 		   ~0L, ZPixmap);
+#endif
 
     st->start_time = time ((time_t) 0);
     st->img_loader = load_image_async_simple (0, xwa->screen, st->window,
@@ -156,8 +162,13 @@ grabImage_done (struct state *st)
 
     st->start_time = time ((time_t) 0);
     if (st->sourceImage) XDestroyImage (st->sourceImage);
+#if 1
+    st->sourceImage = XGetImage (st->dpy, st->window, 0, 0, st->windowWidth, st->windowHeight,
+			     ~0L, RGBAPixmap_);
+#else
     st->sourceImage = XGetImage (st->dpy, st->window, 0, 0, st->windowWidth, st->windowHeight,
 			     ~0L, ZPixmap);
+#endif
 
     if (st->workImage) XDestroyImage (st->workImage);
     st->workImage = NULL;
@@ -181,6 +192,7 @@ grabImage_done (struct state *st)
 	/* just use XSubImage to acquire the right visual, depth, etc;
 	 * easier than the other alternatives */
 	st->workImage = XSubImage (st->sourceImage, 0, 0, st->windowWidth, st->windowHeight);
+	assert(st->workImage != NULL);
 }
 
 /* set up the system */
@@ -540,7 +552,18 @@ static void renderTile (struct state *st, Tile *t)
 		{
 		    continue;
 		}
+#if 1
+        {
+            XColor color;
+            COLORREF rgb;
+            color.pixel = st->borderPixel;
+            XQueryColor(NULL, 0, &color);
+            rgb = RGB(color.red / 256, color.green / 256, color.blue / 256);
+            XPutPixel (st->workImage, x, y, rgb);
+        }
+#else
 		XPutPixel (st->workImage, x, y, st->borderPixel);
+#endif
 	    }
 	    else
 	    {
@@ -638,6 +661,15 @@ twang_draw (Display *dpy, Window window, void *closure)
 {
   struct state *st = (struct state *) closure;
 
+#if 1
+    if (st->workImage == NULL)
+    {
+        XWindowAttributes xgwa;
+    	XGetWindowAttributes(st->dpy, st->window, &xgwa);
+        grabImage_start(st, &xgwa);
+        grabImage_done(st);
+    }
+#else
   if (st->img_loader)   /* still loading */
     {
       st->img_loader = load_image_async_simple (st->img_loader, 0, 0, 0, 0, 0);
@@ -654,6 +686,9 @@ twang_draw (Display *dpy, Window window, void *closure)
     grabImage_start (st, &xgwa);
     return st->delay;
   }
+#endif
+
+  assert(st->workImage != NULL);
 
   modelEvents (st);
   updateModel (st);

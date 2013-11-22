@@ -1,5 +1,7 @@
 #include "xws2win.h"
 
+//////////////////////////////////////////////////////////////////////////////
+
 Pixmap XCreatePixmap(
     Display* dpy, Drawable d,
     unsigned int width, unsigned int height,
@@ -13,7 +15,7 @@ Pixmap XCreatePixmap(
     ZeroMemory(&bi, sizeof(bi));
     bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bi.bmiHeader.biWidth = width;
-    bi.bmiHeader.biHeight = -height;
+    bi.bmiHeader.biHeight = height;
     bi.bmiHeader.biPlanes = 1;
     bi.bmiHeader.biBitCount = 32;
     data->hbm = CreateDIBSection(dpy, &bi, DIB_RGB_COLORS,
@@ -69,8 +71,10 @@ XPixmapFormatValues *XListPixmapFormats(Display *dpy, int *count)
     if (values != NULL)
     {
         values->depth = 32;
-		values->bits_per_pixel = 32;
+        values->bits_per_pixel = 32;
         *count = 1;
     }
     return values;
 }
+
+//////////////////////////////////////////////////////////////////////////////
