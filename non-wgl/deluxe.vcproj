@@ -183,11 +183,39 @@
 				>
 			</File>
 			<File
+				RelativePath="..\colors.c"
+				>
+			</File>
+			<File
 				RelativePath=".\deluxe.c"
 				>
 			</File>
 			<File
+				RelativePath="..\hsv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\pixmap.c"
+				>
+			</File>
+			<File
 				RelativePath="..\screenhack.c"
+				>
+			</File>
+			<File
+				RelativePath="..\xcolor.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xdbe.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ximage.c"
+				>
+			</File>
+			<File
+				RelativePath="..\xws2win.c"
 				>
 			</File>
 			<File
@@ -205,7 +233,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\colors.h"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.h"
+				>
+			</File>
+			<File
 				RelativePath="..\screenhack.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xdbe.h"
 				>
 			</File>
 			<File

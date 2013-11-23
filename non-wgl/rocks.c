@@ -43,7 +43,7 @@ static argtype vars[] =
     {&speed, "speed", NULL, "100", t_Int},
     {&rotate, "rotate", NULL, "True", t_Bool},
     {&move, "move", NULL, "True", t_Bool},
-    {&use3d, "speed", NULL, "False", t_Bool},
+    {&use3d, "use3d", NULL, "False", t_Bool},
     {&left3d, "left3d", NULL, "Blue", t_String},
     {&right3d, "right3d", NULL, "Red", t_String},
     {&delta3d, "delta3d", NULL, "1.5", t_Float},

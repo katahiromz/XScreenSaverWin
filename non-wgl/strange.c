@@ -92,6 +92,8 @@ ModStruct   strange_description =
 # define NO_DBUF
 #endif
 
+#define NO_DBUF
+
 typedef float DBL;
 typedef int PRM;
 

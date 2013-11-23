@@ -1,4 +1,4 @@
-There are 149 Goods, 8 OKs and 66 NGs of total 223 screen savers 
+There are 158 Goods, 9 OKs and 56 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -51,10 +51,10 @@ DNALogo                 Good
 DangerBall              Good        
 DecayScreen             NG          
 Deco                    Good        
-Deluxe                  NG          
+Deluxe                  Good        
 Demon                   Good        
 Discrete                Good        
-Distort                 NG          
+Distort                 Good        
 Drift                   Good        
 Endgame                 Good        
 Engine                  NG          
@@ -92,11 +92,11 @@ GLText                  NG
 Galaxy                  OK          Flickers and slow
 Gears                   Good        
 Gleidescope             OK          Slow
-Goop                    NG          
+Goop                    OK          Transparent disabled
 Grav                    Good        
 Greynetic               Good        
 Halftone                Good        
-Halo                    NG          Slow
+Halo                    NG          Too slow
 Helix                   Good        
 Hexadrop                Good        
 Hilbert                 Good        
@@ -105,7 +105,7 @@ HyperBall               Good
 HyperCube               Good        
 Hypertorus              Good        
 Hypnowheel              Good        
-IFS                     NG          
+IFS                     Good        
 IMSMap                  OK          Slow
 Interaggregate          NG          Hung up
 Interference            Good        
@@ -147,7 +147,7 @@ Noof                    Good
 NoseGuy                 NG          
 Pacman                  NG          
 Pedal                   Good        
-Penetrate               NG          
+Penetrate               Good        
 Penrose                 Good        
 Petri                   Good        
 Phosphor                NG          
@@ -159,16 +159,16 @@ Polyhedra               NG
 Polyominoes             NG          Colors bad
 Polytopes               Good        
 Pong                    NG          
-PopSquares              NG          
+PopSquares              Good        
 Providence              Good        
 Pulsar                  Good        
 Pyro                    NG          Flickers
 Qix                     NG          
 QuasiCrystal            NG          
 Queens                  Good        
-RDbomb                  NG          
-Ripples                 NG          
-Rocks                   NG          
+RDbomb                  NG          Too slow
+Ripples                 NG          Black out
+Rocks                   Good        
 Rorschach               Good        
 RotZoomer               NG          
 Rotor                   Good        
@@ -194,7 +194,7 @@ StarWars                NG
 Starfish                Good        
 StonerView              Good        
 Strange                 NG          
-Substrate               NG          Hung up
+Substrate               Good        
 Superquadrics           Good        
 Surfaces                Good        
 Swirl                   NG          Too slow
@@ -218,8 +218,8 @@ Worm                    NG
 Wormhole                Good        
 XAnalogTV               NG          
 XFlame                  Good        
-XJack                   NG          
-XLyap                   NG          
+XJack                   Good        
+XLyap                   Good        
 XMatrix                 NG          
 XRaySwarm               Good        
 XSpirograph             Good        

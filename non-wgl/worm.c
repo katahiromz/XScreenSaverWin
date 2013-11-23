@@ -38,8 +38,6 @@ static const char sccsid[] = "@(#)worm.c	4.04 97/07/28 xlockmore";
  */
 
 #define STANDALONE
-#define NOARGS
-
 #define DELAY 17000
 #define COUNT -20
 #define CYCLES 10
@@ -69,22 +67,25 @@ static const char sccsid[] = "@(#)worm.c	4.04 97/07/28 xlockmore";
 # include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
+ENTRYPOINT ModeSpecOpt worm_opts =
+{0, NULL, 0, NULL, NULL};
+
 Bool use3d = False;
 float delta3d = 1.5;
+char *right3d = "red";
+char *left3d = "blue";
+char *both3d = "magenta";
+char *none3d = "black";
 
 static argtype vars[] = 
 {
     {&use3d, "use3d", NULL, "False", t_Bool},
     {&delta3d, "delta3d", NULL, "1.5", t_Float},
+    {&right3d, "right3d", NULL, "red", t_String},
+    {&left3d, "left3d", NULL, "blue", t_String},
+    {&both3d, "both3d", NULL, "magenta", t_String},
+    {&none3d, "none3d", NULL, "black", t_String},
 };
-
-#undef MI_DELTA3D
-#define MI_DELTA3D(mi) delta3d
-#undef MI_WIN_IS_USE3D
-#define MI_WIN_IS_USE3D(mi) use3d
-
-ENTRYPOINT ModeSpecOpt worm_opts =
-{0, NULL, 0, NULL, NULL};
 
 #define MINSIZE 1
 
@@ -301,6 +302,14 @@ init_worm (ModeInfo * mi)
 					       sizeof (wormstruct))) == NULL)
 			return;
 	}
+
+	MI_WIN_IS_USE3D(mi) = use3d;
+	MI_LEFT_COLOR(mi) = load_color(mi->dpy, 0, left3d);
+	MI_RIGHT_COLOR(mi) = load_color(mi->dpy, 0, right3d);
+	MI_BOTH_COLOR(mi) = load_color(mi->dpy, 0, both3d);
+	MI_NONE_COLOR(mi) = load_color(mi->dpy, 0, none3d);
+	MI_DELTA3D(mi) = delta3d;
+
 	wp = &worms[MI_SCREEN(mi)];
 	if (MI_NPIXELS(mi) <= 2 || MI_WIN_IS_USE3D(mi))
 		wp->nc = 2;

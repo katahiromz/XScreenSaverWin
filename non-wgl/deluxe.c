@@ -13,6 +13,8 @@
 #include <math.h>
 #include "alpha.h"
 
+#undef HAVE_DOUBLE_BUFFER_EXTENSION
+
 #ifdef HAVE_DOUBLE_BUFFER_EXTENSION
 # include "xdbe.h"
 #endif /* HAVE_DOUBLE_BUFFER_EXTENSION */
@@ -82,7 +84,8 @@ struct throbber {
 static void
 draw_star (struct state *st, Drawable w, struct throbber *t)
 {
-  XPoint points[11];
+  //XPoint points[11];
+  XPoint points[12];
   int x = t->x;
   int y = t->y;
 
@@ -108,6 +111,7 @@ draw_star (struct state *st, Drawable w, struct throbber *t)
   points[8].x = x + s  * cos(o + 0.8*c); points[8].y = y + s  * sin(o + 0.8*c);
   points[9].x = x + s2 * cos(o + 0.9*c); points[9].y = y + s2 * sin(o + 0.9*c);
   points[10] = points[0];
+  points[11] = points[1];
 
   XDrawLines (st->dpy, w, t->gc, points, countof(points), CoordModeOrigin);
 }
@@ -305,7 +309,7 @@ deluxe_init (Display *dpy, Window window)
 
 # ifdef HAVE_DOUBLE_BUFFER_EXTENSION
   //st->dbeclear_p = get_boolean_resource (st->dpy, "useDBEClear", "Boolean");
-  st->dbeclear_p = True
+  st->dbeclear_p = True;
 #endif
 
 # ifdef HAVE_COCOA	/* Don't second-guess Quartz's double-buffering */

@@ -596,6 +596,21 @@ int XClearWindow(Display *dpy, Window w)
     return 0;
 }
 
+int XClearWindow2_(Display *dpy, Window w, GC gc)
+{
+    RECT rc;
+    HDC hdc = (HDC)dpy;
+    HWND hwnd = WindowFromDC(hdc);
+    HBRUSH hbr;
+
+    GetClientRect(hwnd, &rc);
+    hbr = CreateSolidBrush(gc->background_rgb);
+    FillRect(hdc, &rc, hbr);
+    DeleteObject(hbr);
+
+    return 0;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // misc
 
@@ -734,6 +749,11 @@ Status XGetGeometry(
 }
 
 //////////////////////////////////////////////////////////////////////////////
+
+int screen_number(Screen *screen)
+{
+    return 0;
+}
 
 Bool use_subwindow_mode_p(Screen *screen, Window window)
 {

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="ripples"
-	ProjectGUID="{647454D1-C4C3-40B2-93DD-E4E42555D542}"
-	RootNamespace="ripples"
+	Name="ifs"
+	ProjectGUID="{EE214278-A06E-48D1-8C1F-9EB1B32D35C4}"
+	RootNamespace="ifs"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -187,7 +187,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ripples.c"
+				RelativePath=".\ifs.c"
+				>
+			</File>
+			<File
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File

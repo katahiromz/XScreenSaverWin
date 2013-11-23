@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="ripples"
-	ProjectGUID="{647454D1-C4C3-40B2-93DD-E4E42555D542}"
-	RootNamespace="ripples"
+	Name="distort"
+	ProjectGUID="{42F3D172-1832-40CD-B05B-38E83A946A8F}"
+	RootNamespace="distort"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -49,7 +49,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4244;4305;4018"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -125,7 +125,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4244;4305;4018"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -183,11 +183,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\distort.c"
+				>
+			</File>
+			<File
 				RelativePath="..\hsv.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ripples.c"
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File

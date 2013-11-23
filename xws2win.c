@@ -61,6 +61,7 @@ GC XCreateGC(Display *dpy, Drawable d,
     newvalues->line_style = LineSolid;
     newvalues->fill_rule = EvenOddRule;
     newvalues->graphics_exposures = True;
+    newvalues->font = (HFONT)GetStockObject(ANSI_FIXED_FONT);
     if (values != NULL)
         XChangeGC(dpy, newvalues, valuemask, values);
 
@@ -557,11 +558,15 @@ int XDrawArcs(Display *dpy, Drawable d, GC gc,
     return 0;
 }
 
+//Bool xdrawstring_opaque = False;
+
 int XDrawString(Display *dpy, Drawable d, GC gc,
     int x, int y, const char *string, int length)
 {
     XGCValues *values;
     HDC hdc;
+    HGDIOBJ hFontOld;
+	TEXTMETRICA tm;
 
     values = XGetGCValues_(gc);
     if (values == NULL)
@@ -570,7 +575,13 @@ int XDrawString(Display *dpy, Drawable d, GC gc,
     hdc = XCreateDrawableDC_(dpy, d);
     SetTextColor(hdc, values->foreground_rgb);
     SetBkColor(hdc, values->background_rgb);
-    TextOut(dpy, x, y, string, length);
+    SetBkMode(hdc, TRANSPARENT);
+
+    hFontOld = SelectObject(hdc, values->font);
+    GetTextMetricsA(hdc, &tm);
+    TextOut(hdc, x, y - tm.tmAscent, string, length);
+    SelectObject(hdc, hFontOld);
+
     XDeleteDrawableDC_(dpy, d, hdc);
 
     return 0;
@@ -579,7 +590,27 @@ int XDrawString(Display *dpy, Drawable d, GC gc,
 int XDrawImageString(Display *dpy, Drawable d, GC gc,
     int x, int y, const char *string, int length)
 {
-    assert(0);
+    XGCValues *values;
+    HDC hdc;
+    HGDIOBJ hFontOld;
+	TEXTMETRICA tm;
+
+    values = XGetGCValues_(gc);
+    if (values == NULL)
+        return BadGC;
+
+    hdc = XCreateDrawableDC_(dpy, d);
+    SetTextColor(hdc, values->foreground_rgb);
+    SetBkColor(hdc, values->background_rgb);
+    SetBkMode(hdc, TRANSPARENT);
+
+    hFontOld = SelectObject(hdc, values->font);
+    GetTextMetricsA(hdc, &tm);
+    TextOut(hdc, x, y - tm.tmAscent, string, length);
+    SelectObject(hdc, hFontOld);
+
+    XDeleteDrawableDC_(dpy, d, hdc);
+
     return 0;
 }
 
@@ -909,7 +940,22 @@ int XClearArea(
     SetRect(&rc, x, y, x + width, y + height);
     FillRect(hdc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
     XDeleteDrawableDC_(dpy, w, hdc);
-	return 0;
+    return 0;
+}
+
+int XClearArea2_(
+    Display *dpy, Window w, GC gc,
+    int x, int y, unsigned int width, unsigned int height,
+    Bool exposures)
+{
+    RECT rc;
+    HBRUSH hbr = CreateSolidBrush(gc->background_rgb);
+    HDC hdc = XCreateDrawableDC_(dpy, w);
+    SetRect(&rc, x, y, x + width, y + height);
+    FillRect(hdc, &rc, hbr);
+    XDeleteDrawableDC_(dpy, w, hdc);
+    DeleteObject(hbr);
+    return 0;
 }
 
 int XSetSubwindowMode(Display *dpy, GC gc, int mode)
@@ -941,34 +987,36 @@ Bool XTranslateCoordinates(
 
 int XSetPlaneMask(Display *dpy, GC gc, unsigned long planemask)
 {
-	return 1;
+    return 1;
 }
 
 int XSetClipOrigin(Display *dpy, GC gc, int xorig, int yorig)
 {
-	return 1;
+    return 1;
 }
 
 int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
 {
-	return 1;
+    return 1;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-XFontStruct *XLoadQueryFont(Display *dpy, char *name)
+XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
 {
     LOGFONTA lf;
     HDC hdc;
     TEXTMETRICA tm;
     ABC *pabc;
-	HGDIOBJ hFontOld;
+    HGDIOBJ hFontOld;
     int i, nCount;
-	char *p, *q;
+    char *p, *q;
     XFontStruct *fs = (XFontStruct *)calloc(1, sizeof(XFontStruct));
-	assert(fs);
+    assert(fs);
     if (fs == NULL)
         return NULL;
+
+    hdc = CreateCompatibleDC(NULL);
 
     ZeroMemory(&lf, sizeof(lf));
     lstrcpynA(lf.lfFaceName, name, LF_FACESIZE);
@@ -978,14 +1026,14 @@ XFontStruct *XLoadQueryFont(Display *dpy, char *name)
         long n = strtoul(p + 1, &q, 10);
         if (q && *q == '\0')
         {
-            lf.lfHeight = -n;
+            lf.lfHeight = -MulDiv(n, GetDeviceCaps(hdc, LOGPIXELSY), 72);
             *p = '\0';
         }
     }
     lf.lfWeight = FW_NORMAL;
     lf.lfQuality = ANTIALIASED_QUALITY;
     fs->fid = CreateFontIndirectA(&lf);
-	assert(fs->fid);
+    assert(fs->fid);
     if (fs->fid == NULL)
     {
         free(fs);
@@ -996,15 +1044,14 @@ XFontStruct *XLoadQueryFont(Display *dpy, char *name)
     fs->max_char_or_byte2 = 0x7F;
     nCount = (int)fs->max_char_or_byte2 - (int)fs->min_char_or_byte2 + 1;
     pabc = (ABC *)calloc(nCount, sizeof(ABC));
-	assert(pabc);
+    assert(pabc);
     fs->per_char = (XCharStruct *)calloc(nCount, sizeof(XCharStruct));
-	assert(fs->per_char);
+    assert(fs->per_char);
 
-    hdc = CreateCompatibleDC(NULL);
     hFontOld = SelectObject(hdc, fs->fid);
     GetTextMetricsA(hdc, &tm);
     GetCharABCWidthsA(hdc, fs->min_char_or_byte2, fs->max_char_or_byte2, pabc);
-	SelectObject(hdc, hFontOld);
+    SelectObject(hdc, hFontOld);
     DeleteDC(hdc);
     
     fs->min_bounds.lbearing = 0x7FFF;
@@ -1016,7 +1063,7 @@ XFontStruct *XLoadQueryFont(Display *dpy, char *name)
     for (i = 0; i < nCount; i++)
     {
         fs->per_char[i].lbearing = pabc[i].abcA;
-        fs->per_char[i].rbearing = pabc[i].abcC;
+        fs->per_char[i].rbearing = pabc[i].abcA + pabc[i].abcB + pabc[i].abcC;
         fs->per_char[i].width = pabc[i].abcB;
         fs->per_char[i].ascent = tm.tmAscent;
         fs->per_char[i].descent = tm.tmDescent;
@@ -1034,6 +1081,7 @@ XFontStruct *XLoadQueryFont(Display *dpy, char *name)
 int XUnloadFont(Display *dpy, Font fid)
 {
     DeleteObject(fid);
+	return 0;
 }
 
 int XFreeFont(Display *dpy, XFontStruct *fs)
@@ -1049,10 +1097,12 @@ int XTextExtents(XFontStruct *fs, char *string, int nchars,
 {
     SIZE siz;
     TEXTMETRICA tm;
+    HGDIOBJ hFontOld;
     HDC hdc = CreateCompatibleDC(NULL);
-    SelectObject(hdc, fs->fid);
+    hFontOld = SelectObject(hdc, fs->fid);
     GetTextExtentPoint32A(hdc, string, nchars, &siz);
     GetTextMetricsA(hdc, &tm);
+    SelectObject(hdc, hFontOld);
     DeleteDC(hdc);
 
     *font_ascent = overall->ascent = tm.tmAscent;
@@ -1061,10 +1111,73 @@ int XTextExtents(XFontStruct *fs, char *string, int nchars,
     return 1;
 }
 
+int XTextWidth(XFontStruct *fs, const char *string, int count)
+{
+    SIZE siz;
+    HDC hdc = CreateCompatibleDC(NULL);
+    HGDIOBJ hFontOld = SelectObject(hdc, fs->fid);
+    GetTextExtentPoint32A(hdc, string, count, &siz);
+    SelectObject(hdc, hFontOld);
+    DeleteDC(hdc);
+    return siz.cx;
+}
+
 int XSetFont(Display *dpy, GC gc, Font fid)
 {
-    SelectObject(dpy, fid);
-	return 0;
+    XGCValues *values;
+
+    values = XGetGCValues_(gc);
+    if (values == NULL)
+        return BadGC;
+
+    values->font = fid;
+    return 0;
+}
+
+int XFreeFontInfo(char **names, XFontStruct *info, int actualCount)
+{
+    assert(names == NULL);
+    if (info != NULL)
+    {
+        int i;
+        for (i = 0; i < actualCount; i++)
+        {
+            free(info[i].per_char);
+        }
+        free(info);
+    }
+    return 0;
+}
+
+VisualID XVisualIDFromVisual(Visual *visual)
+{
+    return 0;
+}
+
+XVisualInfo *XGetVisualInfo(Display *dpy, long visual_info_mask,
+    XVisualInfo *visual_info_template, int *nitems)
+{
+    XVisualInfo *vi;
+
+    vi = (XVisualInfo *)calloc(1, sizeof(XVisualInfo));
+    if (vi == NULL)
+        return NULL;
+
+    *vi = *visual_info_template;
+
+    vi->visual = 0;
+    vi->visualid = 0;
+    vi->screen = 0;
+    vi->depth = 32;
+    vi->c_class = 0;
+    vi->red_mask = 0x000000FF;
+    vi->green_mask = 0x0000FF00;
+    vi->blue_mask = 0x00FF0000;
+    vi->colormap_size = MAX_COLORMAP;
+    vi->bits_per_rgb = 32;
+    *nitems = 1;
+
+    return vi;
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -191,11 +191,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\pixmap.c"
+				>
+			</File>
+			<File
 				RelativePath=".\strange.c"
 				>
 			</File>
 			<File
 				RelativePath="..\xcolor.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ximage.c"
 				>
 			</File>
 			<File

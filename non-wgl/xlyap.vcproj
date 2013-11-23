@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="ripples"
-	ProjectGUID="{647454D1-C4C3-40B2-93DD-E4E42555D542}"
-	RootNamespace="ripples"
+	Name="xlyap"
+	ProjectGUID="{321F0BA1-4818-4690-AB7A-EF8F5619B4E5}"
+	RootNamespace="xlyap"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -187,10 +187,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ripples.c"
-				>
-			</File>
-			<File
 				RelativePath="..\screenhack.c"
 				>
 			</File>
@@ -200,6 +196,10 @@
 			</File>
 			<File
 				RelativePath="..\ximage.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xlyap.c"
 				>
 			</File>
 			<File

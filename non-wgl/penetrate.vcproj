@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="ripples"
-	ProjectGUID="{647454D1-C4C3-40B2-93DD-E4E42555D542}"
-	RootNamespace="ripples"
+	Name="penetrate"
+	ProjectGUID="{BC73FD5A-01FF-4C6F-8E2F-4753A571C86F}"
+	RootNamespace="penetrate"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -187,7 +187,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ripples.c"
+				RelativePath=".\penetrate.c"
 				>
 			</File>
 			<File
@@ -196,10 +196,6 @@
 			</File>
 			<File
 				RelativePath="..\xcolor.c"
-				>
-			</File>
-			<File
-				RelativePath="..\ximage.c"
 				>
 			</File>
 			<File

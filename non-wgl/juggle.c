@@ -199,6 +199,8 @@ static Bool rings;
 static Bool bballs;
 static char *only;
 
+char *font_ = "Arial 90";
+
 static XrmOptionDescRec opts[] =
 {
   {"-pattern",  ".juggle.pattern",  XrmoptionSepArg, NULL  },
@@ -241,6 +243,7 @@ static argtype vars[] =
   { &rings,    "rings",    "Rings",    DEF_RINGS,    t_Bool   },
   { &bballs,   "bballs",   "BBalls",   DEF_BBALLS,   t_Bool   },
   { &only,     "only",     "BBalls",   " ",          t_String },
+  { &font_,     "font",     "Font",     "Arial 90",   t_String }, //
 };
 static OptionStruct desc[] =
 {
@@ -714,7 +717,7 @@ add_throw(jugglestruct *sp, char type, int h, Notation n, const char* name)
   }
   t->object = NULL;
   if(name != NULL)
-	t->name = strdup(name);
+	t->name = _strdup(name);
   t->posn = type;
   if (n == ADAM) {
 	t->adam = h;
@@ -891,7 +894,7 @@ name(jugglestruct *sp)
 						to pattern */
 	  t->name = NULL;
 	  if(t->pattern != NULL) free(t->pattern);
-	  t->pattern = strdup(buffer);
+	  t->pattern = _strdup(buffer);
 	}
   }
 }
@@ -2567,7 +2570,7 @@ init_juggle (ModeInfo * mi)
 	}
 	(void)wander(sp, 0); /* Initialize wander */
 
-	sp->pattern =  strdup(""); /* Initialise saved pattern with
+	sp->pattern = _strdup(""); /* Initialise saved pattern with
 								  free-able memory */
   }
 
@@ -2623,7 +2626,8 @@ init_juggle (ModeInfo * mi)
   sp->scale = MIN(MI_HEIGHT(mi)/480.0, MI_WIDTH(mi)/160.0);
 
   if(describe && !sp->mode_font) { /* Check to see if there's room to describe patterns. */
-    char *font = get_string_resource (MI_DISPLAY(mi), "font", "Font");
+    //char *font = get_string_resource (MI_DISPLAY(mi), "font", "Font");
+    char *font = font_;
 	sp->mode_font = XLoadQueryFont(MI_DISPLAY(mi), font);
   }
 }
@@ -2797,7 +2801,7 @@ draw_juggle (ModeInfo * mi)
                    0, 0, MI_WIDTH(mi), 25);
 # endif
 	free(sp->pattern);
-	sp->pattern = strdup(pattern);
+	sp->pattern = _strdup(pattern);
 
 	if (MI_IS_VERBOSE(mi)) {
 	  (void) fprintf(stderr, "Juggle[%d]: Running: %s\n",

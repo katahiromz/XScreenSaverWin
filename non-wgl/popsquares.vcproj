@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="ripples"
-	ProjectGUID="{647454D1-C4C3-40B2-93DD-E4E42555D542}"
-	RootNamespace="ripples"
+	Name="popsquares"
+	ProjectGUID="{CF76C8BC-1C44-4BA5-BCED-A818F2A18965}"
+	RootNamespace="popsquares"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -187,7 +187,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ripples.c"
+				RelativePath="..\pixmap.c"
+				>
+			</File>
+			<File
+				RelativePath=".\popsquares.c"
 				>
 			</File>
 			<File
@@ -196,6 +200,10 @@
 			</File>
 			<File
 				RelativePath="..\xcolor.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xdbe.c"
 				>
 			</File>
 			<File
@@ -230,6 +238,10 @@
 			</File>
 			<File
 				RelativePath="..\screenhack.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xdbe.h"
 				>
 			</File>
 			<File

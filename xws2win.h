@@ -69,12 +69,21 @@ typedef struct
 typedef DrawableData* Drawable;
 typedef DrawableData* Pixmap;
 typedef DrawableData* Window;
-typedef int Visual;
+
+typedef struct
+{
+    unsigned long red_mask;
+    unsigned long green_mask;
+    unsigned long blue_mask;
+} Visual;
+
 typedef unsigned long Colormap;
 
 DrawableData* XGetDrawableData_(Drawable d);
 
 typedef char *XPointer;
+
+#define MAX_COLORMAP 16
 
 //////////////////////////////////////////////////////////////////////////////
 // XPoint, XSegment, XRectangle, XArc
@@ -110,6 +119,28 @@ typedef int Status;
 
 typedef int Screen;
 typedef HGLRC GLXContext;
+
+typedef int VisualID;
+
+typedef struct {
+  Visual *visual;
+  VisualID visualid;
+  int screen;
+  int depth;
+  int c_class;
+  unsigned long red_mask;
+  unsigned long green_mask;
+  unsigned long blue_mask;
+  int colormap_size;
+  int bits_per_rgb;
+} XVisualInfo;
+
+VisualID XVisualIDFromVisual(Visual *visual);
+
+enum { VisualScreenMask, VisualIDMask };
+
+XVisualInfo *XGetVisualInfo(Display *dpy, long visual_info_mask,
+    XVisualInfo *visual_info_template, int *nitems);
 
 //////////////////////////////////////////////////////////////////////////////
 // XWindowAttributes
@@ -204,6 +235,7 @@ typedef struct
 #define GCGraphicsExposures (1 << 10)
 #define GCSubwindowMode (1 << 11)
 #define GCFont       (1 << 12)
+#define GCPlaneMask  (1 << 13)
 
 enum    // line_style
 {
@@ -216,7 +248,7 @@ enum    // cap_style
     CapNotLast = PS_ENDCAP_FLAT,
     CapButt = PS_ENDCAP_SQUARE,
     CapRound = PS_ENDCAP_ROUND,
-    CapProjecting = CapButt
+    CapProjecting = PS_ENDCAP_FLAT
 };
 
 enum    // join_style
@@ -258,6 +290,7 @@ typedef struct
     int fill_rule;
     Bool graphics_exposures;
     int subwindow_mode;
+	unsigned long plane_mask;
     HBITMAP hbmOld;
     Font font;
 } XGCValues;
@@ -294,12 +327,14 @@ int XCopyPlane(Display *dpy, Drawable src_drawable, Drawable dst_drawable, GC gc
 
 //////////////////////////////////////////////////////////////////////////////
 
-XFontStruct *XLoadQueryFont(Display *dpy, char *name);
+XFontStruct *XLoadQueryFont(Display *dpy, const char *name);
 int XUnloadFont(Display *dpy, Font fid);
 int XFreeFont(Display *dpy, XFontStruct *fs);
 int XTextExtents(XFontStruct *fs, char *string, int nchars,
     int *dir, int *font_ascent, int *font_descent, XCharStruct *overall);
+int XTextWidth(XFontStruct *fs, const char *string, int count);
 int XSetFont(Display *dpy, GC gc, Font fid);
+int XFreeFontInfo(char **names, XFontStruct *info, int actualCount);
 
 //////////////////////////////////////////////////////////////////////////////
 // XColor
@@ -349,6 +384,8 @@ int XQueryColors(Display *dpy, Colormap cmap, XColor *defs, int ncolors);
 int XParseColor(Display *d, Colormap cmap, const char *name, XColor *c);
 
 unsigned long load_color(Display *dpy, Colormap cmap, const char *name);
+
+#define CellsOfScreen(s) 300
 
 //////////////////////////////////////////////////////////////////////////////
 // XImage
@@ -433,6 +470,7 @@ int XSetLineAttributes(Display *dpy, GC gc,
     int cap_style, int join_style);
 
 int XClearWindow(Display *dpy, Window w);
+int XClearWindow2_(Display *dpy, Window w, GC gc);
 
 int XDrawPoint(Display *dpy, Drawable d, GC gc,
     int x, int y);
@@ -491,6 +529,10 @@ int XSetGraphicsExposures(Display *dpy, GC gc, Bool graphics_exposures);
 
 int XClearArea(
     Display *dpy, Window w,
+    int x, int y, unsigned int width, unsigned int height,
+    Bool exposures);
+int XClearArea2_(
+    Display *dpy, Window w, GC gc,
     int x, int y, unsigned int width, unsigned int height,
     Bool exposures);
 

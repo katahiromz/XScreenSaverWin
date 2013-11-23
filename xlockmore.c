@@ -720,6 +720,13 @@ int visual_depth(Screen *screen, Visual *visual)
     return 32;
 }
 
+void gettimeofday(timeval *t, timezone *tz)
+{
+    DWORD dwTick = GetTickCount();
+    t->tv_sec = dwTick / 1000;
+    t->tv_usec = (dwTick % 1000) * 1000;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // message box output
 

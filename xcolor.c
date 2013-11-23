@@ -917,8 +917,6 @@ typedef struct
     BOOL *pixel_used;
 } ColormapData;
 
-#define MAX_COLORMAP 16
-
 static int colormap_num = 1;
 static ColormapData colormaps[MAX_COLORMAP] =
 {

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="ripples"
-	ProjectGUID="{647454D1-C4C3-40B2-93DD-E4E42555D542}"
-	RootNamespace="ripples"
+	Name="xjack"
+	ProjectGUID="{99D17ADC-FF2A-4AED-A82A-F3A634A1B2E1}"
+	RootNamespace="xjack"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -187,7 +187,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ripples.c"
+				RelativePath="..\minixpm.c"
+				>
+			</File>
+			<File
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File
@@ -200,6 +204,14 @@
 			</File>
 			<File
 				RelativePath="..\ximage.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xjack.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xpm-pixmap.c"
 				>
 			</File>
 			<File
@@ -225,11 +237,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\minixpm.h"
+				>
+			</File>
+			<File
 				RelativePath="..\resource.h"
 				>
 			</File>
 			<File
 				RelativePath="..\screenhack.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xpm-pixmap.h"
 				>
 			</File>
 			<File

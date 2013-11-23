@@ -381,14 +381,35 @@ trans_point(struct state *st,
 
             c = ref_pixel(f, x1, y1);
 
-            point2rgb(f->visdepth, c, &or, &og, &ob);
-            point2rgb(f->visdepth, myc, &r, &g, &b);
+            //point2rgb(f->visdepth, c, &or, &og, &ob);
+            //point2rgb(f->visdepth, myc, &r, &g, &b);
+            {
+                XColor color;
+                color.pixel = c;
+                XQueryColor(st->dpy, st->xgwa.colormap, &color);
+                or = color.red / 256;
+                og = color.green / 256;
+                ob = color.blue / 256;
+                color.pixel = myc;
+                XQueryColor(st->dpy, st->xgwa.colormap, &color);
+                r = color.red / 256;
+                g = color.green / 256;
+                b = color.blue / 256;
+            }
 
             nr = or + (r - or) * a;
             ng = og + (g - og) * a;
             nb = ob + (b - ob) * a;
 
-            c = rgb2point(f->visdepth, nr, ng, nb);
+            //c = rgb2point(f->visdepth, nr, ng, nb);
+            {
+                XColor color;
+                color.red = nr * 256;
+                color.green = ng * 256;
+                color.blue = nb * 256;
+                XAllocColor(st->dpy, st->xgwa.colormap, &color);
+                c = color.pixel;
+            }
 
             ref_pixel(f, x1, y1) = c;
 
@@ -710,13 +731,15 @@ substrate_draw (Display *dpy, Window window, void *closure)
 {
   struct state *st = (struct state *) closure;
   int tempx;
+  static Bool b = False;
 
   if ((st->f->cycles % 10) == 0) {
 
     /* Restart if the window size changes */
     XGetWindowAttributes(st->dpy, st->window, &st->xgwa);
 
-    if (st->f->height != st->xgwa.height || st->f->width != st->xgwa.width) {
+    if (!b || st->f->height != st->xgwa.height || st->f->width != st->xgwa.width) {
+      b = True;
       st->f->height = st->xgwa.height;
       st->f->width = st->xgwa.width;
       st->f->visdepth = st->xgwa.depth;

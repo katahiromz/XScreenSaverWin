@@ -26,6 +26,25 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+typedef struct xlockmore_timeval
+{
+    DWORD tv_sec;
+    DWORD tv_usec;
+} xlockmore_timeval;
+
+typedef struct xlockmore_timezone
+{
+	char dummy1, dummy2;
+} xlockmore_timezone;
+
+#define timeval xlockmore_timeval
+#define timezone xlockmore_timezone
+
+#define HAVE_GETTIMEOFDAY 1
+void gettimeofday(timeval *t, timezone *tz);
+
+//////////////////////////////////////////////////////////////////////////////
+
 typedef enum
 {
     t_Bool, t_Int, t_Float, t_String

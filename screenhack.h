@@ -141,6 +141,7 @@ void ss_clear(Display *d);
 Bool has_writable_cells(Screen *s, Visual *v);
 int visual_depth(Screen *screen, Visual *visual);
 Bool use_subwindow_mode_p(Screen *screen, Window window);
+int screen_number(Screen *screen);
 Pixmap xscreensaver_logo(Screen *screen, Visual *visual,
     Drawable drawable, Colormap cmap,
     unsigned long background_color,

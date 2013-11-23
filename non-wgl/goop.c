@@ -14,6 +14,8 @@
 #include "spline.h"
 #include "alpha.h"
 
+#define HAVE_COCOA 1
+
 char *background = "black";
 char *foreground = "yellow";
 int delay = 12000;
@@ -298,7 +300,7 @@ make_layer (Display *dpy, Window window, int width, int height, int nblobs)
   layer->pixmap = XCreatePixmap (dpy, window, width, height, 1);
   layer->gc = XCreateGC (dpy, layer->pixmap, 0, &gcv);
 
-# ifdef HAVE_COCOA
+# if 0 && defined(HAVE_COCOA)
   jwxyz_XSetAlphaAllowed (dpy, layer->gc, True);
 # endif /* HAVE_COCOA */
 
@@ -482,7 +484,7 @@ make_goop (Screen *screen, Visual *visual, Window window, Colormap cmap,
   goop->pixmap_gc = XCreateGC (dpy, goop->pixmap, GCLineWidth, &gcv);
   goop->window_gc = XCreateGC (dpy, window, GCForeground|GCBackground, &gcv);
 
-# ifdef HAVE_COCOA
+# if 0 && defined(HAVE_COCOA)
   jwxyz_XSetAlphaAllowed (dpy, goop->pixmap_gc, True);
 # endif /* HAVE_COCOA */
   
