@@ -220,6 +220,7 @@ greynetic_draw (Display *dpy, Window window, void *closure)
       bgc.blue = random ();
 # endif /* DO_STIPPLE */
 
+	  bgc.red = random();	//
       if (st->grey_p)
         {
           fgc.green = fgc.blue = fgc.red;

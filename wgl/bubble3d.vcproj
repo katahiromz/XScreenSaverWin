@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\xws2win.c"
+				>
+			</File>
+			<File
 				RelativePath="..\yarandom.c"
 				>
 			</File>

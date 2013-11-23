@@ -136,7 +136,7 @@ ENTRYPOINT ModeSpecOpt bouboule_opts = {
 # endif
 #endif
 
-#include <sys/time.h>
+//#include <sys/time.h>
 
 #define ADAPT_CHECKS 50
 #define ADAPT_ARC_PREFERED 150	/* Maybe the value that is the most important

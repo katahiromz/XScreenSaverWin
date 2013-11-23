@@ -235,10 +235,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\xlockmore.c"
-				>
-			</File>
-			<File
 				RelativePath="..\xcolor.c"
 				>
 			</File>
@@ -247,7 +243,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\xlockmore.c"
+				>
+			</File>
+			<File
 				RelativePath=".\xpm-ximage.c"
+				>
+			</File>
+			<File
+				RelativePath="..\xws2win.c"
 				>
 			</File>
 			<File
@@ -277,11 +281,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\xws2win.h"
+				RelativePath=".\xpm-ximage.h"
 				>
 			</File>
 			<File
-				RelativePath=".\xpm-ximage.h"
+				RelativePath="..\xws2win.h"
 				>
 			</File>
 			<File

@@ -187,11 +187,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\xlockmore.c"
+				RelativePath="..\xcolor.c"
 				>
 			</File>
 			<File
 				RelativePath="..\ximage.c"
+				>
+			</File>
+			<File
+				RelativePath="..\xlockmore.c"
+				>
+			</File>
+			<File
+				RelativePath="..\xws2win.c"
 				>
 			</File>
 			<File

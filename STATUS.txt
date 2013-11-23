@@ -1,4 +1,4 @@
-There are 158 Goods, 9 OKs and 56 NGs of total 223 screen savers 
+There are 157 Goods, 11 OKs and 55 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -49,7 +49,7 @@ CubicGrid               Good
 Cynosure                Good        
 DNALogo                 Good        
 DangerBall              Good        
-DecayScreen             NG          
+DecayScreen             NG          Black out
 Deco                    Good        
 Deluxe                  Good        
 Demon                   Good        
@@ -65,12 +65,12 @@ Extrusion               Good
 FadePlot                Good        
 Fiberlamp               Good        
 Fireworkx               NG          Hung up
-Flag                    Good        
+Flag                    OK          Text doesn't appear
 Flame                   Good        
 FlipFlop                Good        
 FlipScreen3D            OK          Blur and slow
 FlipText                NG          
-Flow                    NG          
+Flow                    Good        
 FluidBalls              OK          Slow
 Flurry                  Good        
 FlyingToasters          Good        
@@ -92,7 +92,7 @@ GLText                  NG
 Galaxy                  OK          Flickers and slow
 Gears                   Good        
 Gleidescope             OK          Slow
-Goop                    OK          Transparent disabled
+Goop                    OK          Transparency disabled
 Grav                    Good        
 Greynetic               Good        
 Halftone                Good        
@@ -107,11 +107,11 @@ Hypertorus              Good
 Hypnowheel              Good        
 IFS                     Good        
 IMSMap                  OK          Slow
-Interaggregate          NG          Hung up
+Interaggregate          NG          Black out
 Interference            Good        
 Intermomentary          Good        
 JigglyPuff              Good        
-Jigsaw                  NG          
+Jigsaw                  NG          Black out
 Juggle                  NG          
 Juggler3D               NG          
 Julia                   Good        
@@ -137,7 +137,7 @@ MirrorBlob              OK          Blur and slow
 Moebius                 Good        
 MoebiusGears            Good        
 Moire                   Good        
-Moire2                  NG          
+Moire2                  NG          Black out
 Molecule                NG          
 Morph3D                 Good        
 Mountain                Good        
@@ -145,7 +145,7 @@ Munch                   Good
 NerveRot                Good        
 Noof                    Good        
 NoseGuy                 NG          
-Pacman                  NG          
+Pacman                  NG          Bitmaps broken
 Pedal                   Good        
 Penetrate               Good        
 Penrose                 Good        
@@ -163,14 +163,14 @@ PopSquares              Good
 Providence              Good        
 Pulsar                  Good        
 Pyro                    NG          Flickers
-Qix                     NG          
+Qix                     NG          Transparency disabled
 QuasiCrystal            NG          
 Queens                  Good        
-RDbomb                  NG          Too slow
+RDbomb                  OK          Slow
 Ripples                 NG          Black out
 Rocks                   Good        
 Rorschach               Good        
-RotZoomer               NG          
+RotZoomer               NG          Black out
 Rotor                   Good        
 Rubik                   Good        
 RubikBlocks             Good        
@@ -194,11 +194,11 @@ StarWars                NG
 Starfish                Good        
 StonerView              Good        
 Strange                 NG          
-Substrate               Good        
+Substrate               NG          Drawing bad
 Superquadrics           Good        
 Surfaces                Good        
 Swirl                   NG          Too slow
-T3D                     NG          Black out
+T3D                     NG          Drawing bad
 Tangram                 NG          
 Thornbird               Good        
 TimeTunnel              NG          
@@ -214,7 +214,7 @@ Voronoi                 Good
 Wander                  Good        
 WhirlWindWarp           Good        
 Whirlygig               Good        
-Worm                    NG          
+Worm                    NG          Drawing bad
 Wormhole                Good        
 XAnalogTV               NG          
 XFlame                  Good        
