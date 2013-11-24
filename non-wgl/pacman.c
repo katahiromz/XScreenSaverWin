@@ -46,7 +46,6 @@ static const char sccsid[] = "@(#)pacman.c	5.00 2000/11/01 xlockmore";
 
 #define STANDALONE
 #define DEF_TRACKMOUSE "False"
-#define USE_PIXMAP
 
 #	define MODE_pacman
 #define DELAY 10000
@@ -68,6 +67,8 @@ static const char sccsid[] = "@(#)pacman.c	5.00 2000/11/01 xlockmore";
 #else /* STANDALONE */
 #	include "xlock.h"       /* in xlockmore distribution */
 #endif /* STANDALONE */
+
+#include "xpm-pixmap.h"
 
 #ifdef MODE_pacman
 
@@ -323,6 +324,41 @@ repopulate (ModeInfo * mi)
     check_death (mi, pp);
 }
 
+unsigned long get_blue_pixel(void)
+{
+    XColor color;
+    color.red = 0x00 * 256;
+    color.green = 0x00 * 256;
+    color.blue = 0xFF * 256;
+    XAllocColor(NULL, 0, &color);
+    return color.pixel;
+}
+
+unsigned long get_yellow_pixel(void)
+{
+    XColor color;
+    color.red = 0x00 * 256;
+    color.green = 0xFF * 256;
+    color.blue = 0xFF * 256;
+    XAllocColor(NULL, 0, &color);
+    return color.pixel;
+}
+
+unsigned long get_green_pixel(void)
+{
+    XColor color;
+    color.red = 0x00 * 256;
+    color.green = 0xFF * 256;
+    color.blue = 0x00 * 256;
+    XAllocColor(NULL, 0, &color);
+    return color.pixel;
+}
+
+unsigned long get_white_pixel(void)
+{
+    return 255;
+}
+
 /* Sets the color to the color of a wall. */
 static void
 setwallcolor (ModeInfo * mi)
@@ -331,7 +367,8 @@ setwallcolor (ModeInfo * mi)
     pacmangamestruct *pp = &pacman_games[MI_SCREEN (mi)];
 
     if (MI_NPIXELS (mi) > 2)
-        XSetForeground (display, pp->stippledGC, MI_PIXEL (mi, BLUE));
+        //XSetForeground (display, pp->stippledGC, MI_PIXEL (mi, BLUE));
+        XSetForeground (display, pp->stippledGC, get_blue_pixel());
     else
         XSetForeground (display, pp->stippledGC, MI_WHITE_PIXEL (mi));
 }
@@ -981,7 +1018,8 @@ draw_pacman_sprite (ModeInfo * mi)
     }
 
     if (MI_NPIXELS (mi) > 2)
-        XSetForeground (display, pp->stippledGC, MI_PIXEL (mi, YELLOW));
+        //XSetForeground (display, pp->stippledGC, MI_PIXEL (mi, YELLOW));
+        XSetForeground (display, pp->stippledGC, get_yellow_pixel());
     else
         XSetForeground (display, pp->stippledGC, MI_WHITE_PIXEL (mi));
 
@@ -1040,7 +1078,8 @@ draw_ghost_sprite (ModeInfo * mi, const unsigned ghost)
                     (unsigned int) pp->ghosts[ghost].row);
 
     if (MI_NPIXELS (mi) > 2)
-        XSetForeground (display, pp->stippledGC, MI_PIXEL (mi, GREEN));
+        //XSetForeground (display, pp->stippledGC, MI_PIXEL (mi, GREEN));
+        XSetForeground (display, pp->stippledGC, get_green_pixel());
     else
         XSetForeground (display, pp->stippledGC, MI_WHITE_PIXEL (mi));
 
@@ -1433,7 +1472,6 @@ load_pacman_pixmaps (Display ** dpy, Window window, pacmangamestruct ** ps)
             pp->pacmanPixmap[i][j] =
                 xpm_data_to_pixmap (display, window, bits[m++], &w, &h,
                                     &pp->pacmanMask[i][j]);
-
             if (!pp->pacmanPixmap[i][j])
                 pacman_fail ("Cannot load pacman pixmap.");
 
@@ -1717,6 +1755,14 @@ draw_pacman (ModeInfo * mi)
 {
     unsigned int g;
     pacmangamestruct *pp;
+    static Bool b = False;
+
+    if (!b)
+    {
+        drawlevel (mi);
+        
+        b = True;
+    }
 
     if (pacman_games == NULL)
         return;

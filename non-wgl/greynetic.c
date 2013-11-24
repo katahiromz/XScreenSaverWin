@@ -14,7 +14,7 @@
 //#ifndef HAVE_COCOA
 //# define DO_STIPPLE
 //#endif
-#undef DO_STIPPLE
+#define DO_STIPPLE
 
 #define NBITS 12
 

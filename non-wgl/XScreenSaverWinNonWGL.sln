@@ -245,6 +245,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ifs", "ifs.vcproj", "{EE214
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "distort", "distort.vcproj", "{42F3D172-1832-40CD-B05B-38E83A946A8F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xanalogtv", "xanalogtv.vcproj", "{04493739-1EAE-4CB8-899F-0586680E0B93}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -739,6 +741,10 @@ Global
 		{42F3D172-1832-40CD-B05B-38E83A946A8F}.Debug|Win32.Build.0 = Debug|Win32
 		{42F3D172-1832-40CD-B05B-38E83A946A8F}.Release|Win32.ActiveCfg = Release|Win32
 		{42F3D172-1832-40CD-B05B-38E83A946A8F}.Release|Win32.Build.0 = Release|Win32
+		{04493739-1EAE-4CB8-899F-0586680E0B93}.Debug|Win32.ActiveCfg = Debug|Win32
+		{04493739-1EAE-4CB8-899F-0586680E0B93}.Debug|Win32.Build.0 = Debug|Win32
+		{04493739-1EAE-4CB8-899F-0586680E0B93}.Release|Win32.ActiveCfg = Release|Win32
+		{04493739-1EAE-4CB8-899F-0586680E0B93}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

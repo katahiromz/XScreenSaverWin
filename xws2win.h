@@ -70,11 +70,15 @@ typedef DrawableData* Drawable;
 typedef DrawableData* Pixmap;
 typedef DrawableData* Window;
 
+enum { TrueColor, DirectColor, PseudoColor, StaticColor };
+
 typedef struct
 {
     unsigned long red_mask;
     unsigned long green_mask;
     unsigned long blue_mask;
+    int class;
+    int bits_per_rgb;
 } Visual;
 
 typedef unsigned long Colormap;
@@ -88,20 +92,24 @@ typedef char *XPointer;
 //////////////////////////////////////////////////////////////////////////////
 // XPoint, XSegment, XRectangle, XArc
 
-typedef struct {
+typedef struct
+{
     int x, y;
 } XPoint;
 
-typedef struct {
+typedef struct
+{
      int x1, y1, x2, y2;
 } XSegment;
 
-typedef struct {
+typedef struct
+{
     int x, y;
     unsigned int width, height;
 } XRectangle;
 
-typedef struct {
+typedef struct
+{
     int x, y;
     unsigned int width, height;
     int angle1, angle2;
@@ -122,17 +130,18 @@ typedef HGLRC GLXContext;
 
 typedef int VisualID;
 
-typedef struct {
-  Visual *visual;
-  VisualID visualid;
-  int screen;
-  int depth;
-  int c_class;
-  unsigned long red_mask;
-  unsigned long green_mask;
-  unsigned long blue_mask;
-  int colormap_size;
-  int bits_per_rgb;
+typedef struct
+{
+    Visual *visual;
+    VisualID visualid;
+    int screen;
+    int depth;
+    int c_class;
+    unsigned long red_mask;
+    unsigned long green_mask;
+    unsigned long blue_mask;
+    int colormap_size;
+    int bits_per_rgb;
 } XVisualInfo;
 
 VisualID XVisualIDFromVisual(Visual *visual);
@@ -264,14 +273,14 @@ enum    // fill_style
     FillOpaqueStippled = BS_DIBPATTERN
 };
 
-enum	// fill_rule
+enum    // fill_rule
 {
     EvenOddRule, WindingRule
 };
 
 enum    // subwindow_mode
 {
-	ClipByChildren, IncludeInferiors
+    ClipByChildren, IncludeInferiors
 };
 
 typedef struct
@@ -290,7 +299,7 @@ typedef struct
     int fill_rule;
     Bool graphics_exposures;
     int subwindow_mode;
-	unsigned long plane_mask;
+    unsigned long plane_mask;
     HBITMAP hbmOld;
     Font font;
 } XGCValues;
@@ -308,9 +317,8 @@ int XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values);
 
 int XFreeGC(Display *dpy, GC gc);
 
-HPEN XCreateWinPen(XGCValues *values);
-HBRUSH XCreateWinBrush(XGCValues *values);
-HFONT XCreateWinFont(XGCValues *values);
+HPEN XCreateWinPen_(XGCValues *values);
+HBRUSH XCreateWinBrush_(XGCValues *values);
 int XSetForeground(Display *dpy, GC gc, unsigned long foreground);
 int XSetBackground(Display *dpy, GC gc, unsigned long background);
 int XSetWindowBackground(Display *dpy, Window w, unsigned long pixel);

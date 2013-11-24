@@ -1,4 +1,4 @@
-There are 157 Goods, 11 OKs and 55 NGs of total 223 screen savers 
+There are 159 Goods, 11 OKs and 53 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -15,7 +15,7 @@ Atlantis                Good
 Attraction              Good        
 Atunnel                 Good        
 BSOD                    NG          
-Barcode                 NG          Bitmap broken
+Barcode                 Good        
 Blaster                 Good        
 BlinkBox                Good        
 BlitSpin                NG          Black out
@@ -145,7 +145,7 @@ Munch                   Good
 NerveRot                Good        
 Noof                    Good        
 NoseGuy                 NG          
-Pacman                  NG          Bitmaps broken
+Pacman                  Good        
 Pedal                   Good        
 Penetrate               Good        
 Penrose                 Good        

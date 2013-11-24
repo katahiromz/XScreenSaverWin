@@ -113,6 +113,13 @@ async_load_state *load_image_async_simple(
     async_load_state *state, Screen *screen, Window window, Drawable target, 
     char **filename_ret, XRectangle *geometry_ret);
 
+void
+load_image_async (Screen *screen, Window window, Drawable drawable,
+                  void (*callback) (Screen *, Window, Drawable,
+                                    const char *name, XRectangle *geom,
+                                    void *closure),
+                  void *closure);
+
 //////////////////////////////////////////////////////////////////////////////
 // screen saver
 

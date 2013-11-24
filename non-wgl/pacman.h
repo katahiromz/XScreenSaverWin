@@ -33,13 +33,18 @@
 
 #include "xlockmore.h"
 
-#if defined(HAVE_GDK_PIXBUF) || defined(HAVE_XPM) || defined(HAVE_COCOA)
-# define USE_PIXMAP
+#define USE_PIXMAP 1
 #include "xpm-pixmap.h"
-# else
-# if defined(USE_PIXMAP)
-#  undef USE_PIXMAP
-# endif
+
+#if 0
+	#if defined(HAVE_GDK_PIXBUF) || defined(HAVE_XPM) || defined(HAVE_COCOA)
+	# define USE_PIXMAP
+	#include "xpm-pixmap.h"
+	# else
+	# if defined(USE_PIXMAP)
+	#  undef USE_PIXMAP
+	# endif
+	#endif
 #endif
 
 #define LEVHEIGHT 	32U

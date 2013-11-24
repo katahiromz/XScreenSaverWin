@@ -728,6 +728,32 @@ void gettimeofday(timeval *t, timezone *tz)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+
+Status XGetGeometry(
+    Display *dpy, Drawable d, Window *root,
+    int *x, int *y, unsigned int *width, unsigned int *height,
+    unsigned int *borderWidth, unsigned int *depth)
+{
+    *root = 0;
+    *x = *y = 0;
+    if (d == 0)
+    {
+        *width = ss.width;
+        *height = ss.height;
+    }
+    else
+    {
+        BITMAP bm;
+        GetObject(d->hbm, sizeof(BITMAP), &bm);
+        *width = bm.bmWidth;
+        *height = bm.bmHeight;
+    }
+    *borderWidth = 0;
+    *depth = 32;
+    return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // message box output
 
 #ifndef NOMSGBOXOUTPUT

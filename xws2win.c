@@ -62,16 +62,9 @@ GC XCreateGC(Display *dpy, Drawable d,
     newvalues->fill_rule = EvenOddRule;
     newvalues->graphics_exposures = True;
     newvalues->font = (HFONT)GetStockObject(ANSI_FIXED_FONT);
+    newvalues->stipple = NULL;
     if (values != NULL)
         XChangeGC(dpy, newvalues, valuemask, values);
-
-#if 0
-    if (d != NULL)
-    {
-        DrawableData *data = XGetDrawableData_(d);
-        newvalues->hbmOld = SelectObject(dpy, data->hbm);
-    }
-#endif
 
     return newvalues;
 }
@@ -139,11 +132,6 @@ int XFreeGC(Display *dpy, GC gc)
     XGCValues* values = XGetGCValues_(gc);
     if (values == NULL)
         return BadGC;
-
-#if 0
-    if (values->hbmOld)
-        SelectObject(dpy, values->hbmOld);
-#endif
 
     free(gc);
     return 0;
@@ -244,7 +232,7 @@ int XDrawPoints(Display *dpy, Drawable d, GC gc,
     return 0;
 }
 
-HPEN XCreateWinPen(XGCValues *values)
+HPEN XCreateWinPen_(XGCValues *values)
 {
     LOGBRUSH lb;
     lb.lbStyle = BS_SOLID;
@@ -254,26 +242,52 @@ HPEN XCreateWinPen(XGCValues *values)
         values->line_width, &lb, 0, NULL);
 }
 
-LPVOID XCreatePackedDIBFromPixmap(Pixmap pixmap)
+typedef struct tagBITMAPINFOEX
+{
+    BITMAPINFOHEADER bmiHeader;
+    RGBQUAD          bmiColors[256];
+} BITMAPINFOEX, *LPBITMAPINFOEX;
+
+#define WIDTHBYTES(i) (((i) + 31) / 32 * 4)
+
+LPVOID XCreatePackedDIBFromPixmap(Pixmap pixmap, COLORREF clrFore, COLORREF clrBack)
 {
     BITMAP bm;
     LPBYTE pb;
-    DWORD size = sizeof(BITMAPINFOHEADER);
-    LPBITMAPINFO lpbi = (LPBITMAPINFO)calloc(1, size);
+    HDC hdc;
+    DWORD size = sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * 2;
+    LPBITMAPINFOEX lpbi = (LPBITMAPINFOEX)calloc(1, size);
     assert(lpbi != NULL);
 
     GetObject(pixmap->hbm, sizeof(BITMAP), &bm);
-    GetDIBits(NULL, pixmap->hbm, 0, bm.bmHeight, NULL, lpbi, DIB_RGB_COLORS);
+    lpbi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    lpbi->bmiHeader.biWidth = bm.bmWidth;
+    lpbi->bmiHeader.biHeight = bm.bmHeight;
+    lpbi->bmiHeader.biPlanes = 1;
+    lpbi->bmiHeader.biBitCount = 1;
+    lpbi->bmiHeader.biSizeImage = WIDTHBYTES(bm.bmWidth * 1) * bm.bmHeight;
+    lpbi->bmiColors[0].rgbBlue = GetBValue(clrBack);
+    lpbi->bmiColors[0].rgbGreen = GetGValue(clrBack);
+    lpbi->bmiColors[0].rgbRed = GetRValue(clrBack);
+    lpbi->bmiColors[0].rgbReserved = 0;
+    lpbi->bmiColors[1].rgbBlue = GetBValue(clrFore);
+    lpbi->bmiColors[1].rgbGreen = GetGValue(clrFore);
+    lpbi->bmiColors[1].rgbRed = GetRValue(clrFore);
+    lpbi->bmiColors[1].rgbReserved = 0;
+
     size += lpbi->bmiHeader.biSizeImage;
-    lpbi = (LPBITMAPINFO)realloc(lpbi, size);
+    lpbi = (LPBITMAPINFOEX)realloc(lpbi, size);
     assert(lpbi != NULL);
+
     pb = (LPBYTE)lpbi;
-    pb += sizeof(BITMAPINFOHEADER);
-    GetDIBits(NULL, pixmap->hbm, 0, bm.bmHeight, pb, lpbi, DIB_RGB_COLORS);
+    pb += sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * 2;
+    hdc = CreateCompatibleDC(NULL);
+    GetDIBits(hdc, pixmap->hbm, 0, bm.bmHeight, pb, (LPBITMAPINFO)lpbi, DIB_PAL_COLORS);
+    DeleteDC(hdc);
     return lpbi;
 }
 
-HBRUSH XCreateWinBrush(XGCValues *values)
+HBRUSH XCreateWinBrush_(XGCValues *values)
 {
     HBRUSH hbr;
     LOGBRUSH lb;
@@ -285,7 +299,11 @@ HBRUSH XCreateWinBrush(XGCValues *values)
     }
     else if (values->fill_style == FillStippled)
     {
-        LPVOID lpPackedDIB = XCreatePackedDIBFromPixmap(values->stipple);
+        LPVOID lpPackedDIB;
+        assert(values->stipple != NULL);
+        lpPackedDIB = XCreatePackedDIBFromPixmap(
+            values->stipple, values->background_rgb, values->foreground_rgb);
+        assert(lpPackedDIB != NULL);
         hbr = CreateDIBPatternBrushPt(lpPackedDIB, DIB_RGB_COLORS);
         free(lpPackedDIB);
         return hbr;
@@ -306,7 +324,7 @@ int XDrawLine(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hPen = XCreateWinPen(values);
+    hPen = XCreateWinPen_(values);
     assert(hPen);
     if (hPen == NULL)
         return BadAlloc;
@@ -345,7 +363,7 @@ int XDrawLines(Display *dpy, Drawable d, GC gc,
     if (lpPoints == NULL)
         return BadAlloc;
 
-    hPen = XCreateWinPen(values);
+    hPen = XCreateWinPen_(values);
     assert(hPen);
     if (hPen == NULL)
     {
@@ -402,7 +420,7 @@ int XDrawRectangle(
     if (values == NULL)
         return BadGC;
 
-    hPen = XCreateWinPen(values);
+    hPen = XCreateWinPen_(values);
     assert(hPen);
     if (hPen == NULL)
         return BadAlloc;
@@ -436,7 +454,7 @@ int XDrawSegments(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hPen = XCreateWinPen(values);
+    hPen = XCreateWinPen_(values);
     assert(hPen);
     if (hPen == NULL)
         return BadAlloc;
@@ -473,7 +491,7 @@ int XDrawArc(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hPen = XCreateWinPen(values);
+    hPen = XCreateWinPen_(values);
     assert(hPen);
     if (hPen == NULL)
         return BadAlloc;
@@ -522,7 +540,7 @@ int XDrawArcs(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hPen = XCreateWinPen(values);
+    hPen = XCreateWinPen_(values);
     if (hPen == NULL)
         return BadAlloc;
 
@@ -558,15 +576,13 @@ int XDrawArcs(Display *dpy, Drawable d, GC gc,
     return 0;
 }
 
-//Bool xdrawstring_opaque = False;
-
 int XDrawString(Display *dpy, Drawable d, GC gc,
     int x, int y, const char *string, int length)
 {
     XGCValues *values;
     HDC hdc;
     HGDIOBJ hFontOld;
-	TEXTMETRICA tm;
+    TEXTMETRICA tm;
 
     values = XGetGCValues_(gc);
     if (values == NULL)
@@ -593,7 +609,7 @@ int XDrawImageString(Display *dpy, Drawable d, GC gc,
     XGCValues *values;
     HDC hdc;
     HGDIOBJ hFontOld;
-	TEXTMETRICA tm;
+    TEXTMETRICA tm;
 
     values = XGetGCValues_(gc);
     if (values == NULL)
@@ -628,7 +644,7 @@ int XFillRectangle(
     if (values == NULL)
         return BadGC;
 
-    hbr = XCreateWinBrush(values);
+    hbr = XCreateWinBrush_(values);
     if (hbr == NULL)
         return BadAlloc;
 
@@ -662,7 +678,7 @@ int XFillRectangles(
     if (values == NULL)
         return BadGC;
 
-    hbr = XCreateWinBrush(values);
+    hbr = XCreateWinBrush_(values);
     if (hbr == NULL)
         return BadAlloc;
 
@@ -725,7 +741,7 @@ int XFillPolygon(Display *dpy, Drawable d, GC gc,
         }
     }
 
-    hbr = XCreateWinBrush(values);
+    hbr = XCreateWinBrush_(values);
     if (hbr == NULL)
     {
         free(lpPoints);
@@ -765,7 +781,7 @@ int XFillArc(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hbr = XCreateWinBrush(values);
+    hbr = XCreateWinBrush_(values);
     if (hbr == NULL)
         return BadAlloc;
 
@@ -816,7 +832,7 @@ int XFillArcs(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hbr = XCreateWinBrush(values);
+    hbr = XCreateWinBrush_(values);
     if (hbr == NULL)
         return BadAlloc;
 
@@ -1081,7 +1097,7 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
 int XUnloadFont(Display *dpy, Font fid)
 {
     DeleteObject(fid);
-	return 0;
+    return 0;
 }
 
 int XFreeFont(Display *dpy, XFontStruct *fs)

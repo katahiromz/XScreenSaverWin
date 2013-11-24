@@ -25,6 +25,10 @@ void XInitImage(XImage *image)
         case 32:
             image->bytes_per_line = (width * depth + (32 - 1)) / 32 * 4;
             break;
+
+        default:
+            assert(0);
+            break;
         }
     }
 
@@ -298,10 +302,18 @@ HBITMAP XCreateWinBitmapFromXImage(XImage *ximage)
         widthbytes = WIDTHBYTES(ximage->width * 1);
         for (y = 0; y < ximage->height; y++)
         {
-            for (x = 0; x < (ximage->width + 7) / 8; x++)
-            {
-                pbBits[y * widthbytes + x] = ximage->data[(ximage->height - y - 1) * ximage->bytes_per_line + x];
-            }
+        	for (x = 0; x < widthbytes; x++)
+        	{
+        		int i;
+				BYTE b1 = ximage->data[(ximage->height - y - 1) * ximage->bytes_per_line + x];
+        		BYTE b2 = 0;
+        		for (i = 0; i < 8; i++)
+        		{
+        			if (b1 & (1 << i))
+	        			b2 |= 1 << (7 - i);
+        		}
+	            pbBits[y * widthbytes + x] = b2;
+        	}
         }
         return hbm;
     }

@@ -407,7 +407,12 @@ BOOL ss_init(HWND hwnd)
     ss.xgwa.width = ss.width;
     ss.xgwa.height = ss.height;
     ss.xgwa.depth = 32;
-    ss.xgwa.visual = NULL;
+    ss.xgwa.visual = (Visual *)calloc(sizeof(Visual), 1);
+    ss.xgwa.visual->class = TrueColor;
+    ss.xgwa.visual->red_mask = 0x000000FF;
+    ss.xgwa.visual->green_mask = 0x0000FF00;
+    ss.xgwa.visual->blue_mask = 0x00FF0000;
+    ss.xgwa.visual->bits_per_rgb = 32;
     ss.xgwa.colormap = 0;
     ss.xgwa.screen = 0;
 
@@ -562,18 +567,18 @@ Display *DisplayOfScreen(Screen *s)
 
 int XDisplayWidth(Display *dpy, int scr)
 {
-	RECT rc;
-	HWND hwnd = WindowFromDC(dpy);
-	GetWindowRect(hwnd, &rc);
-	return rc.right - rc.left;
+    RECT rc;
+    HWND hwnd = WindowFromDC(dpy);
+    GetWindowRect(hwnd, &rc);
+    return rc.right - rc.left;
 }
 
 int XDisplayHeight(Display *dpy, int scr)
 {
-	RECT rc;
-	HWND hwnd = WindowFromDC(dpy);
-	GetWindowRect(hwnd, &rc);
-	return rc.bottom - rc.top;
+    RECT rc;
+    HWND hwnd = WindowFromDC(dpy);
+    GetWindowRect(hwnd, &rc);
+    return rc.bottom - rc.top;
 }
 
 extern unsigned long window_background;
@@ -685,7 +690,8 @@ void gettimeofday(timeval *t, timezone *tz)
 //////////////////////////////////////////////////////////////////////////////
 
 static void do_load_image(
-    async_load_state *state, Screen *screen, Window window, Drawable target)
+    async_load_state *state, Screen *screen, Window window, Drawable target,
+    int width, int height)
 {
     BITMAP bm;
     HDC hdcSrc, hdcDst;
@@ -705,7 +711,16 @@ static void do_load_image(
 
     assert(hdcSrc != NULL);
     assert(hdcDst != NULL);
-    BitBlt(hdcDst, 0, 0, bm.bmWidth, bm.bmHeight, hdcSrc, 0, 0, SRCCOPY);
+    if (width == 0 || height == 0)
+    {
+        BitBlt(hdcDst, 0, 0, bm.bmWidth, bm.bmHeight, hdcSrc, 0, 0, SRCCOPY);
+    }
+    else
+    {
+        SetStretchBltMode(hdcDst, HALFTONE);
+        StretchBlt(hdcDst, 0, 0, width, height,
+            hdcSrc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
+    }
 
     SelectObject(hdcSrc, hbmOld);
     XDeleteDrawableDC_(dpy, target, hdcDst);
@@ -716,12 +731,63 @@ async_load_state *load_image_async_simple(
     async_load_state *state, Screen *screen, Window window, Drawable target, 
     char **filename_ret, XRectangle *geometry_ret)
 {
-	async_load_state state1;
+    async_load_state state1;
     assert(filename_ret == NULL);
     assert(geometry_ret == NULL);
 
-    do_load_image(&state1, screen, window, target);
+    do_load_image(&state1, screen, window, target, 0, 0);
     return NULL;
+}
+
+void
+load_image_async (Screen *screen, Window window, Drawable drawable,
+                  void (*callback) (Screen *, Window, Drawable,
+                                    const char *name, XRectangle *geom,
+                                    void *closure),
+                  void *closure)
+{
+  Display *dpy = DisplayOfScreen (screen);
+  XWindowAttributes xgwa;
+  Bool done = False;
+  XRectangle *geom_ret;
+  XRectangle geom_ret_2;
+  char **name_ret = 0;
+  char *name_ret_2 = 0;
+  async_load_state state1;
+
+  if (!drawable) abort();
+
+  if (callback) {
+    geom_ret = &geom_ret_2;
+    name_ret = &name_ret_2;
+  }
+
+  XGetWindowAttributes (dpy, window, &xgwa);
+  {
+    Window r;
+    int x, y;
+    unsigned int w, h, bbw, d;
+    XGetGeometry (dpy, drawable, &r, &x, &y, &w, &h, &bbw, &d);
+    xgwa.width = w;
+    xgwa.height = h;
+  }
+
+  if (name_ret)
+    *name_ret = 0;
+
+  if (geom_ret) {
+    geom_ret->x = 0;
+    geom_ret->y = 0;
+    geom_ret->width  = xgwa.width;
+    geom_ret->height = xgwa.height;
+  }
+
+  do_load_image(&state1, screen, window, drawable, xgwa.width, xgwa.height);
+
+  if (callback) {
+    callback (screen, window, drawable, name_ret_2, &geom_ret_2, closure);
+    if (name_ret_2) free (name_ret_2);
+  }
 }
 
 Status XGetGeometry(
