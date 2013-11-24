@@ -19,17 +19,24 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
+#if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif
+
+	#include <stdio.h>
+	#include <math.h>
 #endif
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <stdio.h>
-#include <math.h>
+#define DELAY 30000
+#define COUNT 30
+
+char *labelfont = "System 30";
 
 #include "xlockmore.h"
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <float.h>
 
 #if 0
 	/* HAVE_GLUT defined if we're building a standalone glsnake,
@@ -65,6 +72,9 @@
 #define PIN    	180.0
 #define RIGHT   270.0
 
+//#define HAVE_GETTIMEOFDAY
+#define GETTIMEOFDAY_TWO_ARGS
+
 #if 0
 	#ifdef HAVE_GETTIMEOFDAY
 	# ifdef GETTIMEOFDAY_TWO_ARGS
@@ -90,8 +100,9 @@
 	#endif /* HAVE_GETTIMEOFDAY */
 #endif
 
-#define GETSECS(t) GetTickCount() / 1000;
-#define GETMSECS(t) GetTickCount() % 1000;
+typedef struct timeval snaketime;
+#define GETSECS(t) ((t).tv_sec)
+#define GETMSECS(t) ((t).tv_usec/1000)
 
 #include <math.h>
 
@@ -130,19 +141,19 @@
 
 /* static variables */
 
-static GLfloat explode;
-static long statictime;
+static GLfloat explode = 0.03;
+static long statictime = 5000;
 static GLfloat yspin = 60.0;
 static GLfloat zspin = -45.0;
-static GLfloat yangvel;
-static GLfloat zangvel;
-static Bool altcolour;
-static Bool titles;
-static Bool interactive;
-static Bool wireframe;
-static Bool transparent;
-static GLfloat zoom;
-static GLfloat angvel;
+static GLfloat yangvel = 0.10;
+static GLfloat zangvel = 0.14;
+static Bool altcolour = False;
+static Bool titles = False;
+static Bool interactive = False;
+static Bool wireframe = False;
+static Bool transparent = True;
+static GLfloat zoom = 25.0;
+static GLfloat angvel = 1.0;
 
 #ifndef HAVE_GLUT
 
@@ -164,7 +175,6 @@ static GLfloat angvel;
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-//#include "xlockmore.h"
 #include "glxfonts.h"
 
 static XrmOptionDescRec opts[] = {
@@ -196,6 +206,7 @@ static argtype vars[] = {
     {&zoom, "zoom", "Zoom", DEF_ZOOM, t_Float},
     {&wireframe, "wireframe", "Wireframe", DEF_WIREFRAME, t_Bool},
     {&transparent, "transparent", "Transparent!", DEF_TRANSPARENT, t_Bool},
+    {&labelfont, "labelfont", NULL, "System 30", t_String},
 };
 
 ENTRYPOINT ModeSpecOpt glsnake_opts = {countof(opts), opts, countof(vars), vars, NULL};
@@ -1511,7 +1522,7 @@ ModeInfo * mi
 #ifndef HAVE_GLUT
     if (titles)
 # ifdef HAVE_GLBITMAP
-	load_font(mi->dpy, "labelfont", &bp->font, &bp->font_list);
+	load_font(mi->dpy, labelfont, &bp->font, &bp->font_list);
 # else
         bp->font_data = load_texture_font (mi->dpy, "labelFont");
 # endif
@@ -1939,7 +1950,7 @@ static float morph_percent(struct glsnake_cfg *bp)
 #undef isinf
 #define isinf(x) (((x) > 999999999999.9) || ((x) < -999999999999.9))
 
-	if (isnan(retval) || isinf(retval)) retval = 1.0;
+	if (_isnan(retval) || isinf(retval)) retval = 1.0;
     }
     /*printf("morph_pct = %f\n", retval);*/
     return retval;
@@ -2059,7 +2070,8 @@ static void quick_sleep(void)
     glutIdleFunc(NULL);
     glutTimerFunc(1, restore_idle, 0);
 #else
-    usleep(1);
+    //usleep(1);
+	Sleep(0);
 #endif
 }
 

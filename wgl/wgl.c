@@ -27,6 +27,56 @@ BOOL InitPixelFormat(SCREENSAVER *ss)
     INT iPixelFormat = ChoosePixelFormat(ss->hdc, &pfd);
     SetPixelFormat(ss->hdc, iPixelFormat, &pfd);
     ss->hglrc = wglCreateContext(ss->hdc);
+
+    if (hack_ncolors_enabled)
+    {
+		int i;
+        ModeInfo *mi = &ss->modeinfo;
+        mi->colors = (XColor *) calloc(mi->npixels, sizeof(*mi->colors));
+        if (mi->colors == NULL)
+            return FALSE;
+
+        switch (hack_color_scheme)
+        {
+        case color_scheme_uniform:
+            make_uniform_colormap(mi->xgwa.screen, mi->xgwa.visual,
+                mi->xgwa.colormap,
+                mi->colors, &mi->npixels,
+                True, &mi->writable_p, True);
+            break;
+
+        case color_scheme_smooth:
+            make_smooth_colormap(mi->xgwa.screen, mi->xgwa.visual,
+                mi->xgwa.colormap,
+                mi->colors, &mi->npixels,
+                True, &mi->writable_p, True);
+            break;
+
+        case color_scheme_bright:
+        case color_scheme_default:
+            make_random_colormap(mi->xgwa.screen, mi->xgwa.visual,
+                mi->xgwa.colormap,
+                mi->colors, &mi->npixels,
+                (hack_color_scheme == color_scheme_bright),
+                True, &mi->writable_p, True);
+            break;
+
+        default:
+            fprintf(stderr, "Bad color scheme\n");
+            abort();
+        }
+
+        mi->pixels = (unsigned long *)calloc(mi->npixels, sizeof(*mi->pixels));
+        if (mi->pixels == NULL)
+        {
+            free(mi->colors);
+            return FALSE;
+        }
+
+        for (i = 0; i < mi->npixels; i++)
+            mi->pixels[i] = mi->colors[i].pixel;
+    }
+
     return (ss->hglrc != NULL);
 }
 

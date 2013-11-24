@@ -1080,7 +1080,7 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
     {
         fs->per_char[i].lbearing = pabc[i].abcA;
         fs->per_char[i].rbearing = pabc[i].abcA + pabc[i].abcB + pabc[i].abcC;
-        fs->per_char[i].width = pabc[i].abcB;
+        fs->per_char[i].width = pabc[i].abcA + pabc[i].abcB + pabc[i].abcC;
         fs->per_char[i].ascent = tm.tmAscent;
         fs->per_char[i].descent = tm.tmDescent;
         if (fs->per_char[i].width < fs->min_bounds.width)

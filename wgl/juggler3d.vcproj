@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="glsnake"
-	ProjectGUID="{652EF004-A0BE-4FF7-A9A1-7FBDEBA8D50F}"
-	RootNamespace="glsnake"
+	Name="juggler3d"
+	ProjectGUID="{76F1D9F2-ABDE-47AC-851A-6B6AC302E311}"
+	RootNamespace="juggler3d"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib scrnsave.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="comctl32.lib opengl32.lib glu32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).scr"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -120,7 +120,7 @@
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -138,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib scrnsave.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="comctl32.lib opengl32.lib glu32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).scr"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
@@ -179,11 +179,31 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\glsnake.c"
+				RelativePath="..\colors.c"
 				>
 			</File>
 			<File
 				RelativePath=".\glxfonts.c"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.c"
+				>
+			</File>
+			<File
+				RelativePath=".\juggler3d.c"
+				>
+			</File>
+			<File
+				RelativePath=".\rotator.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sphere.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tube.c"
 				>
 			</File>
 			<File
@@ -217,7 +237,31 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\colors.h"
+				>
+			</File>
+			<File
 				RelativePath=".\glxfonts.h"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.h"
+				>
+			</File>
+			<File
+				RelativePath="..\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\rotator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sphere.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tube.h"
 				>
 			</File>
 			<File
