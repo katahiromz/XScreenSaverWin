@@ -39,6 +39,10 @@ BEGIN
     POPUP "&Debug"
     BEGIN
         MENUITEM "Copy &parameters to debug",       IDM_COPY
+        MENUITEM SEPARATOR
+        MENUITEM "200x150",                         IDM_200X150
+        MENUITEM "320x240",                         IDM_320X240
+        MENUITEM "640x480",                         IDM_640X480
     END
     POPUP "&Help"
     BEGIN

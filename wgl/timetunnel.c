@@ -11,6 +11,7 @@
  */
 
 #define GL_GLEXT_PROTOTYPES 1
+#define HAVE_JWZGLES 1
 
 #include "xlockmore.h"
 //#include <math.h> /* for log2 */
@@ -52,7 +53,7 @@
 
 static float start = 0.00, end = 27.79, dilate = 1.00;
 static Bool do_texture = True, drawlogo = True, wire, reverse = False, do_fog = True;
-static const char *do_tx1 = "(none)", *do_tx2 = "(none)", *do_tx3 = "(none)", *do_tun1 = "(none)", *do_tun2 = "(none)", *do_tun3 = "(none)";
+static char *do_tx1 = "(none)", *do_tx2 = "(none)", *do_tx3 = "(none)", *do_tun1 = "(none)", *do_tun2 = "(none)", *do_tun3 = "(none)";
 
 static XrmOptionDescRec opts[] = {
   {"-texture"	, ".texture",   XrmoptionNoArg, "true" },

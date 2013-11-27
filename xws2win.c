@@ -590,7 +590,6 @@ int XDrawString(Display *dpy, Drawable d, GC gc,
 
     hdc = XCreateDrawableDC_(dpy, d);
     SetTextColor(hdc, values->foreground_rgb);
-    SetBkColor(hdc, values->background_rgb);
     SetBkMode(hdc, TRANSPARENT);
 
     hFontOld = SelectObject(hdc, values->font);
@@ -618,7 +617,7 @@ int XDrawImageString(Display *dpy, Drawable d, GC gc,
     hdc = XCreateDrawableDC_(dpy, d);
     SetTextColor(hdc, values->foreground_rgb);
     SetBkColor(hdc, values->background_rgb);
-    SetBkMode(hdc, TRANSPARENT);
+    SetBkMode(hdc, OPAQUE);
 
     hFontOld = SelectObject(hdc, values->font);
     GetTextMetricsA(hdc, &tm);
@@ -1055,7 +1054,7 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
         free(fs);
         return NULL;
     }
-    
+
     fs->min_char_or_byte2 = 0x20;
     fs->max_char_or_byte2 = 0x7F;
     nCount = (int)fs->max_char_or_byte2 - (int)fs->min_char_or_byte2 + 1;
@@ -1069,7 +1068,7 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
     GetCharABCWidthsA(hdc, fs->min_char_or_byte2, fs->max_char_or_byte2, pabc);
     SelectObject(hdc, hFontOld);
     DeleteDC(hdc);
-    
+
     fs->min_bounds.lbearing = 0x7FFF;
     fs->min_bounds.rbearing = 0x7FFF;
     fs->min_bounds.width = 0x7FFF;
@@ -1078,7 +1077,7 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
     fs->max_bounds.width = -1;
     for (i = 0; i < nCount; i++)
     {
-        fs->per_char[i].lbearing = pabc[i].abcA;
+        fs->per_char[i].lbearing = pabc[i].abcA + pabc[i].abcC;
         fs->per_char[i].rbearing = pabc[i].abcA + pabc[i].abcB + pabc[i].abcC;
         fs->per_char[i].width = pabc[i].abcA + pabc[i].abcB + pabc[i].abcC;
         fs->per_char[i].ascent = tm.tmAscent;

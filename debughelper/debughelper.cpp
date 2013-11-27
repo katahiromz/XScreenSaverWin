@@ -7,6 +7,14 @@ HINSTANCE hInst;
 TCHAR szTitle[MAX_LOADSTRING];
 TCHAR szWindowClass[MAX_LOADSTRING];
 
+enum SIZETYPE
+{
+    ST_200X150,
+    ST_320X240,
+    ST_640X480
+};
+
+SIZETYPE sizetype = ST_200X150;
 
 LPTSTR GetParametersToDebug(HWND hWnd)
 {
@@ -78,6 +86,37 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return FALSE;
 }
 
+VOID OnChangeSize(HWND hwnd, INT cx, INT cy)
+{
+    RECT rc = {0, 0, cx, cy};
+    DWORD style = GetWindowLong(hwnd, GWL_STYLE);
+    AdjustWindowRectEx(&rc, style, TRUE, 0);
+    cx = rc.right - rc.left;
+    cy = rc.bottom - rc.top;
+    SetWindowPos(hwnd, NULL, 0, 0, cx, cy,
+        SWP_NOACTIVATE | SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOMOVE);
+}
+
+VOID OnInitMenuPopup(HWND hwnd, HMENU hMenuPopup)
+{
+    switch (sizetype)
+    {
+    case ST_200X150:
+        CheckMenuRadioItem(hMenuPopup, IDM_200X150, IDM_640X480, IDM_200X150, MF_BYCOMMAND);
+        break;
+
+    case ST_320X240:
+        CheckMenuRadioItem(hMenuPopup, IDM_200X150, IDM_640X480, IDM_320X240, MF_BYCOMMAND);
+        break;
+
+    case ST_640X480:
+        CheckMenuRadioItem(hMenuPopup, IDM_200X150, IDM_640X480, IDM_640X480, MF_BYCOMMAND);
+        break;
+
+    default:
+        break;
+    }
+}
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -101,11 +140,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
             break;
 
+        case IDM_200X150:
+            OnChangeSize(hWnd, 200, 150);
+            sizetype = ST_200X150;
+            break;
+
+        case IDM_320X240:
+            OnChangeSize(hWnd, 320, 240);
+            sizetype = ST_320X240;
+            break;
+
+        case IDM_640X480:
+            OnChangeSize(hWnd, 640, 480);
+            sizetype = ST_640X480;
+            break;
+
         case IDM_EXIT:
             DestroyWindow(hWnd);
             break;
         }
         break;
+
+    case WM_INITMENUPOPUP:
+        OnInitMenuPopup(hWnd, (HMENU)wParam);
+        break;
+
     case WM_PAINT:
         hdc = BeginPaint(hWnd, &ps);
         OnPaint(hWnd, hdc);
@@ -161,9 +220,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         CW_USEDEFAULT, 0, cx, cy, NULL, NULL, hInstance, NULL);
 
     if (!hWnd)
-    {
         return FALSE;
-    }
 
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
@@ -190,6 +247,7 @@ int APIENTRY _tWinMain(
 
     if (!InitInstance (hInstance, nCmdShow))
     {
+        MessageBox(NULL, TEXT("Failure on InitInstance!"), NULL, MB_ICONERROR);
         return FALSE;
     }
 

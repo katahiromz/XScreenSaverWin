@@ -753,6 +753,12 @@ Status XGetGeometry(
     return 0;
 }
 
+Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr)
+{
+    *attr = ss.modeinfo.xgwa;
+    return 0;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // message box output
 

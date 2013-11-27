@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="timetunnel"
-	ProjectGUID="{E47F8B3C-986E-4812-9CE5-A795426AA7EE}"
-	RootNamespace="timetunnel"
+	Name="sonar"
+	ProjectGUID="{00EBEEA0-BCC2-48E3-B42A-A6A98DF6DE9A}"
+	RootNamespace="sonar"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -187,11 +187,27 @@
 				>
 			</File>
 			<File
-				RelativePath="..\minixpm.c"
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File
-				RelativePath=".\timetunnel.c"
+				RelativePath=".\rotator.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sonar-sim.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sonar.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sphere.c"
+				>
+			</File>
+			<File
+				RelativePath=".\texfont.c"
 				>
 			</File>
 			<File
@@ -208,10 +224,6 @@
 			</File>
 			<File
 				RelativePath="..\xlockmore.c"
-				>
-			</File>
-			<File
-				RelativePath=".\xpm-ximage.c"
 				>
 			</File>
 			<File
@@ -237,19 +249,27 @@
 				>
 			</File>
 			<File
-				RelativePath="..\minixpm.h"
-				>
-			</File>
-			<File
 				RelativePath="..\resource.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xlockmore.h"
+				RelativePath=".\rotator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\xpm-ximage.h"
+				RelativePath=".\sonar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sphere.h"
+				>
+			</File>
+			<File
+				RelativePath=".\texfont.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xlockmore.h"
 				>
 			</File>
 			<File

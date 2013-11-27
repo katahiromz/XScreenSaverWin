@@ -471,6 +471,7 @@ Display *DisplayOfScreen(Screen *s);
 int XDisplayWidth(Display *dpy, int scr);
 int XDisplayHeight(Display *dpy, int scr);
 Window RootWindow(Display *dpy, int scr);
+#define RootWindowOfScreen(scr) 0
 
 Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr);
 int XSetLineAttributes(Display *dpy, GC gc,

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="timetunnel"
-	ProjectGUID="{E47F8B3C-986E-4812-9CE5-A795426AA7EE}"
-	RootNamespace="timetunnel"
+	Name="carousel"
+	ProjectGUID="{2CC7F32C-99B2-440D-BC79-DD9E2762BF17}"
+	RootNamespace="carousel"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -179,6 +179,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\carousel.c"
+				>
+			</File>
+			<File
 				RelativePath="..\colors.c"
 				>
 			</File>
@@ -187,11 +191,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\minixpm.c"
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File
-				RelativePath=".\timetunnel.c"
+				RelativePath=".\rotator.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sphere.c"
+				>
+			</File>
+			<File
+				RelativePath=".\texfont.c"
 				>
 			</File>
 			<File
@@ -208,10 +220,6 @@
 			</File>
 			<File
 				RelativePath="..\xlockmore.c"
-				>
-			</File>
-			<File
-				RelativePath=".\xpm-ximage.c"
 				>
 			</File>
 			<File
@@ -237,19 +245,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\minixpm.h"
-				>
-			</File>
-			<File
 				RelativePath="..\resource.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xlockmore.h"
+				RelativePath=".\rotator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\xpm-ximage.h"
+				RelativePath=".\sphere.h"
+				>
+			</File>
+			<File
+				RelativePath=".\texfont.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xlockmore.h"
 				>
 			</File>
 			<File

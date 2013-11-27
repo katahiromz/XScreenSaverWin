@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="timetunnel"
-	ProjectGUID="{E47F8B3C-986E-4812-9CE5-A795426AA7EE}"
-	RootNamespace="timetunnel"
+	Name="jigsaw"
+	ProjectGUID="{BB795B64-39B8-4D06-A574-7FF205CCD359}"
+	RootNamespace="jigsaw"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -187,11 +187,31 @@
 				>
 			</File>
 			<File
-				RelativePath="..\minixpm.c"
+				RelativePath=".\jigsaw.c"
 				>
 			</File>
 			<File
-				RelativePath=".\timetunnel.c"
+				RelativePath=".\normals.c"
+				>
+			</File>
+			<File
+				RelativePath="..\pixmap.c"
+				>
+			</File>
+			<File
+				RelativePath=".\rotator.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sphere.c"
+				>
+			</File>
+			<File
+				RelativePath="..\spline.c"
+				>
+			</File>
+			<File
+				RelativePath=".\texfont.c"
 				>
 			</File>
 			<File
@@ -208,10 +228,6 @@
 			</File>
 			<File
 				RelativePath="..\xlockmore.c"
-				>
-			</File>
-			<File
-				RelativePath=".\xpm-ximage.c"
 				>
 			</File>
 			<File
@@ -237,7 +253,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\minixpm.h"
+				RelativePath=".\jigsaw.h"
+				>
+			</File>
+			<File
+				RelativePath=".\normals.h"
 				>
 			</File>
 			<File
@@ -245,11 +265,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\xlockmore.h"
+				RelativePath=".\rotator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\xpm-ximage.h"
+				RelativePath=".\sphere.h"
+				>
+			</File>
+			<File
+				RelativePath="..\spline.h"
+				>
+			</File>
+			<File
+				RelativePath=".\texfont.h"
+				>
+			</File>
+			<File
+				RelativePath="..\xlockmore.h"
 				>
 			</File>
 			<File
