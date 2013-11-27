@@ -22,8 +22,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Icons
 //
 
-IDI_DEBUGHELPER       ICON         "debughelper.ico"
-IDI_SMALL             ICON         "debughelper_small.ico"
+IDI_DEBUGHELPER       ICON         "..\\XScreenSaver.ico"
+IDI_SMALL             ICON         "..\\XScreenSaver.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

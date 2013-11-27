@@ -23,14 +23,16 @@ Pixmap XCreatePixmap(
     return data;
 }
 
-Pixmap XCreateBitmapFromData(
-    Display* dpy, Drawable d,
-    const char* data,
-    unsigned int width, unsigned int height)
-{
-    assert(0);
-    return 0;
-}
+#if 0
+    Pixmap XCreateBitmapFromData(
+        Display* dpy, Drawable d,
+        const char* data,
+        unsigned int width, unsigned int height)
+    {
+        assert(0);
+        return 0;
+    }
+#endif
 
 Pixmap XCreatePixmapFromBitmapData(
     Display* dpy, Drawable d, char* data,
@@ -56,9 +58,9 @@ Pixmap XCreatePixmapFromBitmapData(
 int XFreePixmap(Display *dpy, Pixmap pixmap)
 {
     DrawableData *data = XGetDrawableData_(pixmap);
-	if (data->hbm)
-		DeleteObject(data->hbm);
-	free(data);
+    if (data->hbm)
+        DeleteObject(data->hbm);
+    free(data);
     return 0;
 }
 

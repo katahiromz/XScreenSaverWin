@@ -19,7 +19,7 @@ SIZETYPE sizetype = ST_200X150;
 LPTSTR GetParametersToDebug(HWND hWnd)
 {
     static TCHAR sz[256];
-    wsprintf(sz, TEXT("/p %d"), (UINT)(UINT_PTR)hWnd);
+    wsprintf(sz, TEXT("/p %u"), (UINT)(UINT_PTR)hWnd);
     return sz;
 }
 

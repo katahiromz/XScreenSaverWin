@@ -15,6 +15,13 @@ Bool mono_p = False;
 static LPCSTR pszCompany = "Software\\Katayama Hirofumi MZ";
 
 //////////////////////////////////////////////////////////////////////////////
+
+HBITMAP GetScreenShotBM(VOID)
+{
+    return ss.hbmScreenShot;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // sz_trim
 
 void sz_trim(char *psz)
@@ -364,9 +371,35 @@ BOOL SaveBitmapToFile(LPCTSTR pszFileName, HBITMAP hbm)
 //////////////////////////////////////////////////////////////////////////////
 // screen saver
 
+HANDLE g_hMapping = NULL;
+
+Bool set_saver_name(const char *name)
+{
+    LPVOID p = NULL;
+    SECURITY_ATTRIBUTES sa;
+	ZeroMemory(&sa, sizeof(sa));
+    sa.nLength = sizeof(sa);
+	sa.bInheritHandle = TRUE;
+
+    g_hMapping = CreateFileMappingA(INVALID_HANDLE_VALUE, &sa, PAGE_READWRITE,
+        0, 256, "Katayama Hirofumi MZ XScreenSaverWin");
+	if (g_hMapping)
+	{
+		p = MapViewOfFile(g_hMapping, FILE_MAP_WRITE, 0, 0, 256);
+		if (p)
+		{
+			lstrcpyA((char *)p, progname);
+			UnmapViewOfFile(p);
+		}
+	}
+    return p != NULL;
+}
+
 BOOL ss_init(HWND hwnd)
 {
     RECT rc;
+
+    set_saver_name(progname);
 
     ss.hwnd = hwnd;
 
@@ -408,7 +441,7 @@ BOOL ss_init(HWND hwnd)
     ss.xgwa.height = ss.height;
     ss.xgwa.depth = 32;
     ss.xgwa.visual = (Visual *)calloc(sizeof(Visual), 1);
-    ss.xgwa.visual->class = TrueColor;
+    ss.xgwa.visual->class_ = TrueColor;
     ss.xgwa.visual->red_mask = 0x000000FF;
     ss.xgwa.visual->green_mask = 0x0000FF00;
     ss.xgwa.visual->blue_mask = 0x00FF0000;
@@ -417,6 +450,7 @@ BOOL ss_init(HWND hwnd)
     ss.xgwa.screen = 0;
 
     LoadSetting();
+    SaveSetting();
 
     ss.closure = hack_init(ss.dpy, ss.window);
 
@@ -667,6 +701,7 @@ void ss_term(void)
     hack_free(ss.dpy, ss.window, ss.closure);
     ReleaseDC(ss.hwnd, ss.hdc);
     DeleteObject(ss.hbmScreenShot);
+    CloseHandle(g_hMapping);
 }
 
 void ss_clear(Display *d)
@@ -688,107 +723,6 @@ void gettimeofday(timeval *t, timezone *tz)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-
-static void do_load_image(
-    async_load_state *state, Screen *screen, Window window, Drawable target,
-    int width, int height)
-{
-    BITMAP bm;
-    HDC hdcSrc, hdcDst;
-    Display *dpy = DisplayOfScreen(screen);
-    HGDIOBJ hbmOld;
-    HBITMAP hbm = ss.hbmScreenShot;
-    assert(hbm != NULL);
-
-    GetObject(hbm, sizeof(BITMAP), &bm);
-    state->geom.x = state->geom.y = 0;
-    state->geom.width = bm.bmWidth;
-    state->geom.height = bm.bmHeight;
-
-    hdcSrc = CreateCompatibleDC(dpy);
-    hdcDst = XCreateDrawableDC_(dpy, target);
-    hbmOld = SelectObject(hdcSrc, hbm);
-
-    assert(hdcSrc != NULL);
-    assert(hdcDst != NULL);
-    if (width == 0 || height == 0)
-    {
-        BitBlt(hdcDst, 0, 0, bm.bmWidth, bm.bmHeight, hdcSrc, 0, 0, SRCCOPY);
-    }
-    else
-    {
-        SetStretchBltMode(hdcDst, HALFTONE);
-        StretchBlt(hdcDst, 0, 0, width, height,
-            hdcSrc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
-    }
-
-    SelectObject(hdcSrc, hbmOld);
-    XDeleteDrawableDC_(dpy, target, hdcDst);
-    DeleteDC(hdcSrc);
-}
-
-async_load_state *load_image_async_simple(
-    async_load_state *state, Screen *screen, Window window, Drawable target, 
-    char **filename_ret, XRectangle *geometry_ret)
-{
-    async_load_state state1;
-    assert(filename_ret == NULL);
-    assert(geometry_ret == NULL);
-
-    do_load_image(&state1, screen, window, target, 0, 0);
-    return NULL;
-}
-
-void
-load_image_async (Screen *screen, Window window, Drawable drawable,
-                  void (*callback) (Screen *, Window, Drawable,
-                                    const char *name, XRectangle *geom,
-                                    void *closure),
-                  void *closure)
-{
-  Display *dpy = DisplayOfScreen (screen);
-  XWindowAttributes xgwa;
-  Bool done = False;
-  XRectangle *geom_ret;
-  XRectangle geom_ret_2;
-  char **name_ret = 0;
-  char *name_ret_2 = 0;
-  async_load_state state1;
-
-  if (!drawable) abort();
-
-  if (callback) {
-    geom_ret = &geom_ret_2;
-    name_ret = &name_ret_2;
-  }
-
-  XGetWindowAttributes (dpy, window, &xgwa);
-  {
-    Window r;
-    int x, y;
-    unsigned int w, h, bbw, d;
-    XGetGeometry (dpy, drawable, &r, &x, &y, &w, &h, &bbw, &d);
-    xgwa.width = w;
-    xgwa.height = h;
-  }
-
-  if (name_ret)
-    *name_ret = 0;
-
-  if (geom_ret) {
-    geom_ret->x = 0;
-    geom_ret->y = 0;
-    geom_ret->width  = xgwa.width;
-    geom_ret->height = xgwa.height;
-  }
-
-  do_load_image(&state1, screen, window, drawable, xgwa.width, xgwa.height);
-
-  if (callback) {
-    callback (screen, window, drawable, name_ret_2, &geom_ret_2, closure);
-    if (name_ret_2) free (name_ret_2);
-  }
-}
 
 Status XGetGeometry(
     Display *dpy, Drawable d, Window *root,
@@ -842,8 +776,9 @@ Bool use_subwindow_mode_p(Screen *screen, Window window)
         va_list va;
         int n;
         va_start(va, fmt);
-        n = wvsprintf(sz, fmt, va);
+        n = wvsprintfA(sz, fmt, va);
         va_end(va);
+        OutputDebugStringA(sz);
         lstrcatA(s_szBuffer, sz);
         return n;
     }

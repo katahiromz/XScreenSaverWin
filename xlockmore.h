@@ -375,7 +375,6 @@ void gltrackball_start(trackball_state* trackball, int n1, int n2, int n3, int n
 void gltrackball_track(trackball_state* trackball, int n1, int n2, int n3, int n4);
 
 //////////////////////////////////////////////////////////////////////////////
-// misc
 
 void do_fps(ModeInfo *mi);
 extern Bool has_writable_cells(Screen *s, Visual *v);
@@ -383,17 +382,10 @@ float current_device_rotation(void);
 int ffs(int i);
 int visual_cells(Screen *screen, Visual *visual);
 int visual_depth(Screen *screen, Visual *visual);
-void load_texture_async(
-    Screen *screen, Window window, GLXContext glx_context,
-    int desired_width, int desired_height, Bool mipmap_p, GLuint texid,
-    void (*callback) (const char *filename,
-                      XRectangle *geometry,
-                      int image_width,
-                      int image_height,
-                      int texture_width,
-                      int texture_height,
-                      void *closure),
-    void *closure);
+
+//////////////////////////////////////////////////////////////////////////////
+
+#include "grabscreen.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // screen saver
@@ -418,6 +410,8 @@ void CreateTextureFromImage(XImage *ximage, GLuint texid);
 BOOL ss_init(HWND hwnd);
 void ss_term(void);
 void ss_clear(Display *d);
+
+HBITMAP GetScreenShotBM(VOID);
 
 //////////////////////////////////////////////////////////////////////////////
 

@@ -43,6 +43,9 @@ Bool dontClearRoot = True;
 int delay = 10000;
 char *mode = "random";
 int duration = 120;
+char *imageDirectory = "";
+Bool chooseRandomImages = True;
+Bool grabDesktopImages = False;
 
 static argtype vars[] = 
 {
@@ -52,6 +55,9 @@ static argtype vars[] =
     {&delay, "delay", NULL, "10000", t_Int},
     {&mode, "mode", NULL, "random", t_String},
     {&duration, "duration", NULL, "120", t_Int},
+    //{&imageDirectory, "imageDirectory", NULL, "", t_String},
+    //{&chooseRandomImages, "chooseRandomImages", NULL, "True", t_Bool},
+    //{&grabDesktopImages, "duration", NULL, "False", t_Bool},
 };
 
 struct state {
@@ -176,6 +182,7 @@ decayscreen_draw (Display *dpy, Window window, void *closure)
 {
     struct state *st = (struct state *) closure;
     int left, top, width, height, toleft, totop;
+	static Bool b = False;
 
 #define L 101
 #define R 102
@@ -192,6 +199,7 @@ decayscreen_draw (Display *dpy, Window window, void *closure)
     static const int upright_bias[]   = { L,L,L,R, R,R,R,R, U,U,U,U, U,D,D,D };
     static const int downright_bias[] = { L,L,L,R, R,R,R,R, U,U,U,D, D,D,D,D };
 
+#if 0
     if (st->img_loader)   /* still loading */
       {
         st->img_loader = load_image_async_simple (st->img_loader, 
@@ -218,11 +226,37 @@ decayscreen_draw (Display *dpy, Window window, void *closure)
         }
       return st->delay;
     }
+#endif
 
     if (!st->img_loader &&
         st->start_time + st->duration < time ((time_t) 0)) {
       decayscreen_load_image (st);
     }
+
+#if 1
+    if (!b)
+    {
+      st->start_time = time ((time_t) 0);
+      if (st->random_p)
+        st->mode = random() % (FUZZ+1);
+
+      if (st->mode == MELT || st->mode == STRETCH)
+        /* make sure screen eventually turns background color */
+        XDrawLine (st->dpy, st->window, st->gc, 0, 0, st->sizex, 0); 
+
+      if (!st->saved) {
+        st->saved = XCreatePixmap (st->dpy, st->window,
+                                   st->sizex, st->sizey,
+                                   st->xgwa.depth);
+        st->saved_w = st->sizex;
+        st->saved_h = st->sizey;
+      }
+      XCopyArea (st->dpy, st->window, st->saved, st->gc, 0, 0,
+                 st->sizex, st->sizey, 0, 0);
+      decayscreen_load_image (st);
+        b = True;
+    }
+#endif
 
     switch (st->mode) {
       case SHUFFLE:	st->current_bias = no_bias; break;

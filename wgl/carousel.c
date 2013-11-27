@@ -36,6 +36,7 @@
 char *font = "System 30";
 Bool grabDesktopImages = False;
 Bool chooseRandomImages = True;
+char *imageDirectory = "";
 
 #ifdef USE_GL
 
@@ -163,8 +164,8 @@ static argtype vars[] = {
     {&font, "font", NULL, "System 30", t_String},  //
     {&grabDesktopImages, "grabDesktopImages", NULL, "False", t_Bool},   //
     {&chooseRandomImages, "chooseRandomImages", NULL, "True", t_Bool},  //
+    {&imageDirectory, "imageDirectory", NULL, "", t_String},    //
 };
-
 
 ENTRYPOINT ModeSpecOpt carousel_opts = {countof(opts), opts, countof(vars), vars, NULL};
 

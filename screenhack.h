@@ -36,7 +36,7 @@ typedef struct screenhack_timeval
 
 typedef struct screenhack_timezone
 {
-	char dummy1, dummy2;
+    char dummy1, dummy2;
 } screenhack_timezone;
 
 #define timeval screenhack_timeval
@@ -79,7 +79,7 @@ extern argtype *hack_arginfo;
 
 #ifdef NOARGS
     #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) \
-	    const char *progname = #NAME; \
+        const char *progname = #CLASS; \
         HACK_INIT hack_init = PREFIX ## _init; \
         HACK_DRAW hack_draw = PREFIX ## _draw; \
         HACK_RESHAPE hack_reshape = PREFIX ## _reshape; \
@@ -88,7 +88,7 @@ extern argtype *hack_arginfo;
         argtype *hack_arginfo = NULL;
 #else
     #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) \
-	    const char *progname = #NAME; \
+        const char *progname = #CLASS; \
         HACK_INIT hack_init = PREFIX ## _init; \
         HACK_DRAW hack_draw = PREFIX ## _draw; \
         HACK_RESHAPE hack_reshape = PREFIX ## _reshape; \
@@ -102,23 +102,7 @@ extern argtype *hack_arginfo;
 
 //////////////////////////////////////////////////////////////////////////////
 
-typedef struct async_load_state
-{
-    Bool done_p;
-    char *filename;
-    XRectangle geom;
-} async_load_state;
-
-async_load_state *load_image_async_simple(
-    async_load_state *state, Screen *screen, Window window, Drawable target, 
-    char **filename_ret, XRectangle *geometry_ret);
-
-void
-load_image_async (Screen *screen, Window window, Drawable drawable,
-                  void (*callback) (Screen *, Window, Drawable,
-                                    const char *name, XRectangle *geom,
-                                    void *closure),
-                  void *closure);
+#include "grabscreen.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // screen saver
@@ -155,6 +139,8 @@ Pixmap xscreensaver_logo(Screen *screen, Visual *visual,
     unsigned long **pixels_ret, int *npixels_ret,
     Pixmap *mask_ret,
     Bool big_p);
+
+HBITMAP GetScreenShotBM(VOID);
 
 //////////////////////////////////////////////////////////////////////////////
 

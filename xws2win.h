@@ -56,6 +56,8 @@ typedef DWORD CARD32;
 typedef BOOL Bool;
 #define False FALSE
 #define True TRUE
+#define on TRUE
+#define off FALSE
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -77,7 +79,7 @@ typedef struct
     unsigned long red_mask;
     unsigned long green_mask;
     unsigned long blue_mask;
-    int class;
+    int class_;
     int bits_per_rgb;
 } Visual;
 
@@ -472,6 +474,7 @@ int XDisplayWidth(Display *dpy, int scr);
 int XDisplayHeight(Display *dpy, int scr);
 Window RootWindow(Display *dpy, int scr);
 #define RootWindowOfScreen(scr) 0
+#define ScreenOfDisplay(dpy,i) 0
 
 Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr);
 int XSetLineAttributes(Display *dpy, GC gc,
@@ -545,6 +548,7 @@ int XClearArea2_(
     int x, int y, unsigned int width, unsigned int height,
     Bool exposures);
 
+void XInitImage(XImage *image);
 XImage *XGetImage(Display *dpy, Drawable d,
      int x, int y, unsigned int width, unsigned int height,
      unsigned long plane_mask, int format);

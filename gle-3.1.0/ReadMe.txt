@@ -4,3 +4,7 @@ and "Multithreaded" (non-DLL).
 
 Copy the include and lib folders to the compiling environment before compiling 
 Extrusion.
+
+-------------------------------------------------------------------------------
+
+http://www.linas.org/gle/

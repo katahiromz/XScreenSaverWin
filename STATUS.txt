@@ -1,4 +1,4 @@
-There are 165 Goods, 11 OKs and 47 NGs of total 223 screen savers 
+There are 172 Goods, 11 OKs and 40 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -32,7 +32,7 @@ Bumps                   Good
 CCurve                  Good        
 CWaves                  Good        
 Cage                    Good        
-Carousel                NG          
+Carousel                Good        
 Celtic                  Good        
 Circuit                 NG          
 CloudLife               Good        
@@ -49,7 +49,7 @@ CubicGrid               Good
 Cynosure                Good        
 DNALogo                 Good        
 DangerBall              Good        
-DecayScreen             NG          Black out
+DecayScreen             Good        
 Deco                    Good        
 Deluxe                  Good        
 Demon                   Good        
@@ -69,7 +69,7 @@ Flag                    OK          Text doesn't appear
 Flame                   Good        
 FlipFlop                Good        
 FlipScreen3D            OK          Blur and slow
-FlipText                NG          
+FlipText                Good        
 Flow                    Good        
 FluidBalls              OK          Slow
 Flurry                  Good        
@@ -144,7 +144,7 @@ Mountain                Good
 Munch                   Good        
 NerveRot                Good        
 Noof                    Good        
-NoseGuy                 NG          
+NoseGuy                 Good        
 Pacman                  Good        
 Pedal                   Good        
 Penetrate               Good        
@@ -180,7 +180,7 @@ Sierpinski              Good
 Sierpinski3D            Good        
 SkyTentacles            Good        
 SlideScreen             NG          
-Slip                    NG          
+Slip                    Good        
 Sonar                   Good        
 SpeedMine               NG          
 Sphere                  Good        
@@ -190,7 +190,7 @@ Spotlight               NG
 Sproingies              Good        
 Squiral                 Good        
 Stairs                  Good        
-StarWars                NG          
+StarWars                Good        
 Starfish                Good        
 StonerView              Good        
 Strange                 NG          
@@ -220,7 +220,7 @@ XAnalogTV               NG
 XFlame                  Good        
 XJack                   Good        
 XLyap                   Good        
-XMatrix                 NG          
+XMatrix                 Good        
 XRaySwarm               Good        
 XSpirograph             Good        
 Zoom                    Good        

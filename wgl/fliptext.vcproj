@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\mzc2mini.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\pixmap.c"
 				>
 			</File>
@@ -204,6 +208,10 @@
 			</File>
 			<File
 				RelativePath=".\texfont.c"
+				>
+			</File>
+			<File
+				RelativePath="..\textclient.cpp"
 				>
 			</File>
 			<File
@@ -245,6 +253,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\mzc2mini.h"
+				>
+			</File>
+			<File
 				RelativePath="..\resource.h"
 				>
 			</File>
@@ -258,6 +270,10 @@
 			</File>
 			<File
 				RelativePath=".\texfont.h"
+				>
+			</File>
+			<File
+				RelativePath="..\textclient.h"
 				>
 			</File>
 			<File

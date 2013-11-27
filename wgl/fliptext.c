@@ -10,9 +10,11 @@
  * implied warranty.
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif /* HAVE_CONFIG_H */
+#if 0
+	#ifdef HAVE_CONFIG_H
+	# include "config.h"
+	#endif /* HAVE_CONFIG_H */
+#endif
 
 /* Utopia 800 needs 64 512x512 textures (4096x4096 bitmap).
    Utopia 720 needs 16 512x512 textures (2048x2048 bitmap).
@@ -44,9 +46,6 @@
 #include "texfont.h"
 #include "textclient.h"
 
-char *font = "Arial 30";
-char *foreground = "#00CCFF";
-
 #ifdef USE_GL /* whole file */
 
 /* Should be in <GL/glext.h> */
@@ -60,7 +59,7 @@ char *foreground = "#00CCFF";
 
 #define DEF_PROGRAM    "xscreensaver-text --cols 0"  /* don't wrap */
 #define DEF_LINES      "8"
-#define DEF_FONT_SIZE  "20"
+#define DEF_FONT_SIZE  "40"
 #define DEF_COLUMNS    "80"
 #define DEF_ALIGNMENT  "random"
 #define DEF_SPEED       "1.0"
@@ -69,7 +68,7 @@ char *foreground = "#00CCFF";
 #define FONT_WEIGHT       14
 #define KEEP_ASPECT
 
-typedef enum { NEW, HESITATE, IN, LINGER, OUT, DEAD } line_state;
+typedef enum { NEW, HESITATE, IN, LINGER_, OUT, DEAD } line_state;
 typedef enum { SCROLL_BOTTOM, SCROLL_TOP, SPIN } line_anim_type;
 
 typedef struct { GLfloat x, y, z; } XYZ;
@@ -124,13 +123,20 @@ typedef struct {
 
 static fliptext_configuration *scs = NULL;
 
-static char *program;
-static int max_lines, min_lines;
-static float font_size;
-static int target_columns;
-static char *alignment_str;
+char *program = DEF_PROGRAM;
+static int max_lines = 8, min_lines;
+static float font_size = 40;
+static int target_columns = 80;
+static char *alignment_str = "random";
 static int alignment, alignment_random_p;
-static GLfloat speed;
+static GLfloat speed = 1.0;
+
+char *font = "System 30";
+char *foreground = "#00CCFF";
+char *textMode = "literal";
+char *textLiteral = "XScreenSaver for Windows!";
+char *textFile = "";
+int relaunchDelay = 4;
 
 static XrmOptionDescRec opts[] = {
   {"-program",     ".program",   XrmoptionSepArg, 0 },
@@ -146,14 +152,18 @@ static XrmOptionDescRec opts[] = {
 };
 
 static argtype vars[] = {
-  {&program,        "program",   "Program",    DEF_PROGRAM,   t_String},
   {&max_lines,      "lines",     "Integer",    DEF_LINES,     t_Int},
   {&font_size,      "fontSize",  "Float",      DEF_FONT_SIZE, t_Float},
   {&target_columns, "columns",   "Integer",    DEF_COLUMNS,   t_Int},
   {&alignment_str,  "alignment", "Alignment",  DEF_ALIGNMENT, t_String},
-  {&speed,	    "speed",     "Speed",      DEF_SPEED,     t_Float},
-    {&font, "font", NULL, "Arial 30", t_String},    //
-    {&foreground, "foreground", NULL, "#00CCFF", t_String}, //
+  {&speed,          "speed",     "Speed",      DEF_SPEED,     t_Float},
+  {&font, "font", NULL, "Arial 30", t_String},    //
+  {&foreground, "foreground", NULL, "#00CCFF", t_String}, //
+  {&textMode, "textMode", NULL, "literal", t_String},  //
+  {&textLiteral, "textLiteral", NULL, "", t_String},    //
+  {&textFile, "textFile", NULL, "", t_String},  //
+  {&program, "textProgram", "Program", DEF_PROGRAM, t_String},  //
+  {&relaunchDelay, "relaunchDelay", NULL, "4", t_Int},  //
 };
 
 ENTRYPOINT ModeSpecOpt fliptext_opts = {countof(opts), opts, countof(vars), vars, NULL};
@@ -503,7 +513,7 @@ tick_line (fliptext_configuration *sc, line *line)
       line->state++;
       line->step = 0;
 
-      if (linger == 0 && line->state == LINGER)
+      if (linger == 0 && line->state == LINGER_)
         line->state++;
 
       if (sc->anim_type != SPIN)
@@ -609,7 +619,7 @@ tick_line (fliptext_configuration *sc, line *line)
             }
           break;
 
-        case LINGER:
+        case LINGER_:
           line->from = line->to;
           line->steps = linger;
           break;
@@ -643,7 +653,7 @@ tick_line (fliptext_configuration *sc, line *line)
       break;
 
     case HESITATE:
-    case LINGER:
+    case LINGER_:
     case DEAD:
       break;
     default:
@@ -820,7 +830,7 @@ init_fliptext (ModeInfo *mi)
     clear_gl_error(); /* WTF? sometimes "invalid op" from glViewport! */
   }
 
-  program = get_string_resource (mi->dpy, "program", "Program");
+  //program = get_string_resource (mi->dpy, "program", "Program");
 
   {
     int cw, lh;
@@ -904,7 +914,8 @@ init_fliptext (ModeInfo *mi)
   if (min_lines < 1) min_lines = 1;
 
   parse_color (mi, "foreground",
-               get_string_resource(mi->dpy, "foreground", "Foreground"),
+               //get_string_resource(mi->dpy, "foreground", "Foreground"),
+			   foreground,
                sc->color);
 
   sc->top_margin = (sc->char_width * 100);

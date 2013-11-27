@@ -85,6 +85,8 @@ VOID MakeCurrent(SCREENSAVER *ss)
     wglMakeCurrent(ss->hdc, ss->hglrc);
 }
 
+extern HANDLE g_hMapping;
+
 void ss_term(void)
 {
     free(ss.modeinfo.colors);
@@ -92,112 +94,12 @@ void ss_term(void)
     hack_free(&ss.modeinfo);
     ReleaseDC(ss.hwnd, ss.hdc);
     DeleteObject(ss.hbmScreenShot);
+    CloseHandle(g_hMapping);
 }
 
 void ss_clear(Display *d)
 {
     glClear(GL_COLOR_BUFFER_BIT);
-}
-
-XImage *GetScreenShotXImage(void)
-{
-    XImage *image;
-    INT y, cx, cy, size;
-    BITMAP bm;
-    LPBYTE pbBits, pb;
-    DWORD count;
-    HBITMAP hbm;
-
-    hbm = (HBITMAP)CopyImage(ss.hbmScreenShot, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-    assert(hbm != NULL);
-
-    GetObject(hbm, sizeof(bm), &bm);
-    cx = bm.bmWidth;
-    cy = bm.bmHeight;
-
-    // swap R and B
-    pbBits = (LPBYTE)bm.bmBits;
-    count = cx * cy;
-    while (count--)
-    {
-        BYTE b = pbBits[0];
-        pbBits[0] = pbBits[2];
-        pbBits[2] = b;
-        pbBits++;
-        pbBits++;
-        pbBits++;
-        *pbBits++ = 0xFF;
-    }
-
-    // flip top and bottom
-    pb = (LPBYTE)malloc(cx * 4);
-    assert(pb != NULL);
-    pbBits = (LPBYTE)bm.bmBits;
-    for (y = 0; y < cy / 2; y++)
-    {
-        memcpy(pb, &pbBits[y * cx * 4], cx * 4);
-        memcpy(&pbBits[y * cx * 4], &pbBits[(cy - y - 1) * cx * 4], cx * 4);
-        memcpy(&pbBits[(cy - y - 1) * cx * 4], pb, cx * 4);
-    }
-    free(pb);
-    GdiFlush();
-
-    image = XCreateImage(NULL, NULL, 32, RGBAPixmap_, 0, NULL, cx, cy, 32, 0);
-    if (image)
-    {
-        size = image->bytes_per_line * image->height;
-        image->data = (char *)calloc(size, 1);
-        if (image->data != NULL)
-        {
-            memcpy(image->data, bm.bmBits, size);
-            return image;
-        }
-        free(image->data);
-        free(image);
-        image = NULL;
-    }
-
-    DeleteObject(hbm);
-    return image;
-}
-
-void CreateTextureFromImage(XImage *ximage, GLuint texid)
-{
-    assert(ximage->format == RGBAPixmap_);
-    glBindTexture(GL_TEXTURE_2D, texid);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, ximage->bitmap_pad / 8);
-
-    gluBuild2DMipmaps(GL_TEXTURE_2D, 4, ximage->width, ximage->height,
-        GL_RGBA, GL_UNSIGNED_BYTE, ximage->data);
-}
-
-void
-load_texture_async(Screen *screen, Window window,
-                   GLXContext glx_context,
-                   int desired_width, int desired_height,
-                   Bool mipmap_p,
-                   GLuint texid,
-                   void (*callback) (const char *filename,
-                                     XRectangle *geometry,
-                                     int image_width,
-                                     int image_height,
-                                     int texture_width,
-                                     int texture_height,
-                                     void *closure),
-                   void *closure)
-{
-    XImage *ximage;
-    XRectangle geometry;
-
-    ximage = GetScreenShotXImage();
-    CreateTextureFromImage(ximage, texid);
-    geometry.x = geometry.y = 0;
-    geometry.width = ximage->width;
-    geometry.height = ximage->height;
-
-    (*callback)(NULL, &geometry, ximage->width, ximage->height,
-        geometry.width, geometry.height, closure);
-    XDestroyImage(ximage);
 }
 
 HGLRC *init_GL(ModeInfo *mi)

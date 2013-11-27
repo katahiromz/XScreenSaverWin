@@ -26,7 +26,6 @@ static const char sccsid[] = "@(#)slip.c	5.00 2000/11/01 xlockmore";
  */
 
 #define STANDALONE
-#define NOARGS
 
 # define MODE_slip
 #define DELAY 50000
@@ -49,6 +48,17 @@ static const char sccsid[] = "@(#)slip.c	5.00 2000/11/01 xlockmore";
 # include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
+char *imageDirectory = "";
+Bool chooseRandomImages = True;
+Bool grabDesktopImages = False;
+
+static argtype vars[] = 
+{
+    {&imageDirectory, "imageDirectory", NULL, "", t_String},
+    {&chooseRandomImages, "chooseRandomImages", NULL, "True", t_Bool},
+    {&grabDesktopImages, "grabDesktopImages", NULL, "False", t_Bool},
+};
+
 #ifdef MODE_slip
 
 ENTRYPOINT ModeSpecOpt slip_opts =
@@ -60,7 +70,6 @@ ModStruct   slip_description =
  "init_slip", "init_slip", (char *) NULL, &slip_opts,
  50000, 35, 50, 1, 64, 1.0, "",
  "Shows slipping blits", 0, NULL};
-
 #endif
 
 typedef struct {

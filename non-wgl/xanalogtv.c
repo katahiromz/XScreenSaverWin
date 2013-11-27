@@ -61,6 +61,7 @@ float TVTint = 5;
 float TVBrightness = 3;
 float TVContrast = 1000;
 int use_cmap = 0;
+char *imageDirectory = "";
 
 static argtype vars[] = 
 {
@@ -74,6 +75,7 @@ static argtype vars[] =
     {&TVBrightness, "TVBrightness", NULL, "3", t_Float},
     {&TVContrast, "TVContrast", NULL, "1000", t_Float},
     {&use_cmap, "use_cmap", NULL, "0", t_Int},
+    {&imageDirectory, "imageDirectory", NULL, "", t_String},
 };
 
 enum {

@@ -247,6 +247,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "distort", "distort.vcproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xanalogtv", "xanalogtv.vcproj", "{04493739-1EAE-4CB8-899F-0586680E0B93}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmatrix", "xmatrix.vcproj", "{68B4F768-4404-42A3-974D-9240D81C4B5B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "noseguy", "noseguy.vcproj", "{6A6FC42B-CD59-470A-A7A2-3610ECAE6CC2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -745,6 +749,14 @@ Global
 		{04493739-1EAE-4CB8-899F-0586680E0B93}.Debug|Win32.Build.0 = Debug|Win32
 		{04493739-1EAE-4CB8-899F-0586680E0B93}.Release|Win32.ActiveCfg = Release|Win32
 		{04493739-1EAE-4CB8-899F-0586680E0B93}.Release|Win32.Build.0 = Release|Win32
+		{68B4F768-4404-42A3-974D-9240D81C4B5B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{68B4F768-4404-42A3-974D-9240D81C4B5B}.Debug|Win32.Build.0 = Debug|Win32
+		{68B4F768-4404-42A3-974D-9240D81C4B5B}.Release|Win32.ActiveCfg = Release|Win32
+		{68B4F768-4404-42A3-974D-9240D81C4B5B}.Release|Win32.Build.0 = Release|Win32
+		{6A6FC42B-CD59-470A-A7A2-3610ECAE6CC2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6A6FC42B-CD59-470A-A7A2-3610ECAE6CC2}.Debug|Win32.Build.0 = Debug|Win32
+		{6A6FC42B-CD59-470A-A7A2-3610ECAE6CC2}.Release|Win32.ActiveCfg = Release|Win32
+		{6A6FC42B-CD59-470A-A7A2-3610ECAE6CC2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

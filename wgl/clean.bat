@@ -1,3 +1,5 @@
+@echo off
+
 if exist *.user del *.user
 if exist *.ncb del *.ncb
 if exist *.suo del *.suo

@@ -165,6 +165,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sonar", "sonar.vcproj", "{0
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jigsaw", "jigsaw.vcproj", "{BB795B64-39B8-4D06-A574-7FF205CCD359}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "starwars", "starwars.vcproj", "{DD8053D1-7629-44CF-8110-4A200C9EED39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -499,6 +501,10 @@ Global
 		{BB795B64-39B8-4D06-A574-7FF205CCD359}.Debug|Win32.Build.0 = Debug|Win32
 		{BB795B64-39B8-4D06-A574-7FF205CCD359}.Release|Win32.ActiveCfg = Release|Win32
 		{BB795B64-39B8-4D06-A574-7FF205CCD359}.Release|Win32.Build.0 = Release|Win32
+		{DD8053D1-7629-44CF-8110-4A200C9EED39}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DD8053D1-7629-44CF-8110-4A200C9EED39}.Debug|Win32.Build.0 = Debug|Win32
+		{DD8053D1-7629-44CF-8110-4A200C9EED39}.Release|Win32.ActiveCfg = Release|Win32
+		{DD8053D1-7629-44CF-8110-4A200C9EED39}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

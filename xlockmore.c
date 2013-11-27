@@ -10,8 +10,21 @@
 //////////////////////////////////////////////////////////////////////////////
 
 SCREENSAVER ss;
+Bool mono_p = False;
+#ifdef NDEBUG
+    Bool debug_p = False;
+#else
+    Bool debug_p = True;
+#endif
 
 static LPCSTR pszCompany = "Software\\Katayama Hirofumi MZ";
+
+//////////////////////////////////////////////////////////////////////////////
+
+HBITMAP GetScreenShotBM(VOID)
+{
+    return ss.hbmScreenShot;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // sz_trim
@@ -420,9 +433,31 @@ BOOL SaveBitmapToFile(LPCTSTR pszFileName, HBITMAP hbm)
 //////////////////////////////////////////////////////////////////////////////
 // screen saver
 
+HANDLE g_hMapping = NULL;
+
+Bool set_saver_name(const char *name)
+{
+    LPVOID p;
+    SECURITY_ATTRIBUTES sa;
+	ZeroMemory(&sa, sizeof(sa));
+    sa.nLength = sizeof(sa);
+	sa.bInheritHandle = TRUE;
+
+    g_hMapping = CreateFileMappingA(INVALID_HANDLE_VALUE, &sa, PAGE_READWRITE,
+        0, 256, "Katayama Hirofumi MZ XScreenSaverWin");
+
+    p = MapViewOfFile(g_hMapping, FILE_MAP_WRITE, 0, 0, 256);
+    if (p)
+        lstrcpyA((char *)p, progname);
+    UnmapViewOfFile(p);
+    return p != NULL;
+}
+
 BOOL ss_init(HWND hwnd)
 {
     RECT rc;
+
+    set_saver_name(progname);
 
     ss.hwnd = hwnd;
 
@@ -479,6 +514,7 @@ BOOL ss_init(HWND hwnd)
     ss.modeinfo.xgwa.screen = 0;
 
     LoadSetting(&ss.modeinfo);
+    SaveSetting(&ss.modeinfo);
 
     hack_init(&ss.modeinfo);
 
@@ -775,8 +811,9 @@ Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr)
         va_list va;
         int n;
         va_start(va, fmt);
-        n = wvsprintf(sz, fmt, va);
+        n = wvsprintfA(sz, fmt, va);
         va_end(va);
+        OutputDebugStringA(sz);
         lstrcatA(s_szBuffer, sz);
         return n;
     }

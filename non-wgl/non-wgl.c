@@ -86,6 +86,8 @@ VOID MakeCurrent(SCREENSAVER *ss)
 {
 }
 
+extern HANDLE g_hMapping;
+
 void ss_term(void)
 {
     free(ss.modeinfo.colors);
@@ -94,15 +96,10 @@ void ss_term(void)
     hack_free(&ss.modeinfo);
     ReleaseDC(ss.hwnd, ss.hdc);
     DeleteObject(ss.hbmScreenShot);
+    CloseHandle(g_hMapping);
 }
 
 void ss_clear(Display *d)
 {
     XClearWindow(d, 0);
-}
-
-Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr)
-{
-    *attr = ss.modeinfo.xgwa;
-    return 0;
 }
