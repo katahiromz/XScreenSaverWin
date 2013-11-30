@@ -51,6 +51,10 @@ int delay2 = 500000;
 int duration = 120;
 char *bitmap = "(default)";
 
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
 static argtype vars[] = 
 {
     {&background, "background", NULL, "black", t_String},
@@ -59,6 +63,9 @@ static argtype vars[] =
     {&delay2, "delay2", NULL, "500000", t_Int},
     {&duration, "duration", NULL, "120", t_Int},
     {&bitmap, "bitmap", NULL, "(default)", t_String},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 struct state {

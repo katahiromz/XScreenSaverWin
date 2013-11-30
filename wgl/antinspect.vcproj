@@ -183,6 +183,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\colors.c"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.c"
+				>
+			</File>
+			<File
 				RelativePath=".\sphere.c"
 				>
 			</File>
@@ -216,6 +224,14 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\colors.h"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.h"
+				>
+			</File>
 			<File
 				RelativePath="..\resource.h"
 				>

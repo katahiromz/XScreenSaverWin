@@ -183,11 +183,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\colors.c"
+				>
+			</File>
+			<File
+				RelativePath="..\grabclient.c"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\pixmap.c"
+				>
+			</File>
+			<File
 				RelativePath=".\rotator.c"
 				>
 			</File>
 			<File
 				RelativePath=".\sphere.c"
+				>
+			</File>
+			<File
+				RelativePath=".\texture.c"
 				>
 			</File>
 			<File
@@ -224,6 +244,18 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\colors.h"
+				>
+			</File>
+			<File
+				RelativePath="..\grabscreen.h"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.h"
+				>
+			</File>
 			<File
 				RelativePath="..\resource.h"
 				>

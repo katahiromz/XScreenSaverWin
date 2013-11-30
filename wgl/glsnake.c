@@ -73,7 +73,6 @@ char *labelfont = "System 30";
 #define RIGHT   270.0
 
 //#define HAVE_GETTIMEOFDAY
-#define GETTIMEOFDAY_TWO_ARGS
 
 #if 0
 	#ifdef HAVE_GETTIMEOFDAY

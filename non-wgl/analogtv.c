@@ -428,7 +428,7 @@ analogtv_allocate(Display *dpy, Window window)
 
   it->screen=it->xgwa.screen;
   it->colormap=it->xgwa.colormap;
-  it->visclass=it->xgwa.visual->class;
+  it->visclass=it->xgwa.visual->class_;
   it->visbits=it->xgwa.visual->bits_per_rgb;
   it->visdepth=it->xgwa.depth;
   if (it->visclass == TrueColor || it->visclass == DirectColor) {

@@ -79,7 +79,7 @@
 #include "grab-ximage.h"
 #include "gltrackball.h"
 
-static char *mode = "light";
+char *mode = "light";
 static enum {wire=0,solid,light,checker,grab} _draw;
 
 # define DEF_SQUARES		"19"
@@ -135,6 +135,10 @@ static XrmOptionDescRec opts[] = {
     {"-zoom", ".gflux.zoom", XrmoptionSepArg, 0},
 };
 
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
 static argtype vars[] = {
     {&_squares, "squares", "Squares", DEF_SQUARES, t_Int},
     {&_resolution, "resolution", "Resolution", DEF_RESOLUTION, t_Int},
@@ -149,6 +153,10 @@ static argtype vars[] = {
     {&_waveHeight, "waveHeight", "WaveHeight", DEF_WAVE_HEIGHT, t_Float},
     {&_waveFreq, "waveFreq", "WaveFreq", DEF_WAVE_FREQ, t_Float},
     {&_zoom, "zoom", "Zoom", DEF_ZOOM, t_Float},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
+	{&mode, "mode", NULL, "light", t_String},
 };
 
 static OptionStruct desc[] =

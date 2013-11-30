@@ -183,7 +183,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\grabclient.c"
+				>
+			</File>
+			<File
 				RelativePath="..\hsv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File
@@ -196,6 +204,10 @@
 			</File>
 			<File
 				RelativePath="..\xcolor.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ximage.c"
 				>
 			</File>
 			<File
@@ -214,6 +226,10 @@
 			>
 			<File
 				RelativePath="..\colors.h"
+				>
+			</File>
+			<File
+				RelativePath="..\grabscreen.h"
 				>
 			</File>
 			<File

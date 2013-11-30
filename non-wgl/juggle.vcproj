@@ -191,11 +191,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\pixmap.c"
+				RelativePath=".\non-wgl.c"
 				>
 			</File>
 			<File
-				RelativePath="..\screenhack.c"
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File
@@ -204,6 +204,10 @@
 			</File>
 			<File
 				RelativePath="..\ximage.c"
+				>
+			</File>
+			<File
+				RelativePath="..\xlockmore.c"
 				>
 			</File>
 			<File
@@ -233,7 +237,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\screenhack.h"
+				RelativePath="..\xlockmore.h"
 				>
 			</File>
 			<File
@@ -251,7 +255,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\screenhack.rc"
+				RelativePath="..\xlockmore.rc"
 				>
 			</File>
 		</Filter>

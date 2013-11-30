@@ -1058,6 +1058,7 @@ obj_init (double grid_size, void *closure)
 {
   lavalite_configuration *bp = (lavalite_configuration *) closure;
   bp->grid_size = grid_size;
+  bp->button_down_p = False;
 
   return closure;
 }
@@ -1476,9 +1477,12 @@ draw_lavalite (ModeInfo *mi)
     get_rotation (bp->rot,  &rx, &ry, &rz, !bp->button_down_p);
 
 #if 1
-    cx = 0.5;
+    //cx = 0.5;
+    //cy = 0.5;
+    //cz = 1.0;
+    cx = 0.0;
     cy = 0.5;
-    cz = 1.0;
+    cz = 0.5;
 
 #else  /* #### this crud doesn't really work yet */
 
@@ -1519,11 +1523,19 @@ draw_lavalite (ModeInfo *mi)
     glLoadIdentity();
     glRotatef(current_device_rotation(), 0, 0, 1);
 
+#if 1
+    gluLookAt ((cx - 0.5) * 8,		/* Position the camera */
+               (cy - 0.5) * 8,
+               (cz - 0.5) * 8,
+               0, 0, 0,
+               0, 0, 1);
+#else
     gluLookAt ((cx - 0.5) * 8,		/* Position the camera */
                (cy - 0.5) * 8,
                (cz - 0.5) * 8,
                0, 0, 0,
                0, 1, 0);
+#endif
 
     gltrackball_rotate (bp->trackball);	/* Apply mouse-based camera position */
 

@@ -183,6 +183,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\colors.c"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.c"
+				>
+			</File>
+			<File
 				RelativePath=".\normals.c"
 				>
 			</File>
@@ -234,6 +242,14 @@
 			>
 			<File
 				RelativePath=".\buildlwo.h"
+				>
+			</File>
+			<File
+				RelativePath="..\colors.h"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.h"
 				>
 			</File>
 			<File

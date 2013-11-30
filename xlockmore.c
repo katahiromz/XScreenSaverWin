@@ -796,14 +796,9 @@ Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// message box output
 
-#ifndef NOMSGBOXOUTPUT
+#ifndef NDEBUG
     #undef fprintf
-    #undef abort
-    #undef exit
-
-    static CHAR s_szBuffer[2048] = "";
 
     int __cdecl win32_fprintf(FILE *fp, const char *fmt, ...)
     {
@@ -811,30 +806,14 @@ Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr)
         va_list va;
         int n;
         va_start(va, fmt);
-        n = wvsprintfA(sz, fmt, va);
+        n = vsprintf(sz, fmt, va);
         va_end(va);
-        OutputDebugStringA(sz);
-        lstrcatA(s_szBuffer, sz);
+        if (fp == stdout || fp == stderr)
+            OutputDebugStringA(sz);
+        else
+            vfprintf(fp, fmt, va);
         return n;
     }
-
-    void __cdecl win32_abort(void)
-    {
-        keybd_event(VK_SHIFT, 0, 0, 0);
-        keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
-
-        MessageBoxA(NULL, s_szBuffer, progname, MB_ICONERROR);
-        exit(-1);
-    }
-
-    int __cdecl win32_exit(int n)
-    {
-        keybd_event(VK_SHIFT, 0, 0, 0);
-        keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
-
-        MessageBoxA(NULL, s_szBuffer, progname, MB_ICONERROR);
-        exit(n);
-    }
-#endif  // def MSGBOXOUTPUT
+#endif  // ndef NDEBUG
 
 //////////////////////////////////////////////////////////////////////////////

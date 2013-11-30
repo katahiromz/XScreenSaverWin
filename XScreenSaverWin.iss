@@ -15,11 +15,11 @@ AppUpdatesURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 DefaultDirName={pf}\XScreenSaver for Windows
 DefaultGroupName=XScreenSaver for Windows
 AllowNoIcons=yes
-OutputBaseFilename=xscreensaver_setup
+OutputBaseFilename=xscreensaverwin_setup
 Compression=lzma
 SolidCompression=yes
 UninstallDisplayIcon={app}\xscreensaver.exe
-LicenseFile=LISENCE.txt
+LicenseFile=LICENSE.txt
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -30,6 +30,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "XScreenSaverWin\xscreensaver.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "XScreenSaverWin\xscreensaver-text.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "XScreenSaverWin\abstractile_scr\abstractile.scr"; DestDir: "{app}\abstractile_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\anemone_scr\anemone.scr"; DestDir: "{app}\anemone_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\anemotaxis_scr\anemotaxis.scr"; DestDir: "{app}\anemotaxis_scr"; Flags: ignoreversion
@@ -41,6 +42,7 @@ Source: "XScreenSaverWin\apollonian_scr\apollonian.scr"; DestDir: "{app}\apollon
 Source: "XScreenSaverWin\atlantis_scr\atlantis.scr"; DestDir: "{app}\atlantis_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\attraction_scr\attraction.scr"; DestDir: "{app}\attraction_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\atunnel_scr\atunnel.scr"; DestDir: "{app}\atunnel_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\barcode_scr\barcode.scr"; DestDir: "{app}\barcode_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\blaster_scr\blaster.scr"; DestDir: "{app}\blaster_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\blinkbox_scr\blinkbox.scr"; DestDir: "{app}\blinkbox_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\blocktube_scr\blocktube.scr"; DestDir: "{app}\blocktube_scr"; Flags: ignoreversion
@@ -54,8 +56,10 @@ Source: "XScreenSaverWin\bubble3d_scr\bubble3d.scr"; DestDir: "{app}\bubble3d_sc
 Source: "XScreenSaverWin\bubbles_scr\bubbles.scr"; DestDir: "{app}\bubbles_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\bumps_scr\bumps.scr"; DestDir: "{app}\bumps_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\cage_scr\cage.scr"; DestDir: "{app}\cage_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\carousel_scr\carousel.scr"; DestDir: "{app}\carousel_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\ccurve_scr\ccurve.scr"; DestDir: "{app}\ccurve_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\celtic_scr\celtic.scr"; DestDir: "{app}\celtic_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\circuit_scr\circuit.scr"; DestDir: "{app}\circuit_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\cloudlife_scr\cloudlife.scr"; DestDir: "{app}\cloudlife_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\companion_scr\companion.scr"; DestDir: "{app}\companion_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\compass_scr\compass.scr"; DestDir: "{app}\compass_scr"; Flags: ignoreversion
@@ -70,6 +74,7 @@ Source: "XScreenSaverWin\cubicgrid_scr\cubicgrid.scr"; DestDir: "{app}\cubicgrid
 Source: "XScreenSaverWin\cwaves_scr\cwaves.scr"; DestDir: "{app}\cwaves_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\cynosure_scr\cynosure.scr"; DestDir: "{app}\cynosure_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\dangerball_scr\dangerball.scr"; DestDir: "{app}\dangerball_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\decayscreen_scr\decayscreen.scr"; DestDir: "{app}\decayscreen_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\deco_scr\deco.scr"; DestDir: "{app}\deco_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\deluxe_scr\deluxe.scr"; DestDir: "{app}\deluxe_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\demon_scr\demon.scr"; DestDir: "{app}\demon_scr"; Flags: ignoreversion
@@ -78,6 +83,7 @@ Source: "XScreenSaverWin\distort_scr\distort.scr"; DestDir: "{app}\distort_scr";
 Source: "XScreenSaverWin\dnalogo_scr\dnalogo.scr"; DestDir: "{app}\dnalogo_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\drift_scr\drift.scr"; DestDir: "{app}\drift_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\endgame_scr\endgame.scr"; DestDir: "{app}\endgame_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\engine_scr\engine.scr"; DestDir: "{app}\engine_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\epicycle_scr\epicycle.scr"; DestDir: "{app}\epicycle_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\eruption_scr\eruption.scr"; DestDir: "{app}\eruption_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\euler2d_scr\euler2d.scr"; DestDir: "{app}\euler2d_scr"; Flags: ignoreversion
@@ -88,6 +94,7 @@ Source: "XScreenSaverWin\flag_scr\flag.scr"; DestDir: "{app}\flag_scr"; Flags: i
 Source: "XScreenSaverWin\flame_scr\flame.scr"; DestDir: "{app}\flame_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\flipflop_scr\flipflop.scr"; DestDir: "{app}\flipflop_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\flipscreen3d_scr\flipscreen3d.scr"; DestDir: "{app}\flipscreen3d_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\fliptext_scr\fliptext.scr"; DestDir: "{app}\fliptext_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\flow_scr\flow.scr"; DestDir: "{app}\flow_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\fluidballs_scr\fluidballs.scr"; DestDir: "{app}\fluidballs_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\flurry_scr\flurry.scr"; DestDir: "{app}\flurry_scr"; Flags: ignoreversion
@@ -106,6 +113,9 @@ Source: "XScreenSaverWin\glknots_scr\glknots.scr"; DestDir: "{app}\glknots_scr";
 Source: "XScreenSaverWin\glmatrix_scr\glmatrix.scr"; DestDir: "{app}\glmatrix_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\glplanet_scr\glplanet.scr"; DestDir: "{app}\glplanet_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\glschool_scr\glschool.scr"; DestDir: "{app}\glschool_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\glslideshow_scr\glslideshow.scr"; DestDir: "{app}\glslideshow_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\glsnake_scr\glsnake.scr"; DestDir: "{app}\glsnake_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\gltext_scr\gltext.scr"; DestDir: "{app}\gltext_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\goop_scr\goop.scr"; DestDir: "{app}\goop_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\grav_scr\grav.scr"; DestDir: "{app}\grav_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\greynetic_scr\greynetic.scr"; DestDir: "{app}\greynetic_scr"; Flags: ignoreversion
@@ -124,11 +134,13 @@ Source: "XScreenSaverWin\interference_scr\interference.scr"; DestDir: "{app}\int
 Source: "XScreenSaverWin\intermomentary_scr\intermomentary.scr"; DestDir: "{app}\intermomentary_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\jigglypuff_scr\jigglypuff.scr"; DestDir: "{app}\jigglypuff_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\julia_scr\julia.scr"; DestDir: "{app}\julia_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\kaleidescope_scr\kaleidescope.scr"; DestDir: "{app}\kaleidescope_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\kaleidocycle_scr\kaleidocycle.scr"; DestDir: "{app}\kaleidocycle_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\klein_scr\klein.scr"; DestDir: "{app}\klein_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\kumppa_scr\kumppa.scr"; DestDir: "{app}\kumppa_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\lament_scr\lament.scr"; DestDir: "{app}\lament_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\laser_scr\laser.scr"; DestDir: "{app}\laser_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\lavalite_scr\lavalite.scr"; DestDir: "{app}\lavalite_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\lcdscrub_scr\lcdscrub.scr"; DestDir: "{app}\lcdscrub_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\lightning_scr\lightning.scr"; DestDir: "{app}\lightning_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\lisa_scr\lisa.scr"; DestDir: "{app}\lisa_scr"; Flags: ignoreversion
@@ -140,20 +152,25 @@ Source: "XScreenSaverWin\maze_scr\maze.scr"; DestDir: "{app}\maze_scr"; Flags: i
 Source: "XScreenSaverWin\memscroller_scr\memscroller.scr"; DestDir: "{app}\memscroller_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\menger_scr\menger.scr"; DestDir: "{app}\menger_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\metaballs_scr\metaballs.scr"; DestDir: "{app}\metaballs_scr"; Flags: ignoreversion
-Source: "XScreenSaverWin\mirrorblob_scr\mirrorblob.scr"; DestDir: "{app}\mirrorblob_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\moebiusgears_scr\moebiusgears.scr"; DestDir: "{app}\moebiusgears_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\moebius_scr\moebius.scr"; DestDir: "{app}\moebius_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\moire_scr\moire.scr"; DestDir: "{app}\moire_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\molecule_scr\molecule.scr"; DestDir: "{app}\molecule_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\morph3d_scr\morph3d.scr"; DestDir: "{app}\morph3d_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\mountain_scr\mountain.scr"; DestDir: "{app}\mountain_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\munch_scr\munch.scr"; DestDir: "{app}\munch_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\nerverot_scr\nerverot.scr"; DestDir: "{app}\nerverot_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\noof_scr\noof.scr"; DestDir: "{app}\noof_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\noseguy_scr\noseguy.scr"; DestDir: "{app}\noseguy_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\pacman_scr\pacman.scr"; DestDir: "{app}\pacman_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\pedal_scr\pedal.scr"; DestDir: "{app}\pedal_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\penetrate_scr\penetrate.scr"; DestDir: "{app}\penetrate_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\penrose_scr\penrose.scr"; DestDir: "{app}\penrose_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\petri_scr\petri.scr"; DestDir: "{app}\petri_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\photopile_scr\photopile.scr"; DestDir: "{app}\photopile_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\pinion_scr\pinion.scr"; DestDir: "{app}\pinion_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\pipes_scr\pipes.scr"; DestDir: "{app}\pipes_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\polyhedra_scr\polyhedra.scr"; DestDir: "{app}\polyhedra_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\polytopes_scr\polytopes.scr"; DestDir: "{app}\polytopes_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\popsquares_scr\popsquares.scr"; DestDir: "{app}\popsquares_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\providence_scr\providence.scr"; DestDir: "{app}\providence_scr"; Flags: ignoreversion
@@ -170,15 +187,23 @@ Source: "XScreenSaverWin\shadebobs_scr\shadebobs.scr"; DestDir: "{app}\shadebobs
 Source: "XScreenSaverWin\sierpinski3d_scr\sierpinski3d.scr"; DestDir: "{app}\sierpinski3d_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\sierpinski_scr\sierpinski.scr"; DestDir: "{app}\sierpinski_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\skytentacles_scr\skytentacles.scr"; DestDir: "{app}\skytentacles_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\slip_scr\slip.scr"; DestDir: "{app}\slip_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\sonar_scr\sonar.scr"; DestDir: "{app}\sonar_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\speedmine_scr\speedmine.scr"; DestDir: "{app}\speedmine_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\spheremonics_scr\spheremonics.scr"; DestDir: "{app}\spheremonics_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\sphere_scr\sphere.scr"; DestDir: "{app}\sphere_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\spiral_scr\spiral.scr"; DestDir: "{app}\spiral_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\sproingies_scr\sproingies.scr"; DestDir: "{app}\sproingies_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\squiral_scr\squiral.scr"; DestDir: "{app}\squiral_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\stairs_scr\stairs.scr"; DestDir: "{app}\stairs_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\starfish_scr\starfish.scr"; DestDir: "{app}\starfish_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\starwars_scr\starwars.scr"; DestDir: "{app}\starwars_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\starwars_scr\starwars.txt"; DestDir: "{app}\starwars_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\stonerview_scr\stonerview.scr"; DestDir: "{app}\stonerview_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\strange_scr\strange.scr"; DestDir: "{app}\strange_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\superquadrics_scr\superquadrics.scr"; DestDir: "{app}\superquadrics_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\surfaces_scr\surfaces.scr"; DestDir: "{app}\surfaces_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\tangram_scr\tangram.scr"; DestDir: "{app}\tangram_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\thornbird_scr\thornbird.scr"; DestDir: "{app}\thornbird_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\topblock_scr\topblock.scr"; DestDir: "{app}\topblock_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\triangle_scr\triangle.scr"; DestDir: "{app}\triangle_scr"; Flags: ignoreversion
@@ -197,7 +222,7 @@ Source: "XScreenSaverWin\xjack_scr\xjack.scr"; DestDir: "{app}\xjack_scr"; Flags
 Source: "XScreenSaverWin\xlyap_scr\xlyap.scr"; DestDir: "{app}\xlyap_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\xrayswarm_scr\xrayswarm.scr"; DestDir: "{app}\xrayswarm_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\xspirograph_scr\xspirograph.scr"; DestDir: "{app}\xspirograph_scr"; Flags: ignoreversion
-Source: "XScreenSaverWin\zoom_scr\zoom.scr"; DestDir: "{app}"; Flags: ignoreversion
+Source: "XScreenSaverWin\zoom_scr\zoom.scr"; DestDir: "{app}\zoom_scr"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -205,6 +230,229 @@ Name: "{group}\XScreenSaver for Windows"; Filename: "{app}\xscreensaver.exe"
 Name: "{group}\{cm:ProgramOnTheWeb,XScreenSaver for Windows}"; Filename: "http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html"
 Name: "{group}\{cm:UninstallProgram,XScreenSaver for Windows}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\XScreenSaver for Windows"; Filename: "{app}\xscreensaver.exe"; Tasks: desktopicon
+
+[Registry]
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ"; Flags: uninsdeletekeyifempty
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Abstractile"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Anemone"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Anemotaxis"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Ant"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\AntInspect"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\AntMaze"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\AntSpotlight"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Apollonian"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Apple2"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Atlantis"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Attraction"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Atunnel"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Barcode"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Blaster"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\BlinkBox"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\BlitSpin"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\BlockTube"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Boing"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Bouboule"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\BouncingCow"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\BoxFit"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Boxed"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Braid"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Bubble3D"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Bubbles"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Bumps"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\CCurve"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\CWaves"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Cage"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Carousel"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Celtic"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Circuit"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\CloudLife"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\CompanionCube"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Compass"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Coral"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Crackberg"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Critical"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Crystal"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Cube21"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\CubeStorm"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Cubenetic"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\CubicGrid"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Cynosure"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\DNALogo"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\DangerBall"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\DecayScreen"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Deco"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Deluxe"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Demon"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Discrete"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Distort"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Drift"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Endgame"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Engine"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Epicycle"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Eruption"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Euler2D"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Extrusion"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\FadePlot"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Fiberlamp"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Fireworkx"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Flag"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Flame"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\FlipFlop"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\FlipScreen3D"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\FlipText"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Flow"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\FluidBalls"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Flurry"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\FlyingToasters"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\FontGlide"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Forest"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\FuzzyFlakes"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GFlux"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLBlur"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLCells"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLForestFire"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLHanoi"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLKnots"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLMatrix"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLPlanet"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLSchool"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLSlideshow"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLSnake"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\GLText"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Galaxy"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Gears"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Gleidescope"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Goop"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Grav"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Greynetic"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Halftone"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Halo"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Helix"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Hexadrop"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Hilbert"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Hopalong"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\HyperBall"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\HyperCube"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Hypertorus"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Hypnowheel"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\IFS"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\IMSMap"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Interaggregate"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Interference"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Intermomentary"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\JigglyPuff"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Jigsaw"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Juggle"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Juggler3D"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Julia"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Kaleidescope"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Kaleidocycle"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Klein"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Kumppa"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\LCDscrub"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\LMorph"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Lament"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Laser"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Lavalite"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Lightning"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Lisa"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Lissie"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Lockward"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Loop"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Maze"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\MemScroller"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Menger"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\MetaBalls"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\MirrorBlob"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Moebius"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\MoebiusGears"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Moire"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Moire2"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Molecule"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Morph3D"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Mountain"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Munch"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\NerveRot"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Noof"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\NoseGuy"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Pacman"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Pedal"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Penetrate"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Penrose"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Petri"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Phosphor"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Photopile"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Piecewise"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Pinion"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Pipes"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Polyhedra"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Polyominoes"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Polytopes"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Pong"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\PopSquares"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Providence"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Pulsar"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Pyro"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Qix"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\QuasiCrystal"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Queens"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\RDbomb"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Ripples"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Rocks"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Rorschach"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\RotZoomer"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Rotor"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Rubik"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\RubikBlocks"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\SBalls"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\ShadeBobs"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Sierpinski"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Sierpinski3D"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\SkyTentacles"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Slip"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Sonar"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\SpeedMine"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Sphere"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Spheremonics"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Spiral"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Spotlight"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Sproingies"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Squiral"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Stairs"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\StarWars"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Starfish"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\StonerView"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Strange"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Substrate"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Superquadrics"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Surfaces"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Swirl"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\T3D"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Tangram"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Thornbird"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\TimeTunnel"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\TopBlock"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Triangle"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\TronBit"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Truchet"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Twang"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\UnknownPleasures"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Vermiculate"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Vines"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Voronoi"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Wander"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\WhirlWindWarp"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Whirlygig"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Worm"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Wormhole"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\XAnalogTV"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\XFlame"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\XJack"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\XLyap"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\XMatrix"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\XRaySwarm"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\XSpirograph"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Zoom"; Flags: uninsdeletekey
 
 [Run]
 Filename: "{app}\xscreensaver.exe"; Description: "{cm:LaunchProgram,XScreenSaver for Windows}"; Flags: nowait postinstall skipifsilent

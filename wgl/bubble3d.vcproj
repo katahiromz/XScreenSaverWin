@@ -195,6 +195,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\colors.c"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.c"
+				>
+			</File>
+			<File
 				RelativePath=".\wgl.c"
 				>
 			</File>
@@ -226,6 +234,14 @@
 			>
 			<File
 				RelativePath=".\bubble3d.h"
+				>
+			</File>
+			<File
+				RelativePath="..\colors.h"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.h"
 				>
 			</File>
 			<File

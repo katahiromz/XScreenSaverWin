@@ -84,6 +84,10 @@ static float spin = 0.1;
 static char* flipflopmode_str = "tiles";
 static int textured = False;
 
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
 static argtype vars[] = {
     { &flipflopmode_str, "mode",        "Mode",     DEF_MODE,  t_String},
     { &board_avg_size,   "size",        "Integer",  DEF_BOARD_SIZE,     t_Int},
@@ -93,6 +97,9 @@ static argtype vars[] = {
     { &freesquares,      "freesquares", "Integer",  DEF_NUMSQUARES,     t_Int},
     { &spin,             "spin",        "Float",    DEF_SPIN,           t_Float},
     { &textured,         "textured",    "Bool",     DEF_TEXTURED,       t_Bool},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 ENTRYPOINT ModeSpecOpt flipflop_opts = {countof(opts), opts, countof(vars), vars, NULL};

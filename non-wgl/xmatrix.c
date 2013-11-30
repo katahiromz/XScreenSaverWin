@@ -560,7 +560,7 @@ init_drain (m_state *state)
   int i;
 
 #if 1
-  state->cursor_on = off;
+  state->cursor_on = False;
 #else
   set_cursor (state, False);
 #endif

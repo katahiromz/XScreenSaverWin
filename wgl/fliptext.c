@@ -133,8 +133,8 @@ static GLfloat speed = 1.0;
 
 char *font = "System 30";
 char *foreground = "#00CCFF";
-char *textMode = "literal";
-char *textLiteral = "XScreenSaver for Windows!";
+char *textMode = "";
+char *textLiteral = "";
 char *textFile = "";
 int relaunchDelay = 4;
 

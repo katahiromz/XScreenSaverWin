@@ -88,12 +88,12 @@ static unsigned int a[VectorSize] = {
  015664104320, 016401041535, 016215305520, 033115351014, 017411670323  /* 55 */
 };
 
-static int i1, i2;
+static unsigned int i1 = 0, i2 = 0;
 
 unsigned int
 ya_random (void)
 {
-  register int ret = a[i1] + a[i2];
+  int ret = a[i1] + a[i2];
   a[i1] = ret;
   if (++i1 >= VectorSize) i1 = 0;
   if (++i2 >= VectorSize) i2 = 0;

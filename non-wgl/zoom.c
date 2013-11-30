@@ -40,6 +40,10 @@ int pixspacey = 2;
 int lensoffsetx = 5;
 int lensoffsety = 5;
 
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
 static argtype vars[] = 
 {
     {&dontClearRoot, "dontClearRoot", NULL, "True", t_Bool},
@@ -54,8 +58,10 @@ static argtype vars[] =
     {&pixspacey, "pixspacey", NULL, "2", t_Int},
     {&lensoffsetx, "lensoffsetx", NULL, "5", t_Int},
     {&lensoffsety, "lensoffsety", NULL, "5", t_Int},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
-
 
 struct state {
   Display *dpy;

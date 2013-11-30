@@ -184,20 +184,20 @@ static const char sccsid[] = "@(#)juggle.c	5.10 2003/09/02 xlockmore";
 #define XtNumber(arr)   ((unsigned int) (sizeof(arr) / sizeof(arr[0])))
 #endif
 
-static char *pattern;
-static int tail;
+static char *pattern = "random";
+static int tail = 1;
 #ifdef UNI
-static Bool uni;
+static Bool uni = False;
 #endif
-static Bool real;
-static Bool describe;
-static Bool balls;
-static Bool clubs;
-static Bool torches;
-static Bool knives;
-static Bool rings;
-static Bool bballs;
-static char *only;
+static Bool real = True;
+static Bool describe = True;
+static Bool balls = True;
+static Bool clubs = True;
+static Bool torches = True;
+static Bool knives = True;
+static Bool rings = True;
+static Bool bballs = True;
+static char *only = " ";
 
 char *font_ = "Arial 90";
 

@@ -56,8 +56,6 @@ typedef DWORD CARD32;
 typedef BOOL Bool;
 #define False FALSE
 #define True TRUE
-#define on TRUE
-#define off FALSE
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -72,7 +70,7 @@ typedef DrawableData* Drawable;
 typedef DrawableData* Pixmap;
 typedef DrawableData* Window;
 
-enum { TrueColor, DirectColor, PseudoColor, StaticColor };
+enum { TrueColor, DirectColor, PseudoColor, StaticColor, GrayScale };
 
 typedef struct
 {

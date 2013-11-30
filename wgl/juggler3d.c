@@ -132,7 +132,7 @@
 #define CYCLES 1000
 #define NCOLORS 32
 
-char *titleFont = "System 30";
+char *titleFont = "Arial 30";
 
 # define DEFAULTS	"*delay:	10000	\n" \
 			"*count:	200	\n" \
@@ -172,20 +172,20 @@ char *titleFont = "System 30";
 #define DEF_RINGS "True" /* Use Rings */
 #define DEF_BBALLS "True" /* Use Bowling Balls */
 
-static char *pattern;
-static int tail;
+static char *pattern = "random";
+static int tail = 1;
 #ifdef UNI
-static Bool uni;
+static Bool uni = False;
 #endif
-static Bool real;
-static Bool describe;
-static Bool balls;
-static Bool clubs;
-static Bool torches;
-static Bool knives;
-static Bool rings;
-static Bool bballs;
-static char *only;
+static Bool real = True;
+static Bool describe = True;
+static Bool balls = True;
+static Bool clubs = True;
+static Bool torches = True;
+static Bool knives = True;
+static Bool rings = True;
+static Bool bballs = True;
+static char *only = " ";
 
 static XrmOptionDescRec opts[] = {
   {"-pattern",  ".juggle.pattern",  XrmoptionSepArg, NULL  },
@@ -228,7 +228,7 @@ static argtype vars[] = {
   { &rings,    "rings",    "Rings",    DEF_RINGS,    t_Bool   },
   { &bballs,   "bballs",   "BBalls",   DEF_BBALLS,   t_Bool   },
   { &only,     "only",     "BBalls",   " ",          t_String },
-  {&titleFont, "titleFont", NULL, "System 30", t_String},
+	{&titleFont, "titleFont", NULL, "Arial 30", t_String},
 };
 
 static OptionStruct desc[] =
@@ -2682,7 +2682,7 @@ init_juggle (ModeInfo * mi)
 # ifdef HAVE_GLBITMAP
   load_font (mi->dpy, titleFont,  &sp->mode_font, &sp->font_dlist);
 # else /* !HAVE_GLBITMAP */
-  sp->font_data = load_texture_font (mi->dpy, "titleFont");
+  sp->font_data = load_texture_font (mi->dpy, titleFont);
 # endif /* !HAVE_GLBITMAP */
 
   reshape_juggle (mi, MI_WIDTH(mi), MI_HEIGHT(mi));

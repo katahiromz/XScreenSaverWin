@@ -63,6 +63,10 @@ int duration = 120;
 int soften = 1;
 Bool invert = False;
 
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
 static argtype vars[] = 
 {
     {&background, "background", NULL, "black", t_String},
@@ -73,6 +77,9 @@ static argtype vars[] =
     {&duration, "duration", NULL, "120", t_Int},
     {&soften, "soften", NULL, "1", t_Int},
     {&invert, "invert", NULL, "False", t_Bool},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 static const char *bumps_defaults [] = {

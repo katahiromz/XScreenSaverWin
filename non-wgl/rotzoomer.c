@@ -38,6 +38,10 @@ int numboxes = 2;
 int delay = 10000;
 int duration = 120;
 
+char *imageDirectory = "";
+Bool chooseRandomImages = True;
+Bool grabDesktopImages = False;
+
 static argtype vars[] = 
 {
     {&background, "background", NULL, "black", t_String},
@@ -47,6 +51,9 @@ static argtype vars[] =
     {&numboxes, "numboxes", NULL, "2", t_Int},
     {&delay, "delay", NULL, "10000", t_Int},
     {&duration, "duration", NULL, "120", t_Int},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "True", t_Bool},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "False", t_Bool},
 };
 
 struct zoom_area {

@@ -15,14 +15,10 @@
 
 #define ENTRYPOINT static
 
-#ifndef NOMSGBOXOUTPUT
+#ifndef NDEBUG
     int __cdecl win32_fprintf(FILE *fp, const char *fmt, ...);
-    void __cdecl win32_abort(void);
-    int __cdecl win32_exit(int n);
 
     #define fprintf win32_fprintf
-    #define abort win32_abort
-    #define exit win32_exit
 #endif
 
 //////////////////////////////////////////////////////////////////////////////

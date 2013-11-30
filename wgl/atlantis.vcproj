@@ -183,7 +183,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\colors.c"
+				>
+			</File>
+			<File
 				RelativePath=".\dolphin.c"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.c"
 				>
 			</File>
 			<File
@@ -238,6 +246,14 @@
 			>
 			<File
 				RelativePath=".\atlantis.h"
+				>
+			</File>
+			<File
+				RelativePath="..\colors.h"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.h"
 				>
 			</File>
 			<File

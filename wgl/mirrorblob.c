@@ -116,6 +116,10 @@ static float zoom = 1.0;
 static Bool culling;
 static Bool load_textures;
 
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
 static XrmOptionDescRec opts[] = {
     {"-wire",             ".blob.wire",             XrmoptionNoArg, "true" },
     {"+wire",             ".blob.wire",             XrmoptionNoArg, "false" },
@@ -158,6 +162,9 @@ static argtype vars[] = {
     {&fade_time,    "fadeTime",     "FadeTime",     DEF_FADE_TIME,    t_Float},
     {&hold_time,    "holdTime",     "HoldTime",     DEF_HOLD_TIME,    t_Float},
     {&zoom,         "zoom",         "Zoom",         DEF_ZOOM,         t_Float},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 static OptionStruct desc[] =

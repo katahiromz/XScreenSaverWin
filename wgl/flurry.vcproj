@@ -179,6 +179,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\colors.c"
+				>
+			</File>
+			<File
 				RelativePath=".\flurry-smoke.c"
 				>
 			</File>
@@ -196,6 +200,10 @@
 			</File>
 			<File
 				RelativePath=".\flurry.c"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.c"
 				>
 			</File>
 			<File
@@ -229,7 +237,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\colors.h"
+				>
+			</File>
+			<File
 				RelativePath=".\flurry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.h"
 				>
 			</File>
 			<File

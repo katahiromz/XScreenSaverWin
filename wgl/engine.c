@@ -58,10 +58,10 @@ char *titleFont = "System 30";
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-static char *which_engine;
-static int move;
-static int spin;
-static Bool do_titles;
+static char *which_engine = "";
+static int move = True;
+static int spin = True;
+static Bool do_titles = False;
 
 static XrmOptionDescRec opts[] = {
   {"-engine",  ".engine.engine", XrmoptionSepArg, DEF_ENGINE },

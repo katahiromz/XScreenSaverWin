@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\colors.c"
+				>
+			</File>
+			<File
 				RelativePath=".\cow_face.c"
 				>
 			</File>
@@ -208,6 +212,10 @@
 			</File>
 			<File
 				RelativePath=".\gllist.c"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.c"
 				>
 			</File>
 			<File
@@ -253,7 +261,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\colors.h"
+				>
+			</File>
+			<File
 				RelativePath=".\gllist.h"
+				>
+			</File>
+			<File
+				RelativePath="..\hsv.h"
 				>
 			</File>
 			<File

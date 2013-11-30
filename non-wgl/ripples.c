@@ -66,6 +66,10 @@ int fluidity = 6;
 int light = 4;
 Bool grayscale_ = False;
 
+char *imageDirectory = "";
+Bool chooseRandomImages = True;
+Bool grabDesktopImages = False;
+
 static argtype vars[] = 
 {
     {&background, "background", NULL, "black", t_String},
@@ -82,8 +86,10 @@ static argtype vars[] =
     {&fluidity, "fluidity", NULL, "6", t_Int},
     {&light, "light", NULL, "4", t_Int},
     {&grayscale_, "grayscale", NULL, "False", t_Bool},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "True", t_String},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "False", t_String},
 };
-
 
 #define TABLE 256
 

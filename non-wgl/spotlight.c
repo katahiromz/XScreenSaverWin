@@ -31,6 +31,10 @@ int delay = 10000;
 int duration = 120;
 int radius = 125;
 
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
 static argtype vars[] = 
 {
     {&background, "background", NULL, "black", t_String},
@@ -39,8 +43,10 @@ static argtype vars[] =
     {&delay, "delay", NULL, "10000", t_Int},
     {&duration, "duration", NULL, "120", t_Int},
     {&radius, "radius", NULL, "125", t_Int},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
-
 
 #define MINX 0.0
 #define MINY 0.0

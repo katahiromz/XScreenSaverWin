@@ -36,6 +36,7 @@ Bool grab = False;
 Bool peek = False;
 Bool grabDesktopImages = False;
 Bool chooseRandomImages = True;
+char *imageDirectory = "";
 
 static argtype vars[] = 
 {
@@ -52,6 +53,7 @@ static argtype vars[] =
     {&peek, "peek", NULL, "False", t_Bool},
     {&grabDesktopImages, "grabDesktopImages", NULL, "False", t_Bool},
     {&chooseRandomImages, "chooseRandomImages", NULL, "True", t_Bool},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
 };
 
 typedef struct {

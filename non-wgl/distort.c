@@ -60,6 +60,10 @@ Bool reflect = False;
 Bool blackhole = False;
 char *effect = "none";
 
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
 static argtype vars[] = 
 {
     {&dontClearRoot, "dontClearRoot", NULL, "True", t_Bool},
@@ -75,6 +79,9 @@ static argtype vars[] =
     {&reflect, "reflect", NULL, "False", t_Bool},
     {&blackhole, "blackhole", NULL, "False", t_Bool},
     {&effect, "effect", NULL, "none", t_String},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 struct coo {

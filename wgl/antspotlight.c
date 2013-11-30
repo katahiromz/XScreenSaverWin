@@ -14,7 +14,6 @@
  * Copyright 2003 Blair Tennessy
  */
 
-#define NOARGS
 #define DELAY 20000
 #define DEFAULTS	    "*delay:   20000   \n" \
 			    "*showFPS: False   \n" \
@@ -47,6 +46,16 @@
 #include "tube.h"
 #include "rotator.h"
 #include "gltrackball.h"
+
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
+static argtype vars[] = {
+  {&imageDirectory, "imageDirectory", NULL, "", t_String},
+  {&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+  {&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
+};
 
 ENTRYPOINT ModeSpecOpt antspotlight_opts = {
   0, NULL, 0, NULL, NULL

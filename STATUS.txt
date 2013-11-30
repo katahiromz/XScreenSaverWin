@@ -1,4 +1,4 @@
-There are 172 Goods, 11 OKs and 40 NGs of total 223 screen savers 
+There are 180 Goods, 13 OKs and 32 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -34,7 +34,7 @@ CWaves                  Good
 Cage                    Good        
 Carousel                Good        
 Celtic                  Good        
-Circuit                 NG          
+Circuit                 OK          Label mirrored
 CloudLife               Good        
 CompanionCube           Good        
 Compass                 Good        
@@ -86,9 +86,9 @@ GLKnots                 Good
 GLMatrix                Good        
 GLPlanet                Good        
 GLSchool                Good        
-GLSlideshow             NG          
+GLSlideshow             Good        
 GLSnake                 Good        
-GLText                  NG          
+GLText                  Good        
 Galaxy                  OK          Flickers and slow
 Gears                   Good        
 Gleidescope             OK          Slow
@@ -112,10 +112,10 @@ Interference            Good
 Intermomentary          Good        
 JigglyPuff              Good        
 Jigsaw                  NG          Black out
-Juggle                  NG          
-Juggler3D               Good        
+Juggle                  NG          Action bad
+Juggler3D               NG          Didn't move
 Julia                   Good        
-Kaleidescope            NG          
+Kaleidescope            Good        
 Kaleidocycle            Good        
 Klein                   Good        
 Kumppa                  Good        
@@ -123,7 +123,7 @@ LCDscrub                Good
 LMorph                  Good        
 Lament                  Good        
 Laser                   Good        
-Lavalite                NG          Camera position bad
+Lavalite                Good        
 Lightning               Good        
 Lisa                    Good        
 Lissie                  Good        
@@ -133,12 +133,12 @@ Maze                    Good
 MemScroller             Good        
 Menger                  Good        
 MetaBalls               Good        
-MirrorBlob              OK          Blur and slow
+MirrorBlob              NG          Blur and slow
 Moebius                 Good        
 MoebiusGears            Good        
 Moire                   Good        
-Moire2                  NG          Black out
-Molecule                NG          
+Moire2                  NG          Drawing slow and bad
+Molecule                Good        
 Morph3D                 Good        
 Mountain                Good        
 Munch                   Good        
@@ -150,21 +150,21 @@ Pedal                   Good
 Penetrate               Good        
 Penrose                 Good        
 Petri                   Good        
-Phosphor                NG          
-Photopile               NG          
+Phosphor                NG          Drawing bad
+Photopile               Good        
 Piecewise               NG          Drawing bad
-Pinion                  NG          
+Pinion                  Good        
 Pipes                   Good        
-Polyhedra               NG          
+Polyhedra               Good        
 Polyominoes             NG          Colors bad
 Polytopes               Good        
-Pong                    NG          
+Pong                    NG          Black out
 PopSquares              Good        
 Providence              Good        
 Pulsar                  Good        
 Pyro                    NG          Flickers
 Qix                     NG          Transparency disabled
-QuasiCrystal            NG          
+QuasiCrystal            NG          Black out
 Queens                  Good        
 RDbomb                  OK          Slow
 Ripples                 NG          Black out
@@ -182,11 +182,11 @@ SkyTentacles            Good
 SlideScreen             NG          
 Slip                    Good        
 Sonar                   Good        
-SpeedMine               NG          
+SpeedMine               Good        
 Sphere                  Good        
 Spheremonics            Good        
 Spiral                  Good        
-Spotlight               NG          
+Spotlight               NG          Drawing bad
 Sproingies              Good        
 Squiral                 Good        
 Stairs                  Good        
@@ -201,7 +201,7 @@ Swirl                   NG          Too slow
 T3D                     NG          Drawing bad
 Tangram                 Good        
 Thornbird               Good        
-TimeTunnel              NG          
+TimeTunnel              NG          Drawing bad
 TopBlock                Good        
 Triangle                Good        
 TronBit                 Good        
@@ -216,7 +216,7 @@ WhirlWindWarp           Good
 Whirlygig               Good        
 Worm                    NG          Drawing bad
 Wormhole                Good        
-XAnalogTV               NG          
+XAnalogTV               NG          Drawing bad
 XFlame                  Good        
 XJack                   Good        
 XLyap                   Good        

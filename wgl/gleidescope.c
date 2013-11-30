@@ -114,6 +114,10 @@ static Bool		nozoom = False;			/* no zooming camera */
 static char		*image = "DEFAULT";			/* name of texture to load */
 static int		duration = 30;		/* length of time to display grabbed image */
 
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
 #define MAX_CAM_SPEED			1.0
 #define MAX_ANGLE_VEL			1.0
 #define INITIAL_ANGLE_VEL		0.2
@@ -161,6 +165,9 @@ static argtype vars[] = {
 	{&nozoom,		"nozoom",	"noZoom",	DEF_NOZOOM,	t_Bool},
 	{&image,		"image",	"Image",	DEF_IMAGE,	t_String},
 	{&duration,		"duration",	"Duration",	DEF_DURATION,		t_Int},
+	{&imageDirectory, "imageDirectory", NULL, "", t_String},
+	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 static OptionStruct desc[] = {

@@ -13,14 +13,10 @@
 extern const char *progname;
 extern Bool mono_p;
 
-#ifndef NOMSGBOXOUTPUT
+#ifndef NDEBUG
     int __cdecl win32_fprintf(FILE *fp, const char *fmt, ...);
-    void __cdecl win32_abort(void);
-    int __cdecl win32_exit(int n);
 
     #define fprintf win32_fprintf
-    #define abort win32_abort
-    #define exit win32_exit
 #endif
 
 #define inline  /*empty*/
@@ -79,7 +75,7 @@ extern argtype *hack_arginfo;
 
 #ifdef NOARGS
     #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) \
-        const char *progname = #CLASS; \
+        const char *progname = CLASS; \
         HACK_INIT hack_init = PREFIX ## _init; \
         HACK_DRAW hack_draw = PREFIX ## _draw; \
         HACK_RESHAPE hack_reshape = PREFIX ## _reshape; \
@@ -88,7 +84,7 @@ extern argtype *hack_arginfo;
         argtype *hack_arginfo = NULL;
 #else
     #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) \
-        const char *progname = #CLASS; \
+        const char *progname = CLASS; \
         HACK_INIT hack_init = PREFIX ## _init; \
         HACK_DRAW hack_draw = PREFIX ## _draw; \
         HACK_RESHAPE hack_reshape = PREFIX ## _reshape; \
@@ -133,6 +129,8 @@ Bool has_writable_cells(Screen *s, Visual *v);
 int visual_depth(Screen *screen, Visual *visual);
 Bool use_subwindow_mode_p(Screen *screen, Window window);
 int screen_number(Screen *screen);
+int visual_class(Screen *screen, Visual *visual);
+int visual_cells(Screen *screen, Visual *visual);
 Pixmap xscreensaver_logo(Screen *screen, Visual *visual,
     Drawable drawable, Colormap cmap,
     unsigned long background_color,

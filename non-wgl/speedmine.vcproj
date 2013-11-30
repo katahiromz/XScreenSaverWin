@@ -187,6 +187,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\pixmap.c"
+				>
+			</File>
+			<File
 				RelativePath="..\screenhack.c"
 				>
 			</File>
@@ -196,6 +200,10 @@
 			</File>
 			<File
 				RelativePath="..\xcolor.c"
+				>
+			</File>
+			<File
+				RelativePath="..\ximage.c"
 				>
 			</File>
 			<File

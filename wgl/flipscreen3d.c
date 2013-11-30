@@ -62,8 +62,15 @@ static XrmOptionDescRec opts[] = {
   {"-rotate", ".screenflip.rotate", XrmoptionNoArg, "true" },
 };
 
+char *imageDirectory = "";
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
+
 static argtype vars[] = {
   {&rotate, "rotate", "Rotate", DEF_ROTATE, t_Bool},
+  {&imageDirectory, "imageDirectory", NULL, "", t_String},
+  {&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
+  {&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 ENTRYPOINT ModeSpecOpt screenflip_opts = {countof(opts), opts, countof(vars), vars, NULL};

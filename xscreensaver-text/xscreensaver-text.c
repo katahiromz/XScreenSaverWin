@@ -153,7 +153,7 @@ char *trim(char *s)
     char *p = s;
     char *d = s;
 
-    while (isspace(*s))
+    while (*s == ' ' || *s == '\t' || *s == '\n' || *s == '\r' || *s == '\f' || *s == '\v')
     {
         s++;
     }
@@ -164,7 +164,7 @@ char *trim(char *s)
     }
 
     s--;
-    while (isspace(*s))
+    while (*s == ' ' || *s == '\t' || *s == '\n' || *s == '\r' || *s == '\f' || *s == '\v')
     {
         s--;
         d--;

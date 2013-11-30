@@ -68,7 +68,7 @@
 
 #define DELAY 30000
 
-char *font = "Lucida Console 40";
+char *font = "Arial 80";
 
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*font:       " DEF_FONT   "\n" \
@@ -173,6 +173,7 @@ static argtype vars[] = {
   {&times_p,      "times",       "Times",       DEF_TIMES,        t_Bool},
   {&wobble_p,     "wobble",      "Wobble",      DEF_WOBBLE,       t_Bool},
   {&debug_p,      "debug",       "Debug",       DEF_DEBUG,        t_Bool},
+  {&font, "font", NULL, "Arial 80", t_String},
 };
 
 ENTRYPOINT ModeSpecOpt sonar_opts = {countof(opts), opts, countof(vars), vars, NULL};
