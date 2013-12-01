@@ -593,8 +593,13 @@ static void resize(struct state *st)
 		free(st->mem2);
 		free(st->mem1);
 	}
+#if 1
+	st->xim = XCreateImage(st->dpy, xwa.visual, xwa.depth, RGBAPixmap_, 0, 0,
+	                       st->width, st->height, 8, 0);
+#else
 	st->xim = XCreateImage(st->dpy, xwa.visual, xwa.depth, ZPixmap, 0, 0,
 	                       st->width, st->height, 8, 0);
+#endif
 	if (!st->xim) return;
 
 #ifdef __SSE2___ABANDONED /* causes __ERROR_use_memset_not_bzero_in_xscreensaver__ */

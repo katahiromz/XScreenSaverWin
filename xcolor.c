@@ -1168,7 +1168,7 @@ Status XAllocColorCells(
     unsigned int    npixels)
 {
     unsigned int i;
-	unsigned long pixel;
+    unsigned long pixel;
 
     if (colormaps[cmap].num_items + npixels > 256)
         return False;
@@ -1271,15 +1271,15 @@ int XQueryColor(Display *dpy, Colormap cmap, XColor *def)
     assert(def != NULL);
     if (def != NULL)
     {
-		if (def->pixel < MAX_COLORCELLS && colormaps[cmap].pixel_used[def->pixel])
-		{
-			pixel = def->pixel;
-			def->red = colormaps[cmap].items[pixel].red;
-			def->blue = colormaps[cmap].items[pixel].blue;
-			def->green = colormaps[cmap].items[pixel].green;
-			def->flags = DoRed | DoGreen | DoBlue;
-			return 1;
-		}
+        if (def->pixel < MAX_COLORCELLS && colormaps[cmap].pixel_used[def->pixel])
+        {
+            pixel = def->pixel;
+            def->red = colormaps[cmap].items[pixel].red;
+            def->blue = colormaps[cmap].items[pixel].blue;
+            def->green = colormaps[cmap].items[pixel].green;
+            def->flags = DoRed | DoGreen | DoBlue;
+            return 1;
+        }
     }
     return 0;
 }

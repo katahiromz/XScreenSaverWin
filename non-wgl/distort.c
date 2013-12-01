@@ -868,7 +868,7 @@ distort_reshape (Display *dpy, Window window, void *closure,
   /* XClearWindow (dpy, window); */
   /* Why doesn't this work? */
   if (st->orig_map)  /* created in distort_finish_loading, might be early */
-    XPutImage (st->dpy, st->window, st->gc, st->orig_map,
+    XPutImage(st->dpy, st->window, st->gc, st->orig_map,
                0, 0, st->orig_map->width, st->orig_map->height, 0, 0);
 }
 

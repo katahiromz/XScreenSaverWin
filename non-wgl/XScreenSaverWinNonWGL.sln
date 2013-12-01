@@ -261,6 +261,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kaleidescope", "kaleidescop
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pong", "pong.vcproj", "{BACE2ECB-323A-4BBF-82BD-E782F6FFDA83}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "slidescreen", "slidescreen.vcproj", "{275E1C37-CE46-49AA-BC05-51BEBF4881C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -787,6 +789,10 @@ Global
 		{BACE2ECB-323A-4BBF-82BD-E782F6FFDA83}.Debug|Win32.Build.0 = Debug|Win32
 		{BACE2ECB-323A-4BBF-82BD-E782F6FFDA83}.Release|Win32.ActiveCfg = Release|Win32
 		{BACE2ECB-323A-4BBF-82BD-E782F6FFDA83}.Release|Win32.Build.0 = Release|Win32
+		{275E1C37-CE46-49AA-BC05-51BEBF4881C6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{275E1C37-CE46-49AA-BC05-51BEBF4881C6}.Debug|Win32.Build.0 = Debug|Win32
+		{275E1C37-CE46-49AA-BC05-51BEBF4881C6}.Release|Win32.ActiveCfg = Release|Win32
+		{275E1C37-CE46-49AA-BC05-51BEBF4881C6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

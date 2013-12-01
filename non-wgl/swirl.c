@@ -1143,7 +1143,7 @@ draw_point(ModeInfo * mi, SWIRL_P swirl)
 #endif /* !HAVE_XSHM_EXTENSION */
 	  /* PURIFY 4.0.1 on SunOS4 and on Solaris 2 reports a 256 byte memory
 		 leak on the next line. */
-	  XPutImage(MI_DISPLAY(mi), MI_WINDOW(mi), MI_GC(mi), swirl->ximage,
+	  XPutImage_(MI_DISPLAY(mi), MI_WINDOW(mi), MI_GC(mi), swirl->ximage,
 				x, y, x, y, r, r);
 }
 

@@ -852,13 +852,15 @@ draw_pacman_sprite (ModeInfo * mi)
 
     XSetForeground (display, pp->stippledGC, MI_BLACK_PIXEL (mi));
 
-    XSetClipMask (display, pp->stippledGC, old_mask);
+    //XSetClipMask (display, pp->stippledGC, old_mask);
+    XSetClipMask (display, pp->stippledGC, None);
                   
     XSetClipOrigin (display, pp->stippledGC, pp->pacman.oldcf,
                     pp->pacman.oldrf);
     XFillRectangle (display, window, pp->stippledGC, pp->pacman.oldcf,
                     pp->pacman.oldrf, pp->spritexs, pp->spriteys);
-    XSetClipMask (display, pp->stippledGC, new_mask);
+    //XSetClipMask (display, pp->stippledGC, new_mask);
+    XSetClipMask (display, pp->stippledGC, None);
     XSetClipOrigin (display, pp->stippledGC, pp->pacman.cf, pp->pacman.rf);
     XCopyArea (display, pacman, window,
                pp->stippledGC, 0, 0, pp->spritexs, pp->spriteys,
@@ -945,7 +947,8 @@ draw_ghost_sprite (ModeInfo * mi, const unsigned ghost)
 
     XSetForeground (display, pp->stippledGC, MI_BLACK_PIXEL (mi));
 
-    XSetClipMask (display, pp->stippledGC, pp->ghostMask);
+    //XSetClipMask (display, pp->stippledGC, pp->ghostMask);
+    XSetClipMask (display, pp->stippledGC, None);
     XSetClipOrigin (display, pp->stippledGC,
                     pp->ghosts[ghost].oldcf, pp->ghosts[ghost].oldrf);
     XFillRectangle (display,

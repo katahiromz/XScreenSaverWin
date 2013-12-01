@@ -1221,12 +1221,14 @@ changes made to either should be propagated onwards! */
   gcv.foreground = st->default_fg_pixel;
   gcv.function = GXcopy;
   bl->draw_gc = XCreateGC (st->dpy, st->window, GCForeground, &gcv);
-  XSetClipMask(st->dpy, bl->draw_gc, bl->shape_mask);
+  //XSetClipMask(st->dpy, bl->draw_gc, bl->shape_mask);
+  XSetClipMask(st->dpy, bl->draw_gc, None);
   
   gcv.foreground = st->default_bg_pixel;
   gcv.function = GXcopy;
   bl->erase_gc = XCreateGC (st->dpy, st->window, GCForeground, &gcv);
-  XSetClipMask(st->dpy, bl->erase_gc, bl->shape_mask);
+  //XSetClipMask(st->dpy, bl->erase_gc, bl->shape_mask);
+  XSetClipMask(st->dpy, bl->erase_gc, None);
 }
 
 static void 

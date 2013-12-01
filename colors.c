@@ -13,13 +13,16 @@
    to hack the screen with.
  */
 
-#include "xlockmore.h"
+#include "xws2win.h"
 
 //#include "utils.h"
 #include "hsv.h"
 #include "yarandom.h"
 //#include "visual.h"
 #include "colors.h"
+
+extern char *progname;
+Bool has_writable_cells(Screen *s, Visual *v);
 
 void
 free_colors (Screen *screen, Colormap cmap, XColor *colors, int ncolors)

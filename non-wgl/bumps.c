@@ -670,7 +670,7 @@ static void Execute( SBumps *pBumps )
 	else
 #endif /* HAVE_XSHM_EXTENSION */
 		XPutImage( pBumps->dpy, pBumps->Win, pBumps->GraphicsContext, pBumps->pXImage, iLightX, iLightY, nLightXPos, nLightYPos,
-				   nX, nY );
+				   nX, nY);
 }
 
 

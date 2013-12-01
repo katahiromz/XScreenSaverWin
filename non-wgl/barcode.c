@@ -1867,7 +1867,7 @@ static void renderFrame (struct state *st)
 	st->theImage->data = barcode->bitmap->buf;
 
         XSetForeground (st->dpy, st->theGC, barcode->pixel);
-	XPutImage (st->dpy, st->window, st->theGC, st->theImage, 
+	XPutImage(st->dpy, st->window, st->theGC, st->theImage, 
 		   0, 0, barcode->x, barcode->y, 
 		   BARCODE_WIDTH * barcode->mag,
 		   BARCODE_HEIGHT * barcode->mag);

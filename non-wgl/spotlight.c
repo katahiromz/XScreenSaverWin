@@ -189,7 +189,8 @@ spotlight_init (Display *dpy, Window window)
   clip_gc = XCreateGC(st->dpy, clip_pm, gcflags, &gcv);
   XFillRectangle(st->dpy, clip_pm, clip_gc, 0, 0, st->radius*4, st->radius*4);
 
-  XSetForeground(st->dpy, clip_gc, 1L);
+  //XSetForeground(st->dpy, clip_gc, 1L);
+  XSetForeground(st->dpy, clip_gc, 255);
   XFillArc(st->dpy, clip_pm, clip_gc, st->radius , st->radius,
 	   st->radius*2, st->radius*2, 0, 360*64);
 

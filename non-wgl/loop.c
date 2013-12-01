@@ -1507,6 +1507,7 @@ init_loop (ModeInfo * mi)
 	lp->height = MI_HEIGHT(mi);
 
 	if (!local_neighbors) {
+retry:	//
 		for (i = 0; i < NEIGHBORKINDS; i++) {
 			if (neighbors == plots[i]) {
 				local_neighbors = neighbors;
@@ -1521,8 +1522,9 @@ init_loop (ModeInfo * mi)
 				break;
 			}
 		}
+		if (local_neighbors == 4)	//
+			goto retry;	//
 	}
-
 
   if (local_neighbors == 6) {
     int         nccols, ncrows;

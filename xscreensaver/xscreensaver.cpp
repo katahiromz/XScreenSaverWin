@@ -14,7 +14,7 @@ LPTSTR GetScreenSaverPath(HWND hwnd)
     static TCHAR szPath[MAX_PATH * 2];
     GetModuleFileName(NULL, szPath, MAX_PATH);
     LPTSTR pch = _tcsrchr(szPath, _T('\\'));
-	*pch = _T('\0');
+    *pch = _T('\0');
 
     TCHAR szName1[MAX_PATH], szName2[MAX_PATH];
     INT nIndex = (INT)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
@@ -34,6 +34,39 @@ LPTSTR GetScreenSaverPath(HWND hwnd)
         return NULL;
 
     return szPath;
+}
+
+VOID CenterDialog(HWND hwnd)
+{
+    POINT pt;
+    HWND hwndOwner;
+    RECT rc, rcOwner;
+    BOOL bChild = !!(GetWindowLong(hwnd, GWL_STYLE) & WS_CHILD);
+
+    if (bChild)
+        hwndOwner = GetParent(hwnd);
+    else
+        hwndOwner = GetWindow(hwnd, GW_OWNER);
+
+    if (hwndOwner != NULL)
+        GetWindowRect(hwndOwner, &rcOwner);
+    else
+        SystemParametersInfo(SPI_GETWORKAREA, 0, &rcOwner, 0);
+
+    GetWindowRect(hwnd, &rc);
+
+    pt.x = rcOwner.left +
+        ((rcOwner.right - rcOwner.left) - (rc.right - rc.left)) / 2;
+    pt.y = rcOwner.top +
+        ((rcOwner.bottom - rcOwner.top) - (rc.bottom - rc.top)) / 2;
+
+    if (bChild && hwndOwner != NULL)
+        ScreenToClient(hwndOwner, &pt);
+
+    SetWindowPos(hwnd, NULL, pt.x, pt.y, 0, 0,
+        SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+
+    SendMessage(hwnd, DM_REPOSITION, 0, 0);
 }
 
 BOOL Execute(HWND hwnd, LPCTSTR program, LPCTSTR params)
@@ -138,12 +171,17 @@ VOID OnInitDialog(HWND hDlg)
     if (nCount == 0)
     {
         EnableWindow(hCombo, FALSE);
+        EnableWindow(GetDlgItem(hDlg, ID_INSTALL), FALSE);
+        EnableWindow(GetDlgItem(hDlg, ID_CONFIGURE), FALSE);
+        EnableWindow(GetDlgItem(hDlg, ID_TEST), FALSE);
     }
     else
     {
         SendMessage(hCombo, CB_SETCURSEL, 0, 0);
         OnTestOnWindow(hDlg);
     }
+
+    CenterDialog(hDlg);
 }
 
 INT_PTR CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)

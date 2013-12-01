@@ -231,20 +231,23 @@ typedef struct
 //////////////////////////////////////////////////////////////////////////////
 // GC
 
-#define GCForeground (1 << 0)
-#define GCBackground (1 << 1)
-#define GCFillStyle  (1 << 2)
-#define GCFunction   (1 << 3)
-#define GCStipple    (1 << 4)
-#define GCLineWidth  (1 << 5)
-#define GCCapStyle   (1 << 6)
-#define GCJoinStyle  (1 << 7)
-#define GCLineStyle  (1 << 8)
-#define GCFillRule   (1 << 9)
+#define GCForeground        (1 << 0)
+#define GCBackground        (1 << 1)
+#define GCFillStyle         (1 << 2)
+#define GCFunction          (1 << 3)
+#define GCStipple           (1 << 4)
+#define GCLineWidth         (1 << 5)
+#define GCCapStyle          (1 << 6)
+#define GCJoinStyle         (1 << 7)
+#define GCLineStyle         (1 << 8)
+#define GCFillRule          (1 << 9)
 #define GCGraphicsExposures (1 << 10)
-#define GCSubwindowMode (1 << 11)
-#define GCFont       (1 << 12)
-#define GCPlaneMask  (1 << 13)
+#define GCSubwindowMode     (1 << 11)
+#define GCFont              (1 << 12)
+#define GCPlaneMask         (1 << 13)
+#define GCClipXOrigin       (1 << 14)
+#define GCClipYOrigin       (1 << 15)
+#define GCClipMask          (1 << 16)
 
 enum    // line_style
 {
@@ -302,6 +305,9 @@ typedef struct
     unsigned long plane_mask;
     HBITMAP hbmOld;
     Font font;
+    int clip_x_origin;
+    int clip_y_origin;
+    HRGN clip_mask_region;
 } XGCValues;
 
 typedef XGCValues *GC;
@@ -553,6 +559,12 @@ XImage *XGetImage(Display *dpy, Drawable d,
 int XPutImage(Display *dpy, Drawable d, GC gc,
     XImage *image, int req_xoffset, int req_yoffset,
     int x, int y, unsigned int req_width, unsigned int req_height);
+int XPutImage_(Display *dpy, Drawable d, GC gc,
+    XImage *image, int req_xoffset, int req_yoffset,
+    int x, int y, unsigned int req_width, unsigned int req_height);
+int XPutImage_2(Display *dpy, Drawable d, GC gc,
+    XImage *image, int req_xoffset, int req_yoffset,
+    int x, int y, unsigned int req_width, unsigned int req_height);
 XImage *XSubImage(XImage *ximage,
     int x, int y, unsigned int width, unsigned int height);
 
@@ -572,6 +584,9 @@ Status XGetGeometry(
     unsigned int *borderWidth, unsigned int *depth);
 
 #define XMaxRequestSize(dpy) 100
+
+LPVOID XCreatePackedDIBFromPixmap_(
+    Pixmap pixmap, COLORREF clrFore, COLORREF clrBack);
 
 //////////////////////////////////////////////////////////////////////////////
 

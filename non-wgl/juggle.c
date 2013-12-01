@@ -184,12 +184,12 @@ static const char sccsid[] = "@(#)juggle.c	5.10 2003/09/02 xlockmore";
 #define XtNumber(arr)   ((unsigned int) (sizeof(arr) / sizeof(arr[0])))
 #endif
 
-static char *pattern = "random";
+static char *pattern_ = "random";
 static int tail = 1;
 #ifdef UNI
 static Bool uni = False;
 #endif
-static Bool real = True;
+static Bool real = False;
 static Bool describe = True;
 static Bool balls = True;
 static Bool clubs = True;
@@ -229,7 +229,7 @@ static XrmOptionDescRec opts[] =
 };
 static argtype vars[] =
 {
-  { &pattern,  "pattern",  "Pattern",  DEF_PATTERN,  t_String },
+  { &pattern_,  "pattern",  "Pattern",  DEF_PATTERN,  t_String },
   { &tail,     "tail",     "Tail",     DEF_TAIL,     t_Int    },
 #ifdef UNI
   { &uni,      "uni",      "Uni",      DEF_UNI,      t_Bool   },
@@ -2335,7 +2335,7 @@ refill_juggle(ModeInfo * mi)
   sp = &juggles[MI_SCREEN(mi)];
 
   /* generate pattern */
-  if (pattern == NULL) {
+  if (pattern_ == NULL) {
 
 #define MAXPAT 10
 #define MAXREPEAT 300
@@ -2426,7 +2426,7 @@ refill_juggle(ModeInfo * mi)
 	  }
 	}
   } else { /* pattern supplied in height or 'a' notation */
-	if (!program(mi, pattern, NULL, MI_CYCLES(mi)))
+	if (!program(mi, pattern_, NULL, MI_CYCLES(mi)))
 	  return;
   }
 
@@ -2576,13 +2576,13 @@ init_juggle (ModeInfo * mi)
 
   sp = &juggles[MI_SCREEN(mi)];
 
-  if (pattern &&
-      (!*pattern ||
-       !strcasecmp (pattern, ".") ||
-       !strcasecmp (pattern, "random")))
-	pattern = NULL;
+  if (pattern_ &&
+      (!*pattern_ ||
+       !strcasecmp (pattern_, ".") ||
+       !strcasecmp (pattern_, "random")))
+	pattern_ = NULL;
 
-  if (pattern == NULL && sp->patternindex.maxballs == 0) {
+  if (pattern_ == NULL && sp->patternindex.maxballs == 0) {
 	/* pattern list needs indexing */
 	int nelements = XtNumber(portfolio);
 	int numpat = 0;
@@ -2662,6 +2662,9 @@ draw_juggle (ModeInfo * mi)
 #endif
 
   /* Update timer */
+#if 1
+  sp->time += MI_DELAY(mi) / 1000;
+#else
   if (real) {
 	struct timeval tv;
 	(void)gettimeofday(&tv, NULL);
@@ -2669,6 +2672,7 @@ draw_juggle (ModeInfo * mi)
   } else {
 	sp->time += MI_DELAY(mi) / 1000;
   }
+#endif
 
   /* First pass: Move arms and strip out expired elements */
   for (traj = sp->head->next; traj != sp->head; traj = traj->next) {
@@ -2793,9 +2797,18 @@ draw_juggle (ModeInfo * mi)
   if(pattern != NULL && strcmp(sp->pattern, pattern) != 0 ) {
 	/* Erase old name */
 	XSetForeground(MI_DISPLAY(mi), MI_GC(mi), MI_BLACK_PIXEL(mi));
-# if 0
-	XDrawString(MI_DISPLAY(mi), MI_WINDOW(mi), MI_GC(mi),
-				0, 20, sp->pattern, strlen(sp->pattern));
+# if 1
+    { //
+        char *p;
+        if (sp->pattern && *sp->pattern)
+            p = sp->pattern;
+        else
+            p = "";
+        XSetForeground(MI_DISPLAY(mi), MI_GC(mi), MI_WHITE_PIXEL(mi));
+        XSetBackground(MI_DISPLAY(mi), MI_GC(mi), MI_BLACK_PIXEL(mi));
+        XDrawString(MI_DISPLAY(mi), MI_WINDOW(mi), MI_GC(mi),
+                    0, 20, p, strlen(p));
+    }
 # else
     XFillRectangle(MI_DISPLAY(mi), MI_WINDOW(mi), MI_GC(mi),
                    0, 0, MI_WIDTH(mi), 25);
@@ -2811,7 +2824,9 @@ draw_juggle (ModeInfo * mi)
   if(sp->mode_font != None &&
 	 XTextWidth(sp->mode_font, sp->pattern, strlen(sp->pattern)) < MI_WIDTH(mi)) {
 	/* Redraw once a cycle, in case it's obscured or it changed */
+	//XSetForeground(MI_DISPLAY(mi), MI_GC(mi), MI_WHITE_PIXEL(mi));
 	XSetForeground(MI_DISPLAY(mi), MI_GC(mi), MI_WHITE_PIXEL(mi));
+	XSetBackground(MI_DISPLAY(mi), MI_GC(mi), MI_BLACK_PIXEL(mi));
 	XDrawImageString(MI_DISPLAY(mi), MI_WINDOW(mi), MI_GC(mi),
                      0, 20, sp->pattern, strlen(sp->pattern));
   }

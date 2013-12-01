@@ -798,9 +798,22 @@ Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr)
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef NDEBUG
+    #undef printf
     #undef fprintf
 
-    int __cdecl win32_fprintf(FILE *fp, const char *fmt, ...)
+    int __cdecl xlockmore_printf(const char *fmt, ...)
+    {
+        CHAR sz[512];
+        va_list va;
+        int n;
+        va_start(va, fmt);
+        n = vsprintf(sz, fmt, va);
+        va_end(va);
+        OutputDebugStringA(sz);
+        return n;
+    }
+
+    int __cdecl xlockmore_fprintf(FILE *fp, const char *fmt, ...)
     {
         CHAR sz[512];
         va_list va;
@@ -811,7 +824,7 @@ Status XGetWindowAttributes(Display *dpy, Window w, XWindowAttributes *attr)
         if (fp == stdout || fp == stderr)
             OutputDebugStringA(sz);
         else
-            vfprintf(fp, fmt, va);
+            fputs(sz, fp);
         return n;
     }
 #endif  // ndef NDEBUG

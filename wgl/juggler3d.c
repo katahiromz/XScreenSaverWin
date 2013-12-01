@@ -172,12 +172,12 @@ char *titleFont = "Arial 30";
 #define DEF_RINGS "True" /* Use Rings */
 #define DEF_BBALLS "True" /* Use Bowling Balls */
 
-static char *pattern = "random";
+static char *pattern_ = "random";
 static int tail = 1;
 #ifdef UNI
 static Bool uni = False;
 #endif
-static Bool real = True;
+static Bool real = False;
 static Bool describe = True;
 static Bool balls = True;
 static Bool clubs = True;
@@ -186,6 +186,9 @@ static Bool knives = True;
 static Bool rings = True;
 static Bool bballs = True;
 static char *only = " ";
+
+#undef MI_IS_VERBOSE
+#define MI_IS_VERBOSE(mi) True
 
 static XrmOptionDescRec opts[] = {
   {"-pattern",  ".juggle.pattern",  XrmoptionSepArg, NULL  },
@@ -214,7 +217,7 @@ static XrmOptionDescRec opts[] = {
 };
 
 static argtype vars[] = {
-  { &pattern,  "pattern",  "Pattern",  DEF_PATTERN,  t_String },
+  { &pattern_,  "pattern",  "Pattern",  DEF_PATTERN,  t_String },
   { &tail,     "tail",     "Tail",     DEF_TAIL,     t_Int    },
 #ifdef UNI
   { &uni,      "uni",      "Uni",      DEF_UNI,      t_Bool   },
@@ -2492,7 +2495,7 @@ refill_juggle(ModeInfo * mi)
 
   /* generate pattern */
 
-  if (pattern == NULL) {
+  if (pattern_ == NULL) {
 
 #define MAXPAT 10
 #define MAXREPEAT 300
@@ -2583,7 +2586,7 @@ refill_juggle(ModeInfo * mi)
 	  }
 	}
   } else { /* pattern supplied in height or 'a' notation */
-	if (!program(mi, pattern, NULL, MI_CYCLES(mi)))
+	if (!program(mi, pattern_, NULL, MI_CYCLES(mi)))
 	  return;
   }
 
@@ -2740,7 +2743,6 @@ init_juggle (ModeInfo * mi)
   /* #### hard to make this look good in OpenGL... */
   torches = False;
 
-
   if (sp->head == 0) {  /* first time initializing this juggler */
 
 	sp->count = ABS(MI_COUNT(mi));
@@ -2787,13 +2789,13 @@ init_juggle (ModeInfo * mi)
 
   sp = &juggles[MI_SCREEN(mi)];
 
-  if (pattern &&
-      (!*pattern ||
-       !strcasecmp (pattern, ".") ||
-       !strcasecmp (pattern, "random")))
-	pattern = NULL;
+  if (pattern_ &&
+      (!*pattern_ ||
+       !strcasecmp (pattern_, ".") ||
+       !strcasecmp (pattern_, "random")))
+	pattern_ = NULL;
 
-  if (pattern == NULL && sp->patternindex.maxballs == 0) {
+  if (pattern_ == NULL && sp->patternindex.maxballs == 0) {
 	/* pattern list needs indexing */
 	int nelements = countof(portfolio);
 	int numpat = 0;
@@ -2832,7 +2834,6 @@ init_juggle (ModeInfo * mi)
   /* Use MIN so that users can resize in interesting ways, eg
 	 narrow windows for tall patterns, etc */
   sp->scale = MIN(SCENE_HEIGHT/480.0, SCENE_WIDTH/160.0);
-
 }
 
 #if 0
@@ -2952,6 +2953,9 @@ draw_juggle (ModeInfo *mi)
   mi->polygon_count = 0;
 
   /* Update timer */
+#if 1   //
+  sp->time += MI_DELAY(mi) / 1000;
+#else
   if (real) {
 	struct timeval tv;
 	(void)gettimeofday(&tv, NULL);
@@ -2959,6 +2963,7 @@ draw_juggle (ModeInfo *mi)
   } else {
 	sp->time += MI_DELAY(mi) / 1000;
   }
+#endif
 
   /* First pass: Move arms and strip out expired elements */
   for (traj = sp->head->next; traj != sp->head; traj = traj->next) {
@@ -3059,9 +3064,8 @@ draw_juggle (ModeInfo *mi)
 	}
   }
 
-
   /* Save pattern name so we can erase it when it changes */
-  if(pattern != NULL && strcmp(sp->pattern, pattern) != 0 ) {
+  if(pattern != NULL && *pattern && strcmp(sp->pattern, pattern) != 0 ) {
 	free(sp->pattern);
 	sp->pattern = _strdup(pattern);
 
@@ -3079,7 +3083,7 @@ draw_juggle (ModeInfo *mi)
 # endif /* !HAVE_GLBITMAP */
                    mi->xgwa.width, mi->xgwa.height,
                    10, mi->xgwa.height - 10,
-                   sp->pattern, False);
+                   sp->pattern ? sp->pattern : pattern_ ? pattern_ : "", False);
 
 #ifdef MEMTEST
   if((int)(sp->time/10) % 1000 == 0)

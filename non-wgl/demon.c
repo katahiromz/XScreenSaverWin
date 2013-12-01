@@ -483,6 +483,7 @@ init_demon (ModeInfo * mi)
     jwxyz_XSetAntiAliasing (MI_DISPLAY(mi), MI_GC(mi), False);
 #endif
 
+retry:
 	for (nk = 0; nk < NEIGHBORKINDS; nk++) {
 		if (neighbors == plots[0][nk]) {
 			dp->neighbors = plots[0][nk];
@@ -593,6 +594,8 @@ init_demon (ModeInfo * mi)
 			}
 		}
 	}
+	if (!dp->xb || !dp->yb)
+		goto retry;
 
 	MI_CLEARWINDOW(mi);
 

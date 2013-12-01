@@ -256,7 +256,7 @@ phosphor_init (Display *dpy, Window window)
       if (!state->font)
         {
           fprintf(stderr, "couldn't load font \"%s\"\n", fontname);
-          state->font = XLoadQueryFont (dpy, "fixed");
+          state->font = XLoadQueryFont (dpy, "System");
         }
       if (!state->font)
         {

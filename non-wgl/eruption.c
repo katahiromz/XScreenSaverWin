@@ -231,7 +231,7 @@ static void Execute( struct state *st )
 	}
     }
   XPutImage( st->dpy, st->window, st->gc, st->pImage,
-	     0,0,0,0, st->iWinWidth, st->iWinHeight );
+	     0,0,0,0, st->iWinWidth, st->iWinHeight);
 }
 
 static unsigned long * SetPalette(struct state *st)

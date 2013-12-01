@@ -1535,7 +1535,8 @@ maze_init (Display *dpy_arg, Window window_arg)
                                       &pixels, &npixels, &logo_mask,
                                       xgwa.width > 800 || xgwa.height > 800);
     if (logo_mask) {
-      XSetClipMask (st->dpy, st->logo_gc, logo_mask);
+      //XSetClipMask (st->dpy, st->logo_gc, logo_mask);
+      XSetClipMask (st->dpy, st->logo_gc, None);
       XFreePixmap (st->dpy, logo_mask);
     }
     if (pixels) free (pixels);

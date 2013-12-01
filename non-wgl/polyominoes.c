@@ -1019,7 +1019,7 @@ static void draw_with_bitmaps(ModeInfo * mi, polyominoesstruct *sp)
       if (ARR(x,y) != ARR(x-1,y+1)) bitmap_index |= LEFT_DOWN;
       if (ARR(x,y) != ARR(x+1,y-1)) bitmap_index |= RIGHT_UP;
       if (ARR(x,y) != ARR(x+1,y+1)) bitmap_index |= RIGHT_DOWN;
-      (void) XPutImage(display,window,gc,
+      (void) XPutImage_2(display,window,gc,
                 sp->bitmaps[bitmap_index],
                 0,0,
                 sp->x_margin + sp->box*x,

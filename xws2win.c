@@ -124,6 +124,15 @@ int XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values)
     if (valuemask & GCFont)
         newvalues->font = values->font;
 
+    if (valuemask & GCClipXOrigin)
+        newvalues->clip_x_origin = values->clip_x_origin;
+
+    if (valuemask & GCClipYOrigin)
+        newvalues->clip_y_origin = values->clip_y_origin;
+
+    if (valuemask & GCClipMask)
+        newvalues->clip_mask_region = values->clip_mask_region;
+
     return 0;
 }
 
@@ -133,7 +142,9 @@ int XFreeGC(Display *dpy, GC gc)
     if (values == NULL)
         return BadGC;
 
-    free(gc);
+    if (values->clip_mask_region)
+        DeleteObject(values->clip_mask_region);
+    free(values);
     return 0;
 }
 
@@ -250,7 +261,7 @@ typedef struct tagBITMAPINFOEX
 
 #define WIDTHBYTES(i) (((i) + 31) / 32 * 4)
 
-LPVOID XCreatePackedDIBFromPixmap(Pixmap pixmap, COLORREF clrFore, COLORREF clrBack)
+LPVOID XCreatePackedDIBFromPixmap_(Pixmap pixmap, COLORREF clrFore, COLORREF clrBack)
 {
     BITMAP bm;
     LPBYTE pb;
@@ -301,7 +312,7 @@ HBRUSH XCreateWinBrush_(XGCValues *values)
     {
         LPVOID lpPackedDIB;
         assert(values->stipple != NULL);
-        lpPackedDIB = XCreatePackedDIBFromPixmap(
+        lpPackedDIB = XCreatePackedDIBFromPixmap_(
             values->stipple, values->background_rgb, values->foreground_rgb);
         assert(lpPackedDIB != NULL);
         hbr = CreateDIBPatternBrushPt(lpPackedDIB, DIB_RGB_COLORS);
@@ -651,8 +662,19 @@ int XFillRectangle(
 
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
+
+    if (values->clip_mask_region)
+    {
+        SelectClipRgn(hdc, values->clip_mask_region);
+        OffsetClipRgn(hdc, values->clip_x_origin, values->clip_y_origin);
+    }
+
     SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
     FillRect(hdc, &rc, hbr);
+
+    if (values->clip_mask_region)
+        SelectClipRgn(hdc, NULL);
+
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
@@ -750,11 +772,22 @@ int XFillPolygon(Display *dpy, Drawable d, GC gc,
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
     hbrOld = SelectObject(hdc, hbr);
+
+    if (values->clip_mask_region)
+    {
+        SelectClipRgn(hdc, values->clip_mask_region);
+        OffsetClipRgn(hdc, values->clip_x_origin, values->clip_y_origin);
+    }
+
     SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
     BeginPath(hdc);
     Polygon(hdc, lpPoints, n_points);
     EndPath(hdc);
     FillPath(hdc);
+
+    if (values->clip_mask_region)
+        SelectClipRgn(hdc, NULL);
+
     SelectObject(hdc, hbrOld);
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
@@ -875,17 +908,34 @@ int XCopyArea(Display *dpy,
      unsigned int width, unsigned int height,
      int dst_x, int dst_y)
 {
+    XGCValues *values;
     if (src_drawable == dst_drawable)
     {
         HDC hdc = XCreateDrawableDC_(dpy, dst_drawable);
+        values = XGetGCValues_(gc);
+        if (values->clip_mask_region)
+        {
+            SelectClipRgn(hdc, values->clip_mask_region);
+            OffsetClipRgn(hdc, values->clip_x_origin, values->clip_y_origin);
+        }
         BitBlt(hdc, dst_x, dst_y, width, height, hdc, src_x, src_y, SRCCOPY);
+        if (values->clip_mask_region)
+            SelectClipRgn(hdc, NULL);
         XDeleteDrawableDC_(dpy, dst_drawable, hdc);
     }
     else
     {
         HDC hdcSrc = XCreateDrawableDC_(dpy, src_drawable);
         HDC hdcDst = XCreateDrawableDC_(dpy, dst_drawable);
+        values = XGetGCValues_(gc);
+        if (values->clip_mask_region)
+        {
+            SelectClipRgn(hdcDst, values->clip_mask_region);
+            OffsetClipRgn(hdcDst, values->clip_x_origin, values->clip_y_origin);
+        }
         BitBlt(hdcDst, dst_x, dst_y, width, height, hdcSrc, src_x, src_y, SRCCOPY);
+        if (values->clip_mask_region)
+            SelectClipRgn(hdcDst, NULL);
         XDeleteDrawableDC_(dpy, src_drawable, hdcSrc);
         XDeleteDrawableDC_(dpy, dst_drawable, hdcDst);
     }
@@ -1007,11 +1057,74 @@ int XSetPlaneMask(Display *dpy, GC gc, unsigned long planemask)
 
 int XSetClipOrigin(Display *dpy, GC gc, int xorig, int yorig)
 {
+    XGCValues* values = XGetGCValues_(gc);
+    if (values)
+    {
+        values->clip_x_origin = xorig;
+        values->clip_y_origin = yorig;
+    }
     return 1;
 }
 
 int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
 {
+    if (mask == NULL)
+    {
+        gc->clip_mask_region = NULL;
+    }
+    else
+    {
+        INT x, y;
+        BITMAP bm;
+        LPBYTE pb;
+        LPRGNDATA prd;
+        DWORD size, i, nCount = 0;
+        LPRECT pRects;
+        HRGN hRgn;
+
+        GetObject(mask->hbm, sizeof(bm), &bm);
+        assert(bm.bmBitsPixel == 32);
+
+        pb = (LPBYTE)bm.bmBits;
+        for (y = 0; y < bm.bmHeight; y++)
+        {
+            for (x = 0; x < bm.bmWidth; x++)
+            {
+                if (pb[y * bm.bmWidthBytes + x * 4])
+                    nCount++;
+            }
+        }
+
+        size = sizeof(RGNDATAHEADER) + nCount * sizeof(RECT);
+        prd = (LPRGNDATA)calloc(1, size);
+        assert(prd != NULL);
+        prd->rdh.dwSize = sizeof(RGNDATAHEADER);
+        prd->rdh.iType = RDH_RECTANGLES;
+        prd->rdh.nCount = nCount;
+        prd->rdh.nRgnSize = 0;
+        SetRect(&prd->rdh.rcBound, 0, 0, 0xFFFF, 0xFFFF);
+        pRects = (LPRECT)((LPBYTE)prd + sizeof(RGNDATAHEADER));
+        i = 0;
+        for (y = 0; y < bm.bmHeight; y++)
+        {
+            for (x = 0; x < bm.bmWidth; x++)
+            {
+                if (pb[y * bm.bmWidthBytes + x * 4])
+                {
+                    pRects[i].left = x;
+                    pRects[i].top = y;
+                    pRects[i].right = x + 1;
+                    pRects[i].bottom = y + 1;
+                    i++;
+                }
+            }
+        }
+        hRgn = ExtCreateRegion(NULL, size, prd);
+        assert(hRgn != NULL);
+        free(prd);
+
+        gc->clip_mask_region = hRgn;
+    }
     return 1;
 }
 
@@ -1055,8 +1168,8 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
         return NULL;
     }
 
-    fs->min_char_or_byte2 = 0x20;
-    fs->max_char_or_byte2 = 0x7F;
+    fs->min_char_or_byte2 = 0;
+    fs->max_char_or_byte2 = 255;
     nCount = (int)fs->max_char_or_byte2 - (int)fs->min_char_or_byte2 + 1;
     pabc = (ABC *)calloc(nCount, sizeof(ABC));
     assert(pabc);

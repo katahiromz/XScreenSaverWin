@@ -1,4 +1,4 @@
-There are 180 Goods, 13 OKs and 32 NGs of total 223 screen savers 
+There are 186 Goods, 11 OKs and 26 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -64,7 +64,7 @@ Euler2D                 Good
 Extrusion               Good        
 FadePlot                Good        
 Fiberlamp               Good        
-Fireworkx               NG          Hung up
+Fireworkx               Good        
 Flag                    OK          Text doesn't appear
 Flame                   Good        
 FlipFlop                Good        
@@ -112,8 +112,8 @@ Interference            Good
 Intermomentary          Good        
 JigglyPuff              Good        
 Jigsaw                  NG          Black out
-Juggle                  NG          Action bad
-Juggler3D               NG          Didn't move
+Juggle                  Good        
+Juggler3D               Good        
 Julia                   Good        
 Kaleidescope            Good        
 Kaleidocycle            Good        
@@ -156,7 +156,7 @@ Piecewise               NG          Drawing bad
 Pinion                  Good        
 Pipes                   Good        
 Polyhedra               Good        
-Polyominoes             NG          Colors bad
+Polyominoes             Good        
 Polytopes               Good        
 Pong                    NG          Black out
 PopSquares              Good        
@@ -186,18 +186,18 @@ SpeedMine               Good
 Sphere                  Good        
 Spheremonics            Good        
 Spiral                  Good        
-Spotlight               NG          Drawing bad
+Spotlight               Good        
 Sproingies              Good        
 Squiral                 Good        
 Stairs                  Good        
 StarWars                Good        
 Starfish                Good        
 StonerView              Good        
-Strange                 NG          
+Strange                 NG          Drawing bad
 Substrate               NG          Drawing bad
 Superquadrics           Good        
 Surfaces                Good        
-Swirl                   NG          Too slow
+Swirl                   Good        
 T3D                     NG          Drawing bad
 Tangram                 Good        
 Thornbird               Good        

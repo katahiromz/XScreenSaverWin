@@ -316,8 +316,10 @@ rotzoomer_draw (Display *disp, Window win, void *closure)
 #if 1
   if (st->zoom_box == NULL)
   {
+	//st->orig_map = XGetImage (st->dpy, st->window, 0, 0, 
+    //                              st->width, st->height, ~0L, ZPixmap);
 	st->orig_map = XGetImage (st->dpy, st->window, 0, 0, 
-                                  st->width, st->height, ~0L, ZPixmap);
+                                  st->width, st->height, ~0L, RGBAPixmap_);
         init_hack (st);
   }
 #else
@@ -411,8 +413,13 @@ setup_X (struct state *st)
 #endif /* HAVE_XSHM_EXTENSION */
 
   if (!st->buffer_map) {
+#if 1	//
+    st->buffer_map = XCreateImage(st->dpy, xgwa.visual,
+                                  depth, RGBAPixmap_, 0, 0, st->width, st->height, 8, 0);
+#else
     st->buffer_map = XCreateImage(st->dpy, xgwa.visual,
                                   depth, ZPixmap, 0, 0, st->width, st->height, 8, 0);
+#endif
     st->buffer_map->data = (char *)calloc (st->buffer_map->height,
                                            st->buffer_map->bytes_per_line);
   }

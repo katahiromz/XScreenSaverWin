@@ -11,7 +11,7 @@ char *version = "0.00";
 char *saver_name = "";
 
 int verbose = 0;
-char *text_mode = "date";
+char *text_mode = "";
 char *text_literal = "";
 char *text_file = "";
 char *text_program = "";
@@ -24,28 +24,29 @@ char *saver_key = "Software\\Katayama Hirofumi MZ\\%s";
 
 void usage(void)
 {
-    fprintf(stderr, "usage: %s [ -- options ...]\n\n", progname);
+    fprintf(stderr, "usage: %s [ --options ...]\n\n", progname);
     fprintf(stderr,
         "    Prints out some text for use by various screensavers,\n"
-        "    according to the registry information of the keys:\n"
-        "    HKEY_CURRENT_USER\\Software\\Katayama Hirofumi MZ\\xscreensaver-text\n"
-        "    and HKEY_CURRENT_USER\\Software\\Katayama Hirofumi MZ\\(saver_name) .\n"
+        "    according to the registry information of the key:\n"
+        "    HKEY_CURRENT_USER\\Software\\Katayama Hirofumi MZ\\(saver_name).\n"
         "    This may dump the contents of a file or run a program.\n"
         "\n"
         "  Options\n"
-        "      --date              Print the host name and current time.\n"
+        "      --date              Print the host info and current time.\n"
         "\n"
         "      --text STRING       Print out the given text. It may contains %\n"
         "                          escape sequences as per sterftime(2).\n"
-        "\n"
-        "      --file PATH         Print the contents of given file.\n"
         "                          If --cols is specified re-wrap the lines;\n"
         "                          otherwise, print them as-is.\n"
         "\n"
-        "      --program CMD       Run the given program and print its output.\n"
+        "      --file \"PATH\"       Print the contents of given file.\n"
+        "                          If --cols is specified re-wrap the lines;\n"
+        "                          otherwise, print them as-is.\n"
+        "\n"
+        "      --program \"CMD\"     Run the given program and print its output.\n"
         "                          If --cols is specified, re-wrap the output.\n"
         "\n"
-        "      --cols N            Wrap lines at this column.  Default 72.\n"
+        "      --cols N            Wrap N lines at this column.  Default 72.\n"
         "\n"
         "      --head N            Print first N lines only.\n"
         "\n");
@@ -65,40 +66,42 @@ int parse_options(int argc, char **argv)
         {
             verbose++;
         }
-        else if (lstrcmpiA(argv[i], "--date") == 0)
+        else if (lstrcmpiA(argv[i], "--date") == 0 || lstrcmpiA(argv[i], "-d") == 0)
         {
             text_mode = "date";
             load_p = 0;
         }
-        else if (lstrcmpiA(argv[i], "--text") == 0)
+        else if (lstrcmpiA(argv[i], "--text") == 0 || lstrcmpiA(argv[i], "-t") == 0)
         {
             text_mode = "literal";
             text_literal = argv[++i];
             load_p = 0;
         }
-        else if (lstrcmpiA(argv[i], "--file") == 0)
+        else if (lstrcmpiA(argv[i], "--file") == 0 || lstrcmpiA(argv[i], "-f") == 0)
         {
             text_mode = "file";
             text_file = argv[++i];
             load_p = 0;
         }
         else if (lstrcmpiA(argv[i], "--head") == 0 ||
-                 lstrcmpiA(argv[i], "--heads") == 0)
+                 lstrcmpiA(argv[i], "--heads") == 0 ||
+                 lstrcmpiA(argv[i], "-h") == 0)
         {
             head = atoi(argv[++i]);
         }
-        else if (lstrcmpiA(argv[i], "--program") == 0)
+        else if (lstrcmpiA(argv[i], "--program") == 0 || lstrcmpiA(argv[i], "-p") == 0)
         {
             text_mode = "program";
             text_program = argv[++i];
             load_p = 0;
         }
-        else if (lstrcmpiA(argv[i], "--url") == 0)
+        else if (lstrcmpiA(argv[i], "--url") == 0 || lstrcmpiA(argv[i], "-u") == 0)
         {
             fprintf(stderr, "ERROR: --url is not supported yet\n");
             return 1;
         }
-        else if (lstrcmpiA(argv[i], "--col") == 0 ||
+        else if (lstrcmpiA(argv[i], "-c") == 0 ||
+                 lstrcmpiA(argv[i], "--col") == 0 ||
                  lstrcmpiA(argv[i], "--cols") == 0 ||
                  lstrcmpiA(argv[i], "--column") == 0 ||
                  lstrcmpiA(argv[i], "--columns") == 0)
@@ -114,9 +117,15 @@ int parse_options(int argc, char **argv)
             fprintf(stderr, "ERROR: --cocoa is not supported yet\n");
             return 1;
         }
-        else if (lstrcmpiA(argv[i], "--nyarlathotep") == 0)
+        else if (lstrcmpiA(argv[i], "--nyarlathotep") == 0 || lstrcmpiA(argv[i], "-n") == 0)
         {
             fprintf(stderr, "ERROR: --nyarlathotep is not supported yet\n");
+            return 1;
+        }
+        else if (lstrcmpiA(argv[i], "--help") == 0 || lstrcmpiA(argv[i], "-?") == 0 ||
+                 lstrcmpiA(argv[i], "/?") == 0)
+        {
+            usage();
             return 1;
         }
         else
@@ -174,7 +183,164 @@ char *trim(char *s)
     return p;
 }
 
-output(void)
+void do_text_literal(void)
+{
+    int c, d, cols, lines;
+    char *p;
+    char buf[1024];
+    time_t t = time(NULL);
+
+    strftime(buf, 1024, text_literal, localtime(&t));
+
+    cols = lines = 0;
+    p = buf;
+    d = EOF;
+    while ((c = *p++) != '\0')
+    {
+        if (c == '\r')
+            continue;
+
+        if (c == '\n')
+        {
+            cols = 0;
+            lines++;
+            if (head >= 1 && lines >= head)
+            {
+                putchar(c);
+                break;
+            }
+        }
+        else
+            cols++;
+
+        putchar(c);
+        if (wrap_columns && cols % wrap_columns == 0 && cols)
+            putchar('\n');
+        d = c;
+    }
+    if (d != '\n')
+        putchar('\n');
+}
+
+void do_text_file(void)
+{
+    int c, d, cols, lines;
+    FILE *fp = fopen(text_file, "r");
+    if (fp)
+    {
+        if (verbose)
+            fprintf(stderr, "%s: reading %s\n", progname, text_file);
+
+        cols = lines = 0;
+        d = EOF;
+        while ((c = fgetc(fp)) != EOF)
+        {
+            if (c == '\r')
+                continue;
+
+            if (c == '\n')
+            {
+                cols = 0;
+                lines++;
+                if (head >= 1 && lines >= head)
+                {
+                    putchar(c);
+                    break;
+                }
+            }
+            else
+                cols++;
+
+            putchar(c);
+            if (wrap_columns && cols % wrap_columns == 0 && cols)
+                putchar('\n');
+
+            d = c;
+        }
+        fclose(fp);
+        if (d != '\n')
+            putchar('\n');
+    }
+    else
+    {
+        if (verbose)
+            fprintf(stderr, "%s: cannot open '%s'\n", progname, text_file);
+    }
+}
+
+void do_text_program(void)
+{
+    int c, d, cols, lines;
+    FILE *pipe = _popen(text_program, "w");
+    if (pipe)
+    {
+        if (verbose)
+            fprintf(stderr, "%s: running %s\n", progname, text_program);
+
+        cols = lines = 0;
+        d = EOF;
+        while ((c = fgetc(pipe)) != EOF)
+        {
+            if (c == '\r')
+                continue;
+
+            if (c == '\n')
+            {
+                cols = 0;
+                lines++;
+                if (head >= 1 && lines >= head)
+                {
+                    putchar(c);
+                    break;
+                }
+            }
+            else
+                cols++;
+
+            putchar(c);
+            if (wrap_columns && cols % wrap_columns == 0 && cols)
+                putchar('\n');
+
+            d = c;
+        }
+        _pclose(pipe);
+        if (d != '\n')
+            putchar('\n');
+    }
+    else
+    {
+        if (verbose)
+            fprintf(stderr, "%s: cannot open '%s'\n", progname, text_program);
+    }
+}
+
+void do_date(void)
+{
+    OSVERSIONINFOA verinfo;
+    CHAR buf[64];
+    time_t t = time(NULL);
+    DWORD dwSize;
+    CHAR szComp[MAX_PATH], szUser[MAX_PATH];
+
+    // OS info
+    verinfo.dwOSVersionInfoSize = sizeof(verinfo);
+    GetVersionExA(&verinfo);
+    printf("Microsoft Windows [Version %u.%u.%u]\n",
+        verinfo.dwMajorVersion, verinfo.dwMinorVersion, verinfo.dwBuildNumber);
+
+    // computer_name - user_name
+    dwSize = MAX_PATH;
+    GetComputerNameA(szComp, &dwSize);
+    dwSize = MAX_PATH;
+    GetUserNameA(szUser, &dwSize);
+    printf("%s - %s\n", szComp, szUser);
+
+    // Thu Nov 28 14:52:58     2013
+    strftime(buf, 64, "%a %b %d %H:%M:%S     %Y", localtime(&t));
+    printf("%s\n", buf);
+}
+
+void output(void)
 {
     if (lstrcmpiA(text_mode, "literal") == 0 && strlen(trim(text_literal)) == 0 ||
         lstrcmpiA(text_mode, "file") == 0 && strlen(trim(text_file)) == 0 ||
@@ -188,141 +354,21 @@ output(void)
 
     if (lstrcmpiA(text_mode, "literal") == 0)
     {
-        int c, cols, lines;
-        char *p;
-        size_t len;
-        char buf[1024];
-        time_t t = time(NULL);
-        strftime(buf, 1024, text_literal, localtime(&t));
-        text_literal = _strdup(buf);
-
-        cols = lines = 0;
-        p = text_literal;
-        while ((c = *p++) != '\0')
-        {
-            if (*p == '\r')
-                continue;
-
-            if (c == '\n')
-            {
-                cols = 0;
-                lines++;
-                if (head >= 1 && lines >= head)
-                {
-                    fputc(c, stdout);
-                    break;
-                }
-            }
-            else
-                cols++;
-
-            fputc(c, stdout);
-            if (wrap_columns && cols % wrap_columns == 0)
-                fputc('\n', stdout);
-        }
-
-        puts(text_literal);
-        len = lstrlenA(text_literal);
-        if (text_literal[len - 1] != '\n')
-            puts("");
+        do_text_literal();
     }
     else if (lstrcmpiA(text_mode, "file") == 0)
     {
-        int c, cols, lines;
-        FILE *fp = fopen(text_file, "r");
-        if (fp)
-        {
-            if (verbose)
-                fprintf(stderr, "%s: reading %s\n", progname, text_file);
-
-            cols = lines = 0;
-            while ((c = fgetc(fp)) != EOF)
-            {
-                if (c == '\r')
-                    continue;
-
-                if (c == '\n')
-                {
-                    cols = 0;
-                    lines++;
-                    if (head >= 1 && lines >= head)
-                    {
-                        fputc(c, stdout);
-                        break;
-                    }
-                }
-                else
-                    cols++;
-
-                fputc(c, stdout);
-                if (wrap_columns && cols % wrap_columns == 0)
-                    fputc('\n', stdout);
-            }
-            fclose(fp);
-        }
-        else
-        {
-            if (verbose)
-                fprintf(stderr, "%s: cannot open '%s'\n", progname, text_file);
-        }
+        do_text_file();
     }
     else if (lstrcmpiA(text_mode, "program") == 0)
     {
-        int c, cols, lines;
-        FILE *pipe = _popen(text_program, "w");
-        if (pipe)
-        {
-            if (verbose)
-                fprintf(stderr, "%s: running %s\n", progname, text_program);
-
-            cols = lines = 0;
-            while ((c = fgetc(pipe)) != EOF)
-            {
-                if (c == '\r')
-                    continue;
-
-                if (c == '\n')
-                {
-                    cols = 0;
-                    lines++;
-                    if (head >= 1 && lines >= head)
-                    {
-                        fputc(c, stdout);
-                        break;
-                    }
-                }
-                else
-                    cols++;
-
-                fputc(c, stdout);
-                if (wrap_columns && cols % wrap_columns == 0)
-                    fputc('\n', stdout);
-            }
-            _pclose(pipe);
-        }
-        else
-        {
-            if (verbose)
-                fprintf(stderr, "%s: cannot open '%s'\n", progname, text_program);
-        }
+        do_text_program();
     }
     else    // "date"
     {
-        OSVERSIONINFOA verinfo;
-        CHAR buf[64];
-        time_t t = time(NULL);
-
-        verinfo.dwOSVersionInfoSize = sizeof(verinfo);
-        GetVersionExA(&verinfo);
-        printf("Microsoft Windows [Version %u.%u.%u]\n",
-            verinfo.dwMajorVersion, verinfo.dwMinorVersion, verinfo.dwBuildNumber);
-
-        // Thu Nov 28 14:52:58     2013
-        strftime(buf, 64, "%a %b %d %H:%M:%S     %Y", localtime(&t));
-        printf("%s\n", buf);
+        do_date();
     }
 }
-
 
 int load_values(HKEY hKey)
 {
@@ -388,26 +434,21 @@ int get_prefs(void)
     CHAR keypath[MAX_PATH];
     int got_any_p = 0;
 
-    result = RegOpenKeyExA(HKEY_CURRENT_USER, xsst_key, 0, KEY_READ, &hKey);
-    if (result == ERROR_SUCCESS)
+    if (text_mode == NULL || *text_mode == '\0')
     {
-        got_any_p = load_values(hKey);
-        RegCloseKey(hKey);
-    }
-
-    saver_name = get_saver_name();
-
-    if (saver_name && *saver_name)
-    {
-        if (verbose)
-            fprintf(stderr, "%s: saver:   %s\n", saver_name);
-
-        sprintf(keypath, saver_key, saver_name);
-        result = RegOpenKeyExA(HKEY_CURRENT_USER, keypath, 0, KEY_READ, &hKey);
-        if (result == ERROR_SUCCESS)
+        saver_name = get_saver_name();
+        if (saver_name && *saver_name)
         {
-            got_any_p |= load_values(hKey);
-            RegCloseKey(hKey);
+            if (verbose)
+                fprintf(stderr, "%s: saver:   %s\n", saver_name);
+
+            sprintf(keypath, saver_key, saver_name);
+            result = RegOpenKeyExA(HKEY_CURRENT_USER, keypath, 0, KEY_READ, &hKey);
+            if (result == ERROR_SUCCESS)
+            {
+                got_any_p = load_values(hKey);
+                RegCloseKey(hKey);
+            }
         }
     }
 

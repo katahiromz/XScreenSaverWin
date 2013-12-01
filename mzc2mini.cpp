@@ -958,7 +958,6 @@ BOOL MProcessMaker::CreateProcess(
 #endif
         free(pszCmdLine);
     }
-    MzcAssert(b);
     return b;
 }
 

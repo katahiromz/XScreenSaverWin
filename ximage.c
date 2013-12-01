@@ -302,18 +302,18 @@ HBITMAP XCreateWinBitmapFromXImage(XImage *ximage)
         widthbytes = WIDTHBYTES(ximage->width * 1);
         for (y = 0; y < ximage->height; y++)
         {
-        	for (x = 0; x < widthbytes; x++)
-        	{
-        		int i;
-				BYTE b1 = ximage->data[(ximage->height - y - 1) * ximage->bytes_per_line + x];
-        		BYTE b2 = 0;
-        		for (i = 0; i < 8; i++)
-        		{
-        			if (b1 & (1 << i))
-	        			b2 |= 1 << (7 - i);
-        		}
-	            pbBits[y * widthbytes + x] = b2;
-        	}
+            for (x = 0; x < widthbytes; x++)
+            {
+                int i;
+                BYTE b1 = ximage->data[(ximage->height - y - 1) * ximage->bytes_per_line + x];
+                BYTE b2 = 0;
+                for (i = 0; i < 8; i++)
+                {
+                    if (b1 & (1 << i))
+                        b2 |= 1 << (7 - i);
+                }
+                pbBits[y * widthbytes + x] = b2;
+            }
         }
         return hbm;
     }
@@ -384,6 +384,47 @@ HBITMAP XCreateWinBitmapFromXImage(XImage *ximage)
     }
 
     return NULL;
+}
+
+HBITMAP XCreateWinBitmapFromXImage_2(XImage *ximage, COLORREF rgbFore)
+{
+    BITMAPINFOEX bi;
+    HBITMAP hbm;
+    LPBYTE pbBits;
+    unsigned int x, y, widthbytes;
+    BYTE r = GetRValue(rgbFore), g = GetGValue(rgbFore), b = GetBValue(rgbFore);
+
+    ZeroMemory(&bi, sizeof(bi));
+    bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bi.bmiHeader.biWidth = ximage->width;
+    bi.bmiHeader.biHeight = ximage->height;
+    bi.bmiHeader.biPlanes = 1;
+    bi.bmiHeader.biBitCount = 32;
+    hbm = CreateDIBSection(NULL, (LPBITMAPINFO)&bi, DIB_RGB_COLORS, 
+                           (LPVOID *)&pbBits, NULL, 0);
+    widthbytes = WIDTHBYTES(ximage->width * 32);
+    for (y = 0; y < ximage->height; y++)
+    {
+        for (x = 0; x < widthbytes; x++)
+        {
+            BYTE b1 = ximage->data[(ximage->height - y - 1) * ximage->bytes_per_line + x / 8];
+            if (b1 & 1 << (x & 7))
+            {
+                pbBits[y * widthbytes + x * 4 + 0] = b;
+                pbBits[y * widthbytes + x * 4 + 1] = g;
+                pbBits[y * widthbytes + x * 4 + 2] = r;
+                pbBits[y * widthbytes + x * 4 + 3] = 0xFF;
+            }
+            else
+            {
+                pbBits[y * widthbytes + x * 4 + 0] = 0;
+                pbBits[y * widthbytes + x * 4 + 1] = 0;
+                pbBits[y * widthbytes + x * 4 + 2] = 0;
+                pbBits[y * widthbytes + x * 4 + 3] = 0xFF;
+            }
+        }
+    }
+    return hbm;
 }
 
 XImage *XGetImage(Display *dpy, Drawable d,
@@ -509,14 +550,114 @@ XImage *XGetImage(Display *dpy, Drawable d,
     return ximage;
 }
 
-// NOTE: too slow!!!
+int XPutImage_(Display *dpy, Drawable d, GC gc,
+    XImage *image, int req_xoffset, int req_yoffset,
+    int x, int y, unsigned int req_width, unsigned int req_height)
+{
+    unsigned int x1, y1, x2, y2;
+    XColor color;
+    COLORREF rgb;
+    BYTE r, g, b;
+
+    HDC hdc = XCreateDrawableDC_(dpy, d);
+    if ((image->bits_per_pixel | image->depth) == 1)
+    {
+        unsigned int xoff, yoff;
+        COLORREF rgbFore = gc->foreground_rgb;
+        y2 = req_yoffset;
+        for (y1 = y; y1 < y + req_height; y1++, y2++)
+        {
+            x2 = req_xoffset;
+            for (x1 = x; x1 < x + req_width; x1++, x2++)
+            {
+                xoff = x2 + image->xoffset;
+                yoff = y2 * image->bytes_per_line + (xoff >> 3);
+                if (image->data[yoff] & (1 << (xoff & 7)))
+                {
+                    rgb = rgbFore;
+                    SetPixelV(hdc, x1, y1, rgb);
+                }
+                else
+                {
+                    rgb = 0;
+                    SetPixelV(hdc, x1, y1, rgb);
+                }
+            }
+        }
+    }
+    else if (image->format != RGBAPixmap_)
+    {
+        y2 = req_yoffset;
+        for (y1 = y; y1 < y + req_height; y1++, y2++)
+        {
+            x2 = req_xoffset;
+            for (x1 = x; x1 < x + req_width; x1++, x2++)
+            {
+                color.pixel = XGetPixel(image, x2, y2);
+                XQueryColor(dpy, 0, &color);
+                rgb = RGB(color.red / 256, color.green / 256, color.blue / 256);
+                SetPixelV(hdc, x1, y1, rgb);
+            }
+        }
+    }
+    else
+    {
+        y2 = req_yoffset;
+        for (y1 = y; y1 < y + req_height; y1++, y2++)
+        {
+            x2 = req_xoffset;
+            for (x1 = x; x1 < x + req_width; x1++, x2++)
+            {
+                color.pixel = XGetPixel(image, x2, y2);
+                r = (BYTE)HIWORD(color.pixel);
+                g = HIBYTE(color.pixel);
+                b = LOBYTE(color.pixel);
+                rgb = RGB(r, g, b);
+                SetPixelV(hdc, x1, y1, rgb);
+            }
+        }
+    }
+    XDeleteDrawableDC_(dpy, d, hdc);
+    return 0;
+}
+
+int XPutImage_2(Display *dpy, Drawable d, GC gc,
+    XImage *image, int req_xoffset, int req_yoffset,
+    int x, int y, unsigned int req_width, unsigned int req_height)
+{
+    HBITMAP hbm = XCreateWinBitmapFromXImage_2(image, gc->foreground_rgb);
+    assert(hbm != NULL);
+    if (hbm == NULL)
+        return 0;
+
+    if (d == 0)
+    {
+        HDC hdcSrc = CreateCompatibleDC(dpy);
+        HGDIOBJ hbmOld = SelectObject(hdcSrc, hbm);
+        BitBlt(dpy, x, y, req_width, req_height, hdcSrc, req_xoffset, req_yoffset, SRCCOPY);
+        SelectObject(hdcSrc, hbmOld);
+        DeleteDC(hdcSrc);
+    }
+    else
+    {
+        HDC hdc = XCreateDrawableDC_(dpy, d);
+        HDC hdcSrc = CreateCompatibleDC(dpy);
+        HGDIOBJ hbmOld = SelectObject(hdcSrc, hbm);
+        BitBlt(hdc, x, y, req_width, req_height, hdcSrc, req_xoffset, req_yoffset, SRCCOPY);
+        SelectObject(hdcSrc, hbmOld);
+        DeleteDC(hdcSrc);
+        XDeleteDrawableDC_(dpy, d, hdc);
+    }
+
+    DeleteObject(hbm);
+    return 0;
+}
+
 int XPutImage(Display *dpy, Drawable d, GC gc,
     XImage *image, int req_xoffset, int req_yoffset,
     int x, int y, unsigned int req_width, unsigned int req_height)
 {
-    HBITMAP hbm;
-
-    hbm = XCreateWinBitmapFromXImage(image);
+    HBITMAP hbm = XCreateWinBitmapFromXImage(image);
     assert(hbm != NULL);
     if (hbm == NULL)
         return 0;

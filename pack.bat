@@ -19,7 +19,7 @@ for %%i in (*.scr) do mkdir %%~ni_scr
 for %%i in (*.scr) do move %%i %%~ni_scr
 cd ..
 
-copy wgl\starwars.txt XScreenSaverWin\starwars_scr
+copy wgl\starwars.txt XScreenSaverWin
 exit
 
 :fail

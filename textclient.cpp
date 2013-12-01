@@ -83,40 +83,36 @@ static void launch_text_generator(text_data *d)
     if (d->pmaker->PrepareForRedirect(
         &d->pipeInput->m_hHandle, &d->pipeOutput->m_hHandle, &d->pipeOutput->m_hHandle))
     {
+        BOOL bOK;
+        CHAR *p, szDir[MAX_PATH];
 # ifdef DEBUG
         fprintf(stderr, "%s: textclient: launch pipe: %s\n", progname, program);
 # endif
-        if (d->pmaker->CreateProcess(NULL, program))
+        GetModuleFileNameA(NULL, szDir, MAX_PATH);
+        p = strrchr(szDir, '\\');
+        *p = '\0';
+        d->pmaker->SetCurrentDirectory(szDir);
+        bOK = d->pmaker->CreateProcess(NULL, program);
+        if (!bOK)
+        {
+            // retry
+            strcpy(p, "\\..");
+            d->pmaker->SetCurrentDirectory(szDir);
+            bOK = d->pmaker->CreateProcess(NULL, program);
+        }
+        if (!bOK)
+        {
+            // and retry again
+            GetEnvironmentVariableA("COMSPEC", comspec, MAX_PATH);
+            wsprintfA(program2, "\"%s\" /C %s", comspec, program);
+            bOK = d->pmaker->CreateProcess(NULL, program2);
+        }
+        if (bOK)
         {
 # ifdef DEBUG
             fprintf(stderr, "%s: textclient: CreateProcess\n", progname);
 # endif
             d->input_available_p = True;
-        }
-        else
-        {
-            // retry
-            d->pmaker->SetCurrentDirectory("..");
-            if (d->pmaker->CreateProcess(NULL, program))
-            {
-# ifdef DEBUG
-                fprintf(stderr, "%s: textclient: CreateProcess\n", progname);
-# endif
-                d->input_available_p = True;
-            }
-            else
-            {
-                // and retry again
-                GetEnvironmentVariableA("COMSPEC", comspec, MAX_PATH);
-                wsprintfA(program2, "\"%s\" %s", comspec, program);
-                if (d->pmaker->CreateProcess(NULL, program2))
-                {
-# ifdef DEBUG
-                    fprintf(stderr, "%s: textclient: CreateProcess\n", progname);
-# endif
-                    d->input_available_p = True;
-                }
-            }
         }
     }
 
@@ -181,6 +177,8 @@ EXTERN_C void textclient_close(text_data *d)
 # ifdef DEBUG
     fprintf(stderr, "%s: textclient: free\n", progname);
 # endif
+    if (d->pmaker->IsRunning())
+        d->pmaker->TerminateProcess(-1);
 
     if (d->program)
         free(d->program);
