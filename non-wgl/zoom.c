@@ -58,9 +58,6 @@ static argtype vars[] =
     {&pixspacey, "pixspacey", NULL, "2", t_Int},
     {&lensoffsetx, "lensoffsetx", NULL, "5", t_Int},
     {&lensoffsety, "lensoffsety", NULL, "5", t_Int},
-	{&imageDirectory, "imageDirectory", NULL, "", t_String},
-	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
-	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 struct state {

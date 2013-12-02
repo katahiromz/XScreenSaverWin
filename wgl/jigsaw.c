@@ -89,6 +89,8 @@
 # define HAVE_TESS
 #endif /* !HAVE_JWZGLES */
 
+#undef HAVE_TESS
+
 char *font = "System 30";
 Bool grabDesktopImages = False;
 Bool chooseRandomImages = True;

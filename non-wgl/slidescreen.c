@@ -61,9 +61,6 @@ static argtype vars[] =
     {&delay, "delay", NULL, "50000", t_Int},
     {&delay2, "delay2", NULL, "1000000", t_Int},
     {&duration, "duration", NULL, "120", t_Int},
-	{&imageDirectory, "imageDirectory", NULL, "", t_String},
-	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
-	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 static XrmOptionDescRec slidescreen_options [] = {

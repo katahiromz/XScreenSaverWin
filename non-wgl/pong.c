@@ -62,9 +62,8 @@ Bool clock_ = False;
 
 float TVColor = 70;
 float TVTint = 5;
-float TVBrightness = 3;
-float TVContrast = 1000;
-int use_cmap = 0;
+float TVBrightness = 2;
+float TVContrast = 150;
 
 static const char *pong_defaults [] = {
   ".background: black",
@@ -95,7 +94,6 @@ static argtype vars[] =
     {&TVTint, "TVTint", NULL, "5", t_Float},
     {&TVBrightness, "TVBrightness", NULL, "3", t_Float},
     {&TVContrast, "TVContrast", NULL, "1000", t_Float},
-    {&use_cmap, "use_cmap", NULL, "0", t_Int},
 };
 
 typedef struct _paddle {

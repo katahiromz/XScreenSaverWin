@@ -26,7 +26,7 @@
 #include "screenhack.h"
 #include "textclient.h"
 
-#define FUZZY_BORDER
+#undef FUZZY_BORDER	//
 
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -244,10 +244,10 @@ phosphor_init (Display *dpy, Window window)
   if (!strcasecmp (fontname, "builtin") ||
       !strcasecmp (fontname, "(builtin)"))
     {
-//#ifndef BUILTIN_FONT
+#ifndef BUILTIN_FONT
       //fprintf (stderr, "%s: no builtin font\n", progname);
-      state->font = XLoadQueryFont (dpy, "System 8");
-//#endif /* !BUILTIN_FONT */
+      state->font = XLoadQueryFont (dpy, "Terminal 8");
+#endif /* !BUILTIN_FONT */
     }
   else
     {
@@ -543,8 +543,10 @@ capture_font_bits (p_state *state)
                    ? font->ascent - 1
                    : state->char_height));
 
+  //state->font_bits = XGetImage (state->dpy, p, 0, 0,
+  //                              (safe_width * 256), height, ~0L, XYPixmap);
   state->font_bits = XGetImage (state->dpy, p, 0, 0,
-                                (safe_width * 256), height, ~0L, XYPixmap);
+                                (safe_width * 256), height, ~0L, RGBAPixmap_);
   XFreePixmap (state->dpy, p);
 
   for (i = 0; i < 256; i++)

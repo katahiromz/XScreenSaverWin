@@ -26,7 +26,7 @@
 	#endif
 #endif
 
-#include "xlockmore.h"
+#include "xws2win.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

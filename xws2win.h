@@ -344,7 +344,7 @@ int XCopyPlane(Display *dpy, Drawable src_drawable, Drawable dst_drawable, GC gc
 XFontStruct *XLoadQueryFont(Display *dpy, const char *name);
 int XUnloadFont(Display *dpy, Font fid);
 int XFreeFont(Display *dpy, XFontStruct *fs);
-int XTextExtents(XFontStruct *fs, char *string, int nchars,
+int XTextExtents(XFontStruct *fs, const char *string, int nchars,
     int *dir, int *font_ascent, int *font_descent, XCharStruct *overall);
 int XTextWidth(XFontStruct *fs, const char *string, int count);
 int XSetFont(Display *dpy, GC gc, Font fid);

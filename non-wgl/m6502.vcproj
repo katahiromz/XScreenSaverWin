@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="ripples"
-	ProjectGUID="{647454D1-C4C3-40B2-93DD-E4E42555D542}"
-	RootNamespace="ripples"
+	Name="m6502"
+	ProjectGUID="{52EAC56C-F64E-4D97-AB27-0ECFEE5A06F3}"
+	RootNamespace="m6502"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -49,7 +49,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4244;4305;4018"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -125,7 +125,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4244;4305;4018"
+				DisableSpecificWarnings="4244;4305"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -179,11 +179,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\colors.c"
+				RelativePath=".\analogtv.c"
 				>
 			</File>
 			<File
-				RelativePath="..\grabclient.c"
+				RelativePath=".\asm6502.c"
+				>
+			</File>
+			<File
+				RelativePath="..\colors.c"
 				>
 			</File>
 			<File
@@ -191,11 +195,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\pixmap.c"
+				RelativePath=".\m6502.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ripples.c"
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File
@@ -225,15 +229,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\analogtv.h"
+				>
+			</File>
+			<File
+				RelativePath=".\asm6502.h"
+				>
+			</File>
+			<File
 				RelativePath="..\colors.h"
 				>
 			</File>
 			<File
-				RelativePath="..\grabscreen.h"
+				RelativePath="..\hsv.h"
 				>
 			</File>
 			<File
-				RelativePath="..\hsv.h"
+				RelativePath=".\m6502.h"
 				>
 			</File>
 			<File

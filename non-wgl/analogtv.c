@@ -173,7 +173,6 @@ analogtv_init(void)
       }
     }
   }
-
 }
 
 void
@@ -247,7 +246,6 @@ analogtv_set_defaults(analogtv *it, char *prefix)
   printf("    ANALOGTV_FP_START=%d\n",ANALOGTV_FP_START);
   printf("    ANALOGTV_PIC_END=%d\n",ANALOGTV_PIC_END);
   printf("    ANALOGTV_HASHNOISE_LEN=%d\n",ANALOGTV_HASHNOISE_LEN);
-
 #endif
 
 }
@@ -257,6 +255,15 @@ extern Bool mono_p; /* shoot me */
 static void
 analogtv_free_image(analogtv *it)
 {
+#if 1
+    if (it->pixmap)
+    {
+        XFreePixmap(it->dpy, it->pixmap);
+        it->pixmap = NULL;
+        it->pbBits = NULL;
+        it->widthbytes = 0;
+    }
+#else
   if (it->image) {
     if (it->use_shm) {
 #ifdef HAVE_XSHM_EXTENSION
@@ -267,11 +274,24 @@ analogtv_free_image(analogtv *it)
     }
     it->image=NULL;
   }
+#endif
 }
 
 static void
 analogtv_alloc_image(analogtv *it)
 {
+#if 1
+    if (!it->pixmap)
+    {
+        BITMAP bm;
+        it->pixmap = XCreatePixmap(it->dpy, 0, it->usewidth, it->useheight, 32);
+        assert(it->pixmap);
+
+        GetObject(it->pixmap->hbm, sizeof(bm), &bm);
+        it->pbBits = (LPBYTE)bm.bmBits;
+        it->widthbytes = bm.bmWidthBytes;
+    }
+#else
   if (it->use_shm) {
 #ifdef HAVE_XSHM_EXTENSION
     it->image=create_xshm_image(it->dpy, it->xgwa.visual, it->xgwa.depth, ZPixmap, 0,
@@ -290,6 +310,7 @@ analogtv_alloc_image(analogtv *it)
     it->image->data = (char *)malloc(it->image->height * it->image->bytes_per_line);
   }
   memset (it->image->data, 0, it->image->height * it->image->bytes_per_line);
+#endif
 }
 
 
@@ -409,7 +430,6 @@ analogtv_allocate(Display *dpy, Window window)
   XGCValues gcv;
   analogtv *it=NULL;
   int i;
-  extern int use_cmap;	//
   extern char *background;	//
 
   analogtv_init();
@@ -436,58 +456,32 @@ analogtv_allocate(Display *dpy, Window window)
   it->visclass=it->xgwa.visual->class_;
   it->visbits=it->xgwa.visual->bits_per_rgb;
   it->visdepth=it->xgwa.depth;
-  if (it->visclass == TrueColor || it->visclass == DirectColor) {
-    //if (get_integer_resource (it->dpy, "use_cmap", "Integer"))
-    if (use_cmap)
-    {
-      it->use_cmap=1;
-    } else {
-      it->use_cmap=0;
-    }
-    it->use_color=!mono_p;
-  }
-  else if (it->visclass == PseudoColor || it->visclass == StaticColor) {
-    it->use_cmap=1;
-    it->use_color=!mono_p;
-  }
-  else {
-    it->use_cmap=1;
-    it->use_color=0;
-  }
+  it->use_cmap=0;
+  it->use_color=!mono_p;
 
-  it->red_mask=it->xgwa.visual->red_mask;
-  it->green_mask=it->xgwa.visual->green_mask;
-  it->blue_mask=it->xgwa.visual->blue_mask;
-  it->red_shift=it->red_invprec=-1;
-  it->green_shift=it->green_invprec=-1;
-  it->blue_shift=it->blue_invprec=-1;
+  it->red_mask = 0x000000FF;
+  it->green_mask = 0x0000FF00;
+  it->blue_mask = 0x00FF0000;
+  it->red_shift = 0;
+  it->green_shift = 8;
+  it->blue_shift = 16;
+  it->red_invprec = 8;
+  it->green_invprec = 8;
+  it->blue_invprec = 8;
   if (!it->use_cmap) {
-    /* Is there a standard way to do this? Does this handle all cases? */
-    int shift, prec;
-    for (shift=0; shift<32; shift++) {
-      for (prec=1; prec<16 && prec<40-shift; prec++) {
-        unsigned long mask=(0xffffUL>>(16-prec)) << shift;
-        if (it->red_shift<0 && mask==it->red_mask)
-          it->red_shift=shift, it->red_invprec=16-prec;
-        if (it->green_shift<0 && mask==it->green_mask)
-          it->green_shift=shift, it->green_invprec=16-prec;
-        if (it->blue_shift<0 && mask==it->blue_mask)
-          it->blue_shift=shift, it->blue_invprec=16-prec;
-      }
-    }
-    if (it->red_shift<0 || it->green_shift<0 || it->blue_shift<0) {
-      if (0) fprintf(stderr,"Can't figure out color space\n");
-      goto fail;
-    }
-
     for (i=0; i<ANALOGTV_CV_MAX; i++) {
       int intensity=pow(i/256.0, 0.8)*65535.0; /* gamma correction */
       if (intensity>65535) intensity=65535;
+#if 1
+      it->red_values[i]=((intensity>>8)<<it->red_shift);
+      it->green_values[i]=((intensity>>8)<<it->green_shift);
+      it->blue_values[i]=((intensity>>8)<<it->blue_shift);
+#else
       it->red_values[i]=((intensity>>it->red_invprec)<<it->red_shift);
       it->green_values[i]=((intensity>>it->green_invprec)<<it->green_shift);
       it->blue_values[i]=((intensity>>it->blue_invprec)<<it->blue_shift);
+#endif
     }
-
   }
 
 #if 1
@@ -504,15 +498,20 @@ analogtv_allocate(Display *dpy, Window window)
   analogtv_configure(it);
 
   return it;
-
- fail:
-  if (it) free(it);
-  return NULL;
 }
 
 void
 analogtv_release(analogtv *it)
 {
+#if 1
+    if (it->pixmap)
+    {
+        XFreePixmap(it->dpy, it->pixmap);
+        it->pixmap = NULL;
+        it->pbBits = NULL;
+        it->widthbytes = 0;
+    }
+#else
   if (it->image) {
     if (it->use_shm) {
 #ifdef HAVE_XSHM_EXTENSION
@@ -523,6 +522,7 @@ analogtv_release(analogtv *it)
     }
     it->image=NULL;
   }
+#endif
   if (it->gc) XFreeGC(it->dpy, it->gc);
   it->gc=NULL;
   if (it->n_colors) XFreeColors(it->dpy, it->colormap, it->colors, it->n_colors, 0L);
@@ -556,83 +556,6 @@ analogtv_release(analogtv *it)
 int
 analogtv_set_demod(analogtv *it)
 {
-  int y_levels=10,i_levels=5,q_levels=5;
-
-  /*
-    In principle, we might be able to figure out how to adjust the
-    color map frame-by-frame to get some nice color bummage. But I'm
-    terrified of changing the color map because we'll get flashing.
-
-    I can hardly believe we still have to deal with colormaps. They're
-    like having NEAR PTRs: an enormous hassle for the programmer just
-    to save on memory. They should have been deprecated by 1995 or
-    so. */
-
- cmap_again:
-  if (it->use_cmap && !it->n_colors) {
-
-    if (it->n_colors) {
-      XFreeColors(it->dpy, it->colormap, it->colors, it->n_colors, 0L);
-      it->n_colors=0;
-    }
-
-    {
-      int yli,qli,ili;
-      for (yli=0; yli<y_levels; yli++) {
-        for (ili=0; ili<i_levels; ili++) {
-          for (qli=0; qli<q_levels; qli++) {
-            double interpy,interpi,interpq;
-            double levelmult=700.0;
-            int r,g,b;
-            XColor col;
-
-            interpy=100.0 * ((double)yli/y_levels);
-            interpi=50.0 * (((double)ili-(0.5*i_levels))/(double)i_levels);
-            interpq=50.0 * (((double)qli-(0.5*q_levels))/(double)q_levels);
-
-            r=(int)((interpy + 1.04*interpi + 0.624*interpq)*levelmult);
-            g=(int)((interpy - 0.276*interpi - 0.639*interpq)*levelmult);
-            b=(int)((interpy - 1.105*interpi + 1.729*interpq)*levelmult);
-            if (r<0) r=0;
-            if (r>65535) r=65535;
-            if (g<0) g=0;
-            if (g>65535) g=65535;
-            if (b<0) b=0;
-            if (b>65535) b=65535;
-
-#ifdef DEBUG
-            printf("%0.2f %0.2f %0.2f => %02x%02x%02x\n",
-                   interpy, interpi, interpq,
-                   r/256,g/256,b/256);
-#endif
-
-            col.red=r;
-            col.green=g;
-            col.blue=b;
-            col.pixel=0;
-            if (!XAllocColor(it->dpy, it->colormap, &col)) {
-              if (q_levels > y_levels*4/12)
-                q_levels--;
-              else if (i_levels > y_levels*5/12)
-                i_levels--;
-              else
-                y_levels--;
-
-              if (y_levels<2)
-                return -1;
-              goto cmap_again;
-            }
-            it->colors[it->n_colors++]=col.pixel;
-          }
-        }
-      }
-
-      it->cmap_y_levels=y_levels;
-      it->cmap_i_levels=i_levels;
-      it->cmap_q_levels=q_levels;
-    }
-  }
-
   return 0;
 }
 
@@ -1084,7 +1007,7 @@ analogtv_blast_imagerow(analogtv *it,
                         float *rgbf, float *rgbf_end,
                         int ytop, int ybot)
 {
-  int i,j,x,y;
+  int i,y;
   float *rpf;
   char *level_copyfrom[3];
   int xrepl=it->xrepl;
@@ -1095,7 +1018,8 @@ analogtv_blast_imagerow(analogtv *it,
     double levelmult=it->leveltable[ybot-ytop][y-ytop].value;
     char *rowdata;
 
-    rowdata=it->image->data + y*it->image->bytes_per_line;
+    //rowdata=it->image->data + y*it->image->bytes_per_line;
+    rowdata = it->pbBits + y * it->widthbytes;
 
     /* Fast special cases to avoid the slow XPutPixel. Ugh. It goes to show
        why standard graphics sw has to be fast, or else people will have to
@@ -1106,17 +1030,12 @@ analogtv_blast_imagerow(analogtv *it,
        routines. */
 
     if (level_copyfrom[level]) {
-      memcpy(rowdata, level_copyfrom[level], it->image->bytes_per_line);
+      memcpy(rowdata, level_copyfrom[level], it->widthbytes);
     }
     else {
       level_copyfrom[level] = rowdata;
 
-      if (0) {
-      }
-      else if (it->image->format==ZPixmap &&
-               it->image->bits_per_pixel==32 &&
-               sizeof(unsigned int)==4 &&
-               it->image->byte_order==localbyteorder) {
+      {
         /* int is more likely to be 32 bits than long */
         unsigned int *pixelptr=(unsigned int *)rowdata;
         unsigned int pix;
@@ -1139,78 +1058,15 @@ analogtv_blast_imagerow(analogtv *it,
           pixelptr+=xrepl;
         }
       }
-      else if (it->image->format==ZPixmap &&
-               it->image->bits_per_pixel==16 &&
-               sizeof(unsigned short)==2 &&
-               float_extraction_works &&
-               it->image->byte_order==localbyteorder) {
-        unsigned short *pixelptr=(unsigned short *)rowdata;
-        double r2,g2,b2;
-        float_extract_t r1,g1,b1;
-        unsigned short pix;
-
-        for (rpf=rgbf; rpf!=rgbf_end; rpf+=3) {
-          r2=rpf[0]; g2=rpf[1]; b2=rpf[2];
-          r1.f=r2 * levelmult+float_low8_ofs;
-          g1.f=g2 * levelmult+float_low8_ofs;
-          b1.f=b2 * levelmult+float_low8_ofs;
-          pix = (it->red_values[r1.i & 0x3ff] |
-                 it->green_values[g1.i & 0x3ff] |
-                 it->blue_values[b1.i & 0x3ff]);
-          pixelptr[0] = pix;
-          if (xrepl>=2) {
-            pixelptr[1] = pix;
-            if (xrepl>=3) pixelptr[2] = pix;
-          }
-          pixelptr+=xrepl;
-        }
-      }
-      else if (it->image->format==ZPixmap &&
-               it->image->bits_per_pixel==16 &&
-               sizeof(unsigned short)==2 &&
-               it->image->byte_order==localbyteorder) {
-        unsigned short *pixelptr=(unsigned short *)rowdata;
-        unsigned short pix;
-
-        for (rpf=rgbf; rpf!=rgbf_end; rpf+=3) {
-          int r1=rpf[0] * levelmult;
-          int g1=rpf[1] * levelmult;
-          int b1=rpf[2] * levelmult;
-          if (r1>=ANALOGTV_CV_MAX) r1=ANALOGTV_CV_MAX-1;
-          if (g1>=ANALOGTV_CV_MAX) g1=ANALOGTV_CV_MAX-1;
-          if (b1>=ANALOGTV_CV_MAX) b1=ANALOGTV_CV_MAX-1;
-          pix = it->red_values[r1] | it->green_values[g1] | it->blue_values[b1];
-          pixelptr[0] = pix;
-          if (xrepl>=2) {
-            pixelptr[1] = pix;
-            if (xrepl>=3) pixelptr[2] = pix;
-          }
-          pixelptr+=xrepl;
-        }
-      }
-      else {
-        for (x=0, rpf=rgbf; rpf!=rgbf_end ; x++, rpf+=3) {
-          int ntscri=rpf[0]*levelmult;
-          int ntscgi=rpf[1]*levelmult;
-          int ntscbi=rpf[2]*levelmult;
-          if (ntscri>=ANALOGTV_CV_MAX) ntscri=ANALOGTV_CV_MAX-1;
-          if (ntscgi>=ANALOGTV_CV_MAX) ntscgi=ANALOGTV_CV_MAX-1;
-          if (ntscbi>=ANALOGTV_CV_MAX) ntscbi=ANALOGTV_CV_MAX-1;
-          for (j=0; j<xrepl; j++) {
-            XPutPixel(it->image, x*xrepl + j, y,
-                      it->red_values[ntscri] | it->green_values[ntscgi] |
-                      it->blue_values[ntscbi]);
-          }
-        }
-      }
     }
   }
+  GdiFlush();   //
 }
 
 void
 analogtv_draw(analogtv *it)
 {
-  int i,j,x,y,lineno;
+  int i,lineno;
   int scanstart_i,scanend_i,squishright_i,squishdiv,pixrate;
   float *rgb_start, *rgb_end;
   double pixbright;
@@ -1394,78 +1250,7 @@ analogtv_draw(analogtv *it)
 #endif
     }
 
-    if (it->use_cmap) {
-      for (y=ytop; y<ybot; y++) {
-        int level=analogtv_level(it, y, ytop, ybot);
-        double levelmult=analogtv_levelmult(it, level);
-        double levelmult_y = levelmult * it->contrast_control
-          * puramp(it, 1.0, 0.0, 1.0) / (0.5+0.5*puheight) * 0.070;
-        double levelmult_iq = levelmult * 0.090;
-
-        struct analogtv_yiq_s *yiq=it->yiq;
-        analogtv_ntsc_to_yiq(it, lineno, signal,
-                             (scanstart_i>>16)-10, (scanend_i>>16)+10);
-        pixmultinc=pixrate;
-
-        x=0;
-        i=scanstart_i;
-        while (i<0 && x<it->usewidth) {
-          XPutPixel(it->image, x, y, it->colors[0]);
-          i+=pixmultinc;
-          x++;
-        }
-
-        while (i<scanend_i && x<it->usewidth) {
-          double pixfrac=(i&0xffff)/65536.0;
-          double invpixfrac=(1.0-pixfrac);
-          int pati=i>>16;
-          int yli,ili,qli,cmi;
-
-          double interpy=(yiq[pati].y*invpixfrac
-                          + yiq[pati+1].y*pixfrac) * levelmult_y;
-          double interpi=(yiq[pati].i*invpixfrac
-                          + yiq[pati+1].i*pixfrac) * levelmult_iq;
-          double interpq=(yiq[pati].q*invpixfrac
-                          + yiq[pati+1].q*pixfrac) * levelmult_iq;
-
-          yli = (int)(interpy * it->cmap_y_levels);
-          ili = (int)((interpi+0.5) * it->cmap_i_levels);
-          qli = (int)((interpq+0.5) * it->cmap_q_levels);
-          if (yli<0) yli=0;
-          if (yli>=it->cmap_y_levels) yli=it->cmap_y_levels-1;
-          if (ili<0) ili=0;
-          if (ili>=it->cmap_i_levels) ili=it->cmap_i_levels-1;
-          if (qli<0) qli=0;
-          if (qli>=it->cmap_q_levels) qli=it->cmap_q_levels-1;
-
-          cmi=qli + it->cmap_i_levels*(ili + it->cmap_q_levels*yli);
-
-#ifdef DEBUG
-          if ((random()%65536)==0) {
-            printf("%0.3f %0.3f %0.3f => %d %d %d => %d\n",
-                   interpy, interpi, interpq,
-                   yli, ili, qli,
-                   cmi);
-          }
-#endif
-
-          for (j=0; j<it->xrepl; j++) {
-            XPutPixel(it->image, x, y,
-                      it->colors[cmi]);
-            x++;
-          }
-          if (i >= squishright_i) {
-            pixmultinc += pixmultinc/squishdiv;
-          }
-          i+=pixmultinc;
-        }
-        while (x<it->usewidth) {
-          XPutPixel(it->image, x, y, it->colors[0]);
-          x++;
-        }
-      }
-    }
-    else {
+    {
       struct analogtv_yiq_s *yiq=it->yiq;
       analogtv_ntsc_to_yiq(it, lineno, signal,
                            (scanstart_i>>16)-10, (scanend_i>>16)+10);
@@ -1567,6 +1352,17 @@ analogtv_draw(analogtv *it)
   }
 
   if (overall_bot > overall_top) {
+#if 1
+    HDC hdc = XCreateDrawableDC_(it->dpy, it->window);
+    HDC hdcSrc = CreateCompatibleDC(it->dpy);
+    HGDIOBJ hbmOld = SelectObject(hdcSrc, it->pixmap->hbm);
+    BitBlt(hdc, it->screen_xo, it->screen_yo+overall_top,
+        it->usewidth, overall_bot - overall_top,
+        hdcSrc, 0, overall_top, SRCCOPY);
+    SelectObject(hdcSrc, hbmOld);
+    XDeleteDrawableDC_(it->dpy, it->window, hdc);
+    DeleteDC(hdcSrc);
+#else   // !1
     if (it->use_shm) {
 #ifdef HAVE_XSHM_EXTENSION
       XShmPutImage(it->dpy, it->window, it->gc, it->image,
@@ -1581,6 +1377,7 @@ analogtv_draw(analogtv *it)
                 it->screen_xo, it->screen_yo+overall_top,
                 it->usewidth, overall_bot - overall_top);
     }
+#endif  // !1
   }
 
 #ifdef DEBUG
@@ -1629,6 +1426,7 @@ analogtv_load_ximage(analogtv *it, analogtv_input *input, XImage *pic_im)
   int y_overscan=5; /* overscan this much top and bottom */
   int y_scanlength=ANALOGTV_VISLINES+2*y_overscan;
 
+  assert(pic_im->format == RGBAPixmap_);    //
   img_w=pic_im->width;
   img_h=pic_im->height;
   
@@ -1647,8 +1445,20 @@ analogtv_load_ximage(analogtv *it, analogtv_input *input, XImage *pic_im)
       col1[x].pixel=XGetPixel(pic_im, picx, picy1);
       col2[x].pixel=XGetPixel(pic_im, picx, picy2);
     }
+#if 1
+    for (i = 0; i < ANALOGTV_PIC_LEN; i++)
+    {
+        col1[i].red = (BYTE)HIWORD(col1[i].pixel) * 256;
+        col1[i].green = HIBYTE(col1[i].pixel) * 256;
+        col1[i].blue = LOBYTE(col1[i].pixel) * 256;
+        col2[i].red = (BYTE)HIWORD(col2[i].pixel) * 256;
+        col2[i].green = HIBYTE(col2[i].pixel) * 256;
+        col2[i].blue = LOBYTE(col2[i].pixel) * 256;
+    }
+#else
     XQueryColors(it->dpy, it->colormap, col1, ANALOGTV_PIC_LEN);
     XQueryColors(it->dpy, it->colormap, col2, ANALOGTV_PIC_LEN);
+#endif
 
     for (i=0; i<7; i++) fyx[i]=fyy[i]=0;
     for (i=0; i<4; i++) fix[i]=fiy[i]=fqx[i]=fqy[i]=0.0;
@@ -1946,8 +1756,10 @@ analogtv_make_font(Display *dpy, Window window, analogtv_font *f,
                                            font6x10_width,
                                            font6x10_height,
                                            1, 0, 1);
+    //f->text_im = XGetImage(dpy, text_pm, 0, 0, font6x10_width, font6x10_height,
+    //                       1, XYPixmap);
     f->text_im = XGetImage(dpy, text_pm, 0, 0, font6x10_width, font6x10_height,
-                           1, XYPixmap);
+                           1, RGBAPixmap_);
     XFreePixmap(dpy, text_pm);
 
   } else if (fontname) {
@@ -1961,7 +1773,8 @@ analogtv_make_font(Display *dpy, Window window, analogtv_font *f,
     text_pm=XCreatePixmap(dpy, window, 256*f->char_w, f->char_h, 1);
 
     memset(&gcv, 0, sizeof(gcv));
-    gcv.foreground=1;
+    //gcv.foreground=1;
+    gcv.foreground=255;
     gcv.background=0;
     gcv.font=font->fid;
     gc=XCreateGC(dpy, text_pm, GCFont|GCBackground|GCForeground, &gcv);
@@ -1975,8 +1788,10 @@ analogtv_make_font(Display *dpy, Window window, analogtv_font *f,
       int y=f->char_h*8/10;
       XDrawString(dpy, text_pm, gc, x, y, &c, 1);
     }
+    //f->text_im = XGetImage(dpy, text_pm, 0, 0, 256*f->char_w, f->char_h,
+    //                       1, XYPixmap);
     f->text_im = XGetImage(dpy, text_pm, 0, 0, 256*f->char_w, f->char_h,
-                           1, XYPixmap);
+                           1, RGBAPixmap_);
 # if 0
     XWriteBitmapFile(dpy, "/tmp/tvfont.xbm", text_pm, 
                      256*f->char_w, f->char_h, -1, -1);
@@ -1984,7 +1799,9 @@ analogtv_make_font(Display *dpy, Window window, analogtv_font *f,
     XFreeGC(dpy, gc);
     XFreePixmap(dpy, text_pm);
   } else {
-    f->text_im = XCreateImage(dpy, xgwa.visual, 1, XYPixmap, 0, 0,
+    //f->text_im = XCreateImage(dpy, xgwa.visual, 1, XYPixmap, 0, 0,
+    //                          256*f->char_w, f->char_h, 8, 0);
+    f->text_im = XCreateImage(dpy, xgwa.visual, 1, RGBAPixmap_, 0, 0,
                               256*f->char_w, f->char_h, 8, 0);
     f->text_im->data = (char *)calloc(f->text_im->height,
                                       f->text_im->bytes_per_line);
@@ -2000,7 +1817,8 @@ analogtv_font_pixel(analogtv_font *f, int c, int x, int y)
   if (x<0 || x>=f->char_w) return 0;
   if (y<0 || y>=f->char_h) return 0;
   if (c<0 || c>=256) return 0;
-  return XGetPixel(f->text_im, c*f->char_w + x, y) ? 1 : 0;
+  //return XGetPixel(f->text_im, c*f->char_w + x, y) ? 1 : 0;
+  return XGetPixel(f->text_im, c*f->char_w + x, y) ? 255 : 0;
 }
 
 void
@@ -2010,7 +1828,8 @@ analogtv_font_set_pixel(analogtv_font *f, int c, int x, int y, int value)
   if (y<0 || y>=f->char_h) return;
   if (c<0 || c>=256) return;
 
-  XPutPixel(f->text_im, c*f->char_w + x, y, value);
+  //XPutPixel(f->text_im, c*f->char_w + x, y, value);
+  XPutPixel(f->text_im, c*f->char_w + x, y, value ? 255 : 0);
 }
 
 void

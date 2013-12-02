@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="ripples"
-	ProjectGUID="{647454D1-C4C3-40B2-93DD-E4E42555D542}"
-	RootNamespace="ripples"
+	Name="bsod"
+	ProjectGUID="{5A1DA786-C6CA-4F29-B3EC-918C819B5916}"
+	RootNamespace="bsod"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -179,6 +179,18 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\analogtv.c"
+				>
+			</File>
+			<File
+				RelativePath=".\apple2.c"
+				>
+			</File>
+			<File
+				RelativePath=".\bsod.c"
+				>
+			</File>
+			<File
 				RelativePath="..\colors.c"
 				>
 			</File>
@@ -191,11 +203,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\pixmap.c"
+				RelativePath="..\minixpm.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ripples.c"
+				RelativePath="..\pixmap.c"
 				>
 			</File>
 			<File
@@ -208,6 +220,10 @@
 			</File>
 			<File
 				RelativePath="..\ximage.c"
+				>
+			</File>
+			<File
+				RelativePath=".\xpm-pixmap.c"
 				>
 			</File>
 			<File
@@ -225,6 +241,14 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\analogtv.h"
+				>
+			</File>
+			<File
+				RelativePath=".\apple2.h"
+				>
+			</File>
+			<File
 				RelativePath="..\colors.h"
 				>
 			</File>
@@ -237,11 +261,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\minixpm.h"
+				>
+			</File>
+			<File
 				RelativePath="..\resource.h"
 				>
 			</File>
 			<File
 				RelativePath="..\screenhack.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xpm-pixmap.h"
 				>
 			</File>
 			<File

@@ -44,6 +44,8 @@
 # define USE_XCOPYAREA
 #endif
 
+#undef USE_XCOPYAREA
+
 char *background = "black";
 char *foreground = "white";
 int delay = 500000;
@@ -63,9 +65,6 @@ static argtype vars[] =
     {&delay2, "delay2", NULL, "500000", t_Int},
     {&duration, "duration", NULL, "120", t_Int},
     {&bitmap, "bitmap", NULL, "(default)", t_String},
-	{&imageDirectory, "imageDirectory", NULL, "", t_String},
-	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
-	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 struct state {
@@ -122,6 +121,7 @@ do_bitblt (Display *dpy, Drawable src, Drawable dst, GC gc, int op,
            unsigned int width, unsigned int height,
            int dst_x, int dst_y)
 {
+  assert(width && height);
   if (op == GXclear)
     {
       XSetForeground (dpy, gc, 0xFF000000);  /* ARGB black for Cocoa */

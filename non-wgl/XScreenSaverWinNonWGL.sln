@@ -263,6 +263,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pong", "pong.vcproj", "{BAC
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "slidescreen", "slidescreen.vcproj", "{275E1C37-CE46-49AA-BC05-51BEBF4881C6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "m6502", "m6502.vcproj", "{52EAC56C-F64E-4D97-AB27-0ECFEE5A06F3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bsod", "bsod.vcproj", "{5A1DA786-C6CA-4F29-B3EC-918C819B5916}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -793,6 +797,14 @@ Global
 		{275E1C37-CE46-49AA-BC05-51BEBF4881C6}.Debug|Win32.Build.0 = Debug|Win32
 		{275E1C37-CE46-49AA-BC05-51BEBF4881C6}.Release|Win32.ActiveCfg = Release|Win32
 		{275E1C37-CE46-49AA-BC05-51BEBF4881C6}.Release|Win32.Build.0 = Release|Win32
+		{52EAC56C-F64E-4D97-AB27-0ECFEE5A06F3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{52EAC56C-F64E-4D97-AB27-0ECFEE5A06F3}.Debug|Win32.Build.0 = Debug|Win32
+		{52EAC56C-F64E-4D97-AB27-0ECFEE5A06F3}.Release|Win32.ActiveCfg = Release|Win32
+		{52EAC56C-F64E-4D97-AB27-0ECFEE5A06F3}.Release|Win32.Build.0 = Release|Win32
+		{5A1DA786-C6CA-4F29-B3EC-918C819B5916}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5A1DA786-C6CA-4F29-B3EC-918C819B5916}.Debug|Win32.Build.0 = Debug|Win32
+		{5A1DA786-C6CA-4F29-B3EC-918C819B5916}.Release|Win32.ActiveCfg = Release|Win32
+		{5A1DA786-C6CA-4F29-B3EC-918C819B5916}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

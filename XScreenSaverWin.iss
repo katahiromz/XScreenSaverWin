@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{B7914227-CD94-4B6F-859C-E3823C9552DA}
 AppName=XScreenSaver for Windows
-AppVerName=XScreenSaver v0.55
+AppVerName=XScreenSaver v0.64
 AppPublisher=Katayama Hirofumi MZ
 AppPublisherURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 AppSupportURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
@@ -53,6 +53,7 @@ Source: "XScreenSaverWin\bouncingcow_scr\bouncingcow.scr"; DestDir: "{app}\bounc
 Source: "XScreenSaverWin\boxed_scr\boxed.scr"; DestDir: "{app}\boxed_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\boxfit_scr\boxfit.scr"; DestDir: "{app}\boxfit_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\braid_scr\braid.scr"; DestDir: "{app}\braid_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\bsod_scr\bsod.scr"; DestDir: "{app}\bsod_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\bubble3d_scr\bubble3d.scr"; DestDir: "{app}\bubble3d_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\bubbles_scr\bubbles.scr"; DestDir: "{app}\bubbles_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\bumps_scr\bumps.scr"; DestDir: "{app}\bumps_scr"; Flags: ignoreversion
@@ -135,6 +136,7 @@ Source: "XScreenSaverWin\imsmap_scr\imsmap.scr"; DestDir: "{app}\imsmap_scr"; Fl
 Source: "XScreenSaverWin\interference_scr\interference.scr"; DestDir: "{app}\interference_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\intermomentary_scr\intermomentary.scr"; DestDir: "{app}\intermomentary_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\jigglypuff_scr\jigglypuff.scr"; DestDir: "{app}\jigglypuff_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\jigsaw_scr\jigsaw.scr"; DestDir: "{app}\jigsaw_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\julia_scr\julia.scr"; DestDir: "{app}\julia_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\juggle_scr\juggle.scr"; DestDir: "{app}\juggle_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\juggler3d_scr\juggler3d.scr"; DestDir: "{app}\juggler3d_scr"; Flags: ignoreversion
@@ -152,6 +154,7 @@ Source: "XScreenSaverWin\lissie_scr\lissie.scr"; DestDir: "{app}\lissie_scr"; Fl
 Source: "XScreenSaverWin\lmorph_scr\lmorph.scr"; DestDir: "{app}\lmorph_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\lockward_scr\lockward.scr"; DestDir: "{app}\lockward_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\loop_scr\loop.scr"; DestDir: "{app}\loop_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\m6502_scr\m6502.scr"; DestDir: "{app}\m6502_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\maze_scr\maze.scr"; DestDir: "{app}\maze_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\memscroller_scr\memscroller.scr"; DestDir: "{app}\memscroller_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\menger_scr\menger.scr"; DestDir: "{app}\menger_scr"; Flags: ignoreversion
@@ -172,11 +175,13 @@ Source: "XScreenSaverWin\penetrate_scr\penetrate.scr"; DestDir: "{app}\penetrate
 Source: "XScreenSaverWin\penrose_scr\penrose.scr"; DestDir: "{app}\penrose_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\petri_scr\petri.scr"; DestDir: "{app}\petri_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\photopile_scr\photopile.scr"; DestDir: "{app}\photopile_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\phosphor_scr\phosphor.scr"; DestDir: "{app}\phosphor_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\pinion_scr\pinion.scr"; DestDir: "{app}\pinion_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\pipes_scr\pipes.scr"; DestDir: "{app}\pipes_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\polyhedra_scr\polyhedra.scr"; DestDir: "{app}\polyhedra_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\polyominoes_scr\polyominoes.scr"; DestDir: "{app}\polyominoes_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\polytopes_scr\polytopes.scr"; DestDir: "{app}\polytopes_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\pong_scr\pong.scr"; DestDir: "{app}\pong_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\popsquares_scr\popsquares.scr"; DestDir: "{app}\popsquares_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\providence_scr\providence.scr"; DestDir: "{app}\providence_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\pulsar_scr\pulsar.scr"; DestDir: "{app}\pulsar_scr"; Flags: ignoreversion
@@ -222,6 +227,7 @@ Source: "XScreenSaverWin\wander_scr\wander.scr"; DestDir: "{app}\wander_scr"; Fl
 Source: "XScreenSaverWin\whirlwindwarp_scr\whirlwindwarp.scr"; DestDir: "{app}\whirlwindwarp_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\whirlygig_scr\whirlygig.scr"; DestDir: "{app}\whirlygig_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\wormhole_scr\wormhole.scr"; DestDir: "{app}\wormhole_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\xanalogtv_scr\xanalogtv.scr"; DestDir: "{app}\xanalogtv_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\xflame_scr\xflame.scr"; DestDir: "{app}\xflame_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\xjack_scr\xjack.scr"; DestDir: "{app}\xjack_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\xlyap_scr\xlyap.scr"; DestDir: "{app}\xlyap_scr"; Flags: ignoreversion

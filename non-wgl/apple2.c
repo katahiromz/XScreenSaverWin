@@ -12,18 +12,14 @@
  * with additional work by Jamie Zawinski <jwz@jwz.org>
  */
 
-#if 0
-	#define GETTIMEOFDAY_TWO_ARGS
+#include "screenhack.h"
+#include "yarandom.h"
+#include <math.h>
+//#include "screenhackI.h"
+#include "apple2.h"
 
-	#include "xws2win.h"
-	#include "yarandom.h"
-	#include <math.h>
-	//#include "screenhackI.h"
-	#include "apple2.h"
-
-	#ifdef HAVE_XSHM_EXTENSION
-	#include "xshm.h"
-	#endif
+#ifdef HAVE_XSHM_EXTENSION
+#include "xshm.h"
 #endif
 
 #define DEBUG

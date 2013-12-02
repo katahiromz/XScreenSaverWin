@@ -79,9 +79,6 @@ static argtype vars[] =
     {&reflect, "reflect", NULL, "False", t_Bool},
     {&blackhole, "blackhole", NULL, "False", t_Bool},
     {&effect, "effect", NULL, "none", t_String},
-	{&imageDirectory, "imageDirectory", NULL, "", t_String},
-	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
-	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 struct coo {

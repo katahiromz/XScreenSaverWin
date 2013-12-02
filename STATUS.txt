@@ -1,4 +1,4 @@
-There are 186 Goods, 11 OKs and 26 NGs of total 223 screen savers 
+There are 195 Goods, 9 OKs and 19 NGs of total 223 screen savers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -10,11 +10,10 @@ AntInspect              Good
 AntMaze                 Good        
 AntSpotlight            Good        
 Apollonian              Good        
-Apple2                  NG          
+Apple2                  NG          Drawing bad
 Atlantis                Good        
 Attraction              Good        
 Atunnel                 Good        
-BSOD                    NG          
 Barcode                 Good        
 Blaster                 Good        
 BlinkBox                Good        
@@ -23,18 +22,18 @@ BlockTube               Good
 Boing                   Good        
 Bouboule                Good        
 BouncingCow             Good        
-BoxFit                  Good        
 Boxed                   Good        
+BoxFit                  OK          Hung up if grab is enabled
 Braid                   Good        
+BSOD                    Good        
 Bubble3D                Good        
 Bubbles                 Good        
 Bumps                   Good        
-CCurve                  Good        
-CWaves                  Good        
 Cage                    Good        
 Carousel                Good        
+CCurve                  Good        
 Celtic                  Good        
-Circuit                 OK          Label mirrored
+Circuit                 Good        
 CloudLife               Good        
 CompanionCube           Good        
 Compass                 Good        
@@ -43,11 +42,11 @@ Crackberg               Good
 Critical                Good        
 Crystal                 Good        
 Cube21                  Good        
-CubeStorm               Good        
 Cubenetic               Good        
+CubeStorm               Good        
 CubicGrid               Good        
+CWaves                  Good        
 Cynosure                Good        
-DNALogo                 Good        
 DangerBall              Good        
 DecayScreen             Good        
 Deco                    Good        
@@ -55,6 +54,7 @@ Deluxe                  Good
 Demon                   Good        
 Discrete                Good        
 Distort                 Good        
+DNALogo                 Good        
 Drift                   Good        
 Endgame                 Good        
 Engine                  Good        
@@ -71,15 +71,18 @@ FlipFlop                Good
 FlipScreen3D            OK          Blur and slow
 FlipText                Good        
 Flow                    Good        
-FluidBalls              OK          Slow
+FluidBalls              Good        
 Flurry                  Good        
 FlyingToasters          Good        
-FontGlide               NG          
+FontGlide               NG          Not implemented yet
 Forest                  Good        
 FuzzyFlakes             Good        
+Galaxy                  OK          Flickers and slow
+Gears                   Good        
 GFlux                   Good        
 GLBlur                  OK          Slow
 GLCells                 Good        
+Gleidescope             OK          Slow
 GLForestFire            Good        
 GLHanoi                 Good        
 GLKnots                 Good        
@@ -89,9 +92,6 @@ GLSchool                Good
 GLSlideshow             Good        
 GLSnake                 Good        
 GLText                  Good        
-Galaxy                  OK          Flickers and slow
-Gears                   Good        
-Gleidescope             OK          Slow
 Goop                    OK          Transparency disabled
 Grav                    Good        
 Greynetic               Good        
@@ -106,12 +106,12 @@ HyperCube               Good
 Hypertorus              Good        
 Hypnowheel              Good        
 IFS                     Good        
-IMSMap                  OK          Slow
+IMSMap                  Good        
 Interaggregate          NG          Black out
 Interference            Good        
 Intermomentary          Good        
 JigglyPuff              Good        
-Jigsaw                  NG          Black out
+Jigsaw                  Good        
 Juggle                  Good        
 Juggler3D               Good        
 Julia                   Good        
@@ -119,16 +119,17 @@ Kaleidescope            Good
 Kaleidocycle            Good        
 Klein                   Good        
 Kumppa                  Good        
-LCDscrub                Good        
-LMorph                  Good        
 Lament                  Good        
 Laser                   Good        
 Lavalite                Good        
+LCDscrub                Good        
 Lightning               Good        
 Lisa                    Good        
 Lissie                  Good        
+LMorph                  Good        
 Lockward                Good        
 Loop                    Good        
+m6502                   Good        
 Maze                    Good        
 MemScroller             Good        
 Menger                  Good        
@@ -150,7 +151,7 @@ Pedal                   Good
 Penetrate               Good        
 Penrose                 Good        
 Petri                   Good        
-Phosphor                NG          Drawing bad
+Phosphor                Good        
 Photopile               Good        
 Piecewise               NG          Drawing bad
 Pinion                  Good        
@@ -158,7 +159,7 @@ Pipes                   Good
 Polyhedra               Good        
 Polyominoes             Good        
 Polytopes               Good        
-Pong                    NG          Black out
+Pong                    Good        
 PopSquares              Good        
 Providence              Good        
 Pulsar                  Good        
@@ -167,11 +168,11 @@ Qix                     NG          Transparency disabled
 QuasiCrystal            NG          Black out
 Queens                  Good        
 RDbomb                  OK          Slow
-Ripples                 NG          Black out
+Ripples                 Good        
 Rocks                   Good        
 Rorschach               Good        
-RotZoomer               NG          Black out
 Rotor                   Good        
+RotZoomer               NG          Black out
 Rubik                   Good        
 RubikBlocks             Good        
 SBalls                  Good        
@@ -190,8 +191,8 @@ Spotlight               Good
 Sproingies              Good        
 Squiral                 Good        
 Stairs                  Good        
-StarWars                Good        
 Starfish                Good        
+StarWars                Good        
 StonerView              Good        
 Strange                 NG          Drawing bad
 Substrate               NG          Drawing bad
@@ -216,7 +217,7 @@ WhirlWindWarp           Good
 Whirlygig               Good        
 Worm                    NG          Drawing bad
 Wormhole                Good        
-XAnalogTV               NG          Drawing bad
+XAnalogTV               Good        
 XFlame                  Good        
 XJack                   Good        
 XLyap                   Good        
@@ -224,4 +225,3 @@ XMatrix                 Good
 XRaySwarm               Good        
 XSpirograph             Good        
 Zoom                    Good        
-m6502                   NG          

@@ -62,9 +62,6 @@ static argtype vars[] =
     {&springiness, "springiness", NULL, "0.1", t_Float},
     {&tileSize, "tileSize", NULL, "120", t_Int},
     {&transference, "transference", NULL, "0.025", t_Float},
-	{&imageDirectory, "imageDirectory", NULL, "", t_String},
-	{&chooseRandomImages, "chooseRandomImages", NULL, "False", t_Bool},
-	{&grabDesktopImages, "grabDesktopImages", NULL, "True", t_Bool},
 };
 
 typedef struct

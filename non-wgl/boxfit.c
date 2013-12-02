@@ -27,15 +27,15 @@ char *background = "black";
 char *foreground = "#444444";
 int delay = 20000;
 char *mode = "random";
-int colors = 64;
+int colors_ = 64;
 int boxCount = 50;
 int growBy = 1;
 int spacing = 1;
 int borderSize = 1;
 Bool grab = False;
 Bool peek = False;
-Bool grabDesktopImages = False;
-Bool chooseRandomImages = True;
+Bool grabDesktopImages = True;
+Bool chooseRandomImages = False;
 char *imageDirectory = "";
 
 static argtype vars[] = 
@@ -44,16 +44,13 @@ static argtype vars[] =
     {&foreground, "foreground", NULL, "#444444", t_String},
     {&delay, "delay", NULL, "20000", t_Int},
     {&mode, "mode", NULL, "random", t_String},
-    {&colors, "colors", NULL, "64", t_Int},
+    {&colors_, "colors", NULL, "64", t_Int},
     {&boxCount, "boxCount", NULL, "50", t_Int},
     {&growBy, "growBy", NULL, "1", t_Int},
     {&spacing, "spacing", NULL, "1", t_Int},
     {&borderSize, "borderSize", NULL, "1", t_Int},
     {&grab, "grab", NULL, "False", t_Bool},
     {&peek, "peek", NULL, "False", t_Bool},
-    {&grabDesktopImages, "grabDesktopImages", NULL, "False", t_Bool},
-    {&chooseRandomImages, "chooseRandomImages", NULL, "True", t_Bool},
-	{&imageDirectory, "imageDirectory", NULL, "", t_String},
 };
 
 typedef struct {
@@ -156,11 +153,13 @@ reset_boxes (state *st)
   else
     {
       //st->ncolors = get_integer_resource (st->dpy, "colors", "Colors");  /* re-get */
-      st->ncolors = colors;
+      st->ncolors = colors_;
+	  assert(colors_ != 0);
       if (st->ncolors < 1) st->ncolors = 1;
       make_smooth_colormap (st->xgwa.screen, st->xgwa.visual, st->xgwa.colormap,
                             st->colors, &st->ncolors, True, 0, False);
       if (st->ncolors < 1) abort();
+	  assert(st->ncolors);
       XClearWindow (st->dpy, st->window);
     }
 }
@@ -196,9 +195,11 @@ boxfit_init (Display *dpy, Window window)
   if (! grab)
     {
       //st->ncolors = get_integer_resource (dpy, "colors", "Colors");
-      st->ncolors = colors;
+      st->ncolors = colors_;
+	  assert(colors_);
       if (st->ncolors < 1) st->ncolors = 1;
       st->colors = (XColor *) malloc (sizeof(XColor) * st->ncolors);
+	  assert(st->ncolors);
     }
 
 #if 1
@@ -377,6 +378,7 @@ grow_boxes (state *st)
         }
 
       /* Pick colors for this box */
+	  assert(st->ncolors);
       if (st->image)
         {
           int w = st->image->width;
@@ -473,6 +475,7 @@ draw_boxes (state *st)
       else
         XFillRectangle (st->dpy, st->window, st->gc, b->x, b->y, b->w, b->h);
 
+  	  assert(st->ncolors);
       if (st->border_size > 0)
         {
           unsigned int bd = (st->image
@@ -496,29 +499,37 @@ boxfit_draw (Display *dpy, Window window, void *closure)
 {
   state *st = (state *) closure;
   int delay;
+  static Bool b = False;
 
+  if (0 && !b)
+  {
+      st->image = XGetImage (st->dpy,
+                             (st->loading_pixmap ? st->loading_pixmap :
+                              st->window),
+                             0, 0,
+                             st->xgwa.width, st->xgwa.height, ~0L, 
+                             RGBAPixmap_);
+      if (st->loading_pixmap) XFreePixmap (st->dpy, st->loading_pixmap);
+      XSetWindowBackground (st->dpy, st->window, st->bg_color);
+      if (st->loading_pixmap)
+        XClearWindow (st->dpy, st->window);
+      else
+        st->countdown = 2000000;
+      st->loading_pixmap = 0;
+      b = True;
+  }
+
+  assert(st->ncolors);
   if (st->img_loader)   /* still loading */
     {
       st->img_loader = load_image_async_simple (st->img_loader, 0, 0, 0, 0, 0);
       if (! st->img_loader)  /* just finished */
         {
-          st->image = XGetImage (st->dpy,
-                                 (st->loading_pixmap ? st->loading_pixmap :
-                                  st->window),
-                                 0, 0,
-                                 st->xgwa.width, st->xgwa.height, ~0L, 
-                                 ZPixmap);
-          if (st->loading_pixmap) XFreePixmap (st->dpy, st->loading_pixmap);
-          XSetWindowBackground (st->dpy, st->window, st->bg_color);
-          if (st->loading_pixmap)
-            XClearWindow (st->dpy, st->window);
-          else
-            st->countdown = 2000000;
-          st->loading_pixmap = 0;
         }
       return st->delay;
     }
 
+  assert(st->ncolors);
   if (st->countdown > 0)
     {
       st->countdown -= st->delay;
@@ -530,6 +541,7 @@ boxfit_draw (Display *dpy, Window window, void *closure)
       return st->delay;
     }
 
+  assert(st->ncolors);
   if (st->growing_p) {
     draw_boxes (st);
     delay = grow_boxes (st);

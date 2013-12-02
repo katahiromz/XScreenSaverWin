@@ -58,7 +58,6 @@ float TVColor = 70;
 float TVTint = 5;
 float TVBrightness = 3;
 float TVContrast = 1000;
-int use_cmap = 0;
 
 char *imageDirectory = "";
 Bool chooseRandomImages = True;
@@ -79,8 +78,7 @@ static argtype vars[] =
     {&TVColor, "TVColor", NULL, "70", t_Float},
     {&TVTint, "TVTint", NULL, "5", t_Float},
     {&TVBrightness, "TVBrightness", NULL, "3", t_Float},
-	{&TVContrast, "TVContrast", NULL, "1000", t_Float},
-    {&use_cmap, "use_cmap", NULL, "0", t_Int},
+    {&TVContrast, "TVContrast", NULL, "1000", t_Float},
     {&imageDirectory, "imageDirectory", NULL, "", t_String},
     {&chooseRandomImages, "chooseRandomImages", NULL, "True", t_Bool},
     {&grabDesktopImages, "grabDesktopImages", NULL, "False", t_Bool},

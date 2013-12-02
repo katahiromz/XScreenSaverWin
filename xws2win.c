@@ -913,13 +913,13 @@ int XCopyArea(Display *dpy,
     {
         HDC hdc = XCreateDrawableDC_(dpy, dst_drawable);
         values = XGetGCValues_(gc);
-        if (values->clip_mask_region)
+        if (values && values->clip_mask_region)
         {
             SelectClipRgn(hdc, values->clip_mask_region);
             OffsetClipRgn(hdc, values->clip_x_origin, values->clip_y_origin);
         }
         BitBlt(hdc, dst_x, dst_y, width, height, hdc, src_x, src_y, SRCCOPY);
-        if (values->clip_mask_region)
+        if (values && values->clip_mask_region)
             SelectClipRgn(hdc, NULL);
         XDeleteDrawableDC_(dpy, dst_drawable, hdc);
     }
@@ -1070,6 +1070,8 @@ int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
 {
     if (mask == NULL)
     {
+        if (gc->clip_mask_region)
+            DeleteObject(gc->clip_mask_region);
         gc->clip_mask_region = NULL;
     }
     else
@@ -1107,16 +1109,19 @@ int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
         i = 0;
         for (y = 0; y < bm.bmHeight; y++)
         {
-            for (x = 0; x < bm.bmWidth; x++)
+            for (x = 0; x < bm.bmWidth;)
             {
                 if (pb[y * bm.bmWidthBytes + x * 4])
                 {
-                    pRects[i].left = x;
-                    pRects[i].top = y;
-                    pRects[i].right = x + 1;
-                    pRects[i].bottom = y + 1;
+                    pRects->left = x;
+                    pRects->right = ++x;
+                    pRects->top = y;
+                    pRects->bottom = y + 1;
+                    pRects++;
                     i++;
                 }
+                else
+                    x++;
             }
         }
         hRgn = ExtCreateRegion(NULL, size, prd);
@@ -1148,17 +1153,29 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
 
     ZeroMemory(&lf, sizeof(lf));
     lstrcpynA(lf.lfFaceName, name, LF_FACESIZE);
+    fprintf(stderr, "Loading font: %s\n", name);
     p = strrchr(lf.lfFaceName, ' ');
-    if (p)
+    if (p && '0' <= p[1] && p[1] <= '9')
     {
         long n = strtoul(p + 1, &q, 10);
         if (q && *q == '\0')
         {
             lf.lfHeight = -MulDiv(n, GetDeviceCaps(hdc, LOGPIXELSY), 72);
             *p = '\0';
+            fprintf(stderr, "font size: %d\n", lf.lfHeight);
         }
     }
-    lf.lfWeight = FW_NORMAL;
+    p = strstr(lf.lfFaceName, " Bold");
+    if (p == NULL)
+        p = strstr(lf.lfFaceName, " bold");
+    if (p != NULL)
+    {
+        fprintf(stderr, "font is bold\n", lf.lfHeight);
+        *p = '\0';
+        lf.lfWeight = FW_BOLD;
+    }
+    else
+        lf.lfWeight = FW_NORMAL;
     lf.lfQuality = ANTIALIASED_QUALITY;
     fs->fid = CreateFontIndirectA(&lf);
     assert(fs->fid);
@@ -1220,7 +1237,7 @@ int XFreeFont(Display *dpy, XFontStruct *fs)
     return 0;
 }
 
-int XTextExtents(XFontStruct *fs, char *string, int nchars,
+int XTextExtents(XFontStruct *fs, const char *string, int nchars,
     int *dir, int *font_ascent, int *font_descent, XCharStruct *overall)
 {
     SIZE siz;

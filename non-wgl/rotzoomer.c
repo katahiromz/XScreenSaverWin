@@ -51,9 +51,6 @@ static argtype vars[] =
     {&numboxes, "numboxes", NULL, "2", t_Int},
     {&delay, "delay", NULL, "10000", t_Int},
     {&duration, "duration", NULL, "120", t_Int},
-	{&imageDirectory, "imageDirectory", NULL, "", t_String},
-	{&chooseRandomImages, "chooseRandomImages", NULL, "True", t_Bool},
-	{&grabDesktopImages, "grabDesktopImages", NULL, "False", t_Bool},
 };
 
 struct zoom_area {

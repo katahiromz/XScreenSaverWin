@@ -58,9 +58,8 @@ Bool grabDesktopImages = False;
 Bool chooseRandomImages = True;
 float TVColor = 70;
 float TVTint = 5;
-float TVBrightness = 3;
-float TVContrast = 1000;
-int use_cmap = 0;
+float TVBrightness = 2;
+float TVContrast = 150;
 char *imageDirectory = "";
 
 static argtype vars[] = 
@@ -72,9 +71,8 @@ static argtype vars[] =
     {&chooseRandomImages, "chooseRandomImages", NULL, "True", t_Bool},
     {&TVColor, "TVColor", NULL, "70", t_Float},
     {&TVTint, "TVTint", NULL, "5", t_Float},
-    {&TVBrightness, "TVBrightness", NULL, "3", t_Float},
-    {&TVContrast, "TVContrast", NULL, "1000", t_Float},
-    {&use_cmap, "use_cmap", NULL, "0", t_Int},
+    {&TVBrightness, "TVBrightness", NULL, "2", t_Float},
+    {&TVContrast, "TVContrast", NULL, "150", t_Float},
     {&imageDirectory, "imageDirectory", NULL, "", t_String},
 };
 
@@ -368,8 +366,13 @@ static void image_loaded_cb (Screen *screen, Window window, Drawable pixmap,
     analogtv_input *input = st->stations[this];
     int width=ANALOGTV_PIC_LEN;
     int height=width*3/4;
+#if 1
+    XImage *image = XGetImage (st->dpy, pixmap, 0, 0,
+                               width, height, ~0L, RGBAPixmap_);
+#else
     XImage *image = XGetImage (st->dpy, pixmap, 0, 0,
                                width, height, ~0L, ZPixmap);
+#endif
     XFreePixmap(st->dpy, pixmap);
 
     analogtv_setup_sync(input, 1, (random()%20)==0);

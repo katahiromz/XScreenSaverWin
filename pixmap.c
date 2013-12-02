@@ -15,7 +15,7 @@ Pixmap XCreatePixmap(
     ZeroMemory(&bi, sizeof(bi));
     bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bi.bmiHeader.biWidth = width;
-    bi.bmiHeader.biHeight = height;
+    bi.bmiHeader.biHeight = -(long)height;
     bi.bmiHeader.biPlanes = 1;
     bi.bmiHeader.biBitCount = 32;
     data->hbm = CreateDIBSection(dpy, &bi, DIB_RGB_COLORS,
@@ -43,14 +43,21 @@ Pixmap XCreatePixmapFromBitmapData(
     Pixmap pixmap;
     XImage *ximage;
     GC gc;
+    XGCValues values;
 
-    ximage = XCreateImage(dpy, NULL, depth, ZPixmap,
-        0, data, width, height, 8, 0);
+    ximage = XCreateImage(dpy, NULL, 1, ZPixmap,
+        0, NULL, width, height, 8, 0);
+	ximage->data = data;
     pixmap = XCreatePixmap(dpy, d, width, height, 32);
 
-    gc = XCreateGC(dpy, pixmap, 0, NULL);
+    values.background = bg == 1 ? 255 : 0;
+    values.foreground = fg == 1 ? 255 : 0;
+    gc = XCreateGC(dpy, pixmap, GCBackground | GCForeground, &values);
     XPutImage(dpy, pixmap, gc, ximage, 0, 0, 0, 0, width, height);
     XFreeGC(dpy, gc);
+
+    ximage->data = NULL;
+    XDestroyImage(ximage);
 
     return pixmap;
 }

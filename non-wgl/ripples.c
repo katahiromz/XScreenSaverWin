@@ -17,16 +17,16 @@
  *      water.txt by Tom Hammersley,tomh@globalnet.co.uk
  *
  * Options
- * -delay	usleep every iteration
- * -rate	Add one drop every "rate" iterations
+ * -delay   usleep every iteration
+ * -rate    Add one drop every "rate" iterations
  * -box         Add big square splash every "box" iters (not very good)
- * -water	Ripples on a grabbed background image
+ * -water   Ripples on a grabbed background image
  * -foreground  Interpolate ripples between these two colors
  * -background
- * -oily	Psychedelic colours like man
- * -stir	Add a regular pattern of drops
- * -fluidity	Between 0 and 16. 16 = big drops
- * -light	Hack to add lighting effect
+ * -oily    Psychedelic colours like man
+ * -stir    Add a regular pattern of drops
+ * -fluidity    Between 0 and 16. 16 = big drops
+ * -light   Hack to add lighting effect
  *
  * Code mainly hacked from xflame and decayscreen.
  */
@@ -67,8 +67,8 @@ int light = 4;
 Bool grayscale_ = False;
 
 char *imageDirectory = "";
-Bool chooseRandomImages = True;
-Bool grabDesktopImages = False;
+Bool chooseRandomImages = False;
+Bool grabDesktopImages = True;
 
 static argtype vars[] = 
 {
@@ -86,9 +86,6 @@ static argtype vars[] =
     {&fluidity, "fluidity", NULL, "6", t_Int},
     {&light, "light", NULL, "4", t_Int},
     {&grayscale_, "grayscale", NULL, "False", t_Bool},
-	{&imageDirectory, "imageDirectory", NULL, "", t_String},
-	{&chooseRandomImages, "chooseRandomImages", NULL, "True", t_String},
-	{&grabDesktopImages, "grabDesktopImages", NULL, "False", t_String},
 };
 
 #define TABLE 256
@@ -137,6 +134,7 @@ struct state {
   void (*draw_transparent) (struct state *st, short *src);
 
   async_load_state *img_loader;
+  Pixmap pixmap;
 
 #ifdef HAVE_XSHM_EXTENSION
   Bool use_shm;
@@ -161,8 +159,8 @@ static const double drop_dist[] =
 
 /* From fortune(6) */
 /* -- really weird C code to count the number of bits in a word */
-#define BITCOUNT(x)	(((BX_(x)+(BX_(x)>>4)) & 0x0F0F0F0F) % 255)
-#define BX_(x)		((x) - (((x)>>1)&0x77777777) \
+#define BITCOUNT(x) (((BX_(x)+(BX_(x)>>4)) & 0x0F0F0F0F) % 255)
+#define BX_(x)      ((x) - (((x)>>1)&0x77777777) \
                              - (((x)>>2)&0x33333333) \
                              - (((x)>>3)&0x11111111))
 
@@ -566,13 +564,14 @@ setup_X(struct state *st)
     gcv.subwindow_mode = IncludeInferiors;
 
     gcflags = GCFunction;
-    if (use_subwindow_mode_p(xgwa.screen, st->window))	/* see grabscreen.c */
+    if (use_subwindow_mode_p(xgwa.screen, st->window))  /* see grabscreen.c */
       gcflags |= GCSubwindowMode;
 
     st->gc = XCreateGC(st->dpy, st->window, gcflags, &gcv);
 
-    st->img_loader = load_image_async_simple (0, xgwa.screen, st->window,
-                                              st->window, 0, 0);
+    st->pixmap = XCreatePixmap(st->dpy, st->window, st->bigwidth, st->bigheight, 32);
+    st->img_loader = load_image_async_simple(0, xgwa.screen, st->window,
+                                             st->pixmap, 0, 0);
     st->start_time = time ((time_t) 0);
   } else {
     XGCValues gcv;
@@ -591,7 +590,7 @@ setup_X(struct state *st)
 #ifdef HAVE_XSHM_EXTENSION
   if (st->use_shm) {
     st->buffer_map = create_xshm_image(st->dpy, xgwa.visual, depth,
-				   ZPixmap, 0, &st->shm_info, st->bigwidth, st->bigheight);
+                   ZPixmap, 0, &st->shm_info, st->bigwidth, st->bigheight);
     if (!st->buffer_map) {
       st->use_shm = False;
       fprintf(stderr, "create_xshm_image failed\n");
@@ -601,8 +600,8 @@ setup_X(struct state *st)
 
   if (!st->buffer_map) {
     st->buffer_map = XCreateImage(st->dpy, xgwa.visual,
-			      depth, ZPixmap, 0, 0,
-			      st->bigwidth, st->bigheight, 8, 0);
+                  depth, RGBAPixmap_, 0, 0,
+                  st->bigwidth, st->bigheight, 8, 0);
     st->buffer_map->data = (char *)
       calloc(st->buffer_map->height, st->buffer_map->bytes_per_line);
   }
@@ -615,11 +614,11 @@ DisplayImage(struct state *st)
 #ifdef HAVE_XSHM_EXTENSION
   if (st->use_shm)
     XShmPutImage(st->dpy, st->window, st->gc, st->buffer_map, 0, 0, 0, 0,
-		 st->bigwidth, st->bigheight, False);
+         st->bigwidth, st->bigheight, False);
   else
 #endif /* HAVE_XSHM_EXTENSION */
     XPutImage(st->dpy, st->window, st->gc, st->buffer_map, 0, 0, 0, 0,
-	      st->bigwidth, st->bigheight);
+          st->bigwidth, st->bigheight);
 }
 
 
@@ -1042,7 +1041,7 @@ ripples_init (Display *disp, Window win)
 
   //st->ncolors = get_integer_resource (disp, "colors", "Colors");
   st->ncolors = colors;
-  //if (0 == st->ncolors)		/* English spelling? */
+  //if (0 == st->ncolors)       /* English spelling? */
   //  st->ncolors = get_integer_resource (disp, "colours", "Colors");
 
   if (st->ncolors > sizeof(st->ctab)/sizeof(*st->ctab))
@@ -1085,32 +1084,18 @@ static unsigned long
 ripples_draw (Display *dpy, Window window, void *closure)
 {
   struct state *st = (struct state *) closure;
+  static Bool b = False;
 
-  if (st->img_loader)   /* still loading */
+    if (!b)
     {
-      st->img_loader = load_image_async_simple (st->img_loader, 0, 0, 0, 0, 0);
-      if (! st->img_loader) {  /* just finished */
         XWindowAttributes xgwa;
         XGetWindowAttributes(st->dpy, st->window, &xgwa);
-        st->start_time = time ((time_t) 0);
-        st->orig_map = XGetImage (st->dpy, st->window, 0, 0, 
-                                  xgwa.width, xgwa.height,
-                                  ~0L, ZPixmap);
+        st->orig_map = XGetImage(st->dpy, st->pixmap, 0, 0, 
+                                 xgwa.width, xgwa.height,
+                                 ~0L, RGBAPixmap_);
         init_ripples(st, 0, -SPLASH); /* Start off without any drops */
-      }
-      return st->delay;
+        b = True;
     }
-
-    if (!st->img_loader &&
-        st->start_time + st->duration < time ((time_t) 0)) {
-      XWindowAttributes xgwa;
-      XGetWindowAttributes(st->dpy, st->window, &xgwa);
-      st->img_loader = load_image_async_simple (0, xgwa.screen, st->window,
-                                                st->window, 0, 0);
-      st->start_time = time ((time_t) 0);
-      return st->delay;
-    }
-
     if (st->rate > 0 && (st->iterations % st->rate) == 0)
       add_drop(st, ripple_blob, -SPLASH);
     if (st->stir)
@@ -1134,11 +1119,11 @@ ripples_reshape (Display *dpy, Window window, void *closure,
 }
 
 #if 0
-	static Bool
-	ripples_event (Display *dpy, Window window, void *closure, XEvent *event)
-	{
-	  return False;
-	}
+    static Bool
+    ripples_event (Display *dpy, Window window, void *closure, XEvent *event)
+    {
+      return False;
+    }
 #endif
 
 static void
@@ -1150,20 +1135,20 @@ ripples_free (Display *dpy, Window window, void *closure)
 
 static const char *ripples_defaults[] =
 {
-  ".background:		black",
-  ".foreground:		#FFAF5F",
-  "*colors:		200",
-  "*dontClearRoot:	True",
-  "*delay:		50000",
-  "*duration:		120",
-  "*rate:	 	5",
-  "*box:	 	0",
-  "*water: 		True",
-  "*oily: 		False",
-  "*stir: 		False",
-  "*fluidity: 		6",
-  "*light: 		4",
-  "*grayscale: 		False",
+  ".background:     black",
+  ".foreground:     #FFAF5F",
+  "*colors:     200",
+  "*dontClearRoot:  True",
+  "*delay:      50000",
+  "*duration:       120",
+  "*rate:       5",
+  "*box:        0",
+  "*water:      True",
+  "*oily:       False",
+  "*stir:       False",
+  "*fluidity:       6",
+  "*light:      4",
+  "*grayscale:      False",
 #ifdef HAVE_XSHM_EXTENSION
   "*useSHM: True",
 #else
@@ -1177,20 +1162,20 @@ static const char *ripples_defaults[] =
 
 static XrmOptionDescRec ripples_options[] =
 {
-  { "-colors",	".colors",	XrmoptionSepArg, 0},
-  { "-colours",	".colors",	XrmoptionSepArg, 0},
-  {"-delay",	".delay",	XrmoptionSepArg, 0},
-  {"-duration",	".duration",	XrmoptionSepArg, 0 },
-  {"-rate",	".rate",	XrmoptionSepArg, 0},
-  {"-box",	".box",		XrmoptionSepArg, 0},
-  {"-water",	".water",	XrmoptionNoArg, "True"},
-  {"-oily",	".oily",	XrmoptionNoArg, "True"},
-  {"-stir",	".stir",	XrmoptionNoArg, "True"},
-  {"-fluidity",	".fluidity",	XrmoptionSepArg, 0},
-  {"-light",	".light",	XrmoptionSepArg, 0},
-  {"-grayscale",	".grayscale",	XrmoptionNoArg, "True"},
-  {"-shm",	".useSHM",	XrmoptionNoArg, "True"},
-  {"-no-shm",	".useSHM",	XrmoptionNoArg, "False"},
+  { "-colors",  ".colors",  XrmoptionSepArg, 0},
+  { "-colours", ".colors",  XrmoptionSepArg, 0},
+  {"-delay",    ".delay",   XrmoptionSepArg, 0},
+  {"-duration", ".duration",    XrmoptionSepArg, 0 },
+  {"-rate", ".rate",    XrmoptionSepArg, 0},
+  {"-box",  ".box",     XrmoptionSepArg, 0},
+  {"-water",    ".water",   XrmoptionNoArg, "True"},
+  {"-oily", ".oily",    XrmoptionNoArg, "True"},
+  {"-stir", ".stir",    XrmoptionNoArg, "True"},
+  {"-fluidity", ".fluidity",    XrmoptionSepArg, 0},
+  {"-light",    ".light",   XrmoptionSepArg, 0},
+  {"-grayscale",    ".grayscale",   XrmoptionNoArg, "True"},
+  {"-shm",  ".useSHM",  XrmoptionNoArg, "True"},
+  {"-no-shm",   ".useSHM",  XrmoptionNoArg, "False"},
   {0, 0, 0, 0}
 };
 

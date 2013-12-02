@@ -166,7 +166,10 @@ typedef struct analogtv_s {
 
   Colormap colormap;
   int usewidth,useheight,xrepl,subwidth;
-  XImage *image; /* usewidth * useheight */
+  //XImage *image; /* usewidth * useheight */
+  Pixmap pixmap; /* usewidth * useheight */
+  LPBYTE pbBits;
+  DWORD widthbytes;
   GC gc;
   int screen_xo,screen_yo; /* centers image in window */
 
