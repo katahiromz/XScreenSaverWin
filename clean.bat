@@ -19,3 +19,7 @@ cd ..
 cd xscreensaver-text
 call clean.bat
 cd ..
+
+cd random
+call clean.bat
+cd ..

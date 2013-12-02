@@ -20,5 +20,9 @@ cd xscreensaver-text
 call src_only.bat
 cd ..
 
+cd random
+call src_only.bat
+cd ..
+
 if exist XScreenSaverWin rmdir /S /Q XScreenSaverWin
 if exist Output rmdir /S /Q Output

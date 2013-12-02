@@ -1,3 +1,13 @@
+// Copyright (C) 2013 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>
+//
+// Permission to use, copy, modify, distribute, and sell this software and its
+// documentation for any purpose is hereby granted without fee, provided that
+// the above copyright notice appear in all copies and that both that
+// copyright notice and this permission notice appear in supporting
+// documentation.  No representations are made about the suitability of this
+// software for any purpose.  It is provided "as is" without express or 
+// implied warranty.
+
 #define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
 
@@ -19,8 +29,15 @@ int wrap_columns = 72;
 int load_p = 1;
 int head = -1;
 
-char *xsst_key = "Software\\Katayama Hirofumi MZ\\xscreensaver-text";
-char *saver_key = "Software\\Katayama Hirofumi MZ\\%s";
+int nyarlathotep_p = 0;
+
+const char *saver_key = "Software\\Katayama Hirofumi MZ\\%s";
+
+void show_version(void)
+{
+    fprintf(stderr, "xscreensaver for Windows v0.65 text client utility\n");
+    fprintf(stderr, "Written by Katayama Hirofumi MZ\n");
+}
 
 void usage(void)
 {
@@ -52,15 +69,55 @@ void usage(void)
         "\n");
 }
 
+char do_nyarlathotep_char(char c)
+{
+	// y/A-Za-z/N-ZA-Mn-za-m/
+    if ('A' <= c && c <= 'M')
+    {
+        c = 'N' + c - 'A';
+    }
+    else if ('N' <= c && c <= 'Z')
+    {
+        c = 'A' + c - 'N';
+    }
+    else if ('a' <= c && c <= 'm')
+    {
+        c = 'n' + c - 'a';
+    }
+    else if ('n' <= c && c <= 'z')
+    {
+        c = 'a' + c - 'n';
+    }
+    return c;
+}
+
+char *do_nyarlathotep_buffer(char *s)
+{
+    char *p = s;
+    while (*p)
+    {
+        *p = do_nyarlathotep_char(*p);
+        p++;
+    }
+    return s;
+}
+
 int parse_options(int argc, char **argv)
 {
-    int i;
+    int i, j, n;
+    char *p, *q;
 
     for (i = 1; i < argc; i++)
     {
-        if (argv[i][0] == '-' && argv[i][1] == 'v')
+        if (lstrcmpiA(argv[i], "--version") == 0 || lstrcmpA(argv[i], "-V") == 0)
         {
-            verbose += strlen(argv[i]) - 1;
+            show_version();
+            return 1;
+        }
+        else if (argv[i][0] == '-' && argv[i][1] == 'v')
+        {
+            for (j = 1; argv[i][j] == 'v'; j++)
+                verbose++;
         }
         else if (lstrcmpiA(argv[i], "--verbose") == 0)
         {
@@ -83,11 +140,21 @@ int parse_options(int argc, char **argv)
             text_file = argv[++i];
             load_p = 0;
         }
-        else if (lstrcmpiA(argv[i], "--head") == 0 ||
-                 lstrcmpiA(argv[i], "--heads") == 0 ||
+        else if (lstrcmpiA(argv[i], "--head") == 0 || lstrcmpiA(argv[i], "--heads") == 0 ||
                  lstrcmpiA(argv[i], "-h") == 0)
         {
-            head = atoi(argv[++i]);
+            p = argv[++i];
+            n = strtol(p, &q, 10);
+            if (*q != '\0')
+            {
+                fprintf(stderr, "%s: ERROR: '%s' is not integer\n", progname, p);
+                exit(EXIT_FAILURE);
+            }
+            head = n;
+            if (verbose)
+            {
+                fprintf(stderr, "%s: head == %d\n", progname, head);
+            }
         }
         else if (lstrcmpiA(argv[i], "--program") == 0 || lstrcmpiA(argv[i], "-p") == 0)
         {
@@ -97,7 +164,7 @@ int parse_options(int argc, char **argv)
         }
         else if (lstrcmpiA(argv[i], "--url") == 0 || lstrcmpiA(argv[i], "-u") == 0)
         {
-            fprintf(stderr, "ERROR: --url is not supported yet\n");
+            fprintf(stderr, "%s: ERROR: --url is not supported yet\n", progname);
             return 1;
         }
         else if (lstrcmpiA(argv[i], "-c") == 0 ||
@@ -106,21 +173,27 @@ int parse_options(int argc, char **argv)
                  lstrcmpiA(argv[i], "--column") == 0 ||
                  lstrcmpiA(argv[i], "--columns") == 0)
         {
-            wrap_columns = atoi(argv[++i]);
+            p = argv[++i];
+            n = strtol(p, &q, 10);
+            if (*q != '\0')
+            {
+                fprintf(stderr, "%s: ERROR: '%s' is not integer\n", progname, p);
+                exit(EXIT_FAILURE);
+            }
+            wrap_columns = n;
             if (verbose)
             {
-                fprintf(stderr, "%s: cols == %d\n", wrap_columns);
+                fprintf(stderr, "%s: cols == %d\n", progname, wrap_columns);
             }
         }
         else if (lstrcmpiA(argv[i], "--cocoa") == 0)
         {
-            fprintf(stderr, "ERROR: --cocoa is not supported yet\n");
+            fprintf(stderr, "%s: ERROR: --cocoa is not supported yet\n", progname);
             return 1;
         }
         else if (lstrcmpiA(argv[i], "--nyarlathotep") == 0 || lstrcmpiA(argv[i], "-n") == 0)
         {
-            fprintf(stderr, "ERROR: --nyarlathotep is not supported yet\n");
-            return 1;
+            nyarlathotep_p = 1;
         }
         else if (lstrcmpiA(argv[i], "--help") == 0 || lstrcmpiA(argv[i], "-?") == 0 ||
                  lstrcmpiA(argv[i], "/?") == 0)
@@ -130,9 +203,9 @@ int parse_options(int argc, char **argv)
         }
         else
         {
-            fprintf(stderr, "ERROR: invalid option detected '%s'\n", argv[i]);
+            fprintf(stderr, "%s: ERROR: invalid option detected '%s'\n", progname, argv[i]);
             usage();
-            return 1;
+            exit(EXIT_FAILURE);
         }
     }
     return 0;
@@ -191,6 +264,8 @@ void do_text_literal(void)
     time_t t = time(NULL);
 
     strftime(buf, 1024, text_literal, localtime(&t));
+    if (nyarlathotep_p)
+        do_nyarlathotep_buffer(buf);
 
     cols = lines = 0;
     p = buf;
@@ -238,6 +313,9 @@ void do_text_file(void)
             if (c == '\r')
                 continue;
 
+            if (nyarlathotep_p)
+                c = do_nyarlathotep_char(c);
+
             if (c == '\n')
             {
                 cols = 0;
@@ -264,7 +342,7 @@ void do_text_file(void)
     else
     {
         if (verbose)
-            fprintf(stderr, "%s: cannot open '%s'\n", progname, text_file);
+            fprintf(stderr, "%s: ERROR: cannot open '%s'\n", progname, text_file);
     }
 }
 
@@ -283,6 +361,9 @@ void do_text_program(void)
         {
             if (c == '\r')
                 continue;
+
+            if (nyarlathotep_p)
+                c = do_nyarlathotep_char(c);
 
             if (c == '\n')
             {
@@ -310,14 +391,14 @@ void do_text_program(void)
     else
     {
         if (verbose)
-            fprintf(stderr, "%s: cannot open '%s'\n", progname, text_program);
+            fprintf(stderr, "%s: ERROR: cannot open '%s'\n", progname, text_program);
     }
 }
 
 void do_date(void)
 {
     OSVERSIONINFOA verinfo;
-    CHAR buf[64];
+    CHAR buf[128];
     time_t t = time(NULL);
     DWORD dwSize;
     CHAR szComp[MAX_PATH], szUser[MAX_PATH];
@@ -325,19 +406,27 @@ void do_date(void)
     // OS info
     verinfo.dwOSVersionInfoSize = sizeof(verinfo);
     GetVersionExA(&verinfo);
-    printf("Microsoft Windows [Version %u.%u.%u]\n",
+    sprintf(buf, "Microsoft Windows [Version %u.%u.%u]",
         verinfo.dwMajorVersion, verinfo.dwMinorVersion, verinfo.dwBuildNumber);
+    if (nyarlathotep_p)
+        do_nyarlathotep_buffer(buf);
+    puts(buf);
 
     // computer_name - user_name
     dwSize = MAX_PATH;
     GetComputerNameA(szComp, &dwSize);
     dwSize = MAX_PATH;
     GetUserNameA(szUser, &dwSize);
-    printf("%s - %s\n", szComp, szUser);
+    sprintf(buf, "%s - %s", szComp, szUser);
+    if (nyarlathotep_p)
+        do_nyarlathotep_buffer(buf);
+    puts(buf);
 
     // Thu Nov 28 14:52:58     2013
     strftime(buf, 64, "%a %b %d %H:%M:%S     %Y", localtime(&t));
-    printf("%s\n", buf);
+    if (nyarlathotep_p)
+        do_nyarlathotep_buffer(buf);
+    puts(buf);
 }
 
 void output(void)
@@ -347,7 +436,7 @@ void output(void)
         lstrcmpiA(text_mode, "program") == 0 && strlen(trim(text_program)) == 0)
     {
         if (verbose)
-            fprintf(stderr, "%s: falling back to 'date'\n", progname);
+            fprintf(stderr, "%s: WARNING: falling back to 'date'\n", progname);
 
         text_mode = "date";
     }
@@ -470,12 +559,20 @@ int get_prefs(void)
 int main(int argc, char **argv)
 {
     if (parse_options(argc, argv))
-        return 1;
+        return EXIT_SUCCESS;
+
+    if (verbose > 1)
+    {
+        fprintf(stderr, "head:         %d\n", head);
+        fprintf(stderr, "wrap_columns: %d\n", wrap_columns);
+        if (nyarlathotep_p)
+            fprintf(stderr, "nyarlathotep is enabled\n");
+    }
 
     if (load_p)
         get_prefs();
 
     output();
 
-    return 0;
+    return EXIT_SUCCESS;
 }

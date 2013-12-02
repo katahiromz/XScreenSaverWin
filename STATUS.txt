@@ -180,7 +180,7 @@ ShadeBobs               Good
 Sierpinski              Good        
 Sierpinski3D            Good        
 SkyTentacles            Good        
-SlideScreen             NG          
+SlideScreen             NG          Black out
 Slip                    Good        
 Sonar                   Good        
 SpeedMine               Good        

@@ -11,8 +11,11 @@ if not exist XScreenSaverWin mkdir XScreenSaverWin
 :skip
 copy xscreensaver\Release\*.exe XScreenSaverWin
 copy xscreensaver-text\Release\*.exe XScreenSaverWin
+mkdir XScreenSaverWin\random_scr
+copy random\Release\*.scr XScreenSaverWin\random_scr
 copy non-wgl\Release\*.scr XScreenSaverWin
 copy wgl\Release\*.scr XScreenSaverWin
+copy LICENSE.txt XScreenSaverWin
 
 cd XScreenSaverWin
 for %%i in (*.scr) do mkdir %%~ni_scr

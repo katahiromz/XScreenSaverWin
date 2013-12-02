@@ -17,7 +17,7 @@ LPTSTR GetScreenSaverPath(HWND hwnd)
     *pch = _T('\0');
 
     TCHAR szName1[MAX_PATH], szName2[MAX_PATH];
-    INT nIndex = (INT)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
+    INT nIndex = (INT)(INT_PTR)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
     SendMessage(hCombo, CB_GETLBTEXT, nIndex, (LPARAM)szName1);
     lstrcpy(szName2, szName1);
 
@@ -122,6 +122,49 @@ VOID OnInstall(HWND hDlg)
     Execute(hDlg, TEXT("rundll32.exe"), szParams);
 }
 
+#ifdef UNICODE
+    __declspec(dllimport)
+    DWORD WINAPI GetLongPathNameW(LPCTSTR, LPTSTR, DWORD);
+    #define GetLongPathName GetLongPathNameW
+#else
+    __declspec(dllimport)
+    DWORD WINAPI GetLongPathNameA(LPCTSTR, LPTSTR, DWORD);
+    #define GetLongPathName GetLongPathNameA
+#endif  // def UNICODE
+
+LPTSTR get_registered_screen_saver(void)
+{
+    HKEY hKey;
+    LONG result;
+    DWORD dwSize;
+    TCHAR szPath[MAX_PATH], szLongPath[MAX_PATH];
+    static TCHAR s_buf[MAX_PATH];
+
+    s_buf[0] = _T('\0');
+    result = RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Control Panel\\Desktop"), 0,
+        KEY_READ, &hKey);
+    if (result == ERROR_SUCCESS)
+    {
+        dwSize = sizeof(szPath);
+        result = RegQueryValueEx(hKey, TEXT("SCRNSAVE.EXE"), NULL, NULL,
+            (LPBYTE)szPath, &dwSize);
+        if (result == ERROR_SUCCESS)
+        {
+            LPTSTR pch;
+            GetLongPathName(szPath, szLongPath, MAX_PATH);
+            pch = _tcsrchr(szLongPath, _T('\\'));
+            if (pch)
+                lstrcpy(s_buf, pch + 1);
+            else
+                lstrcpy(s_buf, szLongPath);
+            OutputDebugString(s_buf);
+            OutputDebugString(TEXT("\n"));
+        }
+        RegCloseKey(hKey);
+    }
+    return s_buf[0] ? s_buf : NULL;
+}
+
 VOID OnInitDialog(HWND hDlg)
 {
     HICON hIcon;
@@ -177,7 +220,21 @@ VOID OnInitDialog(HWND hDlg)
     }
     else
     {
-        SendMessage(hCombo, CB_SETCURSEL, 0, 0);
+        INT i = 0;
+        LPTSTR name = get_registered_screen_saver();
+        if (name)
+        {
+            TCHAR szName[MAX_PATH];
+            for (i = 0; i < nCount; i++)
+            {
+                SendMessage(hCombo, CB_GETLBTEXT, i, (LPARAM)szName);
+                if (lstrcmpi(szName, name) == 0)
+                    break;
+            }
+            if (i == nCount)
+                i = 0;
+        }
+        SendMessage(hCombo, CB_SETCURSEL, i, 0);
         OnTestOnWindow(hDlg);
     }
 

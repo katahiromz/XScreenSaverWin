@@ -20,7 +20,7 @@
       I changed the structure of the assembler in this version.
 */
 
-#define NDEBUG  /* Uncomment when done with debugging */
+//#define NDEBUG  /* Uncomment when done with debugging */
 
 #include "xws2win.h"
 #include <stdlib.h>

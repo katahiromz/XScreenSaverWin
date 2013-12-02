@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{B7914227-CD94-4B6F-859C-E3823C9552DA}
 AppName=XScreenSaver for Windows
-AppVerName=XScreenSaver v0.64
+AppVerName=XScreenSaver for Windows v0.65
 AppPublisher=Katayama Hirofumi MZ
 AppPublisherURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 AppSupportURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
@@ -186,7 +186,9 @@ Source: "XScreenSaverWin\popsquares_scr\popsquares.scr"; DestDir: "{app}\popsqua
 Source: "XScreenSaverWin\providence_scr\providence.scr"; DestDir: "{app}\providence_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\pulsar_scr\pulsar.scr"; DestDir: "{app}\pulsar_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\queens_scr\queens.scr"; DestDir: "{app}\queens_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\random_scr\random.scr"; DestDir: "{app}\random_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\rd-bomb_scr\rd-bomb.scr"; DestDir: "{app}\rd-bomb_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\ripples_scr\ripples.scr"; DestDir: "{app}\ripples_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\rocks_scr\rocks.scr"; DestDir: "{app}\rocks_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\rorschach_scr\rorschach.scr"; DestDir: "{app}\rorschach_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\rotor_scr\rotor.scr"; DestDir: "{app}\rotor_scr"; Flags: ignoreversion

@@ -3,7 +3,7 @@ This is XScreenSaver for Windows (XScreenSaverWin).
 This software was based on XScreenSaver 5.22 (for non-Windows OS) by 
 Jamie Zawinski.
 
-Porting to Windows was partially done by Katayama Hirofumi MZ.
+Porting to Windows was mostly done by Katayama Hirofumi MZ.
 
 You can download binary in the XScreenSaverWin homepage.
 
@@ -17,7 +17,7 @@ NOTE: If you want to build the Extrusion screen saver, then
 The XScreenSaverWin homepage
 http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 
-XScreenSaver (original; non-Windows)
+XScreenSaver (original; for non-Windows)
 http://www.jwz.org/xscreensaver/
 
 GitHub XScreenSaverWin repository
