@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{B7914227-CD94-4B6F-859C-E3823C9552DA}
 AppName=XScreenSaver for Windows
-AppVerName=XScreenSaver for Windows v0.65
+AppVerName=XScreenSaver for Windows v0.66
 AppPublisher=Katayama Hirofumi MZ
 AppPublisherURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 AppSupportURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
@@ -270,6 +270,7 @@ Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\BouncingCow"; Flags: uninsdel
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\BoxFit"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Boxed"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Braid"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\BSOD"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Bubble3D"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Bubbles"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Bumps"; Flags: uninsdeletekey
@@ -373,6 +374,7 @@ Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Lisa"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Lissie"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Lockward"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Loop"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\m6502"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Maze"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\MemScroller"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Menger"; Flags: uninsdeletekey
@@ -424,6 +426,7 @@ Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Sierpinski"; Flags: uninsdele
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Sierpinski3D"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\SkyTentacles"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Slip"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\SlideScreen"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Sonar"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\SpeedMine"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Katayama Hirofumi MZ\Sphere"; Flags: uninsdeletekey
