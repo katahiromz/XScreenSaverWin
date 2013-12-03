@@ -23,6 +23,7 @@ for %%i in (*.scr) do move %%i %%~ni_scr
 cd ..
 
 copy wgl\starwars.txt XScreenSaverWin
+copy wgl\starwars.txt XScreenSaverWin\starwars_scr
 exit
 
 :fail

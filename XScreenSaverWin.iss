@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{B7914227-CD94-4B6F-859C-E3823C9552DA}
 AppName=XScreenSaver for Windows
-AppVerName=XScreenSaver for Windows v0.66
+AppVerName=XScreenSaver for Windows v0.67
 AppPublisher=Katayama Hirofumi MZ
 AppPublisherURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 AppSupportURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
@@ -32,6 +32,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "XScreenSaverWin\xscreensaver.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "XScreenSaverWin\xscreensaver-text.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "XScreenSaverWin\starwars.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "XScreenSaverWin\starwars.txt"; DestDir: "{app}\starwars_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\abstractile_scr\abstractile.scr"; DestDir: "{app}\abstractile_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\anemone_scr\anemone.scr"; DestDir: "{app}\anemone_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\anemotaxis_scr\anemotaxis.scr"; DestDir: "{app}\anemotaxis_scr"; Flags: ignoreversion
