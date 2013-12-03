@@ -10,6 +10,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
+#include <tchar.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -35,7 +36,7 @@ const char *saver_key = "Software\\Katayama Hirofumi MZ\\%s";
 
 void show_version(void)
 {
-    fprintf(stderr, "xscreensaver for Windows v0.67 text client utility\n");
+    fprintf(stderr, "xscreensaver for Windows v0.68 text client utility\n");
     fprintf(stderr, "Written by Katayama Hirofumi MZ\n");
 }
 
