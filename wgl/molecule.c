@@ -53,9 +53,9 @@
 # define ATOM_FONT "-*-helvetica-medium-r-normal-*-240-*"
 #endif
 
-char *atomFont = "Arial 30";
+char *atomFont = "Arial 18";
 char *atomFont2 = "Arial 15";
-char *titleFont = "Arial 60";
+char *titleFont = "Arial 20";
 float noLabelThreshold = 30;
 float wireframeThreshold = 150;
 
@@ -253,9 +253,9 @@ static argtype vars[] = {
   {&do_bbox,	  "bbox",	"BBox",		DEF_BBOX,     t_Bool},
   {&shell_alpha,  "shellAlpha",	"ShellAlpha",	DEF_SHELL_ALPHA, t_Float},
   {&verbose_p,    "verbose",    "Verbose",  DEF_VERBOSE,  t_Bool},
-    {&atomFont, "atomFont", NULL, "Arial 30", t_String},	//
+    {&atomFont, "atomFont", NULL, "Arial 18", t_String},	//
     {&atomFont2, "atomFont2", NULL, "Arial 15", t_String},	//
-    {&titleFont, "titleFont", NULL, "Arial 64", t_String},	//
+    {&titleFont, "titleFont", NULL, "Arial 20", t_String},	//
     {&noLabelThreshold, "noLabelThreshold", NULL, "30", t_Float},	//
     {&wireframeThreshold, "wireframeThreshold", NULL, "150", t_Float},	//
 };
@@ -288,13 +288,13 @@ load_fonts (ModeInfo *mi)
 {
   molecule_configuration *mc = &mcs[MI_SCREEN(mi)];
 # ifdef HAVE_GLBITMAP
-  load_font (mi->dpy, "atomFont",  &mc->xfont1, &mc->font1_dlist);
-  load_font (mi->dpy, "atomFont2", &mc->xfont2, &mc->font2_dlist);
-  load_font (mi->dpy, "titleFont", &mc->xfont3, &mc->font3_dlist);
+  load_font (mi->dpy, atomFont,  &mc->xfont1, &mc->font1_dlist);
+  load_font (mi->dpy, atomFont2, &mc->xfont2, &mc->font2_dlist);
+  load_font (mi->dpy, titleFont, &mc->xfont3, &mc->font3_dlist);
 # else
-  mc->font1_data = load_texture_font (mi->dpy, "atomFont");
-  mc->font2_data = load_texture_font (mi->dpy, "atomFont2");
-  mc->font3_data = load_texture_font (mi->dpy, "titleFont");
+  mc->font1_data = load_texture_font (mi->dpy, atomFont);
+  mc->font2_data = load_texture_font (mi->dpy, atomFont2);
+  mc->font3_data = load_texture_font (mi->dpy, titleFont);
 # endif
 }
 

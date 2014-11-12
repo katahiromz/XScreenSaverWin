@@ -181,6 +181,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pinion", "pinion.vcproj", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "polyhedra", "polyhedra.vcproj", "{6E3CCA74-B316-4519-8E75-B502A4773104}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cubicgridclock", "cubicgridclock.vcproj", "{2A77AD23-2CE3-41BF-B18B-DB360BDB74C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -547,6 +549,10 @@ Global
 		{6E3CCA74-B316-4519-8E75-B502A4773104}.Debug|Win32.Build.0 = Debug|Win32
 		{6E3CCA74-B316-4519-8E75-B502A4773104}.Release|Win32.ActiveCfg = Release|Win32
 		{6E3CCA74-B316-4519-8E75-B502A4773104}.Release|Win32.Build.0 = Release|Win32
+		{2A77AD23-2CE3-41BF-B18B-DB360BDB74C8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2A77AD23-2CE3-41BF-B18B-DB360BDB74C8}.Debug|Win32.Build.0 = Debug|Win32
+		{2A77AD23-2CE3-41BF-B18B-DB360BDB74C8}.Release|Win32.ActiveCfg = Release|Win32
+		{2A77AD23-2CE3-41BF-B18B-DB360BDB74C8}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,13 @@
+*.o
+*.exe
+*.user
+*.ncb
+*.suo
+wgl/Debug
+wgl/Release
+non-wgl/Debug
+non-wgl/Release
+xscreensaver/Debug
+xscreensaver/Release
+xscreensaver-text/Debug
+xscreensaver-text/Release

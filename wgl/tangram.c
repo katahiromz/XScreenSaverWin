@@ -753,13 +753,13 @@ static void load_fonts(ModeInfo * mi)
 {
     tangram_configuration *tp = &tps[MI_SCREEN(mi)];
 # ifdef HAVE_GLBITMAP
-    load_font(mi->dpy, "titleFont", &tp->xfont1, &tp->font1_dlist);
-    load_font(mi->dpy, "titleFont2", &tp->xfont2, &tp->font2_dlist);
-    load_font(mi->dpy, "titleFont3", &tp->xfont3, &tp->font3_dlist);
+    load_font(mi->dpy, titleFont, &tp->xfont1, &tp->font1_dlist);
+    load_font(mi->dpy, titleFont2, &tp->xfont2, &tp->font2_dlist);
+    load_font(mi->dpy, titleFont3, &tp->xfont3, &tp->font3_dlist);
 # else /* !HAVE_GLBITMAP */
-    tp->font1_data = load_texture_font (mi->dpy, "titleFont");
-    tp->font2_data = load_texture_font (mi->dpy, "titleFont2");
-    tp->font3_data = load_texture_font (mi->dpy, "titleFont3");
+    tp->font1_data = load_texture_font (mi->dpy, titleFont);
+    tp->font2_data = load_texture_font (mi->dpy, titleFont2);
+    tp->font3_data = load_texture_font (mi->dpy, titleFont3);
 # endif /* !HAVE_GLBITMAP */
 }
 
