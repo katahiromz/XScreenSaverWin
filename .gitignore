@@ -7,7 +7,10 @@ wgl/Debug
 wgl/Release
 non-wgl/Debug
 non-wgl/Release
+random/Debug
+random/Release
 xscreensaver/Debug
 xscreensaver/Release
 xscreensaver-text/Debug
 xscreensaver-text/Release
+XScreenSaverWin/

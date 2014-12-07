@@ -29,6 +29,8 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
+Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "XScreenSaverWin\xscreensaver.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "XScreenSaverWin\xscreensaver-text.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "XScreenSaverWin\starwars.txt"; DestDir: "{app}"; Flags: ignoreversion
@@ -242,6 +244,8 @@ Source: "XScreenSaverWin\zoom_scr\zoom.scr"; DestDir: "{app}\zoom_scr"; Flags: i
 
 [Icons]
 Name: "{group}\XScreenSaver for Windows"; Filename: "{app}\xscreensaver.exe"
+Name: "{group}\README.txt"; Filename: "{app}\README.txt"
+Name: "{group}\READMEJP.txt"; Filename: "{app}\READMEJP.txt"
 Name: "{group}\{cm:ProgramOnTheWeb,XScreenSaver for Windows}"; Filename: "http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html"
 Name: "{group}\{cm:UninstallProgram,XScreenSaver for Windows}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\XScreenSaver for Windows"; Filename: "{app}\xscreensaver.exe"; Tasks: desktopicon
