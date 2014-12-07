@@ -3,6 +3,7 @@
 *.user
 *.ncb
 *.suo
+*.pdb
 wgl/Debug
 wgl/Release
 non-wgl/Debug
