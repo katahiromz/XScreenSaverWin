@@ -29,8 +29,8 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "XScreenSaverWin\README.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "XScreenSaverWin\READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "XScreenSaverWin\xscreensaver.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "XScreenSaverWin\xscreensaver-text.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "XScreenSaverWin\starwars.txt"; DestDir: "{app}"; Flags: ignoreversion
