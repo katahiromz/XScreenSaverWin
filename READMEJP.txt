@@ -17,6 +17,8 @@ Windowsへの移植は、片山博文MZによって行われました。
       したかったら、gle-3.1.0フォルダーをチェックして
       下さい。
 
+動作環境: Windows 2000/XP/Vista/Server 2003/7
+
 -------------------------------------------------------------------------------
 XScreenSaverWinのホームページ
 http://katahiromz.web.fc2.com/xscreensaverwin/

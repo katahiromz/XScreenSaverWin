@@ -13,6 +13,8 @@ Check LICENSE.txt for licensing information.
 NOTE: If you want to build the Extrusion screen saver, then 
       check the gle-3.1.0 folder.
 
+Supported Platforms: Windows 2000/XP/Vista/Server 2003/7
+
 -------------------------------------------------------------------------------
 The XScreenSaverWin homepage
 http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
