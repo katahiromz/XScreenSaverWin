@@ -20,6 +20,7 @@ Compression=lzma
 SolidCompression=yes
 UninstallDisplayIcon={app}\xscreensaver.exe
 LicenseFile=LICENSE.txt
+VersionInfoVersion=0.69
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
