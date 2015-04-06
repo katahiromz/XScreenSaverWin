@@ -84,6 +84,7 @@ BOOL Execute(HWND hwnd, LPCTSTR program, LPCTSTR params)
     BOOL b = CreateProcess(NULL, szCmdLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
     if (b)
     {
+        WaitForInputIdle(pi.hProcess, 1500);
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
         return TRUE;
@@ -105,8 +106,10 @@ VOID OnTestOnWindow(HWND hDlg)
 {
     HWND hPreview = GetDlgItem(hDlg, ID_PREVIEW);
     HWND hChild = GetWindow(hPreview, GW_CHILD);
-    if (hChild != NULL)
+    if (hChild != NULL) {
         SendMessage(hChild, WM_DESTROY, 0, 0);
+        Sleep(250);
+    }
 
     TCHAR szParams[MAX_PATH];
     wsprintf(szParams, TEXT("/p %u"), (UINT)(UINT_PTR)hPreview);
