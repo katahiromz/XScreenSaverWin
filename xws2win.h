@@ -83,8 +83,6 @@ typedef struct
 
 typedef unsigned long Colormap;
 
-DrawableData* XGetDrawableData_(Drawable d);
-
 typedef char *XPointer;
 
 #define MAX_COLORMAP 16

@@ -3,39 +3,31 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-DrawableData* XGetDrawableData_(Drawable d)
-{
-    return d;
-}
-
 HDC XCreateDrawableDC_(Display *dpy, Drawable d)
 {
     HDC hdc;
-    DrawableData* data;
 
     if (d != NULL)
     {
         hdc = CreateCompatibleDC(dpy);
         if (hdc != NULL)
         {
-            data = XGetDrawableData_(d);
-            data->hbmOld = SelectObject(hdc, data->hbm);
+            d->hbmOld = SelectObject(hdc, d->hbm);
         }
     }
     else
     {
         hdc = dpy;
     }
+
     return hdc;
 }
 
 int XDeleteDrawableDC_(Display *dpy, Drawable d, HDC hdc)
 {
-    DrawableData *data;
     if (d != NULL)
     {
-        data = XGetDrawableData_(d);
-        SelectObject(hdc, data->hbmOld);
+        SelectObject(hdc, d->hbmOld);
         DeleteDC(hdc);
     }
     return 0;

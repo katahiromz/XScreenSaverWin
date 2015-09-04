@@ -64,10 +64,9 @@ Pixmap XCreatePixmapFromBitmapData(
 
 int XFreePixmap(Display *dpy, Pixmap pixmap)
 {
-    DrawableData *data = XGetDrawableData_(pixmap);
-    if (data->hbm)
-        DeleteObject(data->hbm);
-    free(data);
+    if (pixmap->hbm)
+        DeleteObject(pixmap->hbm);
+    free(pixmap);
     return 0;
 }
 
