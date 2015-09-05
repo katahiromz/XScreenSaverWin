@@ -33,6 +33,7 @@
  */
 
 #define DELAY 30000
+#define COUNT 80
 #define DEFAULTS	"*delay:	30000       \n" \
 			"*count:        80          \n" \
 			"*resolution:   100         \n" \
@@ -46,7 +47,6 @@
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-//#include "xlockmore.h"
 #include "xlockmore.h"
 #include "colors.h"
 #include "gltrackball.h"
