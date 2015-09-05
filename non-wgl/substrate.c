@@ -381,35 +381,14 @@ trans_point(struct state *st,
 
             c = ref_pixel(f, x1, y1);
 
-            //point2rgb(f->visdepth, c, &or, &og, &ob);
-            //point2rgb(f->visdepth, myc, &r, &g, &b);
-            {
-                XColor color;
-                color.pixel = c;
-                XQueryColor(st->dpy, st->xgwa.colormap, &color);
-                or = color.red / 256;
-                og = color.green / 256;
-                ob = color.blue / 256;
-                color.pixel = myc;
-                XQueryColor(st->dpy, st->xgwa.colormap, &color);
-                r = color.red / 256;
-                g = color.green / 256;
-                b = color.blue / 256;
-            }
+            point2rgb(f->visdepth, c, &or, &og, &ob);
+            point2rgb(f->visdepth, myc, &r, &g, &b);
 
             nr = or + (r - or) * a;
             ng = og + (g - og) * a;
             nb = ob + (b - ob) * a;
 
-            //c = rgb2point(f->visdepth, nr, ng, nb);
-            {
-                XColor color;
-                color.red = nr * 256;
-                color.green = ng * 256;
-                color.blue = nb * 256;
-                XAllocColor(st->dpy, st->xgwa.colormap, &color);
-                c = color.pixel;
-            }
+            c = rgb2point(f->visdepth, nr, ng, nb);
 
             ref_pixel(f, x1, y1) = c;
 
@@ -479,9 +458,11 @@ region_color(struct state *st, GC fgc, struct field *f, crack *cr)
         /* Draw sand bit */
         c = trans_point(st, drawx, drawy, cr->sandcolor, (0.1 - i / (grains * 10.0)), f);
 
-        XSetForeground(st->dpy, fgc, c);
+        //XSetForeground(st->dpy, fgc, c);
+        fgc->foreground_rgb = c;
         XDrawPoint(st->dpy, st->window, fgc, (int) drawx, (int) drawy);
-        XSetForeground(st->dpy, fgc, f->fgcolor);
+        //XSetForeground(st->dpy, fgc, f->fgcolor);
+        fgc->foreground_rgb = f->fgcolor;
     }
 }
 
@@ -694,13 +675,21 @@ substrate_init (Display *dpy, Window window)
             exit(1);
         }
 
-        if (!XAllocColor(st->dpy, st->xgwa.colormap, &tmpcolor)) {
-            fprintf(stderr, "%s: couldn't allocate color %s\n", progname,
-                    rgb_colormap[st->f->numcolors]);
-            exit(1);
-        }
+        #if 1
+            st->f->parsedcolors[st->f->numcolors] = (
+                ((tmpcolor.red >> 8) << 24) |
+                ((tmpcolor.green >> 8) << 16) |
+                ((tmpcolor.blue >> 8) << 8)
+            );
+        #else
+            if (!XAllocColor(st->dpy, st->xgwa.colormap, &tmpcolor)) {
+                fprintf(stderr, "%s: couldn't allocate color %s\n", progname,
+                        rgb_colormap[st->f->numcolors]);
+                exit(1);
+            }
 
-        st->f->parsedcolors[st->f->numcolors] = tmpcolor.pixel;
+            st->f->parsedcolors[st->f->numcolors] = tmpcolor.pixel;
+        #endif
 
         st->f->numcolors++;
     }
@@ -716,8 +705,11 @@ substrate_init (Display *dpy, Window window)
 #endif
     st->fgc = XCreateGC(st->dpy, st->window, GCForeground, &st->gcv);
 
-    st->f->fgcolor = st->gcv.foreground;
-    st->f->bgcolor = st->gcv.background;
+    // hacked by katahiromz
+    //st->f->fgcolor = st->gcv.foreground;
+    //st->f->bgcolor = st->gcv.background;
+    st->f->fgcolor = 0;
+    st->f->bgcolor = 0xFFFFFF;
 
     /* Initialize stuff */
     build_img(st->dpy, st->window, st->xgwa, st->fgc, st->f);
