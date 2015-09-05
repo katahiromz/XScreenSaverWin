@@ -677,9 +677,9 @@ substrate_init (Display *dpy, Window window)
 
         #if 1
             st->f->parsedcolors[st->f->numcolors] = (
-                ((tmpcolor.red >> 8) << 24) |
-                ((tmpcolor.green >> 8) << 16) |
-                ((tmpcolor.blue >> 8) << 8)
+                ((tmpcolor.red >> 8) << 16) |
+                ((tmpcolor.green >> 8) << 8) |
+                ((tmpcolor.blue >> 8) << 0)
             );
         #else
             if (!XAllocColor(st->dpy, st->xgwa.colormap, &tmpcolor)) {

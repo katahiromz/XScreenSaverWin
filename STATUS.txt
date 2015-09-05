@@ -1,4 +1,4 @@
-There are 195 Goods, 10 OKs and 18 NGs of total 223 screensavers 
+There are 196 Goods, 10 OKs and 17 NGs of total 223 screensavers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -195,7 +195,7 @@ Starfish                Good
 StarWars                Good        
 StonerView              Good        
 Strange                 NG          Bad drawing
-Substrate               NG          Bad drawing
+Substrate               Good        
 Superquadrics           Good        
 Surfaces                Good        
 Swirl                   Good        
