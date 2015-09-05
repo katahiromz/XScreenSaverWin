@@ -230,6 +230,7 @@ Source: "XScreenSaverWin\tronbit_scr\tronbit.scr"; DestDir: "{app}\tronbit_scr";
 Source: "XScreenSaverWin\truchet_scr\truchet.scr"; DestDir: "{app}\truchet_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\twang_scr\twang.scr"; DestDir: "{app}\twang_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\unknownpleasures_scr\unknownpleasures.scr"; DestDir: "{app}\unknownpleasures_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\vermiculate_scr\vermiculate.scr"; DestDir: "{app}\vermiculate_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\vines_scr\vines.scr"; DestDir: "{app}\vines_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\voronoi_scr\voronoi.scr"; DestDir: "{app}\voronoi_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\wander_scr\wander.scr"; DestDir: "{app}\wander_scr"; Flags: ignoreversion

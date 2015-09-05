@@ -227,12 +227,14 @@ randpal (struct state *st)
   int ncolors = tailmax - 1;
   make_random_colormap (st->xgwa.screen, st->xgwa.visual, st->mycmap,
                         &st->mycolors[1], &ncolors, True, True, 0, True);
+#if 0
   if (ncolors < tailmax - 1)
     {
       int c;
       for (c = 1; c < tailmax; c++)
 	st->mycolors[c].pixel = WhitePixel (st->dpy, DefaultScreen (st->dpy));
     }
+#endif
 }
 
 static void

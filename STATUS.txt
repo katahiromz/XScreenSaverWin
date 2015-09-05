@@ -1,4 +1,4 @@
-There are 198 Goods, 10 OKs and 15 NGs of total 223 screensavers 
+There are 199 Goods, 10 OKs and 14 NGs of total 223 screensavers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -209,7 +209,7 @@ TronBit                 Good
 Truchet                 Good        
 Twang                   Good        
 UnknownPleasures        Good        
-Vermiculate             NG          Bad colors
+Vermiculate             Good        
 Vines                   Good        
 Voronoi                 Good        
 Wander                  Good        
