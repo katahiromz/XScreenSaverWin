@@ -435,16 +435,43 @@ draw_galaxy(ModeInfo * mi)
     gt->pos[1] += gt->vel[1] * DELTAT;
     gt->pos[2] += gt->vel[2] * DELTAT;
 
+#if 1
+    // hacked and optimized by katahiromz
+    {
+        if (dbufp) {
+            int count = gt->nstars;
+            const XPoint *pt = gt->oldpoints;
+            while (count-- > 0) {
+                SetPixelV(display,
+                    pt->x, pt->y,
+                    0);
+                ++pt;
+            }
+        }
+        XSetForeground(display, gc, MI_PIXEL(mi, gt->galcol));
+        {
+            int count = gt->nstars;
+            const XPoint *pt = gt->newpoints;
+            const unsigned long rgb = gc->foreground_rgb;
+            while (count-- > 0) {
+                SetPixelV(display,
+                    pt->x, pt->y,
+                    rgb);
+                ++pt;
+            }
+        }
+    }
+#else
     if (dbufp) {
       XSetForeground(display, gc, MI_WIN_BLACK_PIXEL(mi));
       XDrawPoints(display, window, gc, gt->oldpoints, gt->nstars,
                   CoordModeOrigin);
     }
-    // hacked by katahiromz
-    //XSetForeground(display, gc, MI_PIXEL(mi, COLORSTEP * gt->galcol));
+    XSetForeground(display, gc, MI_PIXEL(mi, COLORSTEP * gt->galcol));
     XSetForeground(display, gc, MI_PIXEL(mi, gt->galcol));
     XDrawPoints(display, window, gc, gt->newpoints, gt->nstars,
                 CoordModeOrigin);
+#endif
 
     dummy = gt->oldpoints;
     gt->oldpoints = gt->newpoints;
