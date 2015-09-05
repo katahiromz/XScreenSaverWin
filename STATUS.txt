@@ -163,7 +163,7 @@ Pong                    Good
 PopSquares              Good        
 Providence              Good        
 Pulsar                  Good        
-Pyro                    NG          Flickers
+Pyro                    NG          Slow and flickers
 Qix                     NG          Transparency disabled
 QuasiCrystal            NG          Black out
 Queens                  Good        
