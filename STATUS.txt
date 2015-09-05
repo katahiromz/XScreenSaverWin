@@ -1,4 +1,4 @@
-There are 196 Goods, 10 OKs and 17 NGs of total 223 screensavers 
+There are 197 Goods, 10 OKs and 16 NGs of total 223 screensavers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -107,7 +107,7 @@ Hypertorus              Good
 Hypnowheel              Good        
 IFS                     Good        
 IMSMap                  Good        
-Interaggregate          NG          Black out
+Interaggregate          Good        
 Interference            Good        
 Intermomentary          Good        
 JigglyPuff              Good        

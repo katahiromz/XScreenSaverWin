@@ -282,7 +282,7 @@ static inline void point2rgb(int depth, unsigned long c, int *r, int *g, int *b)
     {
     case 32:
     case 24:
-#if 1 || defined(HAVE_COCOA)
+#ifdef HAVE_COCOA
         /* This program idiotically does not go through a color map, so
            we have to hardcode in knowledge of how jwxyz.a packs pixels!
            Fix it to go through st->colors[st->ncolors] instead!
@@ -317,7 +317,7 @@ static inline unsigned long rgb2point(int depth, int r, int g, int b)
     {
     case 32:
     case 24:
-#if 1 || defined(HAVE_COCOA)
+#ifdef HAVE_COCOA
         /* This program idiotically does not go through a color map, so
            we have to hardcode in knowledge of how jwxyz.a packs pixels!
            Fix it to go through st->colors[st->ncolors] instead!
@@ -388,8 +388,14 @@ static inline void drawPoint(int x, int y, unsigned long color, double intensity
 
     c = trans_point(x, y, color, intensity, f);
 
-    XSetForeground(dpy, fgc, c);
-    XDrawPoint(dpy, window, fgc, x, y);
+    // hacked and optimized by katahiromz
+    #if 1
+        SetPixelV(dpy, x, y, c);
+    #else
+        //XSetForeground(dpy, fgc, c);
+        fgc->foreground_rgb = c;
+        XDrawPoint(dpy, window, fgc, x, y);
+    #endif
 }
 
 static inline void paint(SandPainter* painter, double ax, double ay, double bx, double by,
@@ -474,23 +480,29 @@ static void build_colors(struct field *f, Display *dpy, XWindowAttributes *xgwa)
 	
     for(i = 0; i < f->numcolors; ++i)
     {
-        if (!XParseColor(dpy, xgwa->colormap, 
-			 rgb_colormap[i], &tmpcolor)) 
-	{
+        if (!XParseColor(dpy, xgwa->colormap, rgb_colormap[i], &tmpcolor)) 
+        {
             fprintf(stderr, "%s: couldn't parse color %s\n", progname,
                     rgb_colormap[i]);
             exit(1);
         }
 
-        if (!XAllocColor(dpy, xgwa->colormap, &tmpcolor)) 
-	{
-            fprintf(stderr, "%s: couldn't allocate color %s\n", progname,
-                    rgb_colormap[i]);
-            exit(1);
-        }
+        #if 1
+            f->parsedcolors[i] = (
+                ((tmpcolor.red >> 8) << 16) |
+                ((tmpcolor.green >> 8) << 8) |
+                ((tmpcolor.blue >> 8) << 0)
+            );
+        #else
+            if (!XAllocColor(dpy, xgwa->colormap, &tmpcolor)) 
+            {
+                fprintf(stderr, "%s: couldn't allocate color %s\n", progname,
+                        rgb_colormap[i]);
+                exit(1);
+            }
 
-        f->parsedcolors[i] = tmpcolor.pixel;
-
+            f->parsedcolors[i] = tmpcolor.pixel;
+        #endif
     }
 }
 
@@ -514,13 +526,14 @@ static void build_img(struct field *f)
     }
 
 #if 1
-	{
-		unsigned int i;
-		for (i = 0; i < f->width * f->height; i++)
-		{
-			f->off_img[i] = f->bgcolor;
-		}
-	}
+    // hacked by katahiromz
+    {
+        unsigned int i;
+        for (i = 0; i < f->width * f->height; ++i)
+        {
+            f->off_img[i] = f->bgcolor;
+        }
+    }
 #else
     memset(f->off_img, f->bgcolor, 
 	   sizeof(unsigned long) * f->width * f->height);
@@ -855,6 +868,7 @@ interaggregate_init (Display *dpy, Window window)
     st->window = window;
     st->f = init_field();
 #if 1
+    // hacked by katahiromz
     st->growth_delay = growthDelay;
     st->max_cycles = maxCycles;
     st->f->num_circles = numCircles;
@@ -901,8 +915,26 @@ interaggregate_init (Display *dpy, Window window)
     build_colors(st->f, st->dpy, &st->xgwa);
 
 #if 1
+    // hacked by katahiromz
     st->gcv.foreground = load_color(st->dpy, st->xgwa.colormap, foreground);
     st->gcv.background = load_color(st->dpy, st->xgwa.colormap, background);
+    {
+        XColor color;
+        color.pixel = st->gcv.foreground;
+        XQueryColor(st->dpy, st->xgwa.colormap, &color);
+        st->gcv.foreground_rgb = (
+            ((color.red >> 8) << 16) |
+            ((color.green >> 8) << 8) |
+            ((color.blue >> 8) << 0)
+        );
+        color.pixel = st->gcv.background;
+        XQueryColor(st->dpy, st->xgwa.colormap, &color);
+        st->gcv.background_rgb = (
+            ((color.red >> 8) << 16) |
+            ((color.green >> 8) << 8) |
+            ((color.blue >> 8) << 0)
+        );
+    }
 #else
     st->gcv.foreground = get_pixel_resource(st->dpy, st->xgwa.colormap,
                                         "foreground", "Foreground");
@@ -910,11 +942,18 @@ interaggregate_init (Display *dpy, Window window)
                                         "background", "Background");
 #endif
 
+#if 1
+    // hacked by katahiromz
+    st->fgc = XCreateGC(st->dpy, st->window, 0, &st->gcv);
+    st->fgc->foreground_rgb = st->gcv.foreground_rgb;
+#else
     st->fgc = XCreateGC(st->dpy, st->window, GCForeground, &st->gcv);
+#endif
 
     st->f->height = st->xgwa.height;
     st->f->width = st->xgwa.width;
     st->f->visdepth = st->xgwa.depth;
+    // hacked by katahiromz
     //st->f->fgcolor = st->gcv.foreground;
     //st->f->bgcolor = st->gcv.background;
     st->f->fgcolor = st->gcv.foreground_rgb;
@@ -935,7 +974,19 @@ interaggregate_init (Display *dpy, Window window)
 static unsigned long
 interaggregate_draw (Display *dpy, Window window, void *closure)
 {
+  static Bool b = False;
   struct state *st = (struct state *) closure;
+
+    if (!b) {
+        RECT rc;
+        HBRUSH hbr;
+        HWND hwnd = WindowFromDC(dpy);
+        GetClientRect(hwnd, &rc);
+        hbr = CreateSolidBrush(st->gcv.background_rgb);
+        FillRect(dpy, &rc, hbr);
+        DeleteObject(hbr);
+        b = True;
+    }
 
   if ((st->f->cycles % 10) == 0) 
     {
@@ -949,9 +1000,11 @@ interaggregate_draw (Display *dpy, Window window, void *closure)
           st->f->visdepth = st->xgwa.depth;
 
           build_field(st->dpy, st->window, st->xgwa, st->fgc, st->f);
-          XSetForeground(st->dpy, st->fgc, st->gcv.background);
+          //XSetForeground(st->dpy, st->fgc, st->gcv.background);
+          st->fgc->foreground_rgb = st->gcv.background_rgb;
           XFillRectangle(st->dpy, st->window, st->fgc, 0, 0, st->xgwa.width, st->xgwa.height);
-          XSetForeground(st->dpy, st->fgc, st->gcv.foreground);
+          //XSetForeground(st->dpy, st->fgc, st->gcv.foreground);
+          st->fgc->foreground_rgb = st->gcv.foreground_rgb;
         }
     }
 
@@ -964,9 +1017,11 @@ interaggregate_draw (Display *dpy, Window window, void *closure)
   if (st->f->cycles >= st->max_cycles && st->max_cycles != 0)
     {
       build_field(st->dpy, st->window, st->xgwa, st->fgc, st->f);
-      XSetForeground(st->dpy, st->fgc, st->gcv.background);
+      //XSetForeground(st->dpy, st->fgc, st->gcv.background);
+      st->fgc->foreground_rgb = st->gcv.background_rgb;
       XFillRectangle(st->dpy, st->window, st->fgc, 0, 0, st->xgwa.width, st->xgwa.height);
-      XSetForeground(st->dpy, st->fgc, st->gcv.foreground);
+      //XSetForeground(st->dpy, st->fgc, st->gcv.foreground);
+      st->fgc->foreground_rgb = st->gcv.foreground_rgb;
     }
 
 #ifdef TIME_ME
@@ -1008,11 +1063,11 @@ interaggregate_reshape (Display *dpy, Window window, void *closure,
 }
 
 #if 0
-	static Bool
-	interaggregate_event (Display *dpy, Window window, void *closure, XEvent *event)
-	{
-	  return False;
-	}
+    static Bool
+    interaggregate_event (Display *dpy, Window window, void *closure, XEvent *event)
+    {
+      return False;
+    }
 #endif
 
 static void
