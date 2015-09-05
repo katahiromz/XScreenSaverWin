@@ -1,4 +1,4 @@
-There are 195 Goods, 9 OKs and 19 NGs of total 223 screen savers 
+There are 193 Goods, 10 OKs and 20 NGs of total 223 screensavers 
 in XScreenSaver.
 
 (Name)                  (Status)    (Comment)
@@ -10,11 +10,11 @@ AntInspect              Good
 AntMaze                 Good        
 AntSpotlight            Good        
 Apollonian              Good        
-Apple2                  NG          Drawing bad
+Apple2                  NG          Bad drawing
 Atlantis                Good        
 Attraction              Good        
 Atunnel                 Good        
-Barcode                 Good        
+Barcode                 OK          Not colorful
 Blaster                 Good        
 BlinkBox                Good        
 BlitSpin                NG          Black out
@@ -138,7 +138,7 @@ MirrorBlob              NG          Blur and slow
 Moebius                 Good        
 MoebiusGears            Good        
 Moire                   Good        
-Moire2                  NG          Drawing slow and bad
+Moire2                  NG          Slow and bad drawing
 Molecule                Good        
 Morph3D                 Good        
 Mountain                Good        
@@ -153,7 +153,7 @@ Penrose                 Good
 Petri                   Good        
 Phosphor                Good        
 Photopile               Good        
-Piecewise               NG          Drawing bad
+Piecewise               NG          Bad drawing
 Pinion                  Good        
 Pipes                   Good        
 Polyhedra               Good        
@@ -194,28 +194,28 @@ Stairs                  Good
 Starfish                Good        
 StarWars                Good        
 StonerView              Good        
-Strange                 NG          Drawing bad
-Substrate               NG          Drawing bad
+Strange                 NG          Bad drawing
+Substrate               NG          Bad drawing
 Superquadrics           Good        
 Surfaces                Good        
 Swirl                   Good        
-T3D                     NG          Drawing bad
+T3D                     NG          Bad drawing
 Tangram                 Good        
 Thornbird               Good        
-TimeTunnel              NG          Drawing bad
+TimeTunnel              NG          Bad drawing
 TopBlock                Good        
 Triangle                Good        
 TronBit                 Good        
 Truchet                 Good        
 Twang                   Good        
-UnknownPleasures        Good        
-Vermiculate             NG          Colors bad
+UnknownPleasures        NG          Bad drawing
+Vermiculate             NG          Bad colors
 Vines                   Good        
 Voronoi                 Good        
 Wander                  Good        
 WhirlWindWarp           Good        
 Whirlygig               Good        
-Worm                    NG          Drawing bad
+Worm                    NG          Bad drawing
 Wormhole                Good        
 XAnalogTV               Good        
 XFlame                  Good        
