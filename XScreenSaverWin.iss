@@ -137,6 +137,7 @@ Source: "XScreenSaverWin\hypertorus_scr\hypertorus.scr"; DestDir: "{app}\hyperto
 Source: "XScreenSaverWin\hypnowheel_scr\hypnowheel.scr"; DestDir: "{app}\hypnowheel_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\ifs_scr\ifs.scr"; DestDir: "{app}\ifs_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\imsmap_scr\imsmap.scr"; DestDir: "{app}\imsmap_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\interaggregate_scr\interaggregate.scr"; DestDir: "{app}\interaggregate_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\interference_scr\interference.scr"; DestDir: "{app}\interference_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\intermomentary_scr\intermomentary.scr"; DestDir: "{app}\intermomentary_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\jigglypuff_scr\jigglypuff.scr"; DestDir: "{app}\jigglypuff_scr"; Flags: ignoreversion
