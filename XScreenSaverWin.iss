@@ -218,6 +218,7 @@ Source: "XScreenSaverWin\stairs_scr\stairs.scr"; DestDir: "{app}\stairs_scr"; Fl
 Source: "XScreenSaverWin\starfish_scr\starfish.scr"; DestDir: "{app}\starfish_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\starwars_scr\starwars.scr"; DestDir: "{app}\starwars_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\stonerview_scr\stonerview.scr"; DestDir: "{app}\stonerview_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\strange_scr\strange.scr"; DestDir: "{app}\strange_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\superquadrics_scr\superquadrics.scr"; DestDir: "{app}\superquadrics_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\surfaces_scr\surfaces.scr"; DestDir: "{app}\surfaces_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\swirl_scr\swirl.scr"; DestDir: "{app}\swirl_scr"; Flags: ignoreversion
