@@ -203,6 +203,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\ximage.c"
+				>
+			</File>
+			<File
 				RelativePath="..\xws2win.c"
 				>
 			</File>

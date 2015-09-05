@@ -214,68 +214,6 @@ pixmap_to_gl_ximage (Screen *screen, Window window, Pixmap pixmap)
   return server_ximage;
 }
 
-XImage *GetScreenShotXImage(void)
-{
-    XImage *image;
-    INT y, cx, cy, size;
-    BITMAP bm;
-    LPBYTE pbBits, pb;
-    DWORD count;
-    HBITMAP hbm;
-
-    hbm = (HBITMAP)CopyImage(ss.hbmScreenShot, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-    assert(hbm != NULL);
-
-    GetObject(hbm, sizeof(bm), &bm);
-    cx = bm.bmWidth;
-    cy = bm.bmHeight;
-
-    // swap R and B
-    pbBits = (LPBYTE)bm.bmBits;
-    count = cx * cy;
-    while (count--)
-    {
-        BYTE b = pbBits[0];
-        pbBits[0] = pbBits[2];
-        pbBits[2] = b;
-        pbBits++;
-        pbBits++;
-        pbBits++;
-        *pbBits++ = 0xFF;
-    }
-
-    // flip top and bottom
-    pb = (LPBYTE)malloc(cx * 4);
-    assert(pb != NULL);
-    pbBits = (LPBYTE)bm.bmBits;
-    for (y = 0; y < cy / 2; y++)
-    {
-        memcpy(pb, &pbBits[y * cx * 4], cx * 4);
-        memcpy(&pbBits[y * cx * 4], &pbBits[(cy - y - 1) * cx * 4], cx * 4);
-        memcpy(&pbBits[(cy - y - 1) * cx * 4], pb, cx * 4);
-    }
-    free(pb);
-    GdiFlush();
-
-    image = XCreateImage(NULL, NULL, 32, RGBAPixmap_, 0, NULL, cx, cy, 32, 0);
-    if (image)
-    {
-        size = image->bytes_per_line * image->height;
-        image->data = (char *)calloc(size, 1);
-        if (image->data != NULL)
-        {
-            memcpy(image->data, bm.bmBits, size);
-            return image;
-        }
-        free(image->data);
-        free(image);
-        image = NULL;
-    }
-
-    DeleteObject(hbm);
-    return image;
-}
-
 typedef struct {
   GLXContext glx_context;
   Pixmap pixmap;

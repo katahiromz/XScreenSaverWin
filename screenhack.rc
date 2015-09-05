@@ -74,3 +74,34 @@ FONT 8, "Arial"
     CONTROL "Cancel", IDCANCEL, "BUTTON", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 360, 265, 100, 14
     CONTROL "&Reset Setting", IDC_RESET, BUTTON, BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 5, 265, 100, 14
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// Version Info
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     0, 7, 6, 0
+PRODUCTVERSION  0, 7, 6, 0
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+BEGIN
+    // English (U.S.)
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName", "Katayama Hirofumi MZ\0"
+            VALUE "FileDescription", "XScreenSaverWin screenhack\0"
+            VALUE "FileVersion", "0.76\0"
+            VALUE "LegalCopyright", "Copyright (C) 2015 Katayama Hirofumi MZ.\0"
+            VALUE "ProductName", "XScreenSaverWin\0"
+            VALUE "ProductVersion", "0.76\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        // English (U.S.)
+        VALUE "Translation", 0x0409, 0x04E4
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////

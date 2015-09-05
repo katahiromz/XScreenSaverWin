@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{B7914227-CD94-4B6F-859C-E3823C9552DA}
 AppName=XScreenSaver for Windows
-AppVerName=XScreenSaver for Windows v0.75
+AppVerName=XScreenSaver for Windows v0.76
 AppPublisher=Katayama Hirofumi MZ
 AppPublisherURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 AppSupportURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
@@ -20,7 +20,7 @@ Compression=lzma
 SolidCompression=yes
 UninstallDisplayIcon={app}\xscreensaver.exe
 LicenseFile=LICENSE.txt
-VersionInfoVersion=0.75
+VersionInfoVersion=0.76
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -196,6 +196,7 @@ Source: "XScreenSaverWin\ripples_scr\ripples.scr"; DestDir: "{app}\ripples_scr";
 Source: "XScreenSaverWin\rocks_scr\rocks.scr"; DestDir: "{app}\rocks_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\rorschach_scr\rorschach.scr"; DestDir: "{app}\rorschach_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\rotor_scr\rotor.scr"; DestDir: "{app}\rotor_scr"; Flags: ignoreversion
+Source: "XScreenSaverWin\rotzoomer_scr\rotzoomer.scr"; DestDir: "{app}\rotzoomer_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\rubikblocks_scr\rubikblocks.scr"; DestDir: "{app}\rubikblocks_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\rubik_scr\rubik.scr"; DestDir: "{app}\rubik_scr"; Flags: ignoreversion
 Source: "XScreenSaverWin\sballs_scr\sballs.scr"; DestDir: "{app}\sballs_scr"; Flags: ignoreversion

@@ -313,10 +313,8 @@ rotzoomer_draw (Display *disp, Window win, void *closure)
 #if 1
   if (st->zoom_box == NULL)
   {
-	//st->orig_map = XGetImage (st->dpy, st->window, 0, 0, 
-    //                              st->width, st->height, ~0L, ZPixmap);
-	st->orig_map = XGetImage (st->dpy, st->window, 0, 0, 
-                                  st->width, st->height, ~0L, RGBAPixmap_);
+    // hacked by katahiromz
+    st->orig_map = GetScreenShotXImage();
         init_hack (st);
   }
 #else
