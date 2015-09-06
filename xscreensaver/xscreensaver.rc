@@ -16,8 +16,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Version Info
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     0, 7, 6, 0
-PRODUCTVERSION  0, 7, 6, 0
+FILEVERSION     0, 7, 7, 0
+PRODUCTVERSION  0, 7, 7, 0
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 BEGIN
@@ -28,10 +28,10 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Katayama Hirofumi MZ\0"
             VALUE "FileDescription", "XScreenSaverWin\0"
-            VALUE "FileVersion", "0.76\0"
+            VALUE "FileVersion", "0.77\0"
             VALUE "LegalCopyright", "Copyright (C) 2015 Katayama Hirofumi MZ.\0"
             VALUE "ProductName", "XScreenSaverWin\0"
-            VALUE "ProductVersion", "0.76\0"
+            VALUE "ProductVersion", "0.77\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -56,7 +56,7 @@ END
 
 1 DIALOGEX 0, 0, 215, 180
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "XScreenSaver for Windows v0.76"
+CAPTION "XScreenSaver for Windows v0.77"
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 FONT 9, "Arial"
 {
