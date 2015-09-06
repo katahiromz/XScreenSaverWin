@@ -1,5 +1,5 @@
 There are 199 Goods, 10 OKs and 14 NGs of total 223 screensavers 
-in XScreenSaver.
+in XScreenSaverWin.
 
 (Name)                  (Status)    (Comment)
 Abstractile             Good        
