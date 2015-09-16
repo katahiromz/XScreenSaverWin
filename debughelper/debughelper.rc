@@ -72,6 +72,7 @@ BEGIN
         MENUITEM "200x150",                         IDM_200X150
         MENUITEM "320x240",                         IDM_320X240
         MENUITEM "640x480",                         IDM_640X480
+        MENUITEM "1024x768",                        IDM_1024X768
     END
     POPUP "&Help"
     BEGIN

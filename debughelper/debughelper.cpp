@@ -11,7 +11,8 @@ enum SIZETYPE
 {
     ST_200X150,
     ST_320X240,
-    ST_640X480
+    ST_640X480,
+    ST_1024X768
 };
 
 SIZETYPE sizetype = ST_200X150;
@@ -102,15 +103,19 @@ VOID OnInitMenuPopup(HWND hwnd, HMENU hMenuPopup)
     switch (sizetype)
     {
     case ST_200X150:
-        CheckMenuRadioItem(hMenuPopup, IDM_200X150, IDM_640X480, IDM_200X150, MF_BYCOMMAND);
+        CheckMenuRadioItem(hMenuPopup, IDM_200X150, IDM_1024X768, IDM_200X150, MF_BYCOMMAND);
         break;
 
     case ST_320X240:
-        CheckMenuRadioItem(hMenuPopup, IDM_200X150, IDM_640X480, IDM_320X240, MF_BYCOMMAND);
+        CheckMenuRadioItem(hMenuPopup, IDM_200X150, IDM_1024X768, IDM_320X240, MF_BYCOMMAND);
         break;
 
     case ST_640X480:
-        CheckMenuRadioItem(hMenuPopup, IDM_200X150, IDM_640X480, IDM_640X480, MF_BYCOMMAND);
+        CheckMenuRadioItem(hMenuPopup, IDM_200X150, IDM_1024X768, IDM_640X480, MF_BYCOMMAND);
+        break;
+
+    case ST_1024X768:
+        CheckMenuRadioItem(hMenuPopup, IDM_200X150, IDM_1024X768, IDM_1024X768, MF_BYCOMMAND);
         break;
 
     default:
@@ -153,6 +158,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_640X480:
             OnChangeSize(hWnd, 640, 480);
             sizetype = ST_640X480;
+            break;
+
+        case IDM_1024X768:
+            OnChangeSize(hWnd, 640, 480);
+            sizetype = ST_1024X768;
             break;
 
         case IDM_EXIT:
