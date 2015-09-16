@@ -161,7 +161,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
 
         case IDM_1024X768:
-            OnChangeSize(hWnd, 640, 480);
+            OnChangeSize(hWnd, 1024, 768);
             sizetype = ST_1024X768;
             break;
 
