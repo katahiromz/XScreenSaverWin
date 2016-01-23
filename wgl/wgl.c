@@ -91,7 +91,10 @@ void ss_term(void)
 {
     free(ss.modeinfo.colors);
     free(ss.modeinfo.pixels);
-    hack_free(&ss.modeinfo);
+    if (hack_free != NULL)
+    {
+        hack_free(&ss.modeinfo);
+    }
     ReleaseDC(ss.hwnd, ss.hdc);
     DeleteObject(ss.hbmScreenShot);
     CloseHandle(g_hMapping);

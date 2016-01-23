@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{B7914227-CD94-4B6F-859C-E3823C9552DA}
 AppName=XScreenSaver for Windows
-AppVerName=XScreenSaver for Windows v0.77
+AppVerName=XScreenSaver for Windows v0.78
 AppPublisher=Katayama Hirofumi MZ
 AppPublisherURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 AppSupportURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html

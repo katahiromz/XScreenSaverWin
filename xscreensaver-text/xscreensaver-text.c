@@ -36,7 +36,7 @@ const char *saver_key = "Software\\Katayama Hirofumi MZ\\%s";
 
 void show_version(void)
 {
-    fprintf(stderr, "XScreenSaver for Windows v0.77 text client utility\n");
+    fprintf(stderr, "XScreenSaver for Windows v0.78 text client utility\n");
     fprintf(stderr, "Written by Katayama Hirofumi MZ\n");
 }
 
