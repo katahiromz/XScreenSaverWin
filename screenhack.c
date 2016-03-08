@@ -309,11 +309,13 @@ HBITMAP GetScreenShotBitmap(VOID)
     HBITMAP hbm;
     HGDIOBJ hbmOld;
     BITMAPINFO bi;
-    INT cx, cy;
+    INT x, y, cx, cy;
     LPVOID pvBits;
 
-    cx = GetSystemMetrics(SM_CXSCREEN);
-    cy = GetSystemMetrics(SM_CYSCREEN);
+    x = GetSystemMetrics(SM_XVIRTUALSCREEN);
+    y = GetSystemMetrics(SM_YVIRTUALSCREEN);
+    cx = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    cy = GetSystemMetrics(SM_CYVIRTUALSCREEN);
 
     hwnd = GetDesktopWindow();
     hdc = GetWindowDC(hwnd);
@@ -329,7 +331,7 @@ HBITMAP GetScreenShotBitmap(VOID)
     if (hbm != NULL)
     {
         hbmOld = SelectObject(hdcMem, hbm);
-        BitBlt(hdcMem, 0, 0, cx, cy, hdc, 0, 0, SRCCOPY);
+        BitBlt(hdcMem, 0, 0, cx, cy, hdc, x, y, SRCCOPY);
         SelectObject(hdcMem, hbmOld);
         GdiFlush();
     }
@@ -467,6 +469,16 @@ BOOL ss_init(HWND hwnd)
 
 #undef ya_rand_init
     ya_rand_init(0);
+
+    // multiple monitor support
+    if (!fChildPreview)
+    {
+        int x = GetSystemMetrics(SM_XVIRTUALSCREEN);
+        int y = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        int cx = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+        int cy = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+        MoveWindow(hwnd, x, y, cx, cy, TRUE);
+    }
 
     GetClientRect(hwnd, &rc);
     ss.x0 = rc.left;

@@ -242,6 +242,14 @@ VOID OnInitDialog(HWND hDlg)
     }
 
     CenterDialog(hDlg);
+
+    {
+        RECT rcPreview;
+        HWND hwndPreview = GetDlgItem(hDlg, ID_PREVIEW);
+        HDC hdcPreview = GetWindowDC(hwndPreview);
+        GetClientRect(hwndPreview, &rcPreview);
+        FillRect(hdcPreview, &rcPreview, (HBRUSH)GetStockObject(BLACK_BRUSH));
+    }
 }
 
 INT_PTR CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -253,7 +261,16 @@ INT_PTR CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
         OnInitDialog(hDlg);
         return TRUE;
 
-        
+    // Why doesn't it work?
+    //case WM_CTLCOLORSTATIC:
+    //    if (GetDlgCtrlID((HWND)lParam) == ID_PREVIEW) {
+    //        HDC hDC = (HDC)wParam;
+    //        SetTextColor(hDC, 0);
+    //        SetBkColor(hDC, 0);
+    //        return (INT_PTR)GetStockObject(BLACK_BRUSH);
+    //    }
+    //    break;
+
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
