@@ -165,6 +165,13 @@ VOID LoadSetting(VOID)
         KEY_READ, &hSoftwareKey);
     if (result == ERROR_SUCCESS)
     {
+        cb = 256 * sizeof(CHAR);
+        result = RegQueryValueExA(hSoftwareKey,
+            "primary_only", NULL, NULL, szValue, &cb);
+        if (result == ERROR_SUCCESS)
+        {
+            ss.primary_only = !!strtol(szValue, NULL, 10);
+        }
         // load args
         for (i = 0; i < hack_argcount; i++)
         {
@@ -231,6 +238,7 @@ VOID GetSetting(HWND hwnd)
             break;
         }
     }
+    ss.primary_only = (IsDlgButtonChecked(hwnd, chx1) == BST_CHECKED);
 }
 
 VOID ResetSetting(HWND hwnd)
@@ -265,6 +273,12 @@ VOID SaveSetting(VOID)
         KEY_ALL_ACCESS, NULL, &hSoftwareKey, &dwDisp);
     if (result == ERROR_SUCCESS)
     {
+        {
+            sprintf(szValue, "%d", ss.primary_only);
+            dwSize = (strlen(szValue) + 1) * sizeof(CHAR);
+            RegSetValueExA(hSoftwareKey, "primary_only",
+                0, REG_SZ, (LPBYTE)szValue, dwSize);
+        }
         for (i = 0; i < hack_argcount; i++)
         {
             switch (hack_arginfo[i].type)
@@ -312,10 +326,26 @@ HBITMAP GetScreenShotBitmap(VOID)
     INT x, y, cx, cy;
     LPVOID pvBits;
 
-    x = GetSystemMetrics(SM_XVIRTUALSCREEN);
-    y = GetSystemMetrics(SM_YVIRTUALSCREEN);
-    cx = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-    cy = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+    if (ss.primary_only)
+    {
+        HMONITOR hMonitor;
+        MONITORINFO mi;
+
+        hMonitor = MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
+        mi.cbSize = sizeof(mi);
+        GetMonitorInfo(hMonitor, &mi);
+        x = mi.rcMonitor.left;
+        y = mi.rcMonitor.top;
+        cx = mi.rcMonitor.right - mi.rcMonitor.left;
+        cy = mi.rcMonitor.bottom - mi.rcMonitor.top;
+    }
+    else
+    {
+        x = GetSystemMetrics(SM_XVIRTUALSCREEN);
+        y = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        cx = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+        cy = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+    }
 
     hwnd = GetDesktopWindow();
     hdc = GetWindowDC(hwnd);
@@ -433,6 +463,80 @@ BOOL SaveBitmapToFile(LPCTSTR pszFileName, HBITMAP hbm)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+
+LRESULT CALLBACK
+PrimaryWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    unsigned long ul;
+
+    switch(uMsg)
+    {
+    case WM_CREATE:
+        SetTimer(hWnd, 999, 0, NULL);
+        break;
+
+    case WM_DESTROY:
+        KillTimer(hWnd, 999);
+        ss_term();
+        break;
+
+    case WM_TIMER:
+        KillTimer(hWnd, 999);
+        ul = hack_draw(ss.dpy, ss.window, ss.closure);
+        SetTimer(hWnd, 999, ul / 1000, NULL);
+        break;
+
+    case WM_ERASEBKGND:
+        break;
+
+    case WM_SYSCOMMAND:
+    case WM_SETCURSOR:
+    case WM_LBUTTONDOWN:
+    case WM_MBUTTONDOWN:
+    case WM_RBUTTONDOWN:
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+    case WM_MOUSEMOVE:
+    case WM_NCACTIVATE:
+    case WM_ACTIVATEAPP:
+    case WM_ACTIVATE:
+        return DefScreenSaverProc(ss.hwnd, uMsg, wParam, lParam);
+
+    default:
+        return DefWindowProc(hWnd, uMsg, wParam, lParam);
+    }
+
+    return 0;
+}
+
+BOOL CreatePrimaryWindow(INT x, INT y, INT cx, INT cy)
+{
+    WNDCLASS wc;
+
+    ss.hwndPrimary = NULL;
+
+    ZeroMemory(&wc, sizeof(wc));
+    wc.lpfnWndProc = PrimaryWindowProc;
+    wc.hInstance = GetModuleHandle(NULL);
+    wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
+    wc.lpszClassName = TEXT("XScreenSaverWin Primary Window");
+    if (RegisterClass(&wc))
+    {
+        ss.hwndPrimary = CreateWindowEx(
+            WS_EX_NOACTIVATE | WS_EX_TRANSPARENT,
+            wc.lpszClassName, NULL, WS_POPUP, x, y, cx, cy,
+            ss.hwnd, NULL, GetModuleHandle(NULL), NULL);
+        if (ss.hwndPrimary != NULL)
+        {
+            ShowWindow(ss.hwndPrimary, SW_SHOWNOACTIVATE);
+            UpdateWindow(ss.hwndPrimary);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // screen saver
 
 HANDLE g_hMapping = NULL;
@@ -441,21 +545,21 @@ Bool set_saver_name(const char *name)
 {
     LPVOID p = NULL;
     SECURITY_ATTRIBUTES sa;
-	ZeroMemory(&sa, sizeof(sa));
+    ZeroMemory(&sa, sizeof(sa));
     sa.nLength = sizeof(sa);
-	sa.bInheritHandle = TRUE;
+    sa.bInheritHandle = TRUE;
 
     g_hMapping = CreateFileMappingA(INVALID_HANDLE_VALUE, &sa, PAGE_READWRITE,
         0, 256, "Katayama Hirofumi MZ XScreenSaverWin");
-	if (g_hMapping)
-	{
-		p = MapViewOfFile(g_hMapping, FILE_MAP_WRITE, 0, 0, 256);
-		if (p)
-		{
-			lstrcpyA((char *)p, progname);
-			UnmapViewOfFile(p);
-		}
-	}
+    if (g_hMapping)
+    {
+        p = MapViewOfFile(g_hMapping, FILE_MAP_WRITE, 0, 0, 256);
+        if (p)
+        {
+            lstrcpyA((char *)p, progname);
+            UnmapViewOfFile(p);
+        }
+    }
     return p != NULL;
 }
 
@@ -466,11 +570,13 @@ BOOL ss_init(HWND hwnd)
     set_saver_name(progname);
 
     ss.hwnd = hwnd;
+    ss.primary_only = FALSE;
+
+    LoadSetting();
 
 #undef ya_rand_init
     ya_rand_init(0);
 
-    // multiple monitor support
     if (!fChildPreview)
     {
         int x = GetSystemMetrics(SM_XVIRTUALSCREEN);
@@ -480,30 +586,80 @@ BOOL ss_init(HWND hwnd)
         MoveWindow(hwnd, x, y, cx, cy, TRUE);
     }
 
-    GetClientRect(hwnd, &rc);
-    ss.x0 = rc.left;
-    ss.y0 = rc.top;
-    assert(ss.x0 == 0);
-    assert(ss.y0 == 0);
-    ss.width = rc.right - rc.left;
-    ss.height = rc.bottom - rc.top;
-    if (ss.width == 0 || ss.height == 0)
-        return FALSE;
-
     ss.hdc = GetWindowDC(hwnd);
     if (ss.hdc == NULL)
+    {
+        assert(0);
         return FALSE;
+    }
+
+    // fill by black
+    GetClientRect(hwnd, &rc);
+    FillRect(ss.hdc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
+
+    ss.cMonitors = GetSystemMetrics(SM_CMONITORS);
+    if (ss.primary_only && ss.cMonitors > 1)
+    {
+        HMONITOR hMonitor;
+        MONITORINFO mi;
+        INT x, y, cx, cy;
+
+        // get monitor extent
+        hMonitor = MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
+        mi.cbSize = sizeof(mi);
+        GetMonitorInfo(hMonitor, &mi);
+        x = mi.rcMonitor.left;
+        y = mi.rcMonitor.top;
+        cx = mi.rcMonitor.right - mi.rcMonitor.left;
+        cy = mi.rcMonitor.bottom - mi.rcMonitor.top;
+
+        //x = 100;
+        //y = 100;
+        //cx = 500;
+        //cy = 500;
+
+        // clip and set extent
+        //SetWindowOrgEx(ss.hdc, -x, -y, NULL);
+        //IntersectClipRect(ss.hdc, 0, 0, cx, cy);
+        ss.x = x;
+        ss.y = y;
+        ss.width = cx;
+        ss.height = cy;
+        if (!CreatePrimaryWindow(x, y, cx, cy))
+        {
+            assert(0);
+            return FALSE;
+        }
+        ReleaseDC(ss.hwnd, ss.hdc);
+        ss.hdc = GetWindowDC(ss.hwndPrimary);
+    }
+    else
+    {
+        assert(rc.left == 0);
+        assert(rc.top == 0);
+        ss.x = 0;
+        ss.y = 0;
+        ss.width = rc.right - rc.left;
+        ss.height = rc.bottom - rc.top;
+        ss.hwndPrimary = NULL;
+    }
+
+    if (ss.width == 0 || ss.height == 0)
+    {
+        assert(0);
+        return FALSE;
+    }
 
     if (!InitPixelFormat(&ss))
     {
-        ReleaseDC(hwnd, ss.hdc);
+        assert(0);
         return FALSE;
     }
 
     ss.hbmScreenShot = GetScreenShotBitmap();
     if (ss.hbmScreenShot == NULL)
     {
-        ReleaseDC(hwnd, ss.hdc);
+        assert(0);
         return FALSE;
     }
     //SaveBitmapToFile("screenshot.bmp", ss.hbmScreenShot);
@@ -523,11 +679,9 @@ BOOL ss_init(HWND hwnd)
     ss.xgwa.colormap = 0;
     ss.xgwa.screen = 0;
 
-    LoadSetting();
     SaveSetting();
 
     ss.closure = hack_init(ss.dpy, ss.window);
-
     return TRUE;
 }
 
@@ -597,10 +751,20 @@ VOID OnInitDialog(HWND hwnd)
     ShowWindow(GetDlgItem(hwnd, IDC_SIZENAME), SW_HIDE);
     ShowWindow(GetDlgItem(hwnd, IDC_SIZEVAL), SW_HIDE);
 
+    if (ss.primary_only)
+    {
+        CheckDlgButton(hwnd, chx1, BST_CHECKED);
+    }
+    else
+    {
+        CheckDlgButton(hwnd, chx1, BST_UNCHECKED);
+    }
+
     CenterDialog(hwnd);
 }
 
-BOOL WINAPI ScreenSaverConfigureDialog(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+BOOL WINAPI
+ScreenSaverConfigureDialog(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch(uMsg)
     {
@@ -636,16 +800,21 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     return FALSE;
 }
 
-LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI
+ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     unsigned long ul;
+
     switch(uMsg)
     {
     case WM_CREATE:
         if (ss_init(hWnd) == 0)
             return -1;
 
-        SetTimer(hWnd, 999, 0, NULL);
+        if (ss.hwndPrimary == NULL)
+        {
+            SetTimer(hWnd, 999, 0, NULL);
+        }
         break;
 
     case WM_DESTROY:
@@ -675,18 +844,12 @@ Display *DisplayOfScreen(Screen *s)
 
 int XDisplayWidth(Display *dpy, int scr)
 {
-    RECT rc;
-    HWND hwnd = WindowFromDC(dpy);
-    GetWindowRect(hwnd, &rc);
-    return rc.right - rc.left;
+    return ss.width;
 }
 
 int XDisplayHeight(Display *dpy, int scr)
 {
-    RECT rc;
-    HWND hwnd = WindowFromDC(dpy);
-    GetWindowRect(hwnd, &rc);
-    return rc.bottom - rc.top;
+    return ss.height;
 }
 
 extern unsigned long window_background;
@@ -699,7 +862,9 @@ int XClearWindow(Display *dpy, Window w)
     XColor color;
     HBRUSH hbr;
 
-    GetClientRect(hwnd, &rc);
+    rc.left = rc.top = 0;
+    rc.right = ss.width;
+    rc.bottom = ss.height;
     color.pixel = window_background;
     XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
     hbr = CreateSolidBrush(RGB(color.red / 255, color.green / 255, color.blue / 255));
@@ -716,7 +881,9 @@ int XClearWindow2_(Display *dpy, Window w, GC gc)
     HWND hwnd = WindowFromDC(hdc);
     HBRUSH hbr;
 
-    GetClientRect(hwnd, &rc);
+    rc.left = rc.top = 0;
+    rc.right = ss.width;
+    rc.bottom = ss.height;
     hbr = CreateSolidBrush(gc->background_rgb);
     FillRect(hdc, &rc, hbr);
     DeleteObject(hbr);

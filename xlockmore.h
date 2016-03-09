@@ -390,13 +390,16 @@ int visual_depth(Screen *screen, Visual *visual);
 
 typedef struct SCREENSAVER
 {
-    HWND hwnd;
-    HDC hdc;
-    HGLRC hglrc;
-    UINT x0, y0;
-    UINT width, height;
-    ModeInfo modeinfo;
-    HBITMAP hbmScreenShot;
+    HWND        hwnd;
+    HDC         hdc;
+    HWND        hwndPrimary;
+    HGLRC       hglrc;
+    INT         x, y;
+    UINT        width, height;
+    ModeInfo    modeinfo;
+    HBITMAP     hbmScreenShot;
+    INT         cMonitors;
+    BOOL        primary_only;
 } SCREENSAVER;
 
 extern SCREENSAVER ss;

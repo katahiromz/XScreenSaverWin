@@ -107,16 +107,19 @@ extern argtype *hack_arginfo;
 
 typedef struct SCREENSAVER
 {
-    HWND hwnd;
-    HDC hdc;
-    HGLRC hglrc;
-    UINT x0, y0;
-    UINT width, height;
-    HBITMAP hbmScreenShot;
-    Display *dpy;
-    Window window;
-    XWindowAttributes xgwa;
-    void *closure;
+    HWND                hwnd;
+    HDC                 hdc;
+    HWND                hwndPrimary;
+    HGLRC               hglrc;
+    INT                 x, y;
+    UINT                width, height;
+    HBITMAP             hbmScreenShot;
+    Display *           dpy;
+    Window              window;
+    XWindowAttributes   xgwa;
+    void *              closure;
+    INT                 cMonitors;
+    BOOL                primary_only;
 } SCREENSAVER;
 
 extern SCREENSAVER ss;

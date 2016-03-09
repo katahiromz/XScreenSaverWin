@@ -97,7 +97,14 @@ void ss_term(void)
     {
         hack_free(&ss.modeinfo);
     }
-    ReleaseDC(ss.hwnd, ss.hdc);
+    if (ss.hwndPrimary != NULL)
+    {
+        ReleaseDC(ss.hwndPrimary, ss.hdc);
+    }
+    else
+    {
+        ReleaseDC(ss.hwnd, ss.hdc);
+    }
     DeleteObject(ss.hbmScreenShot);
     CloseHandle(g_hMapping);
 }

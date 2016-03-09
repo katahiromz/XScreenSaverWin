@@ -28,9 +28,12 @@ BOOL InitPixelFormat(SCREENSAVER *ss)
     SetPixelFormat(ss->hdc, iPixelFormat, &pfd);
     ss->hglrc = wglCreateContext(ss->hdc);
 
+    //SetWindowOrgEx(ss->hdc, 0, 0, NULL);
+    //ExtSelectClipRgn(ss->hdc, NULL, RGN_COPY);
+
     if (hack_ncolors_enabled)
     {
-		int i;
+        int i;
         ModeInfo *mi = &ss->modeinfo;
         mi->colors = (XColor *) calloc(mi->npixels, sizeof(*mi->colors));
         if (mi->colors == NULL)
@@ -95,7 +98,14 @@ void ss_term(void)
     {
         hack_free(&ss.modeinfo);
     }
-    ReleaseDC(ss.hwnd, ss.hdc);
+    if (ss.hwndPrimary != NULL)
+    {
+        ReleaseDC(ss.hwndPrimary, ss.hdc);
+    }
+    else
+    {
+        ReleaseDC(ss.hwnd, ss.hdc);
+    }
     DeleteObject(ss.hbmScreenShot);
     CloseHandle(g_hMapping);
 }
