@@ -598,7 +598,7 @@ BOOL ss_init(HWND hwnd)
     FillRect(ss.hdc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
 
     ss.cMonitors = GetSystemMetrics(SM_CMONITORS);
-    if (ss.primary_only && ss.cMonitors > 1)
+    if (!fChildPreview && ss.primary_only && ss.cMonitors > 1)
     {
         HMONITOR hMonitor;
         MONITORINFO mi;
