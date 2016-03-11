@@ -28,9 +28,6 @@ BOOL InitPixelFormat(SCREENSAVER *ss)
     SetPixelFormat(ss->hdc, iPixelFormat, &pfd);
     ss->hglrc = wglCreateContext(ss->hdc);
 
-    //SetWindowOrgEx(ss->hdc, 0, 0, NULL);
-    //ExtSelectClipRgn(ss->hdc, NULL, RGN_COPY);
-
     if (hack_ncolors_enabled)
     {
         int i;

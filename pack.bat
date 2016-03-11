@@ -24,9 +24,27 @@ cd ..
 
 copy README.txt XScreenSaverWin
 copy READMEJP.txt XScreenSaverWin
+copy CHANGELOG.txt XScreenSaverWin
 copy wgl\starwars.txt XScreenSaverWin
 copy wgl\starwars.txt XScreenSaverWin\starwars_scr
-exit
+
+@rem delete NG screensavers
+if exist XScreenSaverWin\apple2_scr rd /S /Q XScreenSaverWin\apple2_scr
+if exist XScreenSaverWin\blitspin_scr rd /S /Q XScreenSaverWin\blitspin_scr
+if exist XScreenSaverWin\fontglide_scr rd /S /Q XScreenSaverWin\fontglide_scr
+if exist XScreenSaverWin\halo_scr rd /S /Q XScreenSaverWin\halo_scr
+if exist XScreenSaverWin\mirrorblob_scr rd /S /Q XScreenSaverWin\mirrorblob_scr
+if exist XScreenSaverWin\moire2_scr rd /S /Q XScreenSaverWin\moire2_scr
+if exist XScreenSaverWin\piecewise_scr rd /S /Q XScreenSaverWin\piecewise_scr
+if exist XScreenSaverWin\pyro_scr rd /S /Q XScreenSaverWin\pyro_scr
+if exist XScreenSaverWin\qix_scr rd /S /Q XScreenSaverWin\qix_scr
+if exist XScreenSaverWin\quasiCrystal_scr rd /S /Q XScreenSaverWin\quasiCrystal_scr
+if exist XScreenSaverWin\slidescreen_scr rd /S /Q XScreenSaverWin\slidescreen_scr
+if exist XScreenSaverWin\t3d_scr rd /S /Q XScreenSaverWin\t3d_scr
+if exist XScreenSaverWin\timetunnel_scr rd /S /Q XScreenSaverWin\timetunnel_scr
+if exist XScreenSaverWin\worm_scr rd /S /Q XScreenSaverWin\worm_scr
+
+exit /b
 
 :fail
 echo ERROR: Not built yet!

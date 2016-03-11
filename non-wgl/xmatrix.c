@@ -118,6 +118,7 @@ static argtype vars[] =
 {
     {&background, "background", NULL, "black", t_String},
     {&foreground, "foreground", NULL, "#00AA00", t_String},
+    {&matrixFont, "matrixFont", NULL, "large", t_String},
     {&delay, "delay", NULL, "10000", t_Int},
     {&insert_, "insert", NULL, "both", t_String},
     {&mode_, "mode", NULL, "Matrix", t_String},
@@ -1701,7 +1702,7 @@ xmatrix_draw (Display *dpy, Window window, void *closure)
   }
   if (state->mode == MATRIX &&
       state->knock_knock_p &&
-      (! (random() % 10000)))
+      (! (random() % 5000))) /* hacked by katahiromz*/
     {
       if (! (random() % 5))
         set_mode (state, DRAIN_NMAP);

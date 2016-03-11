@@ -3,7 +3,7 @@
 これはXScreenSaver for Windows (XScreenSaverWin) です。
 
 このソフトウェアは、Jamie Zawinskiさんによる、
-XScreenSaver 5.22 (Windows以外のOS)に基づいています。
+XScreenSaver 5.22 (Windows以外のOS) に基づいています。
 
 Windowsへの移植は、片山博文MZによって行われました。
 
@@ -17,11 +17,11 @@ Windowsへの移植は、片山博文MZによって行われました。
       したかったら、gle-3.1.0フォルダーをチェックして
       下さい。
 
-動作環境: Windows 2000/XP/Vista/Server 2003/7
+動作環境: Windows 2000/XP/Vista/Server 2003/7/10
 
 -------------------------------------------------------------------------------
 XScreenSaverWinのホームページ
-http://katahiromz.web.fc2.com/xscreensaverwin/
+http://katahiromz.web.fc2.com/xscreensaverwin/ja
 
 XScreenSaver (オリジナル; Windows以外用)
 http://www.jwz.org/xscreensaver/

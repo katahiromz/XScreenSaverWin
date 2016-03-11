@@ -156,6 +156,8 @@ VOID LoadSetting(VOID)
     CHAR szValue[256];
     DWORD cb;
 
+    ss.screen_mode = SMODE_WHOLE_VIRTUAL;
+
     result = RegOpenKeyExA(HKEY_CURRENT_USER, pszCompany, 0,
         KEY_READ, &hCompanyKey);
     if (result != ERROR_SUCCESS)
@@ -165,12 +167,13 @@ VOID LoadSetting(VOID)
         KEY_READ, &hSoftwareKey);
     if (result == ERROR_SUCCESS)
     {
+        // load screen_mode
         cb = 256 * sizeof(CHAR);
         result = RegQueryValueExA(hSoftwareKey,
-            "primary_only", NULL, NULL, szValue, &cb);
+            "screen_mode", NULL, NULL, szValue, &cb);
         if (result == ERROR_SUCCESS)
         {
-            ss.primary_only = !!strtol(szValue, NULL, 10);
+            ss.screen_mode = strtol(szValue, NULL, 10);
         }
         // load args
         for (i = 0; i < hack_argcount; i++)
@@ -238,7 +241,8 @@ VOID GetSetting(HWND hwnd)
             break;
         }
     }
-    ss.primary_only = (IsDlgButtonChecked(hwnd, chx1) == BST_CHECKED);
+    i = (INT)SendDlgItemMessageA(hwnd, cmb1, CB_GETCURSEL, 0, 0);
+    ss.screen_mode = i;
 }
 
 VOID ResetSetting(HWND hwnd)
@@ -273,12 +277,6 @@ VOID SaveSetting(VOID)
         KEY_ALL_ACCESS, NULL, &hSoftwareKey, &dwDisp);
     if (result == ERROR_SUCCESS)
     {
-        {
-            sprintf(szValue, "%d", ss.primary_only);
-            dwSize = (strlen(szValue) + 1) * sizeof(CHAR);
-            RegSetValueExA(hSoftwareKey, "primary_only",
-                0, REG_SZ, (LPBYTE)szValue, dwSize);
-        }
         for (i = 0; i < hack_argcount; i++)
         {
             switch (hack_arginfo[i].type)
@@ -308,6 +306,12 @@ VOID SaveSetting(VOID)
             RegSetValueExA(hSoftwareKey, hack_arginfo[i].name,
                 0, REG_SZ, (LPBYTE)szValue, dwSize);
         }
+        {
+            sprintf(szValue, "%d", (INT)ss.screen_mode);
+            dwSize = (strlen(szValue) + 1) * sizeof(CHAR);
+            RegSetValueExA(hSoftwareKey, "screen_mode",
+                0, REG_SZ, (LPBYTE)szValue, dwSize);
+        }
         RegCloseKey(hSoftwareKey);
     }
     RegCloseKey(hCompanyKey);
@@ -326,7 +330,7 @@ HBITMAP GetScreenShotBitmap(VOID)
     INT x, y, cx, cy;
     LPVOID pvBits;
 
-    if (ss.primary_only)
+    if (ss.screen_mode != SMODE_WHOLE_VIRTUAL)
     {
         HMONITOR hMonitor;
         MONITORINFO mi;
@@ -336,8 +340,8 @@ HBITMAP GetScreenShotBitmap(VOID)
         GetMonitorInfo(hMonitor, &mi);
         x = mi.rcMonitor.left;
         y = mi.rcMonitor.top;
-        cx = mi.rcMonitor.right - mi.rcMonitor.left;
-        cy = mi.rcMonitor.bottom - mi.rcMonitor.top;
+        cx = mi.rcMonitor.right - x;
+        cy = mi.rcMonitor.bottom - y;
     }
     else
     {
@@ -536,6 +540,122 @@ BOOL CreatePrimaryWindow(INT x, INT y, INT cx, INT cy)
     return FALSE;
 }
 
+LRESULT CALLBACK
+SecondaryWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    RECT rc;
+    HDC hdc;
+
+    switch(uMsg)
+    {
+    case WM_CREATE:
+        // 300msec
+        SetTimer(hWnd, 999, 300, NULL);
+        break;
+
+    case WM_DESTROY:
+        KillTimer(hWnd, 999);
+        break;
+
+    case WM_TIMER:
+        // copy from primary
+        GetClientRect(hWnd, &rc);
+        hdc = GetWindowDC(hWnd);
+        SetStretchBltMode(hdc, COLORONCOLOR);
+        StretchBlt(
+            hdc, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+            ss.hdc, 0, 0, ss.width, ss.height, SRCCOPY);
+        ReleaseDC(hWnd, hdc);
+        break;
+
+    case WM_ERASEBKGND:
+        break;
+
+    case WM_SYSCOMMAND:
+    case WM_SETCURSOR:
+    case WM_LBUTTONDOWN:
+    case WM_MBUTTONDOWN:
+    case WM_RBUTTONDOWN:
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+    case WM_MOUSEMOVE:
+    case WM_NCACTIVATE:
+    case WM_ACTIVATEAPP:
+    case WM_ACTIVATE:
+        return DefScreenSaverProc(ss.hwnd, uMsg, wParam, lParam);
+
+    default:
+        return DefWindowProc(hWnd, uMsg, wParam, lParam);
+    }
+
+    return 0;
+}
+
+static BOOL CALLBACK 
+MonitorProc(HMONITOR hMonitor, HDC hdc, LPRECT prc, LPARAM lParam)
+{
+    MONITORINFO mi;
+    mi.cbSize = sizeof(mi);
+    GetMonitorInfo(hMonitor, &mi);
+
+    ss.monitor_info[ss.cMonitors] = mi;
+    ++(ss.cMonitors);
+
+    return (ss.cMonitors < MAX_NUM_MONITORS);
+}
+
+BOOL CreateSecondaryWindows(VOID)
+{
+    WNDCLASS wc;
+
+    ZeroMemory(ss.ahwndSecondary, sizeof(ss.ahwndSecondary));
+
+    ZeroMemory(&wc, sizeof(wc));
+    wc.lpfnWndProc = SecondaryWindowProc;
+    wc.hInstance = GetModuleHandle(NULL);
+    wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
+    wc.lpszClassName = TEXT("XScreenSaverWin Secondary Window");
+    if (RegisterClass(&wc))
+    {
+        INT x, y, cx, cy;
+        INT i, count;
+
+        // enumerate monitors
+        ss.cMonitors = 0;
+        EnumDisplayMonitors(NULL, NULL, MonitorProc, 0);
+        count = ss.cMonitors;
+
+        for (i = 0; i < count; ++i)
+        {
+            if (ss.monitor_info[i].dwFlags & MONITORINFOF_PRIMARY)
+            {
+                // skip primary
+                continue;
+            }
+
+            // get extent
+            x = ss.monitor_info[i].rcMonitor.left;
+            y = ss.monitor_info[i].rcMonitor.top;
+            cx = ss.monitor_info[i].rcMonitor.right - x;
+            cy = ss.monitor_info[i].rcMonitor.bottom - y;
+
+            // create secondary window
+            ss.ahwndSecondary[i] = CreateWindowEx(
+                WS_EX_NOACTIVATE | WS_EX_TRANSPARENT,
+                wc.lpszClassName, NULL, WS_POPUP, x, y, cx, cy,
+                ss.hwnd, NULL, GetModuleHandle(NULL), NULL);
+            if (ss.ahwndSecondary[i] == NULL)
+            {
+                return FALSE;
+            }
+            ShowWindow(ss.ahwndSecondary[i], SW_SHOWNOACTIVATE);
+            UpdateWindow(ss.ahwndSecondary[i]);
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // screen saver
 
@@ -570,7 +690,6 @@ BOOL ss_init(HWND hwnd)
     set_saver_name(progname);
 
     ss.hwnd = hwnd;
-    ss.primary_only = FALSE;
 
     LoadSetting();
 
@@ -598,7 +717,8 @@ BOOL ss_init(HWND hwnd)
     FillRect(ss.hdc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
 
     ss.cMonitors = GetSystemMetrics(SM_CMONITORS);
-    if (!fChildPreview && ss.primary_only && ss.cMonitors > 1)
+    if (!fChildPreview && (ss.cMonitors > 1) &&
+        (ss.screen_mode != SMODE_WHOLE_VIRTUAL))
     {
         HMONITOR hMonitor;
         MONITORINFO mi;
@@ -610,22 +730,17 @@ BOOL ss_init(HWND hwnd)
         GetMonitorInfo(hMonitor, &mi);
         x = mi.rcMonitor.left;
         y = mi.rcMonitor.top;
-        cx = mi.rcMonitor.right - mi.rcMonitor.left;
-        cy = mi.rcMonitor.bottom - mi.rcMonitor.top;
+        cx = mi.rcMonitor.right - x;
+        cy = mi.rcMonitor.bottom - y;
 
-        //x = 100;
-        //y = 100;
-        //cx = 500;
-        //cy = 500;
-
-        // clip and set extent
-        //SetWindowOrgEx(ss.hdc, -x, -y, NULL);
-        //IntersectClipRect(ss.hdc, 0, 0, cx, cy);
+        // set primary size
         ss.x = x;
         ss.y = y;
         ss.width = cx;
         ss.height = cy;
-        if (!CreatePrimaryWindow(x, y, cx, cy))
+
+        if (!CreatePrimaryWindow(x, y, cx, cy) ||
+            !CreateSecondaryWindows())
         {
             assert(0);
             return FALSE;
@@ -635,6 +750,7 @@ BOOL ss_init(HWND hwnd)
     }
     else
     {
+        // single screen
         assert(rc.left == 0);
         assert(rc.top == 0);
         ss.x = 0;
@@ -687,6 +803,7 @@ BOOL ss_init(HWND hwnd)
 
 BOOL WINAPI RegisterDialogClasses(HANDLE hInst)
 {
+    InitCommonControls();
     return TRUE;
 }
 
@@ -751,13 +868,15 @@ VOID OnInitDialog(HWND hwnd)
     ShowWindow(GetDlgItem(hwnd, IDC_SIZENAME), SW_HIDE);
     ShowWindow(GetDlgItem(hwnd, IDC_SIZEVAL), SW_HIDE);
 
-    if (ss.primary_only)
     {
-        CheckDlgButton(hwnd, chx1, BST_CHECKED);
-    }
-    else
-    {
-        CheckDlgButton(hwnd, chx1, BST_UNCHECKED);
+        TCHAR szText[128];
+        INT i;
+        for (i = 0; i < 3; ++i)
+        {
+            LoadString(GetModuleHandle(NULL), 3 + i, szText, 128);
+            SendDlgItemMessage(hwnd, cmb1, CB_ADDSTRING, 0, (LPARAM)szText);
+        }
+        SendDlgItemMessage(hwnd, cmb1, CB_SETCURSEL, (WPARAM)ss.screen_mode, 0);
     }
 
     CenterDialog(hwnd);
@@ -805,7 +924,7 @@ ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     unsigned long ul;
 
-    switch(uMsg)
+    switch (uMsg)
     {
     case WM_CREATE:
         if (ss_init(hWnd) == 0)

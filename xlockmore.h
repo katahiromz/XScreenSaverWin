@@ -388,18 +388,29 @@ int visual_depth(Screen *screen, Visual *visual);
 //////////////////////////////////////////////////////////////////////////////
 // screen saver
 
+typedef enum
+{
+    SMODE_WHOLE_VIRTUAL = 0,
+    SMODE_PRIMARY_ONLY = 1,
+    SMODE_DUPLICATE = 2
+} ScreenMode;
+
+#define MAX_NUM_MONITORS    16
+
 typedef struct SCREENSAVER
 {
-    HWND        hwnd;
-    HDC         hdc;
-    HWND        hwndPrimary;
-    HGLRC       hglrc;
-    INT         x, y;
-    UINT        width, height;
-    ModeInfo    modeinfo;
-    HBITMAP     hbmScreenShot;
-    INT         cMonitors;
-    BOOL        primary_only;
+    HWND            hwnd;
+    HDC             hdc;
+    HWND            hwndPrimary;
+    HGLRC           hglrc;
+    INT             x, y;
+    UINT            width, height;
+    ModeInfo        modeinfo;
+    HBITMAP         hbmScreenShot;
+    INT             cMonitors;
+    ScreenMode      screen_mode;
+    HWND            ahwndSecondary[MAX_NUM_MONITORS];
+    MONITORINFO     monitor_info[MAX_NUM_MONITORS];
 } SCREENSAVER;
 
 extern SCREENSAVER ss;

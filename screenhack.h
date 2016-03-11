@@ -105,6 +105,15 @@ extern argtype *hack_arginfo;
 //////////////////////////////////////////////////////////////////////////////
 // screen saver
 
+typedef enum
+{
+    SMODE_WHOLE_VIRTUAL = 0,
+    SMODE_PRIMARY_ONLY,
+    SMODE_DUPLICATE
+} ScreenMode;
+
+#define MAX_NUM_MONITORS    16
+
 typedef struct SCREENSAVER
 {
     HWND                hwnd;
@@ -119,7 +128,9 @@ typedef struct SCREENSAVER
     XWindowAttributes   xgwa;
     void *              closure;
     INT                 cMonitors;
-    BOOL                primary_only;
+    ScreenMode          screen_mode;
+    HWND                ahwndSecondary[MAX_NUM_MONITORS];
+    MONITORINFO         monitor_info[MAX_NUM_MONITORS];
 } SCREENSAVER;
 
 extern SCREENSAVER ss;
