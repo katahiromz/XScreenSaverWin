@@ -29866,6 +29866,7 @@ OutputDir=.
 
 
 Password=XWS2WIN
+Encryption=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
