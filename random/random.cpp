@@ -45,7 +45,7 @@ void get_screensavers(std::vector<tstring>& savers)
             lstrcat(szPath2, TEXT("\\"));
             lstrcat(szPath2, find.cFileName);
 
-            savers.push_back(szPath);
+            savers.push_back(szPath2);
         } while (FindNextFile(hFind, &find));
         FindClose(hFind);
     }
