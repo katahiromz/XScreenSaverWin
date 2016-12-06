@@ -31,7 +31,6 @@ katayama.hirofumi.mz@gmail.com
 
 You can install a screensaver from the main 
 program "xscreensaver.exe".
-Don't copy saver files partially.
 
 [!!! WARNING !!!]
 You cannot install all the screensavers at once.
