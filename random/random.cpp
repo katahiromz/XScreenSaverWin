@@ -19,17 +19,45 @@ std::vector<tstring> g_screensavers;
 void get_screensavers(std::vector<tstring>& savers)
 {
     TCHAR szPath[MAX_PATH], szPath2[MAX_PATH], szDir[MAX_PATH];
-
-    GetModuleFileName(NULL, szPath, MAX_PATH);
-    LPTSTR pch = _tcsrchr(szPath, _T('\\'));
-    *pch = _T('\0');
-    lstrcpy(szDir, szPath);
-    lstrcpy(pch, TEXT("\\..\\*_scr"));
-    pch = _tcsrchr(szDir, _T('\\'));
-    *pch = _T('\0');
-
     WIN32_FIND_DATA find;
-    HANDLE hFind = FindFirstFile(szPath, &find);
+    HANDLE hFind;
+
+    savers.clear();
+    
+    GetModuleFileName(NULL, szPath, MAX_PATH);
+    LPTSTR pch = _tcsrchr(szPath, TEXT('\\'));
+    *pch = TEXT('\0');
+    lstrcpy(szDir, szPath);
+    lstrcpy(pch, TEXT("\\*.scr"));
+
+    // Now, szDir is the directory that has random.scr.
+
+    // try #1
+    hFind = FindFirstFile(szPath, &find);
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if (lstrcmpi(find.cFileName, TEXT("random.scr")) == 0)
+                continue;
+
+            lstrcpy(szPath2, szDir);
+            lstrcat(szPath2, TEXT("\\"));
+            lstrcat(szPath2, find.cFileName);
+
+            savers.push_back(szPath);
+        } while (FindNextFile(hFind, &find));
+        FindClose(hFind);
+    }
+    if (savers.size() > 0)
+        return;
+
+    // try #2
+    lstrcpy(pch, TEXT("\\..\\*_scr"));
+    pch = _tcsrchr(szDir, TEXT('\\'));
+    *pch = TEXT('\0');
+
+    hFind = FindFirstFile(szPath, &find);
     if (hFind != INVALID_HANDLE_VALUE)
     {
         do
@@ -89,15 +117,15 @@ void do_it(tstring& saver)
     TCHAR cmdline[MAX_PATH * 3];
     if (__argc == 3)
     {
-        _stprintf(cmdline, _T("\"%s\" %s %s"), saver.c_str(), __targv[1], __targv[2]);
+        _stprintf(cmdline, TEXT("\"%s\" %s %s"), saver.c_str(), __targv[1], __targv[2]);
     }
     else if (__argc == 2)
     {
-        _stprintf(cmdline, _T("\"%s\" %s"), saver.c_str(), __targv[1]);
+        _stprintf(cmdline, TEXT("\"%s\" %s"), saver.c_str(), __targv[1]);
     }
     else
     {
-        _stprintf(cmdline, _T("\"%s\""), saver.c_str());
+        _stprintf(cmdline, TEXT("\"%s\""), saver.c_str());
     }
 
     Execute(cmdline);

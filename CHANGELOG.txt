@@ -25,3 +25,8 @@ CHANGELOG.txt
  * Added the matrixFont parameter at xmatrix. 
  * Added screen_mode to the Config Dialog.
  * It became a pay software.
+
+2016.12.06 ver.0.81 katahiromz
+
+ * Improved the random screensaver.
+ * Improved README.

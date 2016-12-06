@@ -29,6 +29,15 @@ Katayama Hirofumi MZ (Japanese)
 katayama.hirofumi.mz@gmail.com
 -------------------------------------------------------------------------------
 
+You can install a screensaver from the main 
+program "xscreensaver.exe".
+Don't copy saver files partially.
+
+[!!! WARNING !!!]
+You cannot install all the screensavers at once.
+There is limitation of the number of installable
+savers at once (limitation of Windows).
+
 /////////////////////////////////////////////////////
 // Katayama Hirofumi MZ (katahiromz) [ARMYANT]
 // Homepage     http://katahiromz.web.fc2.com/eindex.html

@@ -91,8 +91,8 @@ END
 // Version Info
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     0, 8, 0, 0
-PRODUCTVERSION  0, 8, 0, 0
+FILEVERSION     0, 8, 1, 0
+PRODUCTVERSION  0, 8, 1, 0
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 BEGIN
@@ -103,10 +103,10 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Katayama Hirofumi MZ\0"
             VALUE "FileDescription", "XScreenSaverWin screenhack\0"
-            VALUE "FileVersion", "0.80\0"
+            VALUE "FileVersion", "0.81\0"
             VALUE "LegalCopyright", "Copyright (C) 2015 Katayama Hirofumi MZ.\0"
             VALUE "ProductName", "XScreenSaverWin\0"
-            VALUE "ProductVersion", "0.80\0"
+            VALUE "ProductVersion", "0.81\0"
         END
     END
     BLOCK "VarFileInfo"
