@@ -1,3 +1,13 @@
+**TODO:**
+* standardize readme files
+* upgrade projects to latest visual studio
+
+**Long term goals**
+* convert to Windows 10 store app
+* refactor code?
+
+---
+
 This is XScreenSaver for Windows (XScreenSaverWin).
 
 This software was based on XScreenSaver 5.22 (for non-Windows OS) by 
