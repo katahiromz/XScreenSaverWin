@@ -1,6 +1,7 @@
 **TODO:**
-* standardize readme files
-* upgrade projects to latest visual studio
+* standardize readme files from .txt to .md **ok**
+* upgrade projects to latest visual studio **ok**
+* unify all projects to a single VS solution file
 
 **Long term goals**
 * convert to Windows 10 store app
