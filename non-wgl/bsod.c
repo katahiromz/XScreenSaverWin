@@ -71,6 +71,7 @@
 Bool doWindows = True;
 Bool doNT = True;
 Bool doWin2K = True;
+Bool doWin10 = True;
 Bool doAmiga = True;
 Bool doMac = True;
 Bool doMacsBug = True;
@@ -106,7 +107,8 @@ INFO_ENTRY2 entries2[] =
 {
     {"Windows", &doWindows},
     {"NT", &doNT},
-    {"Win2K", &doWin2K},
+	{ "Win2K", &doWin2K },
+	{ "Win10", &doWin10 },
     {"Amiga", &doAmiga},
     {"Mac", &doMac},
     {"MacsBug", &doMacsBug},
@@ -159,6 +161,11 @@ static INFOENTRY entries[] =
     {"windowslh", "foreground", "White"},
     {"windowslh", "background", "#AA0000"},
     {"windowslh", "background2", "#AAAAAA"},
+	{ "win10", "foreground", "White" },
+	{ "win10", "background", "#1070AA" },
+	{ "win10", "font", "Segoe UI 16, Consolas 16" },
+	{ "win10", "fontB", "Segoe UI 100, Consolas 100" },
+	{ "win10", "fontC", "Segoe UI 12, Consolas 12" },
     {"glaDOS", "foreground", "White"},
     {"glaDOS", "background", "#0000AA"},
     {"amiga", "foreground", "#FF0000"},
@@ -290,7 +297,7 @@ typedef enum { EOF=0,
                LEFT, CENTER, RIGHT, 
                LEFT_FULL, CENTER_FULL, RIGHT_FULL, 
                COLOR, INVERT, MOVETO, MARGINS,
-               CURSOR_BLOCK, CURSOR_LINE, RECT_, COPY, PIXMAP, IMG,
+               CURSOR_BLOCK, CURSOR_LINE, RECT_, COPY, PIXMAP, IMG, FONT,
                PAUSE, CHAR_DELAY, LINE_DELAY,
                LOOP, RESET
 } bsod_event_type;
@@ -304,7 +311,7 @@ struct bsod_state {
   Display *dpy;
   Window window;
   XWindowAttributes xgwa;
-  XFontStruct *font;
+  XFontStruct *font, *fontA, *fontB, *fontC;
   unsigned long fg, bg;
   GC gc;
   int left_margin, right_margin;    /* for text wrapping */
@@ -471,6 +478,15 @@ struct bsod_state {
 #define BSOD_IMG(bst) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = IMG; \
+  (bst)->pos++; \
+  } while (0)
+
+ /* Switch between fonts A, B and C.
+ */
+#define BSOD_FONT(bst,n) do { \
+  ensure_queue (bst); \
+  (bst)->queue[(bst)->pos].type = FONT; \
+  (bst)->queue[(bst)->pos].arg1 = (void *) ((long) (n)); \
   (bst)->pos++; \
   } while (0)
 
@@ -759,6 +775,18 @@ bsod_pop (struct bsod_state *bst)
       bst->pos++;
       return 0;
     }
+  case FONT:
+    {
+      switch ((long) bst->queue[bst->pos].arg1) {
+      case 0: bst->font = bst->fontA; break;
+      case 1: bst->font = bst->fontB; break;
+      case 2: bst->font = bst->fontC; break;
+      default: abort(); break;
+      }
+      XSetFont (bst->dpy, bst->gc, bst->font->fid);
+      bst->pos++;
+      return 0;
+    }
   case PAUSE:
     {
       long delay = (long) bst->queue[bst->pos].arg1;
@@ -861,7 +889,7 @@ make_bsod_state (Display *dpy, Window window,
   struct bsod_state *bst;
   //char buf1[1024], buf2[1024];
   //char buf3[1024], buf4[1024];
-  const char *font1, *font2;
+  const char *font1, *font2, *font3, *font4;
 
   bst = (struct bsod_state *) calloc (1, sizeof (*bst));
   bst->queue_size = 10;
@@ -880,6 +908,8 @@ make_bsod_state (Display *dpy, Window window,
 #if 1
     font1 = load_info_entry(name, "font");
     font2 = load_info_entry(name, "font2");
+	font3 = load_info_entry(name, "fontB");
+	font4 = load_info_entry(name, "fontC");
 #else
   if (
 # ifdef USE_IPHONE
@@ -925,6 +955,19 @@ make_bsod_state (Display *dpy, Window window,
     bst->font = XLoadQueryFont (dpy, "System 8");
   if (! bst->font)
     abort();
+
+
+  if (font3)
+	  bst->fontB = XLoadQueryFont(dpy, font3);
+  if (font4)
+	  bst->fontC = XLoadQueryFont(dpy, font4);
+
+  if (!bst->fontB) bst->fontB = bst->font;
+  if (!bst->fontC) bst->fontC = bst->font;
+
+  bst->fontA = bst->font;
+
+
 
   gcv.font = bst->font->fid;
 
@@ -1258,6 +1301,133 @@ windows_lh (Display *dpy, Window window)
   return bst;
 }
 
+static struct bsod_state *
+windows_10(Display *dpy, Window window)
+{
+	struct bsod_state *bst =
+		make_bsod_state(dpy, window, "win10", "Win10");
+
+	int qr_width = 41;
+	int qr_height = 41;
+	static const unsigned char qr_bits[] = {
+		0xFF,0xFF,0xFF,0xFF,0xFF,0x01,0xFF,0xFF,0xFF,0xFF,0xFF,0x01,
+		0x03,0x9A,0x70,0xEE,0x80,0x01,0xFB,0x22,0xAA,0xA6,0xBE,0x01,
+		0x8B,0x8E,0x74,0xE7,0xA2,0x01,0x8B,0xEE,0x42,0xC4,0xA2,0x01,
+		0x8B,0x42,0x6E,0xED,0xA2,0x01,0xFB,0xDA,0x63,0xA6,0xBE,0x01,
+		0x03,0xAA,0xAA,0xAA,0x80,0x01,0xFF,0x8B,0xD8,0x9D,0xFF,0x01,
+		0x63,0x62,0xDA,0x1B,0x98,0x01,0x6F,0x67,0x98,0x9F,0xBC,0x01,
+		0x4F,0xCC,0x55,0x81,0x83,0x01,0xB7,0x6D,0xFF,0x68,0xB2,0x01,
+		0xC3,0x10,0x87,0x8B,0x96,0x01,0x6F,0xB1,0x91,0x58,0x94,0x01,
+		0xE3,0x36,0x88,0x84,0xB8,0x01,0x83,0x9B,0xFE,0x59,0xD7,0x01,
+		0x3B,0x74,0x98,0x5C,0xB4,0x01,0x37,0x75,0xDC,0x91,0xA6,0x01,
+		0x77,0xDE,0x01,0x54,0xBA,0x01,0xBB,0x6D,0x8B,0xB9,0xB5,0x01,
+		0x1F,0x06,0xBD,0x9B,0xB4,0x01,0xD3,0xBD,0x91,0x19,0x84,0x01,
+		0x0B,0x20,0xD8,0x91,0xB4,0x01,0x33,0x95,0xBC,0x0A,0xD5,0x01,
+		0xB3,0x60,0xDC,0xD9,0xB6,0x01,0xEF,0x77,0x18,0x09,0xA4,0x01,
+		0xA3,0xC2,0x95,0x51,0xB2,0x01,0xDF,0x63,0xDB,0xBE,0xB3,0x01,
+		0x03,0x08,0xC9,0x09,0xF0,0x01,0xFF,0xA3,0x19,0xBD,0xFB,0x01,
+		0x03,0x2E,0x84,0xA5,0xAA,0x01,0xFB,0x9A,0xFC,0x9B,0xBB,0x01,
+		0x8B,0x7E,0x9C,0x1D,0xB0,0x01,0x8B,0x6E,0x58,0xA1,0xDB,0x01,
+		0x8B,0xDA,0xD5,0x65,0xA2,0x01,0xFB,0x72,0xFB,0xE9,0xF0,0x01,
+		0x03,0x02,0x99,0x3B,0xB3,0x01,0xFF,0xFF,0xFF,0xFF,0xFF,0x01,
+		0xFF,0xFF,0xFF,0xFF,0xFF,0x01 };
+	Pixmap pixmap;
+
+	const char *lines[] = {
+		":(\n",
+		"\n",
+		"Your PC ran into a problem and needs to restart. We're just\n",
+		"collecting some error info, and then we'll restart for you.\n",
+		"\n",
+		"\n",
+		"\n",
+		"For more information about this issue and\n",
+		"possible fixes, visit\n",
+		/*  "https://www.jwz.org/xscreensaver\n",*/
+		"http://youtu.be/-RjmN9RZyr4\n",
+		"\n",
+		"If you call a support person, give them this info:\n",
+		"Stop code CRITICAL_PROCESS_DIED",
+	};
+	int i, y = 0, y0 = 0;
+	int line_height0 = bst->fontB->ascent;
+	int line_height1 = bst->fontA->ascent + bst->fontA->descent;
+	int line_height2 = bst->fontC->ascent + bst->fontC->descent;
+	int line_height = line_height0;
+	int top, left0, left;
+	int stop = 60 + (random() % 39);
+
+	line_height1 *= 1.3;
+	line_height2 *= 1.5;
+
+	top = ((bst->xgwa.height - (line_height0 * 1 +
+		line_height1 * 6 +
+		line_height2 * 6))
+		/ 2);
+
+	{
+		int dir, ascent, descent;
+		XCharStruct ov;
+		const char *s = lines[2];
+		XTextExtents(bst->fontA, s, strlen(s),
+			&dir, &ascent, &descent, &ov);
+		left = left0 = (bst->xgwa.width - ov.width) / 2;
+	}
+
+	pixmap = XCreatePixmapFromBitmapData(dpy, window, (char *)qr_bits,
+		qr_width, qr_height,
+		bst->fg, bst->bg, bst->xgwa.depth);
+	for (i = 0; i < 2; i++)
+	{
+		pixmap = double_pixmap(dpy, bst->gc, bst->xgwa.visual, bst->xgwa.depth,
+			pixmap, qr_width, qr_height);
+		qr_width *= 2;
+		qr_height *= 2;
+	}
+	bst->pixmap = pixmap;
+
+	y = top;
+	line_height = line_height0;
+	BSOD_FONT(bst, 1);
+	for (i = 0; i < countof(lines); i++)
+	{
+		BSOD_MOVETO(bst, left, y);
+		BSOD_TEXT(bst, LEFT, lines[i]);
+		y += line_height;
+		if (i == 0)
+		{
+			BSOD_FONT(bst, 0);
+			line_height = line_height1;
+		}
+		else if (i == 4)
+		{
+			y0 = y;
+			y += line_height / 2;
+			BSOD_PIXMAP(bst, 0, 0, qr_width, qr_height, left, y + line_height1);
+			BSOD_FONT(bst, 2);
+			line_height = line_height2;
+			left += qr_width + line_height2 / 2;
+# ifdef HAVE_MOBILE
+			y -= 14;
+# endif
+		}
+	}
+
+	left = left0;
+	BSOD_FONT(bst, 0);
+	for (i = 0; i <= stop; i++)
+	{
+		char buf[100];
+		sprintf(buf, "%d%% complete", i);
+		BSOD_MOVETO(bst, left, y0);
+		BSOD_TEXT(bst, LEFT, buf);
+		BSOD_PAUSE(bst, 85000);
+	}
+	BSOD_PAUSE(bst, 3000000);
+
+	XClearWindow(dpy, window);
+	return bst;
+}
 
 static struct bsod_state *
 windows_other (Display *dpy, Window window)
@@ -4137,6 +4307,7 @@ static const struct {
   { "Windows",      windows_31 },
   { "NT",       windows_nt },
   { "Win2K",        windows_other },
+  { "Win10",        windows_10 },
   { "Amiga",        amiga },
   { "Mac",      mac },
   { "MacsBug",      macsbug },
