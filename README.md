@@ -1,3 +1,5 @@
+This fork aims to modernize and make it accessible to newer Windows and Visual Studio platforms
+
 **TODO:**
 * standardize readme files from .txt to .md **ok**
 * upgrade projects to latest visual studio **ok**
