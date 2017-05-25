@@ -1,45 +1,40 @@
-This is XScreenSaver for Windows (XScreenSaverWin).
+XScreenSaveWin
+==============
 
-This software was based on XScreenSaver 5.22 (for non-Windows OS) by 
-Jamie Zawinski.
-
+This is XScreenSaver for Windows (XScreenSaverWin). This software was
+based on XScreenSaver 5.22 (for non-Windows OS) by Jamie Zawinski.
 Porting to Windows was mostly done by Katayama Hirofumi MZ.
 
-You can download binary at the XScreenSaverWin homepage.
+You can download binary at the XScreenSaverWin homepage. Check
+STATUS.txt for porting status. Check LICENSE.txt for licensing
+information. It works on Windows 2000/XP/Vista/Server 2003/7/10.
 
-Check STATUS.txt for porting status.
-Check LICENSE.txt for licensing information.
+Once you installed XScreenSaverWin, then you can install a screensaver
+from the main program "xscreensaver.exe".
 
-NOTE: If you want to build the Extrusion screen saver, then 
-      check the gle-3.1.0 folder.
+NOTE: If you want to build the Extrusion screen saver, then check the
+gle-3.1.0 folder.
 
-Supported Platforms: Windows 2000/XP/Vista/Server 2003/7/10
+!!! WARNING !!!
+---------------
 
--------------------------------------------------------------------------------
-The XScreenSaverWin homepage
-http://katahiromz.web.fc2.com/xscreensaverwin/en
+You cannot install all the screensavers at once. There is limitation of
+the number of installable savers at once (limitation of Windows).
 
-XScreenSaver (original; for non-Windows)
-http://www.jwz.org/xscreensaver/
+  ------------------------------------------------------------------------
+  The XScreenSaverWin homepage
+  http://katahiromz.web.fc2.com/xscreensaverwin/en
 
-GitHub XScreenSaverWin repository
-https://github.com/katahiromz/XScreenSaverWin
+  XScreenSaver (original; for non-Windows)
+  http://www.jwz.org/xscreensaver/
 
-Katayama Hirofumi MZ (Japanese)
-katayama.hirofumi.mz@gmail.com
--------------------------------------------------------------------------------
+  GitHub XScreenSaverWin repository
+  https://github.com/katahiromz/XScreenSaverWin
 
-You can install a screensaver from the main 
-program "xscreensaver.exe".
+  Katayama Hirofumi MZ (Japanese) katayama.hirofumi.mz@gmail.com
+  ------------------------------------------------------------------------
 
-[!!! WARNING !!!]
-You cannot install all the screensavers at once.
-There is limitation of the number of installable
-savers at once (limitation of Windows).
+Katayama Hirofumi MZ (katahiromz) [ARMYANT] Homepage:
+http://katahiromz.web.fc2.com/eindex.html BBS:
+http://katahiromz.bbs.fc2.com/ E-Mail: katayama.hirofumi.mz@gmail.com
 
-/////////////////////////////////////////////////////
-// Katayama Hirofumi MZ (katahiromz) [ARMYANT]
-// Homepage     http://katahiromz.web.fc2.com/eindex.html
-// BBS          http://katahiromz.bbs.fc2.com/
-// E-Mail       katayama.hirofumi.mz@gmail.com
-/////////////////////////////////////////////////////

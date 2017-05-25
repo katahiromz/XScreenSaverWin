@@ -1,50 +1,43 @@
-(Japanese, Shift_JIS)
+ï»¿(Japanese, UTF-8)
 
-‚±‚ê‚ÍXScreenSaver for Windows (XScreenSaverWin) ‚Å‚·B
+XScreenSaveWin
+==============
 
-‚±‚Ìƒ\ƒtƒgƒEƒFƒA‚ÍAJamie Zawinski‚³‚ñ‚É‚æ‚éA
-XScreenSaver 5.22 (WindowsˆÈŠO‚ÌOS) ‚ÉŠî‚Ã‚¢‚Ä‚¢‚Ü‚·B
+ã“ã‚Œã¯ XScreenSaver for Windows (XScreenSaverWin) ã§ã™ã€‚ã“ã®ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã¯ã€
+Jamie Zawinski ã•ã‚“ã«ã‚ˆã‚‹ã€XScreenSaver 5.22 (Windows ä»¥å¤–ã® OS) ã«åŸºã¥ã„ã¦
+ã„ã¾ã™ã€‚Windows ã¸ã®ç§»æ¤ã¯ã€ç‰‡å±±åšæ–‡ MZ ã«ã‚ˆã£ã¦è¡Œã‚ã‚Œã¾ã—ãŸã€‚
 
-Windows‚Ö‚ÌˆÚA‚ÍA•ĞR”•¶MZ‚É‚æ‚Á‚Äs‚í‚ê‚Ü‚µ‚½B
+ãƒã‚¤ãƒŠãƒªãƒ¼ã¯ã€XScreenSaverWin ã®ãƒ›ãƒ¼ãƒ ãƒšãƒ¼ã‚¸ã§ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã§ãã¾ã™ã€‚ç§»æ¤çŠ¶
+æ³ã¯ STATUS.txt ã§ã”ç¢ºèªãã ã•ã„ã€‚ãƒ©ã‚¤ã‚»ãƒ³ã‚¹æƒ…å ±ã¯ã€LICENSE.txt ã‚’ã”å‚ç…§ä¸‹
+ã•ã„ã€‚Windows 2000/XP/Vista/Server 2003/7/10 ã§å‹•ä½œã—ã¾ã™ã€‚
 
-ƒoƒCƒiƒŠ[‚ÍAXScreenSaverWin‚Ìƒz[ƒ€ƒy[ƒW‚Å
-ƒ_ƒEƒ“ƒ[ƒh‚Å‚«‚Ü‚·B
+ä¸€åº¦ XScreenSaverWin ã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ãŸã‚‰ã€ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚»ãƒ¼ãƒãƒ¼ã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«
+ã¯ã€ãƒ¡ã‚¤ãƒ³ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã€Œxscreensaver.exeã€ã‹ã‚‰è¡Œãˆã¾ã™ã€‚
 
-ˆÚAó‹µ‚ÍSTATUS.txt‚Å‚²Šm”F‚­‚¾‚³‚¢B
-ƒ‰ƒCƒZƒ“ƒXî•ñ‚ÍALICENSE.txt‚ğ‚²QÆ‰º‚³‚¢B
+æ³¨è¨˜: ã‚‚ã—ã€Extrusion ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚»ãƒ¼ãƒãƒ¼ã‚’ãƒ“ãƒ«ãƒ‰ã—ãŸã‹ã£ãŸã‚‰ã€gle-3.1.0 ãƒ•
+ã‚©ãƒ«ãƒ€ãƒ¼ã‚’ãƒã‚§ãƒƒã‚¯ã—ã¦ä¸‹ã•ã„ã€‚
 
-’‹L: ‚à‚µAExtrusionƒXƒNƒŠ[ƒ“ƒZ[ƒo[‚ğƒrƒ‹ƒh
-      ‚µ‚½‚©‚Á‚½‚çAgle-3.1.0ƒtƒHƒ‹ƒ_[‚ğƒ`ƒFƒbƒN‚µ‚Ä
-      ‰º‚³‚¢B
+!!! æ³¨æ„ !!
+-----------
 
-“®ìŠÂ‹«: Windows 2000/XP/Vista/Server 2003/7/10
+ã™ã¹ã¦ã®ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚»ãƒ¼ãƒãƒ¼ã‚’ä¸€åº¦ã«ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹ã“ã¨ã¯ã§ãã¾ã›ã‚“ã€‚ä¸€åº¦ã«
+ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã§ãã‚‹ã‚»ãƒ¼ãƒãƒ¼ã®æ•°ã«ã¯åˆ¶é™ãŒã‚ã‚Šã¾ã™ï¼ˆWindows ã®åˆ¶é™ï¼‰ã€‚
 
--------------------------------------------------------------------------------
-XScreenSaverWin‚Ìƒz[ƒ€ƒy[ƒW
-http://katahiromz.web.fc2.com/xscreensaverwin/ja
+  ------------------------------------------------------------------------
+  XScreenSaverWinã®ãƒ›ãƒ¼ãƒ ãƒšãƒ¼ã‚¸
+  http://katahiromz.web.fc2.com/xscreensaverwin/ja
 
-XScreenSaver (ƒIƒŠƒWƒiƒ‹; WindowsˆÈŠO—p)
-http://www.jwz.org/xscreensaver/
+  XScreenSaver (ã‚ªãƒªã‚¸ãƒŠãƒ«; Windowsä»¥å¤–ç”¨)
+  http://www.jwz.org/xscreensaver/
 
-GitHub XScreenSaverWin repository
-https://github.com/katahiromz/XScreenSaverWin
+  GitHub XScreenSaverWin repository
+  https://github.com/katahiromz/XScreenSaverWin
 
-•ĞR”•¶MZ (‚©‚½‚â‚Ü‚Ğ‚ë‚Ó‚İƒGƒ€ƒ[ƒbƒh)
-katayama.hirofumi.mz@gmail.com
--------------------------------------------------------------------------------
+  ç‰‡å±±åšæ–‡MZ (ã‹ãŸã‚„ã¾ã²ã‚ãµã¿ã‚¨ãƒ ã‚¼ãƒƒãƒ‰)
+  katayama.hirofumi.mz@gmail.com
+  ------------------------------------------------------------------------
 
-ƒXƒNƒŠ[ƒ“ƒZ[ƒo[‚ÌƒCƒ“ƒXƒg[ƒ‹‚ÍA
-ƒƒCƒ“ƒvƒƒOƒ‰ƒ€uxscreensaver.exev‚©‚ç
-s‚Á‚Ä‰º‚³‚¢B
-
-y’ˆÓz
-‚·‚×‚Ä‚ÌƒXƒNƒŠ[ƒ“ƒZ[ƒo[‚ğˆê“x‚ÉƒCƒ“ƒXƒg[ƒ‹
-‚·‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñBˆê“x‚ÉƒCƒ“ƒXƒg[ƒ‹‚Å‚«‚é
-ƒZ[ƒo[‚Ì”‚É‚Í§ŒÀ‚ª‚ ‚è‚Ü‚·iWindows‚Ì§ŒÀjB
-
-/////////////////////////////////////////////////////
-// •ĞR”•¶MZ (katahiromz) [ŒR‘à‹a]
-// ƒz[ƒ€ƒy[ƒW http://katahiromz.web.fc2.com/
-// Œf¦”Â       http://katahiromz.bbs.fc2.com/
-// ƒ[ƒ‹       katayama.hirofumi.mz@gmail.com
-/////////////////////////////////////////////////////
+ç‰‡å±±åšæ–‡MZ (katahiromz) è»éšŠèŸ»
+ãƒ›ãƒ¼ãƒ ãƒšãƒ¼ã‚¸: http://katahiromz.web.fc2.com/
+æ²ç¤ºæ¿: http://katahiromz.bbs.fc2.com/
+ãƒ¡ãƒ¼ãƒ«: katayama.hirofumi.mz@gmail.com
