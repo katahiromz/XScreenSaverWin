@@ -37,7 +37,7 @@ Jamie Zawinski さんによる、XScreenSaver 5.22 (Windows 以外の OS) に基
   katayama.hirofumi.mz@gmail.com
   ------------------------------------------------------------------------
 
-片山博文MZ (katahiromz) 軍隊蟻
-ホームページ: http://katahiromz.web.fc2.com/
-掲示板: http://katahiromz.bbs.fc2.com/
-メール: katayama.hirofumi.mz@gmail.com
+ * 片山博文MZ (katahiromz) 軍隊蟻
+ * ホームページ: http://katahiromz.web.fc2.com/
+ * 掲示板: http://katahiromz.bbs.fc2.com/
+ * メール: katayama.hirofumi.mz@gmail.com
