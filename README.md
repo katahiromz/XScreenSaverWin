@@ -13,6 +13,7 @@ NOTE: If you want to build the Extrusion screen saver, then check the gle-3.1.0 
 You cannot install all the screensavers at once. There is limitation of the number of installable savers at once (limitation of Windows).
 
 -------------------------------------------------------------------------------
+
 The XScreenSaverWin homepage
 http://katahiromz.web.fc2.com/xscreensaverwin/en
 
@@ -24,7 +25,9 @@ https://github.com/katahiromz/XScreenSaverWin
 
 Katayama Hirofumi MZ (Japanese)
 katayama.hirofumi.mz@gmail.com
+
 -------------------------------------------------------------------------------
+
 * Katayama Hirofumi MZ (katahiromz) [ARMYANT]
 * Homepage:       http://katahiromz.web.fc2.com/eindex.html
 * BBS:            http://katahiromz.bbs.fc2.com/
