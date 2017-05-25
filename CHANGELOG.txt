@@ -30,3 +30,8 @@ CHANGELOG.txt
 
  * Improved the random screensaver.
  * Improved README.
+
+2016.05.25 katahiromz
+
+ * Added Windows 10 BSOD.
+
