@@ -490,6 +490,15 @@ struct bsod_state {
   (bst)->pos++; \
   } while (0)
 
+ /* Switch between fonts A, B and C.
+ */
+#define BSOD_FONT(bst,n) do { \
+  ensure_queue (bst); \
+  (bst)->queue[(bst)->pos].type = FONT; \
+  (bst)->queue[(bst)->pos].arg1 = (void *) ((long) (n)); \
+  (bst)->pos++; \
+  } while (0)
+
 /* Jump around in the state table.  You can use this as the last thing 
    in your state table to repeat the last N elements forever.
  */
