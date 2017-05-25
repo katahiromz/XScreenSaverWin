@@ -27,7 +27,7 @@ https://github.com/katahiromz/XScreenSaverWin
 片山博文MZ (かたやまひろふみエムゼッド)
 katayama.hirofumi.mz@gmail.com
 -------------------------------------------------------------------------------
-片山博文MZ (katahiromz) [軍隊蟻]
-ホームページ: http://katahiromz.web.fc2.com/
-掲示板:       http://katahiromz.bbs.fc2.com/
-メール:       katayama.hirofumi.mz@gmail.com
+* 片山博文MZ (katahiromz) [軍隊蟻]
+* ホームページ: http://katahiromz.web.fc2.com/
+* 掲示板:       http://katahiromz.bbs.fc2.com/
+* メール:       katayama.hirofumi.mz@gmail.com
