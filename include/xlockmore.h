@@ -215,7 +215,7 @@ typedef struct
 typedef enum COLOR_SCHEME {
     color_scheme_default, color_scheme_uniform, 
     color_scheme_smooth, color_scheme_bright
-};
+} COLOR_SCHEME;
 
 #ifdef WRITABLE_COLORS
 # undef WRITABLE_COLORS

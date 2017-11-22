@@ -3,8 +3,8 @@
 if exist XScreenSaverWin goto skip
 if not exist xscreensaver\Release goto fail
 if not exist xscreensaver-text\Release goto fail
-if not exist non-wgl\Release goto fail
-if not exist wgl\Release goto fail
+if not exist src\non-wgl\Release goto fail
+if not exist src\wgl\Release goto fail
 
 if not exist XScreenSaverWin mkdir XScreenSaverWin
 
@@ -13,8 +13,8 @@ copy xscreensaver\Release\*.exe XScreenSaverWin
 copy xscreensaver-text\Release\*.exe XScreenSaverWin
 mkdir XScreenSaverWin\random_scr
 copy random\Release\*.scr XScreenSaverWin\random_scr
-copy non-wgl\Release\*.scr XScreenSaverWin
-copy wgl\Release\*.scr XScreenSaverWin
+copy src\non-wgl\Release\*.scr XScreenSaverWin
+copy src\wgl\Release\*.scr XScreenSaverWin
 copy LICENSE.txt XScreenSaverWin
 
 cd XScreenSaverWin
@@ -25,8 +25,8 @@ cd ..
 copy README.txt XScreenSaverWin
 copy READMEJP.txt XScreenSaverWin
 copy CHANGELOG.txt XScreenSaverWin
-copy wgl\starwars.txt XScreenSaverWin
-copy wgl\starwars.txt XScreenSaverWin\starwars_scr
+copy src\wgl\starwars.txt XScreenSaverWin
+copy src\wgl\starwars.txt XScreenSaverWin\starwars_scr
 
 @rem delete NG screensavers
 if exist XScreenSaverWin\apple2_scr rd /S /Q XScreenSaverWin\apple2_scr

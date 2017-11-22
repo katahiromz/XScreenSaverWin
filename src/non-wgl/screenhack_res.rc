@@ -8,7 +8,7 @@
 LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
 #pragma code_page(65001)    // UTF-8
 
-1 ICON "XScreenSaver.ico"
+1 ICON "../XScreenSaver.ico"
 
 // Dialog
 DLG_SCRNSAVECONFIGURE DIALOG DISCARDABLE 0, 0, 465, 285
@@ -74,7 +74,7 @@ FONT 8, "Arial"
     CONTROL "", cmb1, "COMBOBOX", CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 300, 245, 160, 100
     CONTROL "OK", IDOK, "BUTTON", BS_DEFPUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 255, 265, 100, 14
     CONTROL "Cancel", IDCANCEL, "BUTTON", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 360, 265, 100, 14
-    CONTROL "&Reset Setting", IDC_RESET, BUTTON, BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 5, 265, 100, 14
+    CONTROL "&Reset Setting", IDC_RESET, "BUTTON", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 5, 265, 100, 14
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -102,7 +102,7 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName", "Katayama Hirofumi MZ\0"
-            VALUE "FileDescription", "XScreenSaverWin xlockmore\0"
+            VALUE "FileDescription", "XScreenSaverWin screenhack\0"
             VALUE "FileVersion", "0.82\0"
             VALUE "LegalCopyright", "Copyright (C) 2015-2017 Katayama Hirofumi MZ.\0"
             VALUE "ProductName", "XScreenSaverWin\0"
