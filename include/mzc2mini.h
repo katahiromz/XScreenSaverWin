@@ -1,9 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////
 // mzc2mini.h - MZC2 mini
-// Copyright (C) 2012-2013 Katayama Hirofumi MZ.  All rights reserved.
+// Copyright (C) 2012-2017 Katayama Hirofumi MZ.  All rights reserved.
 ////////////////////////////////////////////////////////////////////////////
 #ifndef MZC2MINI
 #define MZC2MINI
+
+#include <windows.h>
+#include <vector>
+#include <cassert>
+#include <string>
+#include <tchar.h>
 
 ////////////////////////////////////////////////////////////////////////////
 // tstring
@@ -197,7 +203,7 @@ public:
 protected:
     HANDLE m_hFind;
     TCHAR m_szRoot[MAX_PATH];
-#ifdef _DEBUG
+#ifndef NDEBUG
     BOOL m_bFound;
 #endif
     WIN32_FIND_DATA m_find;

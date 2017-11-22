@@ -96,9 +96,9 @@ macro(add_screenhack_screensaver)
             list(APPEND SOURCES ${argument})
         endif()
     endforeach()
-    add_executable(${TARGET} ${SOURCES} screenhack_res.rc)
+    add_executable(${TARGET} ${SOURCES} ../screenhack_res.rc)
     set_target_properties(${TARGET} PROPERTIES SUFFIX ".scr")
-    target_link_libraries(${TARGET} comctl32 screenhack scrnsave)
+    target_link_libraries(${TARGET} comctl32 common screenhack scrnsave)
 endmacro()
 
 # add_xlockmore_screensaver macro
@@ -112,14 +112,16 @@ macro(add_xlockmore_screensaver)
             list(APPEND SOURCES ${argument})
         endif()
     endforeach()
-    add_executable(${TARGET} ${SOURCES} xlockmore_res.rc)
+    add_executable(${TARGET} ${SOURCES} ../xlockmore_res.rc)
     set_target_properties(${TARGET} PROPERTIES SUFFIX ".scr")
-    target_link_libraries(${TARGET} comctl32 xlockmore ${OPENGL_LIBRARIES} scrnsave)
+    target_link_libraries(${TARGET} comctl32 common xlockmore scrnsave)
 endmacro()
 
 ##############################################################################
 
-include_directories(include)
+add_definitions(-DUSE_GL=1)
+
+include_directories(. include)
 
 add_subdirectory(debughelper)
 add_subdirectory(gle)
@@ -128,6 +130,7 @@ add_subdirectory(savers)
 add_subdirectory(xscreensaver)
 add_subdirectory(xscreensaver-text)
 
+add_subdirectory(common)
 add_subdirectory(xlockmore)
 add_subdirectory(screenhack)
 

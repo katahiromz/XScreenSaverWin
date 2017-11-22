@@ -1,10 +1,6 @@
 add_library(screenhack STATIC
-    colors.c
-    hsv.c
-    minixpm.c
+    grabclient.c
     screenhack.c
-    xcolor.c
-    ximage.c
-    xws2win.c
-    yarandom.c)
-target_link_libraries(screenhack comctl32)
+    xdbe.c)
+target_include_directories(screenhack PRIVATE ../include)
+target_link_libraries(screenhack comctl32 common)

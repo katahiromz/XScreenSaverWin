@@ -336,7 +336,7 @@ truchet_init (Display *dpy, Window window)
   st->anim_delay = anim_delay;
   st->anim_step_size = anim_step_size;
 #else
-  st->maxlinewidth = maxLineWidth", "Integer");
+  st->maxlinewidth = get_integer_resource (st->dpy, "maxLineWidth", "Integer");
   st->minlinewidth = get_integer_resource (st->dpy, "minLineWidth", "Integer");
   st->minwidth = get_integer_resource (st->dpy, "minWidth", "Integer");
   st->minheight = get_integer_resource (st->dpy, "minHeight", "Integer");

@@ -4,14 +4,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #define _CRT_SECURE_NO_WARNINGS
-#include <windows.h>
-#include <vector>
-#include <cassert>
-#include <tchar.h>
 #include "mzc2mini.h"
 
 ////////////////////////////////////////////////////////////////////////////
-
 
 VOID MzcSplit(std::vector<tstring>& v, const tstring& s, TCHAR separator)
 {
