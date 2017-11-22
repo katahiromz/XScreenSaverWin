@@ -1,0 +1,14 @@
+
+You can make the examples in this directory by running
+make -f Makefile.examples
+If this makefile doesn't work for you, you'l need to 
+get the source, and run configure.
+
+
+To run a whole sequence of demos, run the shell script 
+./rundemo  This shell script will run them in order 
+from basic to complex, and print a short explanation
+of each demo to stdout.  Use the leftmouse to move,
+and middlemouse to get to the popup menu. Exit each demo
+from the menu.
+

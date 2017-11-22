@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D813099C-C7B8-43A3-9678-94EFB3E530FC}</ProjectGuid>
+    <RootNamespace>StaticLib</RootNamespace>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccProvider>
+    </SccProvider>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>ExtrusionLib_db</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>ExtrusionLib</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <LanguageStandard>
+      </LanguageStandard>
+      <BrowseInformation>true</BrowseInformation>
+      <CompileAsManaged>false</CompileAsManaged>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+    </Lib>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(SolutionDir)lib\$(TargetFileName)"
+copy "$(OutDir)$(TargetName).pdb" "$(SolutionDir)lib\$(TargetName).pdb"
+copy "$(ProjectDir)ExtrusionLib.h" "$(SolutionDir)include\ExtrusionLib.h"
+ccopy "$(ProjectDir)gleBaseExtrusion.h" "$(SolutionDir)include\gleBaseExtrusion.h"
+copy "$(ProjectDir)gleConeExtrusion.h" "$(SolutionDir)include\gleConeExtrusion.h"
+copy "$(ProjectDir)gleCylinderExtrusion.h" "$(SolutionDir)include\gleCylinderExtrusion.h"
+copy "$(ProjectDir)gleExtrusion.h" "$(SolutionDir)include\gleExtrusion.h"
+copy "$(ProjectDir)gleHelicoidExtrusion.h" "$(SolutionDir)include\gleHelicoidExtrusion.h"
+copy "$(ProjectDir)gleIBeam.h" "$(SolutionDir)include\gleIBeam.h"
+copy "$(ProjectDir)gleLatheExtrusion.h" "$(SolutionDir)include\gleLatheExtrusion.h"
+copy "$(ProjectDir)gleScrew.h" "$(SolutionDir)include\gleScrew.h"
+copy "$(ProjectDir)gleSimpleBeam.h" "$(SolutionDir)include\gleSimpleBeam.h"
+copy "$(ProjectDir)gleSimpleTwistedIBeam.h" "$(SolutionDir)include\gleSimpleTwistedIBeam.h"
+copy "$(ProjectDir)gleSpiralExtrusion.h" "$(SolutionDir)include\gleSpiralExtrusion.h"
+copy "$(ProjectDir)gleTaperExtrusion.h" "$(SolutionDir)include\gleTaperExtrusion.h"
+copy "$(ProjectDir)gleToroidExtrusion.h" "$(SolutionDir)include\gleToroidExtrusion.h"
+copy "$(ProjectDir)gleTwistedIBeam.h" "$(SolutionDir)include\gleTwistedIBeam.h"
+copy "$(ProjectDir)gleTwistExtrusion.h" "$(SolutionDir)include\gleTwistExtrusion.h"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/D "EXTRUSIONLIB_STATIC_BUILD" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+    </Lib>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(SolutionDir)lib\$(TargetFileName)"
+copy "$(ProjectDir)ExtrusionLib.h" "$(SolutionDir)include\ExtrusionLib.h"
+copy "$(ProjectDir)gleBaseExtrusion.h" "$(SolutionDir)include\gleBaseExtrusion.h"
+copy "$(ProjectDir)gleConeExtrusion.h" "$(SolutionDir)include\gleConeExtrusion.h"
+copy "$(ProjectDir)gleCylinderExtrusion.h" "$(SolutionDir)include\gleCylinderExtrusion.h"
+copy "$(ProjectDir)gleExtrusion.h" "$(SolutionDir)include\gleExtrusion.h"
+copy "$(ProjectDir)gleHelicoidExtrusion.h" "$(SolutionDir)include\gleHelicoidExtrusion.h"
+copy "$(ProjectDir)gleIBeam.h" "$(SolutionDir)include\gleIBeam.h"
+copy "$(ProjectDir)gleLatheExtrusion.h" "$(SolutionDir)include\gleLatheExtrusion.h"
+copy "$(ProjectDir)gleScrew.h" "$(SolutionDir)include\gleScrew.h"
+copy "$(ProjectDir)gleSimpleBeam.h" "$(SolutionDir)include\gleSimpleBeam.h"
+copy "$(ProjectDir)gleSimpleTwistedIBeam.h" "$(SolutionDir)include\gleSimpleTwistedIBeam.h"
+copy "$(ProjectDir)gleSpiralExtrusion.h" "$(SolutionDir)include\gleSpiralExtrusion.h"
+copy "$(ProjectDir)gleTaperExtrusion.h" "$(SolutionDir)include\gleTaperExtrusion.h"
+copy "$(ProjectDir)gleToroidExtrusion.h" "$(SolutionDir)include\gleToroidExtrusion.h"
+copy "$(ProjectDir)gleTwistedIBeam.h" "$(SolutionDir)include\gleTwistedIBeam.h"
+copy "$(ProjectDir)gleTwistExtrusion.h" "$(SolutionDir)include\gleTwistExtrusion.h"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ExtrusionInternals.cpp" />
+    <ClCompile Include="ExtrusionLib.cpp" />
+    <ClCompile Include="gleBaseExtrusion.cpp" />
+    <ClCompile Include="gleConeExtrusion.cpp" />
+    <ClCompile Include="gleCylinderExtrusion.cpp" />
+    <ClCompile Include="gleExtrusion.cpp" />
+    <ClCompile Include="gleHelicoidExtrusion.cpp" />
+    <ClCompile Include="gleIBeam.cpp" />
+    <ClCompile Include="gleLatheExtrusion.cpp" />
+    <ClCompile Include="gleScrew.cpp" />
+    <ClCompile Include="gleSimpleBeam.cpp" />
+    <ClCompile Include="gleSimpleTwistedIBeam.cpp" />
+    <ClCompile Include="gleSpiralExtrusion.cpp" />
+    <ClCompile Include="gleTaperExtrusion.cpp" />
+    <ClCompile Include="gleToroidExtrusion.cpp" />
+    <ClCompile Include="gleTwistedIBeam.cpp" />
+    <ClCompile Include="gleTwistExtrusion.cpp" />
+    <ClCompile Include="StaticLib.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ExtrusionInternals.h" />
+    <ClInclude Include="ExtrusionLib.h" />
+    <ClInclude Include="gleBaseExtrusion.h" />
+    <ClInclude Include="gleConeExtrusion.h" />
+    <ClInclude Include="gleCylinderExtrusion.h" />
+    <ClInclude Include="gleExtrusion.h" />
+    <ClInclude Include="gleHelicoidExtrusion.h" />
+    <ClInclude Include="gleIBeam.h" />
+    <ClInclude Include="gleLatheExtrusion.h" />
+    <ClInclude Include="gleScrew.h" />
+    <ClInclude Include="gleSimpleBeam.h" />
+    <ClInclude Include="gleSimpleTwistedIBeam.h" />
+    <ClInclude Include="gleSpiralExtrusion.h" />
+    <ClInclude Include="gleTaperExtrusion.h" />
+    <ClInclude Include="gleToroidExtrusion.h" />
+    <ClInclude Include="gleTwistedIBeam.h" />
+    <ClInclude Include="gleTwistExtrusion.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

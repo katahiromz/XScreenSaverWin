@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN"> 
+<html>
+<head>
+<title>GLE Build Notes & General Info</title>
+</head>
+<body>
+
+<h1>GLE Build Notes &amp; General Info</h1>
+
+<h2>Background and Overview</h2>
+The GLE Tubing and Extrusion Library is a graphics application 
+programming interface (API).  The library consists of a number
+of "C" language subroutines for drawing tubing and extrusions.
+The library is distributed in source code form, in a package 
+that includes documentation, a VRML proposal, Makefiles, and 
+full source code and header files.   It uses the OpenGL (TM)
+programming API to perform the actual drawing of the tubing and
+extrusions.
+
+<p>
+GLE is known to run on UNIX(r) and UNIX-like operating systems 
+such as Linux, AIX, IRIX, Ultrix and HPUX with OpenGL or Mesa.
+GLE is also known to run on OS/2 Warp.
+<p>
+A spec file is included for automatically building RedHat RPM's.
+
+<h2>Build Notes</h2>
+The GLE build system uses the GNU automake/autoconf tools.  These
+tools should allow GLE to build cleanly on virtually all computing
+platforms.
+<p>
+To build the library, simply type <tt>configure</tt> at the command line
+to set things up for your CPU & operating system.  Then run
+<tt>make</tt> to compile. Finally, <tt>cd</tt> to the <tt>examples</tt>
+ directory, and run the shell script <tt>rundemo</tt> to launch each 
+of the demos in order (from most basic, to advanced).
+
+<p>
+You may find the following <tt>configure</tt> flags useful:
+<dl>
+<dt><tt>--enable-lenient-tess</tt>
+<dd>If you have a tesselator that is happy with anything,
+    including degenerate points, collinear segments, <i>etc.</i>
+    then define this. Otherwise, don't specify this flag.
+    Setting this flag provides a minor performance improvement.
+
+    I believe that the stock SGI tesselator is "lenient",
+    despite explicit disclaimers in the documentation.
+    (circa 1995).
+
+    Early versions of the MesaGL tesselator are not at all 
+    forgiving of degenerate points.  This resulted in frequent 
+    crashes and/or hangs.  (circa 1997-2000). Recent versions
+    (as of 2001) seem to work fine.  If you have an old version
+    of MesaGL, do not set  <tt>--enable-lenient-tess</tt>
+<p>
+<dt><tt>--disable-auto-texture</tt>
+<dd>Disable texture mapping code.  Disabling texture
+    mapping may provide a very minor performance improvement.
+
+<p>
+<dt><tt>--enable-irisgl</tt>
+<dd>Compile for old IrisGL/GL-3.2 API.  This used to work, but
+    hasn't been tested in a long time.
+<p>
+<dt><tt>--enable-debug</tt>
+<dd>Will compile sources so printf routines will be called instead
+    of OpenGL routines.  Warning: this will generate a *lot* of
+    output!
+</dl>
+<p>
+
+If you have difficulties... here are some notes:
+
+<dl>
+<dt><b>IBM AIX, SGI Irix, HP and DEC Systems</b>
+<dd>There are no known compile or run time problems.  If you have
+    difficulty making on these systems, make sure that OpenGL and 
+    GLUT are present. (Note: the new automake/autoconf build process
+    has *not* been tested on these systems.)
+    <p>
+
+<dt><b>Linux Systems</b>
+<dd>Older MesaGL tesselator was prone to hangs and crashes.  
+    Recent (2001) versions seem to do just fine.  There are currently
+    no other known compile or runtime problems.
+    <p>
+
+<dt><b>Windows NT/2000 and Windows 95/98</b>
+<dd>GLE will compile & run on these Microsoft systems under
+    several different development environments.  The subdirectory
+    <tt>ms-visual-c</tt> contains project files.  The README
+    contains additional information.
+    <p>
+
+<dt><b>Macintosh OS version 9</b>
+<dd>GLE has been reported to compile & run on this Apple operating
+    system using the CodeWarrier development environment, once 
+    some 'standard' modifications are made. (??)
+    <p>
+
+<dt><b>GL and OpenGL Libraries</b>
+<dd>The tubing and extrusion library can be compiled for GL 3.2 or for
+    OpenGL. By default, the Makefile are configured for OpenGL. 
+    (Warning: the library has NOT been run on GL 3.2 in years, and
+    so might be broken in minor ways.  With tweaking, though it should
+    work.)
+<p>
+<dt><b>Obtaining the GL, OpenGL and GLUT libraries</b>
+<dd>OpenGL is available on most UNIX(R) workstations,
+    as well as OS/2(R) and Windows NT.  Contact your
+    workstation vendor for more information or visit
+    the <a href="http://www.opengl.org/">
+    OpenGL Web Site</a>
+    (See also <a href="http://www.sgi.com/software/opengl/">
+    SGI's OpenGL site</a>).
+    GLE also works with Mesa, a public-domain OpenGL-like 
+    API. Mesa can be found at 
+    <a href="http://www.mesa3d.org/">
+    http://www.mesa3d.org/</a>
+    <p>
+    The demos require that the GLUT windowing and 
+    utility library be installed.  GLUT can be obtained
+    at 
+    <a href="http://reality.sgi.com/opengl/glut3/">
+    http://reality.sgi.com/opengl/glut3/</a>
+    <p>
+
+<dt><b>GLUT Libraries</b>
+<dd>The demos require the GLUT library and headers to be installed.
+<p>
+
+<dt><b>Compile time warnings</b>
+<dd>You may see some compile time warnings.  Ignore these.  These occur
+    because not all compilers correctly handle doubly-index subscripts,
+    and so the code does some funny business to get around this.
+    To the best of my knowledge, the code still executes correctly
+    despite these warnings.  Note, however, that my efforts to eliminate
+    these warning may result in code that old compilers will not be able
+    to compile, or will compile but not execute correctly.
+    <p>
+    (In my humble opinion, the way in which the C/C++ language handles
+    doubly, triply, <i>etc.</i> subscripted arrays is fundamentally broken.
+    The syntax is not self-consistent. Many important constructs are
+    undefined by ANSI-C (and C++).  In the good old days, when most compilers 
+    were broken in this area anyway, you could happily work around this
+    with single-index arrays and fancy address calculation.  Now that
+    compilers have been fixed, and, thanks to C++, strict-type-checking 
+    is all the rage, the fundamental short-comings of C/C++ in this
+    area start becoming horribly apparent.  
+    To put it another way, I agonized over how subscripting should be
+    handled, and what, if any new types needed to be introduced.
+    Sadly, I was unable to design code that compiled on most compilers,
+    AND not introduce new types, AND avoid strict-typechecking warning
+    messages.  Sadly, the result is a horrible mess. )
+
+</dl>
+
+<p>
+
+<hr>
+Last updated: Linas Vepstas July 2001
+
+
+</body>
+</html>

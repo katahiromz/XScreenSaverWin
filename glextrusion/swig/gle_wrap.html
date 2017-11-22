@@ -1,0 +1,234 @@
+<HTML>
+<HEAD>
+<TITLE>
+GLE Module. Extrusion and tubing primitives library</TITLE>
+<BODY BGCOLOR="#ffffff">
+<H1>GLE Module. Extrusion and tubing primitives library</H1>
+<PRE>[ Python Module : gle ]
+</PRE>
+
+<P><TT><B>TUBE_JN_RAW = 0x1</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+defines for tubing join styles   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>TUBE_JN_ANGLE = 0x2</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>TUBE_JN_CUT = 0x3</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>TUBE_JN_ROUND = 0x4</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>TUBE_JN_MASK = 0xf</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+mask bits   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>TUBE_JN_CAP = 0x10</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>TUBE_NORM_FACET = 0x100</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+determine how normal vectors are to be handled   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>TUBE_NORM_EDGE = 0x200</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>TUBE_NORM_PATH_EDGE = 0x400</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+for spiral, lathe, helix primitives   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>TUBE_NORM_MASK = 0xf00</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+mask bits   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>TUBE_CONTOUR_CLOSED = 0x1000</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+closed or open countours   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_ENABLE = 0x10000</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_STYLE_MASK = 0xff</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_VERTEX_FLAT = 1</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_NORMAL_FLAT = 2</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_VERTEX_CYL = 3</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_NORMAL_CYL = 4</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_VERTEX_SPH = 5</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_NORMAL_SPH = 6</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_VERTEX_MODEL_FLAT = 7</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_NORMAL_MODEL_FLAT = 8</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_VERTEX_MODEL_CYL = 9</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_NORMAL_MODEL_CYL = 10</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_VERTEX_MODEL_SPH = 11</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>GLE_TEXTURE_NORMAL_MODEL_SPH = 12</B></TT>
+<BLOCKQUOTE><PRE>[ Constant: int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleGetJoinStyle()</B></TT>
+<BLOCKQUOTE><PRE>[ returns int  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleSetJoinStyle(style)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+bitwise OR of flags   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>glePolyCylinder(npoints,point_array,color_array,radius)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+num points in polyline   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>glePolyCone(npoints,point_array,color_array,radius_array)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+numpoints in poly-line   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleExtrusion(ncp,contour,cont_normal,up,npoints,point_array,color_array)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+number of contour points   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleTwistExtrusion(ncp,contour,cont_normal,up,npoints,point_array,color_array,twist_array)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+number of contour points   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleSuperExtrusion(ncp,contour,cont_normal,up,npoints,point_array,color_array,xform_array)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+extrude 2D contour, specifying local affine tranformations   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleSpiral(ncp,contour,cont_normal,up,startRadius,drdTheta,startZ,dzdTheta,startXform,dXformdTheta,startTheta,sweepTheta)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+number of contour points   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleLathe(ncp,contour,cont_normal,up,startRadius,drdTheta,startZ,dzdTheta,startXform,dXformdTheta,startTheta,sweepTheta)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+lathe moves contour along helical path by helically shearing 3D space   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleHelicoid(rToroid,startRadius,drdTheta,startZ,dzdTheta,startXform,dXformdTheta,startTheta,sweepTheta)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+circle contour (torus) radius   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleToroid(rToroid,startRadius,drdTheta,startZ,dzdTheta,startXform,dXformdTheta,startTheta,sweepTheta)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+circle contour (torus) radius   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleScrew(ncp,contour,cont_normal,up,startz,endz,twist)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+number of contour points   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleTextureMode(mode)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>rot_axis(omega,axis)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+Rotation Utilities   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>rot_about_axis(angle,axis)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>rot_omega(axis)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>rot_prince(omega,axis)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>urot_axis(m,omega,axis)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>urot_about_axis(m,angle,axis)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>urot_omega(m,axis)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>urot_prince(m,omega,axis)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>uview_direction(m,v21,up)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+returned   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>uviewpoint(m,v1,v2,up)</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+returned   
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleFeedBack()</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B>gleFreeFeedbackBuffers()</B></TT>
+<BLOCKQUOTE><PRE>[ returns void  ]
+</PRE></BLOCKQUOTE>
+
+<P><TT><B></B></TT>
+
+
+</BODY>
+</HTML>

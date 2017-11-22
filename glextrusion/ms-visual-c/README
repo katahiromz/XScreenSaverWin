@@ -1,0 +1,10 @@
+
+This directory contains projects files for building
+GLE with the Microsoft Visual Studio C++ Workspace.
+
+Built libraries will be located in the lib-folder. The Debug-version is named gled.lib and the release-version gle.lib. Both are compiled using the run-time libraries "Debug Multithreaded DLL" and "Multithreaded DLL".
+
+When the library is built an include/GL directory will be created and the gle.h file from the src directory will be copied into it. To use the library in other projects add the directory ...\gle\ms-visual-c\include to the include-directory list in Visual Studio in the Tools/Options/Directories settings.
+
+Contributed by Jonas Lindemann <jonas.lindemann@byggmek.lth.se>
+July 2001

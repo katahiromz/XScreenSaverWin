@@ -1,0 +1,35 @@
+.\"
+.\" GLE Tubing & Extrusions Library Documentation 
+.\"
+.TH gleSetNumSides 3GLE "3.0" "GLE" "GLE"
+.SH NAME
+gleSetNumSides, gleGetNumSides - Query and Set the cylinder roundness.
+.SH SYNTAX
+.nf
+.LP
+void gleSetNumSides (int nslices);
+int gleGetNumSides (void);
+.fi
+.SH ARGUMENTS
+.IP \fInslices\fP 1i
+positive integer number of slices
+.SH DESCRIPTION
+
+Query and set the GLE cylinder and cone roundness. When GLE draws
+a cylinder or a cone, it approximates the circular cross-section
+with a polygon (of 20 sides by default).  These subroutines can
+be used to change the default number of sides in this cross-section.
+A smaller number of sides can typically be drawn much faster, at
+the loss of some visual accuracy.  Increasing the number of sides to
+more than 20 will typically have no noticable visual effect.
+
+.SH BUGS
+
+Multiple threads using GLE share a single global number of sides
+(although this should be easily fixable because GLE does use 
+a centralized graphics context).
+
+.SH SEE ALSO
+glePolyCylinder, glePolyCone
+.SH AUTHOR
+Linas Vepstas (linas@linas.org)

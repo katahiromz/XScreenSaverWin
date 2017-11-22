@@ -1,0 +1,127 @@
+#! /bin/sh
+#
+# rundemo script.  This script will launch each of the demo 
+# programs in turn.
+#
+echo " "
+echo "The most basic primitive is the cylinder primitive."
+echo "Press left mouse button to move. Press middle mouse button"
+echo "to exit."
+echo " "
+./cylinder
+#
+# ------------------------------------------------------------
+echo " "
+echo "The joinstyles connecting the poly-cylinder segments"
+echo "can be modified. Use teh middle mouse button to select"
+echo "a menu entry"
+echo " "
+./joinstyle
+#
+# ------------------------------------------------------------
+echo " "
+echo "By varying the radius, we can build a polycone."
+echo "Note that the join style can be applied to cones as well."
+echo " "
+./joincone
+#
+# ------------------------------------------------------------
+echo " "
+echo "Alpha Blending (transparency) is now supported!"
+echo " "
+./alpha
+#
+# ------------------------------------------------------------
+echo " "
+echo "Sloppy Sax -- A more complicated polycone example"
+echo " "
+./horn
+#
+# ------------------------------------------------------------
+echo " "
+echo "In fact, join styles can be applied to an arbitrary"
+echo "cross-section."
+echo " "
+./texas
+#
+# ------------------------------------------------------------
+echo " "
+echo "The way in which the join style is applied depends on the"
+echo "the distance of the contour from the origin. Compare the "
+echo "upper and lower figures for different join styles."
+echo " "
+./joinoffset
+#
+# ------------------------------------------------------------
+echo " "
+echo "In fact, joinstyles can be applied to non-closed contours as well."
+echo "This demo also demonstrates the use of per-segment twisting. "
+echo " "
+./twistoid
+#
+# ------------------------------------------------------------
+echo " "
+echo "A different example of applying a twist."
+echo " "
+./beam
+#
+# ------------------------------------------------------------
+echo " "
+echo "A generalized torus ..."
+echo " "
+./helix
+#
+# ------------------------------------------------------------
+echo " "
+echo "A generalized torus has a number of adjustable parameters"
+echo " "
+./helix2
+#
+# ------------------------------------------------------------
+echo " "
+echo "A generalized torus has a number of adjustable parameters"
+echo " "
+./helix3
+#
+# ------------------------------------------------------------
+echo " "
+echo "A generalized torus can even exhibit torsion"
+echo " "
+./helix4
+#
+# ------------------------------------------------------------
+echo " "
+echo "Torsion helps shear this candlestick profile"
+echo " "
+./candlestick
+#
+# ------------------------------------------------------------
+echo " "
+echo "Effect of Torsion vs. Parallel translation"
+echo " "
+./transport
+#
+# ------------------------------------------------------------
+echo " "
+echo "Texture mapped cylinders"
+echo " "
+./helixtex
+#
+# ------------------------------------------------------------
+echo " "
+echo "Simple Screw Shape"
+echo " "
+./screw
+#
+# ------------------------------------------------------------
+echo " "
+echo "Complex Screw Shape"
+echo " "
+./taper
+#
+# ------------------------------------------------------------
+echo " "
+echo "Misc other"
+./twistex
+./twoid
+echo " end of demo --- That's all folks!"

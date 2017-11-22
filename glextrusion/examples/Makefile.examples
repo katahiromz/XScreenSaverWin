@@ -1,0 +1,223 @@
+
+PROGRAMS =    beam		  candlestick     cone            cylinder        helix           helix2          helix3          helix4          helixtex        horn            joincone        joinoffset      joinstyle       screw           taper           texas           transport       twistoid        twistex         twoid
+
+
+beam_SOURCES = beam.c mainsimple.c
+cone_SOURCES = cone.c mainsimple.c
+cylinder_SOURCES = cylinder.c mainsimple.c
+helix_SOURCES = helix.c mainsimple.c
+helix2_SOURCES = helix2.c mainsimple.c
+helix3_SOURCES = helix3.c mainsimple.c
+helix4_SOURCES = helix4.c mainsimple.c
+helixtex_SOURCES = helixtex.c texture.c maintex.c
+horn_SOURCES = horn.c mainsimple.c
+joincone_SOURCES = cone.c mainjoin.c
+joinoffset_SOURCES = joinoffset.c mainjoin.c
+joinstyle_SOURCES = cylinder.c mainjoin.c
+screw_SOURCES = screw.c texture.c maintex.c
+taper_SOURCES = taper.c mainsimple.c
+texas_SOURCES = texas.c mainjoin.c
+twistoid_SOURCES = twoid.c
+twistex_SOURCES = twistoid.c texture.c maintex.c
+
+
+INCLUDES =     -I/usr/X11R6/include   -I${top_srcdir}   -I${top_srcdir}/src 
+
+
+LDADD = -lgle -lglut -lGLU -lGL -lXmu  -L/usr/X11R6/lib -lXi -lXext -lXmu -lXt -lX11  -L../src/.libs
+
+CPPFLAGS = 
+LDFLAGS = 
+LIBS =  -lm
+X_CFLAGS =  -I/usr/X11R6/include
+X_LIBS = -lgle -lglut -lGLU -lGL -lXmu  -L/usr/X11R6/lib -lXi -lXext -lXmu -lXt -lX11
+X_EXTRA_LIBS = 
+X_PRE_LIBS =  -lSM -lICE
+beam_OBJECTS =  beam.o mainsimple.o
+beam_LDADD = $(LDADD)
+beam_DEPENDENCIES = 
+beam_LDFLAGS = 
+candlestick_SOURCES = candlestick.c
+candlestick_OBJECTS =  candlestick.o
+candlestick_LDADD = $(LDADD)
+candlestick_DEPENDENCIES = 
+candlestick_LDFLAGS = 
+cone_OBJECTS =  cone.o mainsimple.o
+cone_LDADD = $(LDADD)
+cone_DEPENDENCIES = 
+cone_LDFLAGS = 
+cylinder_OBJECTS =  cylinder.o mainsimple.o
+cylinder_LDADD = $(LDADD)
+cylinder_DEPENDENCIES = 
+cylinder_LDFLAGS = 
+helix_OBJECTS =  helix.o mainsimple.o
+helix_LDADD = $(LDADD)
+helix_DEPENDENCIES = 
+helix_LDFLAGS = 
+helix2_OBJECTS =  helix2.o mainsimple.o
+helix2_LDADD = $(LDADD)
+helix2_DEPENDENCIES = 
+helix2_LDFLAGS = 
+helix3_OBJECTS =  helix3.o mainsimple.o
+helix3_LDADD = $(LDADD)
+helix3_DEPENDENCIES = 
+helix3_LDFLAGS = 
+helix4_OBJECTS =  helix4.o mainsimple.o
+helix4_LDADD = $(LDADD)
+helix4_DEPENDENCIES = 
+helix4_LDFLAGS = 
+helixtex_OBJECTS =  helixtex.o texture.o maintex.o
+helixtex_LDADD = $(LDADD)
+helixtex_DEPENDENCIES = 
+helixtex_LDFLAGS = 
+horn_OBJECTS =  horn.o mainsimple.o
+horn_LDADD = $(LDADD)
+horn_DEPENDENCIES = 
+horn_LDFLAGS = 
+joincone_OBJECTS =  cone.o mainjoin.o
+joincone_LDADD = $(LDADD)
+joincone_DEPENDENCIES = 
+joincone_LDFLAGS = 
+joinoffset_OBJECTS =  joinoffset.o mainjoin.o
+joinoffset_LDADD = $(LDADD)
+joinoffset_DEPENDENCIES = 
+joinoffset_LDFLAGS = 
+joinstyle_OBJECTS =  cylinder.o mainjoin.o
+joinstyle_LDADD = $(LDADD)
+joinstyle_DEPENDENCIES = 
+joinstyle_LDFLAGS = 
+screw_OBJECTS =  screw.o texture.o maintex.o
+screw_LDADD = $(LDADD)
+screw_DEPENDENCIES = 
+screw_LDFLAGS = 
+taper_OBJECTS =  taper.o mainsimple.o
+taper_LDADD = $(LDADD)
+taper_DEPENDENCIES = 
+taper_LDFLAGS = 
+texas_OBJECTS =  texas.o mainjoin.o
+texas_LDADD = $(LDADD)
+texas_DEPENDENCIES = 
+texas_LDFLAGS = 
+transport_SOURCES = transport.c
+transport_OBJECTS =  transport.o
+transport_LDADD = $(LDADD)
+transport_DEPENDENCIES = 
+transport_LDFLAGS = 
+twistoid_OBJECTS =  twoid.o
+twistoid_LDADD = $(LDADD)
+twistoid_DEPENDENCIES = 
+twistoid_LDFLAGS = 
+twistex_OBJECTS =  twistoid.o texture.o maintex.o
+twistex_LDADD = $(LDADD)
+twistex_DEPENDENCIES = 
+twistex_LDFLAGS = 
+twoid_SOURCES = twoid.c
+twoid_OBJECTS =  twoid.o
+twoid_LDADD = $(LDADD)
+twoid_DEPENDENCIES = 
+twoid_LDFLAGS = 
+CFLAGS = -g -O2 -Wall
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(CFLAGS) $(LDFLAGS) -o $@
+
+
+all: $(PROGRAMS)
+
+beam: $(beam_OBJECTS) $(beam_DEPENDENCIES)
+	@rm -f beam
+	$(LINK) $(beam_LDFLAGS) $(beam_OBJECTS) $(beam_LDADD) $(LIBS)
+
+candlestick: $(candlestick_OBJECTS) $(candlestick_DEPENDENCIES)
+	@rm -f candlestick
+	$(LINK) $(candlestick_LDFLAGS) $(candlestick_OBJECTS) $(candlestick_LDADD) $(LIBS)
+
+cone: $(cone_OBJECTS) $(cone_DEPENDENCIES)
+	@rm -f cone
+	$(LINK) $(cone_LDFLAGS) $(cone_OBJECTS) $(cone_LDADD) $(LIBS)
+
+cylinder: $(cylinder_OBJECTS) $(cylinder_DEPENDENCIES)
+	@rm -f cylinder
+	$(LINK) $(cylinder_LDFLAGS) $(cylinder_OBJECTS) $(cylinder_LDADD) $(LIBS)
+
+helix: $(helix_OBJECTS) $(helix_DEPENDENCIES)
+	@rm -f helix
+	$(LINK) $(helix_LDFLAGS) $(helix_OBJECTS) $(helix_LDADD) $(LIBS)
+
+helix2: $(helix2_OBJECTS) $(helix2_DEPENDENCIES)
+	@rm -f helix2
+	$(LINK) $(helix2_LDFLAGS) $(helix2_OBJECTS) $(helix2_LDADD) $(LIBS)
+
+helix3: $(helix3_OBJECTS) $(helix3_DEPENDENCIES)
+	@rm -f helix3
+	$(LINK) $(helix3_LDFLAGS) $(helix3_OBJECTS) $(helix3_LDADD) $(LIBS)
+
+helix4: $(helix4_OBJECTS) $(helix4_DEPENDENCIES)
+	@rm -f helix4
+	$(LINK) $(helix4_LDFLAGS) $(helix4_OBJECTS) $(helix4_LDADD) $(LIBS)
+
+helixtex: $(helixtex_OBJECTS) $(helixtex_DEPENDENCIES)
+	@rm -f helixtex
+	$(LINK) $(helixtex_LDFLAGS) $(helixtex_OBJECTS) $(helixtex_LDADD) $(LIBS)
+
+horn: $(horn_OBJECTS) $(horn_DEPENDENCIES)
+	@rm -f horn
+	$(LINK) $(horn_LDFLAGS) $(horn_OBJECTS) $(horn_LDADD) $(LIBS)
+
+joincone: $(joincone_OBJECTS) $(joincone_DEPENDENCIES)
+	@rm -f joincone
+	$(LINK) $(joincone_LDFLAGS) $(joincone_OBJECTS) $(joincone_LDADD) $(LIBS)
+
+joinoffset: $(joinoffset_OBJECTS) $(joinoffset_DEPENDENCIES)
+	@rm -f joinoffset
+	$(LINK) $(joinoffset_LDFLAGS) $(joinoffset_OBJECTS) $(joinoffset_LDADD) $(LIBS)
+
+joinstyle: $(joinstyle_OBJECTS) $(joinstyle_DEPENDENCIES)
+	@rm -f joinstyle
+	$(LINK) $(joinstyle_LDFLAGS) $(joinstyle_OBJECTS) $(joinstyle_LDADD) $(LIBS)
+
+screw: $(screw_OBJECTS) $(screw_DEPENDENCIES)
+	@rm -f screw
+	$(LINK) $(screw_LDFLAGS) $(screw_OBJECTS) $(screw_LDADD) $(LIBS)
+
+taper: $(taper_OBJECTS) $(taper_DEPENDENCIES)
+	@rm -f taper
+	$(LINK) $(taper_LDFLAGS) $(taper_OBJECTS) $(taper_LDADD) $(LIBS)
+
+texas: $(texas_OBJECTS) $(texas_DEPENDENCIES)
+	@rm -f texas
+	$(LINK) $(texas_LDFLAGS) $(texas_OBJECTS) $(texas_LDADD) $(LIBS)
+
+transport: $(transport_OBJECTS) $(transport_DEPENDENCIES)
+	@rm -f transport
+	$(LINK) $(transport_LDFLAGS) $(transport_OBJECTS) $(transport_LDADD) $(LIBS)
+
+twistoid: $(twistoid_OBJECTS) $(twistoid_DEPENDENCIES)
+	@rm -f twistoid
+	$(LINK) $(twistoid_LDFLAGS) $(twistoid_OBJECTS) $(twistoid_LDADD) $(LIBS)
+
+twistex: $(twistex_OBJECTS) $(twistex_DEPENDENCIES)
+	@rm -f twistex
+	$(LINK) $(twistex_LDFLAGS) $(twistex_OBJECTS) $(twistex_LDADD) $(LIBS)
+
+twoid: $(twoid_OBJECTS) $(twoid_DEPENDENCIES)
+	@rm -f twoid
+	$(LINK) $(twoid_LDFLAGS) $(twoid_OBJECTS) $(twoid_LDADD) $(LIBS)
+
+%.o: %.c
+	@echo '$(COMPILE) -c $<'; \
+	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+
+clean:
+	rm -f *.o $(PROGRAMS)
+	rm -rf .deps
+
+run:
+	rundemo
+

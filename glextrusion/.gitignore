@@ -1,0 +1,15 @@
+Makefile
+autogen.err
+autom4te.cache
+config.cache
+config.log
+config.status
+config.h
+config.h.in~
+*.tar.gz
+*.patch
+*.diff
+*.diffs
+stamp-h
+stamp-h.in
+libtool

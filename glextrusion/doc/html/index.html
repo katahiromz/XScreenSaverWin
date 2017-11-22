@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN"> 
+<html>
+<title>GLE Tubing and Extrusion Fact Sheet</title>
+
+<meta name="description" content="The GLE Tubing and Extrusion Library
+    is a graphics programming interface (API) for drawing 
+    tubing, extrusions and sweeps using the OpenGL API.">
+<meta name="keywords" content="GLE, tubing, extrusion, graphics, OpenGL,
+    lathe, sweep, torus, polycylinder, polycone, contour, parallel
+    translation, helix, texture mapping">
+<body>
+<h1>GLE Tubing and Extrusion Fact Sheet</h1>
+<a href="http://www.opengl.org/">
+<img align=right src="ogla_sm.gif" alt="OpenGL Logo">
+</a>
+<a href="http://sourceforge.net"> 
+<img src="http://sourceforge.net/sflogo.php?group_id=5539" 
+     align=right width="88" height="31" border="0" alt="SourceForge Logo">
+</a>
+<br>
+
+<h2>The Hard Facts</h2>
+The GLE Tubing and Extrusion Library is a graphics application 
+programming interface (API).  The library consists of a number
+of "C" language subroutines for drawing tubing and extrusions.
+It is a very fast implementation of these shapes, outperforming
+all other implementations, most by orders of magnitude.
+The library is distributed in source code form, in a package 
+that includes documentation, a VRML proposal, Makefiles, and 
+full source code and header files.   It uses the OpenGL (TM)
+programming API to perform the actual drawing of the tubing and
+extrusions.
+
+<p>
+GLE is designed for and maintained on the 
+<a href="http://www.linas.org/linux/graphics-ad.html">Linux</a> 
+operating system, and is known to run on other Unix operating systems 
+such as 
+<a href="http://www.rs6000.ibm.com">AIX</a>, 
+<a href="http://www.sgi.com">IRIX</a>, Ultrix and HPUX with 
+<a href="http://www.opengl.org">OpenGL</a> or 
+<a href="http://www.mesa3d.org">Mesa</a>.
+GLE is also known to run on 
+<a href="http://www.software.ibm.com/os/warp/index.html">
+IBM OS/2 Warp</a>,  Apple Macintosh OS9, and Microsoft Windows NT
+and has been used to develop screen-savers for some of these popular 
+PC operating systems.
+<p>
+<b>News:</b> Alpha Blending/Transparency now supported by means of 
+   new <tt>*_c4f</tt> routines that allow RGBA values to be passed 
+	down into the API.
+<p>
+<b>News:</b> Dave Richards has created a set of MSWindows-specific C++
+   classes that are derived from gle.  See the
+   <a href="http://www.quiknet.com/~moriarty/">GLE32</a> site.
+   (<a href="http://www.linas.org/mirrors/www.quiknet.com/~moriarty/">mirror</a>)
+<p>
+<b>News:</b> There is now a mailing list to discuss gle:
+   <tt>gle-discuss@lists.sourceforge.net</tt>. 
+   Subscribe <a href="http://lists.sourceforge.net/mailman/listinfo/gle-discuss">
+   by web</a>  or
+   <a href="http://www.geocrawler.com/redir-sf.php3?list=gle-discuss">
+   view the archives</a>.
+<p>
+<b>News:</b> Version 3.0 is out, sporting an improved/simplified 
+   build system, which should make compiling this package a lot less
+   confusing.  Project has been moved to 
+   <a href="http://sourceforge.net/project/?group_id=5539">SourceForge</a>,
+   which means you can get live CVS, and should make it easier for
+   folks to submit patches & participate in this project.
+<p>
+<b>News:</b> <a href="http://www.symbolstone.org/technology/java">
+   ShapeShifter</a> is a re-write of the GLE library in Java.  
+   Available freely, under the 'Artistic License'.
+<p>
+<b>News:</b> OpenGL internals programmers & hardware developers,
+   <a href="http://www.linas.org/linux/graphics-ad.html">
+   please read this.</a>
+<p>
+<b>News:</b> Python bindings are shipped with this release.  
+   They were generated with a non-standard version of SWIG.
+   There is also another (different) set of bindings for GLE that 
+   come standard with OpenGL at the 
+   <a href="http://pyopengl.sourceforge.net/">PyOpenGL site</a>. 
+   At this point, neither set should be considered to be more 
+   'standard' than the other.
+<p>
+
+
+
+<img src="basic.gif"> 
+<img src="texscr.gif"> 
+<img src="twist3.gif"> 
+<p>
+
+<h2>A Gentle Introduction</h2>
+The libgle.a library contains a collection of routines for drawing
+sweeps and extrusions.  A "sweep" or "extrusion" is a 2D contour
+(polyline) that is swept or extruded along a 3D path (polyline).
+For example, sweeping a circle along a straight line will generate
+a cylinder. Sweeping a circle along a circular path will generate 
+a doughnut (torus).
+<p>
+The library also includes a set of utility routines for drawing some of
+the more common extruded shapes: a polycylinder, a polycone, a
+generalized torus (circle swept along a helical path), a "helix"
+(arbitrary contour swept along a helical path) and a "lathe" (arbitrary
+contour swept along a helical path, with torsion used to keep the
+contour aligned).
+<p>
+<! <img src="helix.gif"> 
+<img src="helix2.gif"> 
+<img src="helixtex.gif"> 
+<p>
+The most general extrusion supported by this library allows an arbitrary
+2D contour to be swept around an arbitrary 3D path.  A set of normal
+vectors can be specified to go along with the contour; the normal vectors
+determine the appearance of the contour when lighting is turned on.
+A set of colors and affine matrices can be specified to go along with
+the 3D path.  The colors are used to color along the path. The affine
+matrices are used to operate on the contour as it is swept along.  If no
+affine matrices are specified, the contour is extruded using the
+mathematical concept of "parallel translation" or "Gaussian
+translation". That is, the contour is moved (and drawn) along the 
+extrusion path in a "straight" manner.  If there are affine matrices, 
+they are applied to the contour at each extrusion segment before the
+segment is drawn.
+<p>
+<img src="helix4.gif"> <img src="shear.gif">
+<p>
+The affine matrices allow work in a quasi-non-Euclidean space.
+They essentially allow the contour to be distorted as it is swept 
+along.  The allow the contour to be rotated, translated and 
+rescaled as it is drawn.  For example, a rescaling will turn a 
+polycylinder into a poly-cone, since the circle that is being 
+extruded is scaled to a different size at each extrusion vertex.
+A rotation allows the contour to be spun around while it is being 
+extruded, thus for instance allowing drill-bit type shapes to be
+drawn.  A translation allows the appearance of shearing in 
+real space; that is, taking a contour and displacing it, 
+without otherwise bending it.  Note that the affines are
+2x3 matrices, not 3x4 matrices, since they apply to the 2D 
+contour as it is being extruded.
+<p>
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="tube.html">Tubing & Extrusions Subroutine Documentation</a>
+<li><a href="join.html">JoinStyle Subroutine Documentation</a>
+<li><a href="texture.html">Texture Generation</a>
+<li><a href="build.html">Compiling the Library</a>
+<li><a href="pipeline.html">Design &amp; Implementation Internals, the Pipeline</a>
+<li><a href="vrml.html">A VRML Extension Proposal</a>
+<li><a href="http://www.linas.org/gle/index.html">The GLE Web Site</a>
+<li><a href="http://sourceforge.net/projects/gle/">GLE on 
+    SourceForge</a> (live CVS)
+<li><a href="http://www.linas.org/gle/pub/gle-3.0.lsm">The GLE LSM entry</a>
+<li><a href="http://www.linas.org/gle/pub/">Source Code
+    Distribution (Primary -- linas.org)</a>
+<li><a href="http://metalab.unc.edu/pub/Linux/libs/X/gle-3.0.1.tar.gz">Source
+Code Distribution (Secondary -- Metalab)</a>
+<li><a href="ftp://tsx-11.mit.edu/pub/linux/sources/libs/gle.2.2.7.tar.gz">Source Code Distribution (Secondary -- TSX-11)</a>
+</ul>
+
+<h2> Version Summary </h2>
+Version 1.0 -- Originally developed by Linas Vepstas for IBM GL 3.2
+               and SGI IrisGL in 1991<br>
+Version 2.0 -- Port to OpenGL, March, July, October 1993 <br>
+Version 2.1 -- Port demos to GLUT Library, assorted lint/compile time
+               cleanup, April 1995<br>
+Version 2.1.1 -- Additional demos, October 1995<br>
+Version 2.2.0 -- Fully HTML'ized documentation, Christmas 1995 <br>
+Version 2.2.1 -- Additional demos <br>
+Version 2.2.2 -- Extensive screen shots added to documentation, January 1996 <br>
+Version 2.2.3 -- VRML proposal, February 1996 <br>
+Version 2.2.4 -- metalab (prev. sunsite), tsx-11 post, March 1996 <br>
+Version 2.2.5 -- Documentation cleanup, July 1996 <br>
+Version 2.2.6 -- Documentation cleanup, April 1997 <br>
+Version 2.2.7 -- Minor bug fixes, December 1997 <br>
+Version 2.3   -- Bug fixes for drawing of end caps for MesaGL, 
+                 man pages from Mark Kilgard, December 1997 <br>
+Version 3.0.0 -- Consolidation, simplification of build structure;
+                 major version number changed because header files
+                 consolidated and renamed.
+                 Use automake/autoconf to build. 
+                 Move CVStree to sourceforge.  June 2000<br>
+Version 3.0.1 -- Misc bug fixes, configure.in fix<br>
+Version 3.0.2 -- C++ wrapper fixes<br>
+Version 3.0.3 -- look for libXmu in configure<br>
+Version 3.0.4 -- python bindings, minor bug fix<br>
+Version 3.0.5 -- Visual C project files; 
+                 create pipeline documentation;
+                 fix makefile to install docs, examples.<br>
+Version 3.0.6 -- disable fprintf(stderr) on Win32 systems.
+                 use newer automake/autoconf configure.
+                 Add GPL as an alternate license choice.
+                 November 2001.<br>
+Version 3.0.7 -- configure.in libXi fix for detecting libglut.<br>
+Version 3.0.8 -- configure.in check for libXi first ... 
+                 Fix memory leak with atexit()<br>
+Version 3.1.0 -- Add support for Alpha Blending -- March 2003 <br>
+<p>
+<h2> Credits </h2>
+Written and maintained by Linas Vepstas 
+<a href="mailto:linas@linas.org">&lt;linas@linas.org&gt;</a>. <br>
+Many thanks Mark Kilgard for converting the web pages to real Unix 
+man pages.  
+<br>
+Visit my <a href="http://www.linas.org/linux/">Enterprise Linux</a> web
+site for more info about Linux in a commercial, business setting.
+<p>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN"> 
+<html>
+<! 
+    GLE extrusion, sweep and tubing library
+>
+
+<title>gleJoinStyle Documentation</title>
+<body>
+<h1>gleJoinStyle Documentation</h1>
+
+<img src="cut.gif"> <img src="round.gif"> <br>
+<img src="angle.gif"> <img src="raw.gif">
+
+<h2>Subroutine Descriptions</h2>
+
+<dl>
+
+<dt><pre><b>int gleGetJoinStyle (void); 
+void gleSetJoinStyle (int style);	      /* bitwise OR of flags */ 
+</b></pre>
+<dd> Query and Set the join style flags. This word is a bitwise OR of the flags
+described below.
+<h3> Extrusion Join Styles </h3>
+
+<dl>
+<dt><b>TUBE_JN_RAW</b>
+<dd>Draw polycylinders, polycones, extrusions, <i>etc.</i> 
+    with no special treatment of the
+    extrusion ends. 
+<p>
+<dt><b> TUBE_JN_ANGLE        </b>
+<dd>Draw polycylinders, polycones, extrusions, <i>etc.</i> 
+    by extending the different segments until they 
+    butt into each other with an angular style.
+<p>
+<dt><b> TUBE_JN_CUT          </b>
+<dd>Draw polycylinders, polycones, extrusions, <i>etc.</i> 
+    by joining together the different segments and slicing off
+    the joint at half the angle between the segments.  A cap is drawn.
+    Note that the slicing plane runs through the origin of the contour
+    coordinate system. Thus, the amount of slice can be varied by offsetting
+    the contour with respect to the origin.
+    <p>
+    Note that when two segments meet at a shallow angle, the cut join
+    style will potentially shave off a whole lot of the contour,
+    leading to "surprising" results...
+
+<p>
+<dt><b> TUBE_JN_ROUND        </b>
+<dd> Joints will be rounded. Strictly speaking, the part of the joint
+   above the origin will be rounded. The part below the origin will come
+   together in an angular join.
+
+<p>
+<dt><b> TUBE_JN_MASK         </b>
+<dd> Mask bits.  This can be used to mask off the bit field that defines
+     the join style.
+</dl>
+
+<img src="offround.gif">
+<img src="endcap.gif">
+
+<h3> End Caps </h3>
+<dl>
+<dt><b> TUBE_JN_CAP          </b>
+<dd> If this is set, a cap will be drawn at each end of the extrusion.
+<p>
+</dl>
+
+
+<img src="facenorm.gif"><img src="edgenorm.gif">
+<img src="facesweep.gif"><img src="edgesweep.gif">
+<img src="facet.gif"><img src="edge.gif">
+<h3>Automatic Normal Vector Generation </h3>
+<dl>
+<dt><b> TUBE_NORM_FACET      </b>
+<dd> A normal vector is generated per facet. Useful for having an
+     extrusion have a "faceted" look, such as when extruding a square -- each
+     of the four sides of the square will look flat.
+<p>
+<dt><b> TUBE_NORM_EDGE       </b>
+<dd> Normal vectors are generated so that they lie along edges. Useful
+     for making angular things look rounded under lighting. For example,
+     when extruding a hexagon and using this flag, the hexagonal
+     extrusion will look (more like a) smooth perfectly round cylinder,
+     rather than a six-sided shape.
+<p>
+<dt><b> TUBE_NORM_PATH_EDGE  </b>
+<dd> Normal vectors are generated so that they both lie on edges, and so
+     that they interpolate between neighboring segments.  Useful for
+     drawing "spaghetti" -- extrusions that follow a spline path.
+     Because the spline path must be "tessellated" into small straight
+     segments, each segment will look straight unless this flag is set.
+<p>
+<dt><b> TUBE_NORM_MASK       </b>
+<dd> A mask useful for masking out the "norm" bits.
+</dl>
+
+<img src="opencontour.gif">
+<h3>Closed or Open Contours </h3>
+<dl>
+<dt><b> TUBE_CONTOUR_CLOSED	</b>
+<dd> If this bit is set, the contour will be treated as a "closed"
+contour, where the last point connects back up to the first.
+It is useful to set this flag when drawing closed shapes (such as
+extruded cylinders, star-shapes, I-Beams, <i>etc.</i>)  When drawing open
+extrusions (<i>e.g.</i> corrugated sheet metal), you DON'T want to set this
+flag.
+<p>
+</dl>
+</dl>
+
+<h2> The End </h2>
+<address>
+Originally developed by Linas Vepstas in 1991<br>
+Version 2.0 -- port to OpenGL, 1993 <br>
+Version 2.1 -- assorted touch-ups, cleanups, <i>etc.</i><br>
+Version 2.1.1 -- additional demos <br>
+</address>
+
+</body>
+</html>
