@@ -124,7 +124,7 @@ include_directories(include)
 add_subdirectory(debughelper)
 add_subdirectory(gle)
 add_subdirectory(random)
-add_subdirectory(src)
+add_subdirectory(savers)
 add_subdirectory(xscreensaver)
 add_subdirectory(xscreensaver-text)
 
