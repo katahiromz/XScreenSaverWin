@@ -52,8 +52,6 @@ endif()
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 set(BUILD_SHARED_LIBRARIES OFF)
 
-set(SCRNSAVE_SOURCE "")
-
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # using GCC
     set(CMAKE_EXE_LINKER_FLAGS " -static -static-libgcc -static-libstdc++")
