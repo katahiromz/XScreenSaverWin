@@ -98,7 +98,7 @@ macro(add_screenhack_screensaver)
     endforeach()
     add_executable(${TARGET} ${SOURCES} ../screenhack_res.rc)
     set_target_properties(${TARGET} PROPERTIES SUFFIX ".scr")
-    target_link_libraries(${TARGET} comctl32 common screenhack scrnsave)
+    target_link_libraries(${TARGET} comctl32 screenhack scrnsave)
 endmacro()
 
 # add_xlockmore_screensaver macro
@@ -114,7 +114,7 @@ macro(add_xlockmore_screensaver)
     endforeach()
     add_executable(${TARGET} ${SOURCES} ../xlockmore_res.rc)
     set_target_properties(${TARGET} PROPERTIES SUFFIX ".scr")
-    target_link_libraries(${TARGET} comctl32 common xlockmore scrnsave)
+    target_link_libraries(${TARGET} comctl32 xlockmore scrnsave)
 endmacro()
 
 ##############################################################################
@@ -125,6 +125,7 @@ include_directories(. include)
 
 add_subdirectory(debughelper)
 add_subdirectory(gle)
+#add_subdirectory(glparts)
 add_subdirectory(random)
 add_subdirectory(savers)
 add_subdirectory(xscreensaver)

@@ -1,5 +1,4 @@
 add_library(screenhack STATIC
-    grabclient.c
     screenhack.c
     xdbe.c)
 target_include_directories(screenhack PRIVATE ../include)
