@@ -12,9 +12,6 @@ information. It works on Windows 2000/XP/Vista/Server 2003/7/10.
 Once you installed XScreenSaverWin, then you can install a screensaver
 from the main program "xscreensaver.exe".
 
-NOTE: If you want to build the Extrusion screen saver, then check the
-gle-3.1.0 folder.
-
 !!! WARNING !!!
 ---------------
 

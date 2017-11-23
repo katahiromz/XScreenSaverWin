@@ -14,9 +14,6 @@ Jamie Zawinski さんによる、XScreenSaver 5.22 (Windows 以外の OS) に基
 一度 XScreenSaverWin をインストールしたら、スクリーンセーバーのインストール
 は、メインプログラム「xscreensaver.exe」から行えます。
 
-注記: もし、Extrusion スクリーンセーバーをビルドしたかったら、gle-3.1.0 フ
-ォルダーをチェックして下さい。
-
 !!! 注意 !!
 -----------
 
