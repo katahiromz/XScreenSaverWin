@@ -1,4 +1,4 @@
-add_library(glparts STATIC
+add_library(gl-parts STATIC
     chessmodels.c
     companion_disc.c
     companion_heart.c
@@ -63,4 +63,4 @@ add_library(glparts STATIC
     tube.c
     whale.c)
 
-target_include_directories(glparts PRIVATE include ../gle/glextrusion/src)
+target_include_directories(gl-parts PRIVATE include ../gle/glextrusion/src)
