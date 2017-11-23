@@ -54,7 +54,7 @@
 
 #ifdef USE_GL /* whole file */
 
-#include "sphere.h"
+#include "glsphere.h"
 
 #if 0
 	#ifdef HAVE_XMU

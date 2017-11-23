@@ -147,7 +147,7 @@ char *titleFont = "Arial 30";
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
 #include "xlockmore.h"
-#include "sphere.h"
+#include "glsphere.h"
 #include "tube.h"
 #include "rotator.h"
 #include "gltrackball.h"

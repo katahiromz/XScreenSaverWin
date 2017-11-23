@@ -25,7 +25,7 @@
 #include "xlockmore.h"
 
 //#include "xlockmore.h"
-#include "sphere.h"
+#include "glsphere.h"
 #include <ctype.h>
 
 #ifdef USE_GL /* whole file */

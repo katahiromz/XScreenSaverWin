@@ -31,7 +31,7 @@
 
 //#include "xlockmore.h"
 #include "colors.h"
-#include "sphere.h"
+#include "glsphere.h"
 #include "tube.h"
 #include "rotator.h"
 #include "gltrackball.h"

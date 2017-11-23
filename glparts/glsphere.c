@@ -39,7 +39,7 @@
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "sphere.h"
+#include "glsphere.h"
 
 typedef struct { GLfloat x, y, z; } XYZ;
 

@@ -43,7 +43,7 @@ History
 
 //#include "xlockmore.h"
 #include "topblock.h"
-#include "sphere.h"
+#include "glsphere.h"
 #include "tube.h"
 #include "gltrackball.h"
 #include <ctype.h>

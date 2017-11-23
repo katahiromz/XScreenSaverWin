@@ -42,7 +42,7 @@
 #endif
 
 #include "xlockmore.h"
-#include "sphere.h"
+#include "glsphere.h"
 #include "tube.h"
 #include "rotator.h"
 #include "gltrackball.h"

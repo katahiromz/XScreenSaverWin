@@ -99,7 +99,7 @@ static const char sccsid[] = "@(#)pipes.c	4.07 97/11/24 xlockmore";
 	#endif /* HAVE_JWZGLES */
 #endif
 
-#include "sphere.h"
+#include "glsphere.h"
 #include "buildlwo.h"
 #include "teapot.h"
 #include "gltrackball.h"

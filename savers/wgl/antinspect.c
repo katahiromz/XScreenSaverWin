@@ -42,7 +42,7 @@
 #endif
 
 #include "xlockmore.h"
-#include "sphere.h"
+#include "glsphere.h"
 #include "gltrackball.h"
 
 #define DEF_SHADOWS  "True"

@@ -10,9 +10,9 @@
  */
 
 #include "xlockmore.h"
-#include "sphere.h"
+#include "glsphere.h"
 #include "glschool_gl.h"
-#include "sphere.h"
+#include "glsphere.h"
 #include "tube.h"
 
 void

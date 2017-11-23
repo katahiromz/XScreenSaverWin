@@ -81,7 +81,7 @@ static const char sccsid[] = "@(#)stairs.c	4.07 97/11/24 xlockmore";
 #include "../images/wood.xpm"
 #endif
 
-#include "sphere.h"
+#include "glsphere.h"
 #include "gltrackball.h"
 
 ENTRYPOINT ModeSpecOpt stairs_opts =

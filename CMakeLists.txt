@@ -121,11 +121,11 @@ endmacro()
 
 add_definitions(-DUSE_GL=1)
 
-include_directories(. include)
+include_directories(. include glparts/include)
 
 add_subdirectory(debughelper)
 add_subdirectory(gle)
-#add_subdirectory(glparts)
+add_subdirectory(glparts)
 add_subdirectory(random)
 add_subdirectory(savers)
 add_subdirectory(xscreensaver)

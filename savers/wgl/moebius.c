@@ -116,7 +116,7 @@ static const char sccsid[] = "@(#)moebius.c	5.01 2001/03/01 xlockmore";
 #endif
 #endif /* 0 */
 
-#include "sphere.h"
+#include "glsphere.h"
 #include "tube.h"
 
 #include "rotator.h"

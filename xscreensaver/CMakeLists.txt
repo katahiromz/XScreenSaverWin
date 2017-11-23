@@ -1,1 +1,1 @@
-add_executable(xscreensaver xscreensaver.cpp xscreensaver_res.rc)
+add_executable(xscreensaver WIN32 xscreensaver.cpp xscreensaver_res.rc)

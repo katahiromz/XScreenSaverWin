@@ -50,7 +50,7 @@ static const char sccsid[] = "@(#)antmaze.c	5.01 2001/03/01 xlockmore";
 #ifdef MODE_antmaze
 
 #include "xlockmore.h"
-#include "sphere.h"
+#include "glsphere.h"
 #include "tube.h"
 #include "rotator.h"
 #include "gltrackball.h"
