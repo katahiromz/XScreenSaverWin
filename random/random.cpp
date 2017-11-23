@@ -88,6 +88,22 @@ void get_screensavers(std::vector<tstring>& savers)
     }
 }
 
+static HWND s_hwndFound = NULL;
+
+BOOL CALLBACK
+EnumWindowsProc(HWND hwnd, LPARAM lParam)
+{
+    DWORD pid1 = (DWORD)lParam;
+
+    DWORD pid2 = 0;
+    GetWindowThreadProcessId(hwnd, &pid2);
+
+    if (pid1 == pid2)
+        s_hwndFound = hwnd;
+
+    return TRUE;
+}
+
 BOOL Execute(const TCHAR *cmdline)
 {
     STARTUPINFO si;
@@ -102,7 +118,15 @@ BOOL Execute(const TCHAR *cmdline)
     if (CreateProcess(NULL, pszCmdLine, NULL, NULL, FALSE, 0,
                       NULL, NULL, &si, &pi))
     {
+        WaitForInputIdle(pi.hProcess, INFINITE);
         free(pszCmdLine);
+
+        EnumWindows(EnumWindowsProc, pi.dwProcessId);
+        if (s_hwndFound)
+        {
+            AttachThreadInput(GetCurrentThreadId(), pi.dwThreadId, TRUE);
+        }
+
         WaitForSingleObject(pi.hProcess, INFINITE);
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
