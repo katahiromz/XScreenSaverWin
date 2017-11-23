@@ -28,9 +28,9 @@ LPTSTR GetScreenSaverPath(HWND hwnd)
     }
 
     lstrcpy(szName2, szName);
-    pch = _tcsrchr(szName2, _T('.'));
-    if (pch != NULL)
-        *pch = _T('_');
+    LPTSTR pchDot = _tcsrchr(szName2, _T('.'));
+    if (pchDot != NULL)
+        *pchDot = _T('_');
 
     lstrcat(pch, TEXT("\\"));
     lstrcat(pch, szName2);
