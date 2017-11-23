@@ -1,12 +1,6 @@
 #include "xlockmore.h"
 #include "resource.h"
 
-#ifdef _UNICODE
-    #pragma comment(lib, "scrnsavw.lib")
-#else
-    #pragma comment(lib, "scrnsave.lib")
-#endif
-
 //////////////////////////////////////////////////////////////////////////////
 
 SCREENSAVER ss;
