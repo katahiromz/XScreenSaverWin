@@ -13,7 +13,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # project name and language
-project(RisohEditor C)
+project(XScreenSaverWin C)
 enable_language(CXX)
 
 # check build type
@@ -124,7 +124,7 @@ add_definitions(-DUSE_GL=1)
 include_directories(. include glparts/include)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    add_definitions(/W4)
+    add_definitions(/W1)
 else()
     add_subdirectory(scrnsave)
 endif()
