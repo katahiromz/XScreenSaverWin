@@ -15,7 +15,9 @@ set BUILD_DIR=build\Debug
 if exist %BUILD_DIR% goto found_build_dir
 
 set BUILD_DIR=build
-if exist %BUILD_DIR% goto found_build_dir
+if exist %BUILD_DIR%\xscreensaver.exe goto found_build_dir
+
+goto fail
 
 :found_build_dir
 

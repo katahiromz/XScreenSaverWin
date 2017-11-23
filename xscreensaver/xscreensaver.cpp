@@ -16,24 +16,33 @@ LPTSTR GetScreenSaverPath(HWND hwnd)
     LPTSTR pch = _tcsrchr(szPath, _T('\\'));
     *pch = _T('\0');
 
-    TCHAR szName1[MAX_PATH], szName2[MAX_PATH];
+    TCHAR szName[MAX_PATH], szName2[MAX_PATH];
     INT nIndex = (INT)(INT_PTR)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
-    SendMessage(hCombo, CB_GETLBTEXT, nIndex, (LPARAM)szName1);
-    lstrcpy(szName2, szName1);
+    SendMessage(hCombo, CB_GETLBTEXT, nIndex, (LPARAM)szName);
 
+    lstrcat(pch, TEXT("\\"));
+    lstrcat(pch, szName);
+    if (GetFileAttributes(szPath) != 0xFFFFFFFF)
+    {
+        return szPath;
+    }
+
+    lstrcpy(szName2, szName);
     pch = _tcsrchr(szName2, _T('.'));
     if (pch != NULL)
         *pch = _T('_');
 
+    lstrcat(pch, TEXT("\\"));
+    lstrcat(pch, szName2);
     lstrcat(szPath, TEXT("\\"));
-    lstrcat(szPath, szName2);
-    lstrcat(szPath, TEXT("\\"));
-    lstrcat(szPath, szName1);
+    lstrcat(szPath, szName);
 
-    if (GetFileAttributes(szPath) == 0xFFFFFFFF)
-        return NULL;
+    if (GetFileAttributes(szPath) != 0xFFFFFFFF)
+    {
+        return szPath;
+    }
 
-    return szPath;
+    return NULL;
 }
 
 VOID CenterDialog(HWND hwnd)
@@ -106,7 +115,8 @@ VOID OnTestOnWindow(HWND hDlg)
 {
     HWND hPreview = GetDlgItem(hDlg, ID_PREVIEW);
     HWND hChild = GetWindow(hPreview, GW_CHILD);
-    if (hChild != NULL) {
+    if (hChild != NULL)
+    {
         SendMessage(hChild, WM_DESTROY, 0, 0);
         Sleep(250);
     }
@@ -170,8 +180,37 @@ LPTSTR get_registered_screen_saver(void)
     return s_buf[0] ? s_buf : NULL;
 }
 
+WNDPROC fnOldPreviewWndProc = NULL;
+
+LRESULT CALLBACK
+PreviewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if (uMsg == WM_ERASEBKGND)
+    {
+        RECT rc;
+        GetClientRect(hwnd, &rc);
+        HDC hDC = (HDC)wParam;
+        FillRect(hDC, &rc, GetStockBrush(BLACK_BRUSH));
+        return TRUE;
+    }
+    if (uMsg == WM_PAINT)
+    {
+        RECT rc;
+        GetClientRect(hwnd, &rc);
+        PAINTSTRUCT ps;
+        HDC hDC = BeginPaint(hwnd, &ps);
+        FillRect(hDC, &rc, GetStockBrush(BLACK_BRUSH));
+        EndPaint(hwnd, &ps);
+        return 0;
+    }
+    return CallWindowProc(fnOldPreviewWndProc, hwnd, uMsg, wParam, lParam);
+}
+
 VOID OnInitDialog(HWND hDlg)
 {
+    HWND hwndPreview = GetDlgItem(hDlg, ID_PREVIEW);
+    fnOldPreviewWndProc = SubclassWindow(hwndPreview, PreviewWndProc);
+
     HICON hIcon;
     hIcon = LoadIcon(hInst, MAKEINTRESOURCE(1));
     SendMessage(hDlg, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
@@ -262,14 +301,6 @@ VOID OnInitDialog(HWND hDlg)
     }
 
     CenterDialog(hDlg);
-
-    //{
-    //    RECT rcPreview;
-    //    HWND hwndPreview = GetDlgItem(hDlg, ID_PREVIEW);
-    //    HDC hdcPreview = GetWindowDC(hwndPreview);
-    //    GetClientRect(hwndPreview, &rcPreview);
-    //    FillRect(hdcPreview, &rcPreview, (HBRUSH)GetStockObject(BLACK_BRUSH));
-    //}
 }
 
 INT_PTR CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -280,16 +311,6 @@ INT_PTR CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
     case WM_INITDIALOG:
         OnInitDialog(hDlg);
         return TRUE;
-
-    // Why doesn't it work?
-    //case WM_CTLCOLORSTATIC:
-    //    if (GetDlgCtrlID((HWND)lParam) == ID_PREVIEW) {
-    //        HDC hDC = (HDC)wParam;
-    //        SetTextColor(hDC, 0);
-    //        SetBkColor(hDC, 0);
-    //        return (INT_PTR)GetStockObject(BLACK_BRUSH);
-    //    }
-    //    break;
 
     case WM_COMMAND:
         switch (LOWORD(wParam))
