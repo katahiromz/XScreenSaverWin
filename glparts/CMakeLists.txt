@@ -28,6 +28,7 @@ add_library(glparts STATIC
     glut_swidth.c
     glxfonts.c
     involute.c
+    marching.c
     normals.c
     rotator.c
     s1_1.c
