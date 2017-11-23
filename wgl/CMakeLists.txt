@@ -182,4 +182,4 @@ target_link_libraries(tronbit glparts ${OPENGL_LIBRARIES})
 target_link_libraries(unknownpleasures glparts ${OPENGL_LIBRARIES})
 target_link_libraries(voronoi glparts ${OPENGL_LIBRARIES})
 
-target_include_directories(extrusion PRIVATE ../../gle/glextrusion/src)
+target_include_directories(extrusion PRIVATE ../gle/glextrusion/src)

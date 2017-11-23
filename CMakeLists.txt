@@ -127,7 +127,6 @@ add_subdirectory(debughelper)
 add_subdirectory(gle)
 add_subdirectory(glparts)
 add_subdirectory(random)
-add_subdirectory(savers)
 add_subdirectory(xscreensaver)
 add_subdirectory(xscreensaver-text)
 
@@ -138,5 +137,8 @@ add_subdirectory(screenhack)
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_subdirectory(scrnsave)
 endif()
+
+add_subdirectory(non-wgl)
+add_subdirectory(wgl)
 
 ##############################################################################
