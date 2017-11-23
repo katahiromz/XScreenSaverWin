@@ -69,10 +69,12 @@ BEGIN
     BEGIN
         MENUITEM "Copy &parameters to debug",       IDM_COPY
         MENUITEM SEPARATOR
-        MENUITEM "200x150",                         IDM_200X150
-        MENUITEM "320x240",                         IDM_320X240
-        MENUITEM "640x480",                         IDM_640X480
-        MENUITEM "1024x768",                        IDM_1024X768
+        MENUITEM "&200x150",                        IDM_200X150
+        MENUITEM "&320x240",                        IDM_320X240
+        MENUITEM "&640x480",                        IDM_640X480
+        MENUITEM "&1024x768",                       IDM_1024X768
+        MENUITEM SEPARATOR
+        MENUITEM "&Kill ScreenSaver",               IDM_KILLSCR
     END
     POPUP "&Help"
     BEGIN

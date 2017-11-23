@@ -19,6 +19,7 @@
 #define IDM_320X240             111
 #define IDM_640X480             112
 #define IDM_1024X768            113
+#define IDM_KILLSCR             114
 #define IDC_MYICON              2
 #ifndef IDC_STATIC
 #define IDC_STATIC              -1

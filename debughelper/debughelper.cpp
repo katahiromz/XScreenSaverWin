@@ -122,6 +122,13 @@ VOID OnInitMenuPopup(HWND hwnd, HMENU hMenuPopup)
     }
 }
 
+void OnKillScr(HWND hWnd)
+{
+    HWND hChild = GetTopWindow(hWnd);
+    if (hChild)
+        SendMessage(hChild, WM_CLOSE, 0, 0);
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int wmId, wmEvent;
@@ -164,6 +171,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             sizetype = ST_1024X768;
             break;
 
+        case IDM_KILLSCR:
+            OnKillScr(hWnd);
+            break;
+
         case IDM_EXIT:
             DestroyWindow(hWnd);
             break;
@@ -189,7 +200,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return 0;
 }
-
 
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
