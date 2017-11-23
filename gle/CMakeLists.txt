@@ -19,3 +19,7 @@ add_library(gle STATIC
       glextrusion/src/urotate.c
       glextrusion/src/view.c)
 target_link_libraries(gle ${OPENGL_LIBRARIES})
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set_target_properties(gle PROPERTIES SUFFIX ".lib")
+endif()

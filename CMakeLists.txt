@@ -125,7 +125,7 @@ include_directories(. include glparts/include)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_definitions(/W4)
-else
+else()
     add_subdirectory(scrnsave)
 endif()
 
