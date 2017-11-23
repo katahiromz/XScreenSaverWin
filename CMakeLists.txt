@@ -122,7 +122,7 @@ add_definitions(-DUSE_GL=1)
 include_directories(. include glparts/include)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    add_definitions(/W1)
+    add_definitions(/W1)    # MSVC slowed down by many warnings
 else()
     add_subdirectory(scrnsave)
 endif()
