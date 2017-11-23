@@ -1,5 +1,6 @@
 add_library(common STATIC
     colors.c
+    erase.c
     font-ximage.c
     grabclient.c
     hsv.c
