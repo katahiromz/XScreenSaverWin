@@ -111,7 +111,13 @@ add_definitions(-DUSE_GL=1)
 include_directories(. include gl-parts/include)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    add_definitions(/W1)    # MSVC slowed down by many warnings
+    # MSVC slowed down by many warnings
+    add_definitions(/W1)
+
+    # "gled" for Debug
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set_target_properties(gle PROPERTIES OUTPUT_NAME "gled")
+    endif()
 else()
     add_subdirectory(scrnsave)
 endif()
