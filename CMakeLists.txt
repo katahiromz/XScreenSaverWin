@@ -55,9 +55,6 @@ set(BUILD_SHARED_LIBRARIES OFF)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # using GCC
     set(CMAKE_EXE_LINKER_FLAGS " -static -static-libgcc -static-libstdc++")
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # using MSVC
-    add_definitions(-DTHIS_IS_MSVC)
 endif()
 
 # enable Win32 resource
