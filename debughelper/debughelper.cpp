@@ -2,7 +2,6 @@
 
 #define MAX_LOADSTRING 100
 
-
 HINSTANCE hInst;
 TCHAR szTitle[MAX_LOADSTRING];
 TCHAR szWindowClass[MAX_LOADSTRING];
