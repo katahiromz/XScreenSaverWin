@@ -9,7 +9,7 @@ Jamie Zawinski さんによる、XScreenSaver 5.22 (Windows 以外の OS) に基
 
 バイナリーは、XScreenSaverWin のホームページでダウンロードできます。移植状
 況は STATUS.txt でご確認ください。ライセンス情報は、LICENSE.txt をご参照下
-さい。Windows 2000/XP/Vista/Server 2003/7/10 で動作します。
+さい。Windows XP/Vista/Server 2003/7/10 で動作します。
 
 一度 XScreenSaverWin をインストールしたら、スクリーンセーバーのインストール
 は、メインプログラム「xscreensaver.exe」から行えます。

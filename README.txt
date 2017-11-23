@@ -7,7 +7,7 @@ Porting to Windows was mostly done by Katayama Hirofumi MZ.
 
 You can download binary at the XScreenSaverWin homepage. Check
 STATUS.txt for porting status. Check LICENSE.txt for licensing
-information. It works on Windows 2000/XP/Vista/Server 2003/7/10.
+information. It works on Windows XP/Vista/Server 2003/7/10.
 
 Once you installed XScreenSaverWin, then you can install a screensaver
 from the main program "xscreensaver.exe".
