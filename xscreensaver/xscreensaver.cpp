@@ -218,6 +218,24 @@ VOID OnInitDialog(HWND hDlg)
     INT nCount = (INT)SendMessage(hCombo, CB_GETCOUNT, 0, 0);
     if (nCount == 0)
     {
+        lstrcpy(pch, TEXT("\\*.scr"));
+        hFind = FindFirstFile(szPath, &find);
+        if (hFind != INVALID_HANDLE_VALUE)
+        {
+            do
+            {
+                COMBOBOXEXITEM item;
+                item.mask = CBEIF_TEXT;
+                item.iItem = -1;
+                item.pszText = find.cFileName;
+                SendMessage(hCombo, CBEM_INSERTITEM, 0, (LPARAM)&item);
+            } while (FindNextFile(hFind, &find));
+            FindClose(hFind);
+        }
+    }
+    nCount = (INT)SendMessage(hCombo, CB_GETCOUNT, 0, 0);
+    if (nCount == 0)
+    {
         EnableWindow(hCombo, FALSE);
         EnableWindow(GetDlgItem(hDlg, ID_INSTALL), FALSE);
         EnableWindow(GetDlgItem(hDlg, ID_CONFIGURE), FALSE);
@@ -245,13 +263,13 @@ VOID OnInitDialog(HWND hDlg)
 
     CenterDialog(hDlg);
 
-    {
-        RECT rcPreview;
-        HWND hwndPreview = GetDlgItem(hDlg, ID_PREVIEW);
-        HDC hdcPreview = GetWindowDC(hwndPreview);
-        GetClientRect(hwndPreview, &rcPreview);
-        FillRect(hdcPreview, &rcPreview, (HBRUSH)GetStockObject(BLACK_BRUSH));
-    }
+    //{
+    //    RECT rcPreview;
+    //    HWND hwndPreview = GetDlgItem(hDlg, ID_PREVIEW);
+    //    HDC hdcPreview = GetWindowDC(hwndPreview);
+    //    GetClientRect(hwndPreview, &rcPreview);
+    //    FillRect(hdcPreview, &rcPreview, (HBRUSH)GetStockObject(BLACK_BRUSH));
+    //}
 }
 
 INT_PTR CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)

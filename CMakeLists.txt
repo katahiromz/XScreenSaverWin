@@ -123,6 +123,12 @@ add_definitions(-DUSE_GL=1)
 
 include_directories(. include glparts/include)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    add_definitions(/W4)
+else
+    add_subdirectory(scrnsave)
+endif()
+
 add_subdirectory(debughelper)
 add_subdirectory(gle)
 add_subdirectory(glparts)
@@ -133,10 +139,6 @@ add_subdirectory(xscreensaver-text)
 add_subdirectory(common)
 add_subdirectory(xlockmore)
 add_subdirectory(screenhack)
-
-if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    add_subdirectory(scrnsave)
-endif()
 
 add_subdirectory(non-wgl)
 add_subdirectory(wgl)
