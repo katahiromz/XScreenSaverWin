@@ -20,7 +20,7 @@ LPTSTR GetScreenSaverPath(HWND hwnd)
     INT nIndex = (INT)(INT_PTR)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
     SendMessage(hCombo, CB_GETLBTEXT, nIndex, (LPARAM)szName);
 
-    lstrcat(pch, TEXT("\\"));
+    lstrcpy(pch, TEXT("\\"));
     lstrcat(pch, szName);
     if (GetFileAttributes(szPath) != 0xFFFFFFFF)
     {
@@ -32,7 +32,7 @@ LPTSTR GetScreenSaverPath(HWND hwnd)
     if (pchDot != NULL)
         *pchDot = _T('_');
 
-    lstrcat(pch, TEXT("\\"));
+    lstrcpy(pch, TEXT("\\"));
     lstrcat(pch, szName2);
     lstrcat(szPath, TEXT("\\"));
     lstrcat(szPath, szName);
