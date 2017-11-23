@@ -95,8 +95,6 @@ static HBITMAP do_load_picture(LPCSTR file)
 
     hbm = NULL;
     hr = OleLoadPicture(pStream, dwSize, FALSE, &IID_IPicture, (void **)&pPicture);
-    assert(pPicture);
-
     if (pPicture != NULL)
     {
         pPicture->lpVtbl->get_Handle(pPicture, (OLE_HANDLE *)&hbm);
