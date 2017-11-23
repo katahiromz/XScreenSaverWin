@@ -116,7 +116,7 @@ endmacro()
 
 add_definitions(-DUSE_GL=1)
 
-include_directories(. include glparts/include)
+include_directories(. include gl-parts/include)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_definitions(/W1)    # MSVC slowed down by many warnings
@@ -126,7 +126,7 @@ endif()
 
 add_subdirectory(debughelper)
 add_subdirectory(gle)
-add_subdirectory(glparts)
+add_subdirectory(gl-parts)
 add_subdirectory(random)
 add_subdirectory(xscreensaver)
 add_subdirectory(xscreensaver-text)
@@ -135,7 +135,7 @@ add_subdirectory(common)
 add_subdirectory(xlockmore)
 add_subdirectory(screenhack)
 
-add_subdirectory(non-wgl)
-add_subdirectory(wgl)
+add_subdirectory(nongl-savers)
+add_subdirectory(gl-savers)
 
 ##############################################################################
