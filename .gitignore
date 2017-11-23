@@ -25,3 +25,6 @@ TMP1.$$$
 *.opensdf
 ipch
 XScreenSaverWin
+*.sln
+*.vcproj
+*.vcxproj
