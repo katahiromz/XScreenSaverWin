@@ -1,0 +1,13 @@
+How To Build
+============
+
+Just use CMake. You might have to install CMake into your development environment.
+
+After build, double clicking batch file "pack.bat" will deploy the files.
+
+The installer source is installer.iss,
+that's an Inno Setup script. Please run Inno Setup after deployment.
+
+You mayn't put so many .scr files in one folder directly.
+It fails .scr installation.
+There's Windows limitation in the numbers of installables at once.
