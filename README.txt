@@ -15,7 +15,7 @@ from the main program "xscreensaver.exe".
 !!! WARNING !!!
 ---------------
 
-You cannot install all the screensaver at once.
+You cannot install all the screensavers at once.
 You mayn't put so many .scr files in one folder directly.
 It fails .scr installation.
 There's limitation of Windows in the numbers of installables at once.
