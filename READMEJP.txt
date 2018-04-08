@@ -23,9 +23,6 @@ Jamie Zawinski さんによる、XScreenSaver 5.22 (Windows 以外の OS) に基
 一度にインストールできる数には制限があります（Windows の制限）。
 
   ------------------------------------------------------------------------
-  XScreenSaverWinのホームページ
-  http://katahiromz.web.fc2.com/xscreensaverwin/ja
-
   XScreenSaver (オリジナル; Windows以外用)
   http://www.jwz.org/xscreensaver/
 

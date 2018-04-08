@@ -21,9 +21,6 @@ It fails .scr installation.
 There's limitation of Windows in the numbers of installables at once.
 
   ------------------------------------------------------------------------
-  The XScreenSaverWin homepage
-  http://katahiromz.web.fc2.com/xscreensaverwin/en
-
   XScreenSaver (original; for non-Windows)
   http://www.jwz.org/xscreensaver/
 
