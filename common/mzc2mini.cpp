@@ -27,7 +27,7 @@ VOID MzcSplit(std::vector<tstring>& v, const tstring& s, LPCTSTR separators)
     size_t i = s.find_first_not_of(separators), n = s.size();
 
     v.clear();
-    while (0 <= i && i < n)
+    while (i < n)
     {
         size_t stop = s.find_first_of(separators, i);
         if (stop == tstring::npos || stop > n) stop = n;
@@ -464,7 +464,8 @@ BOOL __cdecl MFile::WriteFormatA(LPCSTR pszFormat, ...)
     va_list argList;
     CHAR sz[1024];
     va_start(argList, pszFormat);
-    std::vsprintf(sz, pszFormat, argList);
+    using namespace std;
+    vsprintf(sz, pszFormat, argList);
     BOOL b = WriteSzA(sz);
     va_end(argList);
     return b;
