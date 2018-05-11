@@ -52,7 +52,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # using Clang
     set(CMAKE_C_FLAGS "-static")
     set(CMAKE_CXX_FLAGS "-static")
-    message(FATAL "ERROR")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # replace "/MD" with "/MT" (building without runtime DLLs)
     set(CompilerFlags
