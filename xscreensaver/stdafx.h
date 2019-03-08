@@ -8,10 +8,14 @@
 #include <windowsx.h>
 #include <commctrl.h>
 #include <shellapi.h>
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <memory.h>
-#include <string.h>
 #include <tchar.h>
+
+#ifdef __cplusplus
+    #include <cstdlib>
+    #include <cstdio>
+    #include <cstring>
+#else
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <string.h>
+#endif

@@ -15,7 +15,11 @@
 #ifndef __GLE_PORT_H__
 #define __GLE_PORT_H__
 
-#include <stdio.h>
+#ifdef __cplusplus
+    #include <cstdio>
+#else
+    #include <stdio.h>
+#endif
 
 #ifndef TRUE
 #define TRUE 1

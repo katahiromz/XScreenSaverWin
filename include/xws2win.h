@@ -10,13 +10,22 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
 #include <commctrl.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #define _USE_MATH_DEFINES
-#include <math.h>
-#include <time.h>
-#include <assert.h>
+#ifdef __cplusplus
+    #include <cstdlib>
+    #include <cstdio>
+    #include <cstring>
+    #include <cmath>
+    #include <ctime>
+    #include <cassert>
+#else
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <string.h>
+    #include <math.h>
+    #include <time.h>
+    #include <assert.h>
+#endif
 
 #undef min
 #undef max
