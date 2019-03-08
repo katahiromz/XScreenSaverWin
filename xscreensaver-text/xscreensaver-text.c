@@ -530,7 +530,7 @@ int get_prefs(void)
         if (saver_name && *saver_name)
         {
             if (verbose)
-                fprintf(stderr, "%s: saver:   %s\n", saver_name);
+                fprintf(stderr, "%s: saver:   %s\n", progname, saver_name);
 
             sprintf(keypath, saver_key, saver_name);
             result = RegOpenKeyExA(HKEY_CURRENT_USER, keypath, 0, KEY_READ, &hKey);
@@ -544,10 +544,10 @@ int get_prefs(void)
 
     if (verbose > 1)
     {
-        fprintf(stderr, "%s: mode:    %s\n", text_mode);
-        fprintf(stderr, "%s: literal: %s\n", text_literal);
-        fprintf(stderr, "%s: file:    %s\n", text_file);
-        fprintf(stderr, "%s: program: %s\n", text_program);
+        fprintf(stderr, "%s: mode:    %s\n", progname, text_mode);
+        fprintf(stderr, "%s: literal: %s\n", progname, text_literal);
+        fprintf(stderr, "%s: file:    %s\n", progname, text_file);
+        fprintf(stderr, "%s: program: %s\n", progname, text_program);
     }
 
     _strlwr(text_mode);
