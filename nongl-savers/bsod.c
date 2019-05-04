@@ -373,8 +373,8 @@ struct bsod_state {
 #define BSOD_COLOR(bst,fg,bg) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = COLOR; \
-  (bst)->queue[(bst)->pos].arg1 = (void *) fg; \
-  (bst)->queue[(bst)->pos].arg2 = (void *) bg; \
+  (bst)->queue[(bst)->pos].arg1 = (void *) (ptrdiff_t) fg; \
+  (bst)->queue[(bst)->pos].arg2 = (void *) (ptrdiff_t) bg; \
   (bst)->pos++; \
   } while (0)
 
@@ -384,8 +384,8 @@ struct bsod_state {
 #define BSOD_MOVETO(bst,x,y) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = MOVETO; \
-  (bst)->queue[(bst)->pos].arg1 = (void *) ((long) (x)); \
-  (bst)->queue[(bst)->pos].arg2 = (void *) ((long) (y)); \
+  (bst)->queue[(bst)->pos].arg1 = (void *) ((ptrdiff_t) (x)); \
+  (bst)->queue[(bst)->pos].arg2 = (void *) ((ptrdiff_t) (y)); \
   (bst)->pos++; \
   } while (0)
 
@@ -394,7 +394,7 @@ struct bsod_state {
 #define BSOD_PAUSE(bst,usec) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = PAUSE; \
-  (bst)->queue[(bst)->pos].arg1 = (void *) ((long) (usec)); \
+  (bst)->queue[(bst)->pos].arg1 = (void *) ((ptrdiff_t) (usec)); \
   (bst)->pos++; \
   } while (0)
 
@@ -403,7 +403,7 @@ struct bsod_state {
 #define BSOD_CHAR_DELAY(bst,usec) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = CHAR_DELAY; \
-  (bst)->queue[(bst)->pos].arg1 = (void *) ((long) (usec)); \
+  (bst)->queue[(bst)->pos].arg1 = (void *) ((ptrdiff_t) (usec)); \
   (bst)->pos++; \
   } while (0)
 
@@ -412,7 +412,7 @@ struct bsod_state {
 #define BSOD_LINE_DELAY(bst,usec) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = LINE_DELAY; \
-  (bst)->queue[(bst)->pos].arg1 = (void *) (usec); \
+  (bst)->queue[(bst)->pos].arg1 = (void *) (ptrdiff_t) (usec); \
   (bst)->pos++; \
   } while (0)
 
@@ -422,8 +422,8 @@ struct bsod_state {
 #define BSOD_MARGINS(bst,left,right) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = MARGINS; \
-  (bst)->queue[(bst)->pos].arg1 = (void *) ((long) (left)); \
-  (bst)->queue[(bst)->pos].arg2 = (void *) ((long) (right)); \
+  (bst)->queue[(bst)->pos].arg1 = (void *) ((ptrdiff_t) (left)); \
+  (bst)->queue[(bst)->pos].arg2 = (void *) ((ptrdiff_t) (right)); \
   (bst)->pos++; \
   } while (0)
 
@@ -444,11 +444,11 @@ struct bsod_state {
 #define BSOD_RECT(bst,fill,x,y,w,h) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = RECT_; \
-  (bst)->queue[(bst)->pos].arg1 = (void *) ((long) (fill)); \
-  (bst)->queue[(bst)->pos].arg2 = (void *) ((long) (x)); \
-  (bst)->queue[(bst)->pos].arg3 = (void *) ((long) (y)); \
-  (bst)->queue[(bst)->pos].arg4 = (void *) ((long) (w)); \
-  (bst)->queue[(bst)->pos].arg5 = (void *) ((long) (h)); \
+  (bst)->queue[(bst)->pos].arg1 = (void *) ((ptrdiff_t) (fill)); \
+  (bst)->queue[(bst)->pos].arg2 = (void *) ((ptrdiff_t) (x)); \
+  (bst)->queue[(bst)->pos].arg3 = (void *) ((ptrdiff_t) (y)); \
+  (bst)->queue[(bst)->pos].arg4 = (void *) ((ptrdiff_t) (w)); \
+  (bst)->queue[(bst)->pos].arg5 = (void *) ((ptrdiff_t) (h)); \
   (bst)->pos++; \
   } while (0)
 
@@ -457,12 +457,12 @@ struct bsod_state {
 #define BSOD_COPY(bst,srcx,srcy,w,h,tox,toy) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = COPY; \
-  (bst)->queue[(bst)->pos].arg1 = (void *) ((long) (srcx)); \
-  (bst)->queue[(bst)->pos].arg2 = (void *) ((long) (srcy)); \
-  (bst)->queue[(bst)->pos].arg3 = (void *) ((long) (w)); \
-  (bst)->queue[(bst)->pos].arg4 = (void *) ((long) (h)); \
-  (bst)->queue[(bst)->pos].arg5 = (void *) ((long) (tox)); \
-  (bst)->queue[(bst)->pos].arg6 = (void *) ((long) (toy)); \
+  (bst)->queue[(bst)->pos].arg1 = (void *) ((ptrdiff_t) (srcx)); \
+  (bst)->queue[(bst)->pos].arg2 = (void *) ((ptrdiff_t) (srcy)); \
+  (bst)->queue[(bst)->pos].arg3 = (void *) ((ptrdiff_t) (w)); \
+  (bst)->queue[(bst)->pos].arg4 = (void *) ((ptrdiff_t) (h)); \
+  (bst)->queue[(bst)->pos].arg5 = (void *) ((ptrdiff_t) (tox)); \
+  (bst)->queue[(bst)->pos].arg6 = (void *) ((ptrdiff_t) (toy)); \
   (bst)->pos++; \
   } while (0)
 
@@ -486,7 +486,7 @@ struct bsod_state {
 #define BSOD_FONT(bst,n) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = FONT; \
-  (bst)->queue[(bst)->pos].arg1 = (void *) ((long) (n)); \
+  (bst)->queue[(bst)->pos].arg1 = (void *) ((ptrdiff_t) (n)); \
   (bst)->pos++; \
   } while (0)
 
@@ -496,7 +496,7 @@ struct bsod_state {
 #define BSOD_LOOP(bst,off) do { \
   ensure_queue (bst); \
   (bst)->queue[(bst)->pos].type = LOOP; \
-  (bst)->queue[(bst)->pos].arg1 = (void *) (off); \
+  (bst)->queue[(bst)->pos].arg1 = (void *) (ptrdiff_t) (off); \
   (bst)->pos++; \
   } while (0)
 
@@ -684,7 +684,7 @@ bsod_pop (struct bsod_state *bst)
       if (! bst->queue[bst->pos].arg3)    /* "done once" */
         {
           position_for_text (bst, s);
-          bst->queue[bst->pos].arg4 = (void *) bst->queue[bst->pos].type;
+          bst->queue[bst->pos].arg4 = (void *) (ptrdiff_t) bst->queue[bst->pos].type;
           bst->queue[bst->pos].type = LEFT;
 
           if (type == CENTER_FULL ||
@@ -703,8 +703,8 @@ bsod_pop (struct bsod_state *bst)
 
       c = *s++;
       draw_char (bst, c);
-      bst->queue[bst->pos].arg2 = (void *) s;
-      bst->queue[bst->pos].arg3 = (void *) 1;  /* "done once" */
+      bst->queue[bst->pos].arg2 = (void *) (ptrdiff_t) s;
+      bst->queue[bst->pos].arg3 = (void *) (ptrdiff_t) 1;  /* "done once" */
 
       return (c == '\r' || c == '\n'
               ? bst->line_delay
@@ -722,8 +722,8 @@ bsod_pop (struct bsod_state *bst)
     }
   case COLOR:
     {
-      bst->fg = (unsigned long) bst->queue[bst->pos].arg1;
-      bst->bg = (unsigned long) bst->queue[bst->pos].arg2;
+      bst->fg = (ptrdiff_t) bst->queue[bst->pos].arg1;
+      bst->bg = (ptrdiff_t) bst->queue[bst->pos].arg2;
       XSetForeground (bst->dpy, bst->gc, bst->fg);
       XSetBackground (bst->dpy, bst->gc, bst->bg);
       bst->pos++;
@@ -731,18 +731,18 @@ bsod_pop (struct bsod_state *bst)
     }
   case MOVETO:
     {
-      bst->x = (long) bst->queue[bst->pos].arg1;
-      bst->y = (long) bst->queue[bst->pos].arg2;
+      bst->x = (ptrdiff_t) bst->queue[bst->pos].arg1;
+      bst->y = (ptrdiff_t) bst->queue[bst->pos].arg2;
       bst->pos++;
       return 0;
     }
   case RECT_:
     {
-      int f = (long) bst->queue[bst->pos].arg1;
-      int x = (long) bst->queue[bst->pos].arg2;
-      int y = (long) bst->queue[bst->pos].arg3;
-      int w = (long) bst->queue[bst->pos].arg4;
-      int h = (long) bst->queue[bst->pos].arg5;
+      int f = (ptrdiff_t) bst->queue[bst->pos].arg1;
+      int x = (ptrdiff_t) bst->queue[bst->pos].arg2;
+      int y = (ptrdiff_t) bst->queue[bst->pos].arg3;
+      int w = (ptrdiff_t) bst->queue[bst->pos].arg4;
+      int h = (ptrdiff_t) bst->queue[bst->pos].arg5;
       if (f)
         XFillRectangle (bst->dpy, bst->window, bst->gc, x, y, w, h);
       else
@@ -753,12 +753,12 @@ bsod_pop (struct bsod_state *bst)
   case COPY:
   case PIXMAP:
     {
-      int srcx = (long) bst->queue[bst->pos].arg1;
-      int srcy = (long) bst->queue[bst->pos].arg2;
-      int w    = (long) bst->queue[bst->pos].arg3;
-      int h    = (long) bst->queue[bst->pos].arg4;
-      int tox  = (long) bst->queue[bst->pos].arg5;
-      int toy  = (long) bst->queue[bst->pos].arg6;
+      int srcx = (ptrdiff_t) bst->queue[bst->pos].arg1;
+      int srcy = (ptrdiff_t) bst->queue[bst->pos].arg2;
+      int w    = (ptrdiff_t) bst->queue[bst->pos].arg3;
+      int h    = (ptrdiff_t) bst->queue[bst->pos].arg4;
+      int tox  = (ptrdiff_t) bst->queue[bst->pos].arg5;
+      int toy  = (ptrdiff_t) bst->queue[bst->pos].arg6;
       XCopyArea (bst->dpy, 
                  (type == PIXMAP ? bst->pixmap : bst->window), 
                  bst->window, bst->gc,
@@ -777,7 +777,7 @@ bsod_pop (struct bsod_state *bst)
     }
   case FONT:
     {
-      switch ((long) bst->queue[bst->pos].arg1) {
+      switch ((ptrdiff_t) bst->queue[bst->pos].arg1) {
       case 0: bst->font = bst->fontA; break;
       case 1: bst->font = bst->fontB; break;
       case 2: bst->font = bst->fontC; break;
@@ -789,34 +789,34 @@ bsod_pop (struct bsod_state *bst)
     }
   case PAUSE:
     {
-      long delay = (long) bst->queue[bst->pos].arg1;
+      long delay = (ptrdiff_t) bst->queue[bst->pos].arg1;
       bst->pos++;
       return delay;
     }
   case CHAR_DELAY:
     {
-      bst->char_delay = (long) bst->queue[bst->pos].arg1;
+      bst->char_delay = (ptrdiff_t) bst->queue[bst->pos].arg1;
       bst->pos++;
       return 0;
     }
   case LINE_DELAY:
     {
-      bst->line_delay = (long) bst->queue[bst->pos].arg1;
+      bst->line_delay = (ptrdiff_t) bst->queue[bst->pos].arg1;
       bst->pos++;
       return 0;
     }
   case MARGINS:
     {
-      bst->left_margin  = (long) bst->queue[bst->pos].arg1;
-      bst->right_margin = (long) bst->queue[bst->pos].arg2;
+      bst->left_margin  = (ptrdiff_t) bst->queue[bst->pos].arg1;
+      bst->right_margin = (ptrdiff_t) bst->queue[bst->pos].arg2;
       bst->pos++;
       return 0;
     }
   case CURSOR_BLOCK:
   case CURSOR_LINE:
     {
-      long delay = (long) bst->queue[bst->pos].arg1;
-      long count = (long) bst->queue[bst->pos].arg2;
+      long delay = (ptrdiff_t) bst->queue[bst->pos].arg1;
+      long count = (ptrdiff_t) bst->queue[bst->pos].arg2;
       int ox = bst->x;
 
       if (type == CURSOR_BLOCK)
@@ -837,7 +837,7 @@ bsod_pop (struct bsod_state *bst)
       bst->x = ox;
 
       count--;
-      bst->queue[bst->pos].arg2 = (void *) count;
+      bst->queue[bst->pos].arg2 = (void *) (ptrdiff_t) count;
       if (count <= 0)
         bst->pos++;
 
@@ -845,7 +845,7 @@ bsod_pop (struct bsod_state *bst)
     }
   case LOOP:
     {
-      long off = (long) bst->queue[bst->pos].arg1;
+      long off = (ptrdiff_t) bst->queue[bst->pos].arg1;
       bst->pos += off;
       if (bst->pos < 0 || bst->pos >= bst->queue_size)
         abort();
