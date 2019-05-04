@@ -422,7 +422,7 @@ more_bits (state *st, scroller *sc)
       /* I don't understand what's going on there, but on MacOS X, we're
          getting insane values for lomem and himem (both Xlib and HAVE_COCOA).
          Does malloc() draw from more than one heap? */
-      if ((unsigned long) himem - (unsigned long) lomem > 0x0FFFFFFF) {
+      if ((ptrdiff_t) himem - (ptrdiff_t) lomem > 0x0FFFFFFF) {
 # if 0
         fprintf (stderr, "%s: wonky: 0x%08x - 0x%08x = 0x%08x\n", progname,
                  (unsigned int) himem,  (unsigned int) lomem,
