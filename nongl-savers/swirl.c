@@ -221,7 +221,7 @@ initialise_swirl(ModeInfo * mi, SWIRL_P swirl)
 	/* colours stuff */
 	swirl->colours = 0;	/* how many colours possible */
 	swirl->dcolours = 0;	/* how many colours for shading */
-	swirl->cmap = (Colormap) NULL;
+	swirl->cmap = (Colormap)0;
 	swirl->rgb_values = NULL;	/* colour definitions array */
 #ifndef STANDALONE
 	swirl->current_map = 0;	/* current colour map, 0..dcolours-1 */
