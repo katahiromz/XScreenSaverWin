@@ -60,6 +60,8 @@ typedef DWORD CARD32;
 
 #define rint(e) ((int)(e + 0.5))
 
+#define MAX_COLORCELLS 300
+
 //////////////////////////////////////////////////////////////////////////////
 // Bool
 
@@ -321,8 +323,34 @@ typedef struct
 typedef XGCValues *GC;
 
 #define XGetGCValues_(gc) gc
-HDC XCreateDrawableDC_(Display *dpy, Drawable d);
-int XDeleteDrawableDC_(Display *dpy, Drawable d, HDC hdc);
+
+static inline HDC XCreateDrawableDC_(Display *dpy, Drawable d)
+{
+    HDC hdc;
+
+    if (d != NULL)
+    {
+        hdc = CreateCompatibleDC(dpy);
+        assert(hdc != NULL);
+        d->hbmOld = (HBITMAP)SelectObject(hdc, d->hbm);
+    }
+    else
+    {
+        hdc = dpy;
+    }
+
+    return hdc;
+}
+
+static inline int XDeleteDrawableDC_(Display *dpy, Drawable d, HDC hdc)
+{
+    if (d != NULL)
+    {
+        SelectObject(hdc, d->hbmOld);
+        DeleteDC(hdc);
+    }
+    return 0;
+}
 
 GC XCreateGC(Display *dpy, Drawable d,
      unsigned long valuemask, 
@@ -333,9 +361,6 @@ int XFreeGC(Display *dpy, GC gc);
 
 HPEN XCreateWinPen_(XGCValues *values);
 HBRUSH XCreateWinBrush_(XGCValues *values);
-int XSetForeground(Display *dpy, GC gc, unsigned long foreground);
-int XSetBackground(Display *dpy, GC gc, unsigned long background);
-int XSetWindowBackground(Display *dpy, Window w, unsigned long pixel);
 
 int XCopyArea(
      Display *dpy,
@@ -401,13 +426,61 @@ int XStoreColors(
     XColor*     color,
     int         ncolors);
 
-int XQueryColor(Display *dpy, Colormap cmap, XColor *def);
-int XQueryColors(Display *dpy, Colormap cmap, XColor *defs, int ncolors);
-int XParseColor(Display *d, Colormap cmap, const char *name, XColor *c);
-
 unsigned long load_color(Display *dpy, Colormap cmap, const char *name);
 
 #define CellsOfScreen(s) 300
+#define DefaultScreenOfDisplay(dpy) 0
+#define DefaultColormap(dpy,scr) 0
+
+typedef struct
+{
+    WORD red;
+    WORD green;
+    WORD blue;
+} xColorItem;
+
+typedef struct
+{
+    int num_items;
+    xColorItem *items;
+    BOOL *pixel_used;
+} ColormapData;
+
+extern ColormapData colormaps[MAX_COLORMAP];
+
+static inline int XQueryColor(Display *dpy, Colormap cmap, XColor *def)
+{
+    int pixel;
+    assert(def != NULL);
+    if (def->pixel < MAX_COLORCELLS && colormaps[cmap].pixel_used[def->pixel])
+    {
+        pixel = def->pixel;
+        def->red = colormaps[cmap].items[pixel].red;
+        def->blue = colormaps[cmap].items[pixel].blue;
+        def->green = colormaps[cmap].items[pixel].green;
+        def->flags = DoRed | DoGreen | DoBlue;
+        return 1;
+    }
+    return 0;
+}
+
+static inline int XSetForeground(Display *dpy, GC gc, unsigned long foreground)
+{
+    XColor color;
+    XGCValues *values;
+
+    values = XGetGCValues_(gc);
+    values->foreground = foreground;
+    color.pixel = foreground;
+    XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
+    values->foreground_rgb = RGB(color.red / 256, color.green / 256, color.blue / 256);
+    return 0;
+}
+
+int XQueryColors(Display *dpy, Colormap cmap, XColor *defs, int ncolors);
+int XParseColor(Display *d, Colormap cmap, const char *name, XColor *c);
+int XSetBackground(Display *dpy, GC gc, unsigned long background);
+int XSetWindowBackground(Display *dpy, Window w, unsigned long pixel);
 
 //////////////////////////////////////////////////////////////////////////////
 // XImage
@@ -472,11 +545,9 @@ XPixmapFormatValues *XListPixmapFormats(Display *dpy, int *count);
 // X Window
 
 Display *DisplayOfScreen(Screen *s);
-#define DefaultScreenOfDisplay(dpy) 0
 #define DefaultScreen(dpy) 0
 #define BlackPixelOfScreen(s) 0
 #define WhitePixelOfScreen(s) 255
-#define DefaultColormap(dpy,scr) 0
 #define BlackPixel(dpy,scr) 0
 #define WhitePixel(dpy,scr) 255
 #define BitmapPad(dpy) 32
@@ -506,9 +577,67 @@ int XDrawLine(Display *dpy, Drawable d, GC gc,
 int XDrawLines(Display *dpy, Drawable d, GC gc,
     XPoint *points, int npoints, int mode);
 
-int XDrawRectangle(
+static inline int XDrawRectangle(
     Display *dpy, Drawable d, GC gc,
-    int x, int y, unsigned int width, unsigned int height);
+    int x, int y, unsigned int width, unsigned int height)
+{
+    XGCValues *values;
+    HDC hdc;
+    HPEN hPen;
+    HGDIOBJ hPenOld;
+    int nR2;
+
+    values = XGetGCValues_(gc);
+    hPen = XCreateWinPen_(values);
+    assert(hPen);
+    if (hPen == NULL)
+        return BadAlloc;
+
+    hdc = XCreateDrawableDC_(dpy, d);
+    nR2 = SetROP2(hdc, values->function);
+    hPenOld = SelectObject(hdc, hPen);
+
+    SelectObject(hdc, GetStockObject(NULL_BRUSH));
+    Rectangle(hdc, x, y, x + width, y + height);
+
+    SelectObject(hdc, hPenOld);
+    SetROP2(hdc, nR2);
+    XDeleteDrawableDC_(dpy, d, hdc);
+
+    DeleteObject(hPen);
+    return 0;
+}
+
+static inline int XDrawRectangleSimplified(
+    Display *dpy, Drawable d, GC gc,
+    int x, int y, unsigned int width, unsigned int height)
+{
+    XGCValues *values;
+    HDC hdc;
+    HPEN hPen;
+    HGDIOBJ hPenOld;
+    int nR2;
+
+    values = XGetGCValues_(gc);
+    hPen = XCreateWinPen_(values);
+    //assert(hPen);
+    //if (hPen == NULL)
+    //    return BadAlloc;
+
+    hdc = XCreateDrawableDC_(dpy, d);
+    //nR2 = SetROP2(hdc, values->function);
+    hPenOld = SelectObject(hdc, hPen);
+
+    SelectObject(hdc, GetStockObject(NULL_BRUSH));
+    Rectangle(hdc, x, y, x + width, y + height);
+
+    SelectObject(hdc, hPenOld);
+    //SetROP2(hdc, nR2);
+    XDeleteDrawableDC_(dpy, d, hdc);
+
+    DeleteObject(hPen);
+    return 0;
+}
 
 int XDrawSegments(Display *dpy, Drawable d, GC gc,
     XSegment *segments, int nsegments);
@@ -524,9 +653,88 @@ int XDrawString(Display *dpy, Drawable d, GC gc,
 int XDrawImageString(Display *dpy, Drawable d, GC gc,
     int x, int y, const char *string, int length);
 
-int XFillRectangle(
+static inline int XFillRectangle(
     Display *dpy, Drawable d, GC gc,
-    int x, int y, unsigned int width, unsigned int height);
+    int x, int y, unsigned int width, unsigned int height)
+{
+    XGCValues *values;
+    HDC hdc;
+    HBRUSH hbr;
+    RECT rc;
+    int nR2;
+
+    values = XGetGCValues_(gc);
+    hbr = XCreateWinBrush_(values);
+    if (hbr == NULL)
+        return BadAlloc;
+
+    SetRect(&rc, x, y, x + width, y + height);
+
+    hdc = XCreateDrawableDC_(dpy, d);
+    nR2 = SetROP2(hdc, values->function);
+
+    if (values->clip_mask_region)
+    {
+        SelectClipRgn(hdc, values->clip_mask_region);
+        OffsetClipRgn(hdc, values->clip_x_origin, values->clip_y_origin);
+    }
+
+    SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
+    FillRect(hdc, &rc, hbr);
+
+    if (values->clip_mask_region)
+        SelectClipRgn(hdc, NULL);
+
+    SetROP2(hdc, nR2);
+    XDeleteDrawableDC_(dpy, d, hdc);
+
+    DeleteObject(hbr);
+    return 0;
+}
+
+static inline int XFillRectangleSimplified(
+    Display *dpy, Drawable d, GC gc,
+    int x, int y, unsigned int width, unsigned int height)
+{
+    XGCValues *values;
+    HDC hdc;
+    HBRUSH hbr;
+    RECT rc;
+    //int nR2;
+
+    values = XGetGCValues_(gc);
+
+    hbr = CreateSolidBrush(values->foreground_rgb); //XCreateWinBrush_(values);
+    //if (hbr == NULL)
+    //    return BadAlloc;
+
+    rc.left = x;
+    rc.top = y;
+    rc.right = x + width;
+    rc.bottom = y + height;
+
+    hdc = XCreateDrawableDC_(dpy, d);
+    //nR2 = SetROP2(hdc, values->function);
+
+    //if (values->clip_mask_region)
+    //{
+    //    SelectClipRgn(hdc, values->clip_mask_region);
+    //    OffsetClipRgn(hdc, values->clip_x_origin, values->clip_y_origin);
+    //}
+
+    //SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
+    FillRect(hdc, &rc, hbr);
+
+    //if (values->clip_mask_region)
+    //    SelectClipRgn(hdc, NULL);
+
+    //SetROP2(hdc, nR2);
+    XDeleteDrawableDC_(dpy, d, hdc);
+
+    DeleteObject(hbr);
+    return 0;
+}
+
 int XFillRectangles(
     Display *dpy, Drawable d, GC gc,
     XRectangle *rectangles, int n_rects);

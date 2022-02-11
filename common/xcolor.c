@@ -765,13 +765,6 @@ static const NAMED_COLOR_ENTRY named_color_entries[] =
     {144, 238, 144, "LightGreen"},
 };
 
-typedef struct
-{
-    WORD red;
-    WORD green;
-    WORD blue;
-} xColorItem;
-
 static xColorItem win_colormap_items[MAX_COLORCELLS] =
 {
     {0, 0, 0},                      //[0]
@@ -910,15 +903,9 @@ static BOOL win_pixel_used[MAX_COLORCELLS] =
     TRUE         // [255]
 };
 
-typedef struct
-{
-    int num_items;
-    xColorItem *items;
-    BOOL *pixel_used;
-} ColormapData;
-
 static int colormap_num = 1;
-static ColormapData colormaps[MAX_COLORMAP] =
+
+ColormapData colormaps[MAX_COLORMAP] =
 {
     {20, win_colormap_items, win_pixel_used},
 };
@@ -1265,25 +1252,6 @@ int visual_cells(Screen *screen, Visual *visual)
     return colormaps[cmap].num_items;
 }
 
-int XQueryColor(Display *dpy, Colormap cmap, XColor *def)
-{
-    int pixel;
-    assert(def != NULL);
-    if (def != NULL)
-    {
-        if (def->pixel < MAX_COLORCELLS && colormaps[cmap].pixel_used[def->pixel])
-        {
-            pixel = def->pixel;
-            def->red = colormaps[cmap].items[pixel].red;
-            def->blue = colormaps[cmap].items[pixel].blue;
-            def->green = colormaps[cmap].items[pixel].green;
-            def->flags = DoRed | DoGreen | DoBlue;
-            return 1;
-        }
-    }
-    return 0;
-}
-
 int XQueryColors(Display *dpy, Colormap cmap, XColor *defs, int ncolors)
 {
     int i, pixel;
@@ -1321,22 +1289,6 @@ int XSetBackground(Display *dpy, GC gc, unsigned long background)
     color.pixel = background;
     XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
     values->background_rgb = RGB(color.red / 256, color.green / 256, color.blue / 256);
-    return 0;
-}
-
-int XSetForeground(Display *dpy, GC gc, unsigned long foreground)
-{
-    XColor color;
-    XGCValues *values;
-
-    values = XGetGCValues_(gc);
-    if (values == NULL)
-        return BadGC;
-
-    values->foreground = foreground;
-    color.pixel = foreground;
-    XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
-    values->foreground_rgb = RGB(color.red / 256, color.green / 256, color.blue / 256);
     return 0;
 }
 

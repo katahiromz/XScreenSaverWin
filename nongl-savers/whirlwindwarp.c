@@ -60,6 +60,10 @@ static argtype vars[] =
     {&meters, "meters", NULL, "False", t_Bool},
 };
 
+#ifdef WIN32
+    #define XDrawRectangle XDrawRectangleSimplified /* hacked by katahiromz */
+    #define XFillRectangle XFillRectangleSimplified /* hacked by katahiromz */
+#endif
 struct state {
   Display *dpy;
   Window window;

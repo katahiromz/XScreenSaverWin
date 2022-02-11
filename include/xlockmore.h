@@ -6,7 +6,6 @@
 #endif
 #include <scrnsave.h>
 
-#define MAX_COLORCELLS 300
 #define GETTIMEOFDAY_TWO_ARGS 1
 
 #define inline  /*empty*/

@@ -3,36 +3,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-HDC XCreateDrawableDC_(Display *dpy, Drawable d)
-{
-    HDC hdc;
-
-    if (d != NULL)
-    {
-        hdc = CreateCompatibleDC(dpy);
-        if (hdc != NULL)
-        {
-            d->hbmOld = SelectObject(hdc, d->hbm);
-        }
-    }
-    else
-    {
-        hdc = dpy;
-    }
-
-    return hdc;
-}
-
-int XDeleteDrawableDC_(Display *dpy, Drawable d, HDC hdc)
-{
-    if (d != NULL)
-    {
-        SelectObject(hdc, d->hbmOld);
-        DeleteDC(hdc);
-    }
-    return 0;
-}
-
 GC XCreateGC(Display *dpy, Drawable d,
      unsigned long valuemask, XGCValues *values)
 {
@@ -296,9 +266,7 @@ HBRUSH XCreateWinBrush_(XGCValues *values)
     LOGBRUSH lb;
     if (values->fill_style == FillSolid)
     {
-        lb.lbColor = values->foreground_rgb;
-        lb.lbStyle = BS_SOLID;
-        return CreateBrushIndirect(&lb);
+        return CreateSolidBrush(values->foreground_rgb);
     }
     else if (values->fill_style == FillStippled)
     {
@@ -406,40 +374,6 @@ int XDrawLines(Display *dpy, Drawable d, GC gc,
 
     DeleteObject(hPen);
 
-    return 0;
-}
-
-int XDrawRectangle(
-    Display *dpy, Drawable d, GC gc,
-    int x, int y, unsigned int width, unsigned int height)
-{
-    XGCValues *values;
-    HDC hdc;
-    HPEN hPen;
-    HGDIOBJ hPenOld;
-    int nR2;
-
-    values = XGetGCValues_(gc);
-    if (values == NULL)
-        return BadGC;
-
-    hPen = XCreateWinPen_(values);
-    assert(hPen);
-    if (hPen == NULL)
-        return BadAlloc;
-
-    hdc = XCreateDrawableDC_(dpy, d);
-    nR2 = SetROP2(hdc, values->function);
-    hPenOld = SelectObject(hdc, hPen);
-
-    SelectObject(hdc, GetStockObject(NULL_BRUSH));
-    Rectangle(hdc, x, y, x + width, y + height);
-
-    SelectObject(hdc, hPenOld);
-    SetROP2(hdc, nR2);
-    XDeleteDrawableDC_(dpy, d, hdc);
-
-    DeleteObject(hPen);
     return 0;
 }
 
@@ -629,48 +563,6 @@ int XDrawImageString(Display *dpy, Drawable d, GC gc,
 
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    return 0;
-}
-
-int XFillRectangle(
-    Display *dpy, Drawable d, GC gc,
-    int x, int y, unsigned int width, unsigned int height)
-{
-    XGCValues *values;
-    HDC hdc;
-    HBRUSH hbr;
-    RECT rc;
-    int nR2;
-
-    values = XGetGCValues_(gc);
-    if (values == NULL)
-        return BadGC;
-
-    hbr = XCreateWinBrush_(values);
-    if (hbr == NULL)
-        return BadAlloc;
-
-    SetRect(&rc, x, y, x + width, y + height);
-
-    hdc = XCreateDrawableDC_(dpy, d);
-    nR2 = SetROP2(hdc, values->function);
-
-    if (values->clip_mask_region)
-    {
-        SelectClipRgn(hdc, values->clip_mask_region);
-        OffsetClipRgn(hdc, values->clip_x_origin, values->clip_y_origin);
-    }
-
-    SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
-    FillRect(hdc, &rc, hbr);
-
-    if (values->clip_mask_region)
-        SelectClipRgn(hdc, NULL);
-
-    SetROP2(hdc, nR2);
-    XDeleteDrawableDC_(dpy, d, hdc);
-
-    DeleteObject(hbr);
     return 0;
 }
 
