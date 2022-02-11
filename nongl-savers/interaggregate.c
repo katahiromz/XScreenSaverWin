@@ -54,6 +54,9 @@
 #include <math.h>
 
 
+#ifdef _WIN32
+    #define XFillRectangle XFillRectangleSimplified /* hacked by katahiromz */
+#endif
 /* this program goes faster if some functions are inline.  The following is
  * borrowed from ifs.c */
 #if !defined( __GNUC__ ) && !defined(__cplusplus) && !defined(c_plusplus)
