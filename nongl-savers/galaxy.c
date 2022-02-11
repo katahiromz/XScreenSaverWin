@@ -306,7 +306,9 @@ gt->vel[2];
 
  }
 
+#ifndef _WIN32 // optimized by katahiromz
  XClearWindow(MI_DISPLAY(mi), MI_WINDOW(mi));
+#endif
 
 #if 0
  (void) printf("ngalaxies=%d, f_hititerations=%d\n", gp->ngalaxies,
@@ -351,8 +353,10 @@ draw_galaxy(ModeInfo * mi)
   int         i, j, k; /* more tmp */
   XPoint    *dummy = NULL;
 
+#ifndef _WIN32 /* optimized by katahiromz */
   if (! dbufp)
     XClearWindow(MI_DISPLAY(mi), MI_WINDOW(mi));
+#endif
 
   if(spin){
     gp->rot_y += 0.01;
@@ -438,28 +442,34 @@ draw_galaxy(ModeInfo * mi)
 #if 1
     // hacked and optimized by katahiromz
     {
+        HDC hdc = CreateCompatibleDC(display);
+        HBITMAP hbm = CreateCompatibleBitmap(display, MI_WIN_WIDTH(mi), MI_WIN_HEIGHT(mi));
+        HGDIOBJ hbmOld = SelectObject(hdc, hbm);
         if (dbufp) {
             int count = gt->nstars;
             const XPoint *pt = gt->oldpoints;
             while (count-- > 0) {
-                SetPixelV(display,
-                    pt->x, pt->y,
-                    0);
+                SetPixelV(hdc, pt->x, pt->y, 0);
                 ++pt;
             }
         }
-        XSetForeground(display, gc, MI_PIXEL(mi, gt->galcol));
+        XSetForeground(hdc, gc, MI_PIXEL(mi, gt->galcol));
         {
             int count = gt->nstars;
             const XPoint *pt = gt->newpoints;
             const unsigned long rgb = gc->foreground_rgb;
             while (count-- > 0) {
-                SetPixelV(display,
-                    pt->x, pt->y,
-                    rgb);
+                SetPixelV(hdc, pt->x, pt->y, rgb);
                 ++pt;
             }
         }
+        SelectObject(hdc, hbmOld);
+        GdiFlush();
+        hbmOld = SelectObject(hdc, hbm);
+        BitBlt(display, 0, 0, MI_WIN_WIDTH(mi), MI_WIN_HEIGHT(mi), hdc, 0, 0, SRCCOPY);
+        SelectObject(hdc, hbmOld);
+        DeleteObject(hbm);
+        DeleteDC(hdc);
     }
 #else
     if (dbufp) {
@@ -486,7 +496,9 @@ draw_galaxy(ModeInfo * mi)
 ENTRYPOINT void
 reshape_galaxy(ModeInfo * mi, int width, int height)
 {
+#ifndef _WIN32 // optimized by katahiromz
   XClearWindow (MI_DISPLAY (mi), MI_WINDOW(mi));
+#endif
   init_galaxy (mi);
 }
 
