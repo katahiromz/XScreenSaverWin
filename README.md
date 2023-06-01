@@ -1,21 +1,20 @@
-XScreenSaveWin
-==============
+# XScreenSaveWin
 
 This is XScreenSaver for Windows (XScreenSaverWin). This software was
 based on XScreenSaver 5.22 (for non-Windows OS) by Jamie Zawinski.
 Porting to Windows was mostly done by Katayama Hirofumi MZ.
 
-Check STATUS.txt for porting status. Check LICENSE.txt for licensing
+Check [../STATUS.txt](STATUS.txt) for porting status. Check LICENSE.txt for licensing
 information. It works on Windows XP/Vista/Server 2003/7/10.
 
 Once you installed XScreenSaverWin, then you can install a screensaver
-from the main program "xscreensaver.exe".
+from the main program `xscreensaver.exe`.
 
 !!! WARNING !!!
 ---------------
 
 You cannot install all the screensavers at once.
-You mayn't put so many .scr files in one folder directly.
+You may not put so many .scr files in one folder directly.
 It fails .scr installation.
 There's limitation of Windows in the numbers of installables at once.
 
