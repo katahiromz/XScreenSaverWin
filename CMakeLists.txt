@@ -18,8 +18,8 @@ enable_language(CXX)
 
 # check build type
 if (NOT CMAKE_BUILD_TYPE)
-    message(STATUS "No build type selected, default to Debug")
-    set(CMAKE_BUILD_TYPE "Debug")
+    message(STATUS "No build type selected, default to Release")
+    set(CMAKE_BUILD_TYPE "RELEASE")
 endif()
 
 # make uppercase string of build type
@@ -36,9 +36,9 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 # Win32 or not?
-if (NOT WIN32)
-    message(FATAL_ERROR "You must use a Win32 compiler")
-endif()
+# if (NOT WIN32)
+#     message(FATAL_ERROR "You must use a Win32 compiler")
+# endif()
 
 # do statically link
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")

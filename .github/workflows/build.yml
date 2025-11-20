@@ -1,0 +1,35 @@
+name: Build
+on:
+  release:
+    types: [published]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Inno Setup
+      run: choco install innosetup
+
+    - name: Configure CMake
+      run: cmake -S . -B build
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Create installer
+      run: .\create-installer.ps1
+
+    - name: Upload installer
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: XScreenSaverWin-Setup.exe
+        asset_name: XScreenSaverWin-Setup.exe
+        asset_content_type: application/octet-stream
