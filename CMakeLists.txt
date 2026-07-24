@@ -1,10 +1,8 @@
 # CMakeLists.txt --- CMake project settings
-#    ex) cmake -G "Visual Studio 9 2008" .
-#    ex) cmake -DCMAKE_BUILD_TYPE=Release -G "MSYS Makefiles" .
 ##############################################################################
 
 # CMake minimum version
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 3.10)
 
 # use new policy
 if(COMMAND cmake_policy)
@@ -12,9 +10,8 @@ if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-# project name and language
-project(XScreenSaverWin C)
-enable_language(CXX)
+# project name, version, and languages
+project(XScreenSaverWin VERSION 0.84 LANGUAGES C CXX RC)
 
 # check build type
 if (NOT CMAKE_BUILD_TYPE)

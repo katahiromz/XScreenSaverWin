@@ -28,4 +28,9 @@ XScreenSaverWin
 *.sln
 *.vcproj
 *.vcxproj
+<<<<<<< HEAD
 XScreenSaverWin-Setup.exe
+=======
+.ninja*
+*.ninja
+>>>>>>> e9c95a9 (0.84-pre)

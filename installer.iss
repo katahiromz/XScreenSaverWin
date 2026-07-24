@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{B7914227-CD94-4B6F-859C-E3823C9552DA}
 AppName=XScreenSaver for Windows
-AppVerName=XScreenSaver for Windows v0.83
+AppVerName=XScreenSaver for Windows v0.84
 AppPublisher=Katayama Hirofumi MZ
 AppPublisherURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 AppSupportURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
@@ -15,12 +15,16 @@ AppUpdatesURL=http://katahiromz.web.fc2.com/xscreensaverwin/eindex.html
 DefaultDirName={pf}\XScreenSaver for Windows
 DefaultGroupName=XScreenSaver for Windows
 AllowNoIcons=yes
+<<<<<<< HEAD
 OutputBaseFilename=XScreenSaverWin-Setup
+=======
+OutputBaseFilename=XScreenSaverWin-0.84-Setup
+>>>>>>> e9c95a9 (0.84-pre)
 Compression=lzma
 SolidCompression=yes
 UninstallDisplayIcon={app}\xscreensaver.exe
 LicenseFile=LICENSE.txt
-VersionInfoVersion=0.83
+VersionInfoVersion=0.84
 OutputDir=.
 
 [Languages]
