@@ -6,6 +6,7 @@
 
 #define MAX_LOADSTRING 256
 #define RESTART_TIMER_ID 999
+#define COMPANY_KEY TEXT("Software\\Katayama Hirofumi MZ\\XScreenSaverWin")
 
 static HINSTANCE g_hInst = NULL;
 static WNDPROC g_fnOldPreviewWndProc = NULL;
@@ -263,9 +264,8 @@ static BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
     else
     {
         TCHAR szBuff[MAX_PATH] = TEXT("");
-        HKEY hKey;
-        RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\XScreenSaverWin"),
-                     0, KEY_READ, &hKey);
+        HKEY hKey = NULL;
+        RegOpenKeyEx(HKEY_CURRENT_USER, COMPANY_KEY, 0, KEY_READ, &hKey);
         if (hKey)
         {
             DWORD cbBuff = sizeof(szBuff);
@@ -316,9 +316,8 @@ static void OnDestroy(HWND hwnd)
     INT nIndex = (INT)(INT_PTR)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
     SendMessage(hCombo, CB_GETLBTEXT, nIndex, (LPARAM)szName);
 
-    HKEY hKey;
-    RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\XScreenSaverWin"),
-                   0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
+    HKEY hKey = NULL;
+    RegCreateKeyEx(HKEY_CURRENT_USER, COMPANY_KEY, 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
     if (hKey)
     {
         RegSetValueEx(hKey, TEXT("CurSel"), 0, REG_SZ, (PBYTE)szName, (lstrlen(szName) + 1) * sizeof(TCHAR));

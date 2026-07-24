@@ -26,7 +26,7 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 //////////////////////////////////////////////////////////////////////////////
 // RT_MANIFEST
 
-1 24 "res/Manifest_1.manifest"
+1 MANIFEST "res/Manifest_1.manifest"
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -36,14 +36,14 @@ LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
 // RT_DIALOG
 
 1 DIALOGEX 0, 0, 215, 180
-CAPTION "XScreenSaver for Windows v0.84"
+CAPTION "XScreenSaverWin v0.84"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
 FONT 9, "Arial", 0, 0, 1 // DEFAULT_CHARSET
 {
     CONTROL "", ID_PREVIEW, "STATIC", SS_BLACKRECT | WS_GROUP, 5, 5, 200, 120
     LTEXT "&Select ScreenSaver:", -1, 5, 130, 205, 10
     CONTROL "(Select ScreenSaver)", ID_COMBO, "COMBOBOX", CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP, 5, 140, 205, 125
-    PUSHBUTTON "&Install", ID_INSTALL, 5, 160, 60, 14
+    PUSHBUTTON "&Install...", ID_INSTALL, 5, 160, 60, 14
     PUSHBUTTON "&Configure...", ID_CONFIGURE, 70, 160, 60, 14
     PUSHBUTTON "&Test", ID_TEST, 150, 160, 60, 14
 }
@@ -81,15 +81,6 @@ FILETYPE        VFT_APP
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// RT_STRING
-
-STRINGTABLE
-{
-    IDS_APP_TITLE "xscreensaver"
-    109 "XSCREENSAVER"
-}
-
-//////////////////////////////////////////////////////////////////////////////
 
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
@@ -97,14 +88,14 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 // RT_DIALOG
 
 1 DIALOGEX 0, 0, 215, 180
-CAPTION "XScreenSaver for Windows v0.84"
+CAPTION "XScreenSaverWin v0.84"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
 FONT 9, "MS UI Gothic", 0, 0, 128 // SHIFTJIS_CHARSET
 {
     CONTROL "", ID_PREVIEW, "STATIC", SS_BLACKRECT | WS_GROUP, 5, 5, 200, 120
     LTEXT "スクリーンセーバー(&S):", -1, 5, 130, 205, 10
     CONTROL "(選択してね)", ID_COMBO, "COMBOBOX", CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP, 5, 140, 205, 125
-    PUSHBUTTON "インストール(&I)", ID_INSTALL, 5, 160, 60, 14
+    PUSHBUTTON "インストール(&I)...", ID_INSTALL, 5, 160, 60, 14
     PUSHBUTTON "設定(&C)...", ID_CONFIGURE, 70, 160, 60, 14
     PUSHBUTTON "テスト(&T)", ID_TEST, 150, 160, 60, 14
 }
