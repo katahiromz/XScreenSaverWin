@@ -1,11 +1,14 @@
+// xscreensaver.cpp --- XScreenSaverWin screensaver front-end
+// Author: katahiromz
+// License: GPL v3
+// Copyright (C) 2013-2016 Katayama Hirofumi MZ.
 #include "stdafx.h"
 #include "xscreensaver.h"
 
 #define MAX_LOADSTRING 256
+#define RESTART_TIMER_ID 999
 
-HINSTANCE hInst;
-TCHAR szTitle[MAX_LOADSTRING];
-TCHAR szWindowClass[MAX_LOADSTRING];
+HINSTANCE g_hInst = NULL;
 
 LPTSTR GetScreenSaverPath(HWND hwnd)
 {
@@ -205,15 +208,15 @@ PreviewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return CallWindowProc(fnOldPreviewWndProc, hwnd, uMsg, wParam, lParam);
 }
 
-VOID OnInitDialog(HWND hwnd)
+BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
     HWND hwndPreview = GetDlgItem(hwnd, ID_PREVIEW);
     fnOldPreviewWndProc = SubclassWindow(hwndPreview, PreviewWndProc);
 
     HICON hIcon;
-    hIcon = LoadIcon(hInst, MAKEINTRESOURCE(1));
+    hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(1));
     SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-    hIcon = (HICON)LoadImage(hInst, MAKEINTRESOURCE(1), IMAGE_ICON,
+    hIcon = (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(1), IMAGE_ICON,
         GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), 0);
     SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 
@@ -316,6 +319,7 @@ VOID OnInitDialog(HWND hwnd)
     }
 
     CenterDialog(hwnd);
+	return TRUE;
 }
 
 void OnDestroy(HWND hwnd)
@@ -336,58 +340,67 @@ void OnDestroy(HWND hwnd)
     }
 }
 
-INT_PTR CALLBACK DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+void OnTimer(HWND hwnd, UINT id)
 {
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
+    if (id == RESTART_TIMER_ID)
     {
-    case WM_INITDIALOG:
-        OnInitDialog(hwnd);
-        return TRUE;
-
-    case WM_COMMAND:
-        switch (LOWORD(wParam))
+        HWND hPreview = GetDlgItem(hwnd, ID_PREVIEW);
+        HWND hChild = GetWindow(hPreview, GW_CHILD);
+        if (hChild == NULL)
         {
-        case IDOK:
-            EndDialog(hwnd, IDOK);
-            return TRUE;
-
-        case IDCANCEL:
-            EndDialog(hwnd, IDCANCEL);
-            return TRUE;
-
-        case ID_INSTALL:
-            OnInstall(hwnd);
-            break;
-
-        case ID_CONFIGURE:
-            OnConfigure(hwnd);
-            break;
-
-        case ID_TEST:
-            OnTest(hwnd);
-            break;
-
-        case ID_COMBO:
-            if (HIWORD(wParam) == CBN_SELCHANGE)
-            {
-                OnTestOnWindow(hwnd);
-            }
-            break;
+            KillTimer(hwnd, id);
+            OnTestOnWindow(hwnd);
         }
+    }
+}
+
+void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    case IDOK:
+        EndDialog(hwnd, IDOK);
         break;
 
-    case WM_DESTROY:
-        OnDestroy(hwnd);
+    case IDCANCEL:
+        EndDialog(hwnd, IDCANCEL);
+        break;
+
+    case ID_INSTALL:
+        OnInstall(hwnd);
+        break;
+
+    case ID_CONFIGURE:
+        OnConfigure(hwnd);
+        break;
+
+    case ID_TEST:
+        OnTest(hwnd);
+        SetTimer(hwnd, RESTART_TIMER_ID, 500, NULL);
+        break;
+
+    case ID_COMBO:
+        if (codeNotify == CBN_SELCHANGE)
+            OnTestOnWindow(hwnd);
         break;
     }
-    return FALSE;
+}
+
+INT_PTR CALLBACK DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+        HANDLE_MSG(hwnd, WM_INITDIALOG, OnInitDialog);
+        HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
+        HANDLE_MSG(hwnd, WM_TIMER, OnTimer);
+        HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
+    }
+    return 0;
 }
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-    hInst = hInstance;
-
+    g_hInst = hInstance;
     return TRUE;
 }
 
@@ -399,13 +412,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadString(hInstance, IDC_XSCREENSAVER, szWindowClass, MAX_LOADSTRING);
-
-    if (!InitInstance (hInstance, nCmdShow))
-    {
+    if (!InitInstance(hInstance, nCmdShow))
         return FALSE;
-    }
 
     return DialogBox(hInstance, MAKEINTRESOURCE(1), NULL, DialogProc);
 }
