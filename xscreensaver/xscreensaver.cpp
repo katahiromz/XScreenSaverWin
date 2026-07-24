@@ -4,6 +4,7 @@
 // Copyright (C) 2013-2026 Katayama Hirofumi MZ.
 #include "stdafx.h"
 #include "xscreensaver.h"
+#include <commctrl.h>
 
 #define MAX_LOADSTRING 256
 #define RESTART_TIMER_ID 999
@@ -388,6 +389,7 @@ DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 static BOOL InitInstance(HINSTANCE hInstance, INT nCmdShow)
 {
+    InitCommonControls();
     g_hInst = hInstance;
     return TRUE;
 }
