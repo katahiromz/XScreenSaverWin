@@ -1,7 +1,7 @@
 // xscreensaver.cpp --- XScreenSaverWin screensaver front-end
 // Author: katahiromz
 // License: GPL v3
-// Copyright (C) 2013-2016 Katayama Hirofumi MZ.
+// Copyright (C) 2013-2026 Katayama Hirofumi MZ.
 #include "stdafx.h"
 #include "xscreensaver.h"
 
@@ -17,7 +17,7 @@ LPTSTR GetScreenSaverPath(HWND hwnd)
     static TCHAR szPath[MAX_PATH * 2];
     GetModuleFileName(NULL, szPath, MAX_PATH);
     LPTSTR pch = _tcsrchr(szPath, _T('\\'));
-    *pch = _T('\0');
+    *pch = 0;
 
     TCHAR szName[MAX_PATH], szName2[MAX_PATH];
     INT nIndex = (INT)(INT_PTR)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
