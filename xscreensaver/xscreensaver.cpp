@@ -107,31 +107,31 @@ BOOL Execute(HWND hwnd, LPCTSTR program, LPCTSTR params)
     return ret;
 }
 
-VOID OnConfigure(HWND hDlg)
+VOID OnConfigure(HWND hwnd)
 {
-    Execute(hDlg, GetScreenSaverPath(hDlg), NULL);
+    Execute(hwnd, GetScreenSaverPath(hwnd), NULL);
 }
 
-VOID OnTest(HWND hDlg)
+VOID OnTest(HWND hwnd)
 {
-    Execute(hDlg, GetScreenSaverPath(hDlg), TEXT("/S"));
+    Execute(hwnd, GetScreenSaverPath(hwnd), TEXT("/S"));
 }
 
-VOID OnTestOnWindow(HWND hDlg)
+VOID OnTestOnWindow(HWND hwnd)
 {
-    HWND hPreview = GetDlgItem(hDlg, ID_PREVIEW);
+    HWND hPreview = GetDlgItem(hwnd, ID_PREVIEW);
     TCHAR szParams[MAX_PATH];
     wsprintf(szParams, TEXT("/p %u"), (UINT)(UINT_PTR)hPreview);
-    Execute(hDlg, GetScreenSaverPath(hDlg), szParams);
+    Execute(hwnd, GetScreenSaverPath(hwnd), szParams);
 }
 
-VOID OnInstall(HWND hDlg)
+VOID OnInstall(HWND hwnd)
 {
-    LPTSTR pszPath = GetScreenSaverPath(hDlg);
+    LPTSTR pszPath = GetScreenSaverPath(hwnd);
 
     TCHAR szParams[MAX_PATH];
     wsprintf(szParams, TEXT("desk.cpl,InstallScreenSaver %s"), pszPath);
-    Execute(hDlg, TEXT("rundll32.exe"), szParams);
+    Execute(hwnd, TEXT("rundll32.exe"), szParams);
 }
 
 #ifndef GetLongPathName
@@ -205,19 +205,19 @@ PreviewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return CallWindowProc(fnOldPreviewWndProc, hwnd, uMsg, wParam, lParam);
 }
 
-VOID OnInitDialog(HWND hDlg)
+VOID OnInitDialog(HWND hwnd)
 {
-    HWND hwndPreview = GetDlgItem(hDlg, ID_PREVIEW);
+    HWND hwndPreview = GetDlgItem(hwnd, ID_PREVIEW);
     fnOldPreviewWndProc = SubclassWindow(hwndPreview, PreviewWndProc);
 
     HICON hIcon;
     hIcon = LoadIcon(hInst, MAKEINTRESOURCE(1));
-    SendMessage(hDlg, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+    SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
     hIcon = (HICON)LoadImage(hInst, MAKEINTRESOURCE(1), IMAGE_ICON,
         GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), 0);
-    SendMessage(hDlg, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+    SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 
-    HWND hCombo = GetDlgItem(hDlg, ID_COMBO);
+    HWND hCombo = GetDlgItem(hwnd, ID_COMBO);
 
     TCHAR szPath[MAX_PATH], szPath2[MAX_PATH], szDir[MAX_PATH];
     GetModuleFileName(NULL, szPath, MAX_PATH);
@@ -267,9 +267,9 @@ VOID OnInitDialog(HWND hDlg)
     if (nCount == 0)
     {
         EnableWindow(hCombo, FALSE);
-        EnableWindow(GetDlgItem(hDlg, ID_INSTALL), FALSE);
-        EnableWindow(GetDlgItem(hDlg, ID_CONFIGURE), FALSE);
-        EnableWindow(GetDlgItem(hDlg, ID_TEST), FALSE);
+        EnableWindow(GetDlgItem(hwnd, ID_INSTALL), FALSE);
+        EnableWindow(GetDlgItem(hwnd, ID_CONFIGURE), FALSE);
+        EnableWindow(GetDlgItem(hwnd, ID_TEST), FALSE);
     }
     else
     {
@@ -312,10 +312,10 @@ VOID OnInitDialog(HWND hDlg)
                 i = 0;
         }
         SendMessage(hCombo, CB_SETCURSEL, i, 0);
-        OnTestOnWindow(hDlg);
+        OnTestOnWindow(hwnd);
     }
 
-    CenterDialog(hDlg);
+    CenterDialog(hwnd);
 }
 
 void OnDestroy(HWND hwnd)
@@ -336,49 +336,49 @@ void OnDestroy(HWND hwnd)
     }
 }
 
-INT_PTR CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
     case WM_INITDIALOG:
-        OnInitDialog(hDlg);
+        OnInitDialog(hwnd);
         return TRUE;
 
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
         case IDOK:
-            EndDialog(hDlg, IDOK);
+            EndDialog(hwnd, IDOK);
             return TRUE;
 
         case IDCANCEL:
-            EndDialog(hDlg, IDCANCEL);
+            EndDialog(hwnd, IDCANCEL);
             return TRUE;
 
         case ID_INSTALL:
-            OnInstall(hDlg);
+            OnInstall(hwnd);
             break;
 
         case ID_CONFIGURE:
-            OnConfigure(hDlg);
+            OnConfigure(hwnd);
             break;
 
         case ID_TEST:
-            OnTest(hDlg);
+            OnTest(hwnd);
             break;
 
         case ID_COMBO:
             if (HIWORD(wParam) == CBN_SELCHANGE)
             {
-                OnTestOnWindow(hDlg);
+                OnTestOnWindow(hwnd);
             }
             break;
         }
         break;
 
     case WM_DESTROY:
-        OnDestroy(hDlg);
+        OnDestroy(hwnd);
         break;
     }
     return FALSE;
