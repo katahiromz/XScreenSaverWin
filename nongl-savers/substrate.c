@@ -32,11 +32,11 @@
 #include "screenhack.h"
 #include <math.h>
 
-/* this program goes faster if some functions are inline.  The following is
+/* this program goes faster if some functions are __inline.  The following is
  * borrowed from ifs.c */
 #if !defined( __GNUC__ ) && !defined(__cplusplus) && !defined(c_plusplus)
-#undef inline
-#define inline			/* */
+#undef __inline
+#define __inline			/* */
 #endif
 
 char *background = "white";
@@ -199,7 +199,7 @@ static struct field
 #define ref_pixel(f, x, y)   ((f)->off_img[(y) * (f)->width + (x)])
 #define ref_cgrid(f, x, y)   ((f)->cgrid[(y) * (f)->width + (x)])
 
-static inline void start_crack(struct field *f, crack *cr) 
+static __inline void start_crack(struct field *f, crack *cr) 
 {
     /* synthesis of Crack::findStart() and crack::startCrack() */
     int px = 0;
@@ -273,7 +273,7 @@ static inline void start_crack(struct field *f, crack *cr)
 
 }
 
-static inline void make_crack(struct field *f) 
+static __inline void make_crack(struct field *f) 
 {
     crack *cr;
 
@@ -303,7 +303,7 @@ static inline void make_crack(struct field *f)
     }
 }
 
-static inline void point2rgb(int depth, unsigned long c, int *r, int *g, int *b) 
+static __inline void point2rgb(int depth, unsigned long c, int *r, int *g, int *b) 
 {
     switch(depth) {
         case 32:
@@ -335,7 +335,7 @@ static inline void point2rgb(int depth, unsigned long c, int *r, int *g, int *b)
     }
 }
 
-static inline unsigned long rgb2point(int depth, int r, int g, int b) 
+static __inline unsigned long rgb2point(int depth, int r, int g, int b) 
 {
     unsigned long ret = 0;
 
@@ -365,7 +365,7 @@ static inline unsigned long rgb2point(int depth, int r, int g, int b)
 
 /* alpha blended point drawing -- this is Not Right and will likely fail on 
  * non-intel platforms as it is now, needs fixing */
-static inline unsigned long
+static __inline unsigned long
 trans_point(struct state *st,
             int x1, int y1, unsigned long myc, float a, 
             struct field *f) 
@@ -399,7 +399,7 @@ trans_point(struct state *st,
     return f->bgcolor;
 }
 
-static inline void 
+static __inline void 
 region_color(struct state *st, GC fgc, struct field *f, crack *cr) 
 {
     /* synthesis of Crack::regionColor() and SandPainter::render() */
@@ -514,7 +514,7 @@ static void build_substrate(struct field *f)
 }
 
 
-static inline void
+static __inline void
 movedrawcrack(struct state *st, GC fgc, struct field *f, int cracknum) 
 {
     /* Basically Crack::move() */

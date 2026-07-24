@@ -513,7 +513,7 @@ static void glow_blur(struct state *st)
 	}
 }
 
-static inline unsigned char addbs(unsigned char c, unsigned int i)
+static __inline unsigned char addbs(unsigned char c, unsigned int i)
 {
 	i += c;
 	return(i > 255 ? 255 : i);

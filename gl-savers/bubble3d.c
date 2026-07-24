@@ -53,10 +53,10 @@ typedef struct bubble {
 
 /* Should be taken care of already... but just in case */
 #if !defined( __GNUC__ ) && !defined(__cplusplus) && !defined(c_plusplus)
-#undef inline
-#define inline			/* */
+#undef __inline
+#define __inline			/* */
 #endif
-static inline void
+static __inline void
 normalize(GLfloat v[3])
 {
 	GLfloat     d = (GLfloat) sqrt((double) (v[0] * v[0] + v[1] * v[1] +
@@ -71,13 +71,13 @@ normalize(GLfloat v[3])
 	}
 }
 
-static inline GLfloat
+static __inline GLfloat
 dotprod(GLfloat * v1, GLfloat * v2)
 {
 	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
 
-static inline GLfloat
+static __inline GLfloat
 max(GLfloat a, GLfloat b)
 {
 	return a > b ? a : b;

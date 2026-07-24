@@ -57,11 +57,11 @@
 #ifdef _WIN32
     #define XFillRectangle XFillRectangleSimplified /* hacked by katahiromz */
 #endif
-/* this program goes faster if some functions are inline.  The following is
+/* this program goes faster if some functions are __inline.  The following is
  * borrowed from ifs.c */
 #if !defined( __GNUC__ ) && !defined(__cplusplus) && !defined(c_plusplus)
-#undef inline
-#define inline			/* */
+#undef __inline
+#define __inline			/* */
 #endif
 
 #ifndef MIN
@@ -279,7 +279,7 @@ init_field(void)
 
 /* Consider rewriting with XQueryColor, or ImageByteOrder */
 
-static inline void point2rgb(int depth, unsigned long c, int *r, int *g, int *b) 
+static __inline void point2rgb(int depth, unsigned long c, int *r, int *g, int *b) 
 {
     switch(depth) 
     {
@@ -312,7 +312,7 @@ static inline void point2rgb(int depth, unsigned long c, int *r, int *g, int *b)
     }
 }
 
-static inline unsigned long rgb2point(int depth, int r, int g, int b) 
+static __inline unsigned long rgb2point(int depth, int r, int g, int b) 
 {
     unsigned long ret = 0;
 
@@ -343,7 +343,7 @@ static inline unsigned long rgb2point(int depth, int r, int g, int b)
 
 /* alpha blended point drawing -- this is Not Right and will likely fail on 
  * non-intel platforms as it is now, needs fixing */
-static inline unsigned long trans_point(int x1, int y1, unsigned long myc, double a, 
+static __inline unsigned long trans_point(int x1, int y1, unsigned long myc, double a, 
 				 struct field *f) 
 {
     if (a >= 1.0) 
@@ -375,7 +375,7 @@ static inline unsigned long trans_point(int x1, int y1, unsigned long myc, doubl
     }
 }
 
-static inline void drawPoint(int x, int y, unsigned long color, double intensity,
+static __inline void drawPoint(int x, int y, unsigned long color, double intensity,
 		      Display *dpy, Window window, GC fgc, struct field *f)
 	       
 {
@@ -401,7 +401,7 @@ static inline void drawPoint(int x, int y, unsigned long color, double intensity
     #endif
 }
 
-static inline void paint(SandPainter* painter, double ax, double ay, double bx, double by,
+static __inline void paint(SandPainter* painter, double ax, double ay, double bx, double by,
 		  Display *dpy, Window window, GC fgc, 
 		  struct field *f)
 {

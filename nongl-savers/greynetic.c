@@ -32,7 +32,7 @@ static argtype vars[] =
 };
 
 /* On some systems (notably MacOS X) these files are messed up.
- * They're tiny, so we might as well just inline them here.
+ * They're tiny, so we might as well just __inline them here.
  *
  * # include <X11/bitmaps/stipple>
  * # include <X11/bitmaps/cross_weave>

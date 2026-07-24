@@ -324,7 +324,7 @@ typedef XGCValues *GC;
 
 #define XGetGCValues_(gc) gc
 
-static inline HDC XCreateDrawableDC_(Display *dpy, Drawable d)
+static __inline HDC XCreateDrawableDC_(Display *dpy, Drawable d)
 {
     HDC hdc;
 
@@ -342,7 +342,7 @@ static inline HDC XCreateDrawableDC_(Display *dpy, Drawable d)
     return hdc;
 }
 
-static inline int XDeleteDrawableDC_(Display *dpy, Drawable d, HDC hdc)
+static __inline int XDeleteDrawableDC_(Display *dpy, Drawable d, HDC hdc)
 {
     if (d != NULL)
     {
@@ -448,7 +448,7 @@ typedef struct
 
 extern ColormapData colormaps[MAX_COLORMAP];
 
-static inline int XQueryColor(Display *dpy, Colormap cmap, XColor *def)
+static __inline int XQueryColor(Display *dpy, Colormap cmap, XColor *def)
 {
     int pixel;
     assert(def != NULL);
@@ -464,7 +464,7 @@ static inline int XQueryColor(Display *dpy, Colormap cmap, XColor *def)
     return 0;
 }
 
-static inline int XSetForeground(Display *dpy, GC gc, unsigned long foreground)
+static __inline int XSetForeground(Display *dpy, GC gc, unsigned long foreground)
 {
     XColor color;
     XGCValues *values;
@@ -577,7 +577,7 @@ int XDrawLine(Display *dpy, Drawable d, GC gc,
 int XDrawLines(Display *dpy, Drawable d, GC gc,
     XPoint *points, int npoints, int mode);
 
-static inline int XDrawRectangle(
+static __inline int XDrawRectangle(
     Display *dpy, Drawable d, GC gc,
     int x, int y, unsigned int width, unsigned int height)
 {
@@ -608,7 +608,7 @@ static inline int XDrawRectangle(
     return 0;
 }
 
-static inline int XDrawRectangleSimplified(
+static __inline int XDrawRectangleSimplified(
     Display *dpy, Drawable d, GC gc,
     int x, int y, unsigned int width, unsigned int height)
 {
@@ -653,7 +653,7 @@ int XDrawString(Display *dpy, Drawable d, GC gc,
 int XDrawImageString(Display *dpy, Drawable d, GC gc,
     int x, int y, const char *string, int length);
 
-static inline int XFillRectangle(
+static __inline int XFillRectangle(
     Display *dpy, Drawable d, GC gc,
     int x, int y, unsigned int width, unsigned int height)
 {
@@ -692,7 +692,7 @@ static inline int XFillRectangle(
     return 0;
 }
 
-static inline int XFillRectangleSimplified(
+static __inline int XFillRectangleSimplified(
     Display *dpy, Drawable d, GC gc,
     int x, int y, unsigned int width, unsigned int height)
 {

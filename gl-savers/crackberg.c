@@ -415,7 +415,7 @@ static void trile_calc_smooth_norms(cberg_state *cberg, Trile *new)
     }
 }
 
-static inline void trile_light(cberg_state *cberg, 
+static __inline void trile_light(cberg_state *cberg, 
                                unsigned int x, unsigned int y, 
                                unsigned int which)
 {
@@ -436,7 +436,7 @@ static inline void trile_light(cberg_state *cberg,
     }
 }
 
-static inline void trile_draw_vertex(cberg_state *cberg, unsigned int ix,
+static __inline void trile_draw_vertex(cberg_state *cberg, unsigned int ix,
     unsigned int iy, unsigned int which, double x,double y,
     double zcur, double z1, double z2)
 {
@@ -945,7 +945,7 @@ static void calc_points(cberg_state *cberg, double *x1,double *y1,
 }
 
 /* this is pretty stupid.. */
-static inline void minmax4(double a, double b, double c, double d, 
+static __inline void minmax4(double a, double b, double c, double d, 
   double *min, double *max)
 {
     *min = *max = a;
@@ -1151,7 +1151,7 @@ static const Color *select_color(cberg_state *cberg)
 
 
 /* simple one for now.. */
-static inline double drunken_rando(double cur_val, double max, double width)
+static __inline double drunken_rando(double cur_val, double max, double width)
 {
     double r = random() / (double) RAND_MAX * 2;
     if (cur_val > 0)

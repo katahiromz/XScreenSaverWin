@@ -186,7 +186,7 @@ static GLvoid normal(GLfloat [], GLfloat [], GLfloat [],
  * To avoid going completely insane, we also reorder these so the newly 
  * renumbered cylinder 0 is always first: 0-3-4-1-2-5
  *   
- * For a flat 6, the included angle is 180 degrees (0 would be a inline
+ * For a flat 6, the included angle is 180 degrees (0 would be a __inline
  * engine).  Because these are all four-stroke engines, each piston goes
  * through 720 degrees of rotation for each time the spark plug sparks,
  * so in this case, we would use the following angles:
@@ -806,7 +806,7 @@ static int makeshaft (Engine *e)
   polys += rod(e, -2, 0, 0, 2, crankDiam);
 
   /* Each crank is crankWidth units wide and the total width of a
-   * cylinder assembly is 3.3 units. For inline engines, there is just
+   * cylinder assembly is 3.3 units. For __inline engines, there is just
    * a single crank per cylinder width.  For other engine
    * configurations, there is a crank between each pair of adjacent
    * cylinders on one side of the engine, so the crankOffset length is

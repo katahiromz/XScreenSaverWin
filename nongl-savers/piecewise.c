@@ -19,8 +19,8 @@
 #endif /* HAVE_DOUBLE_BUFFER_EXTENSION */
 
 #if !defined( __GNUC__ ) && !defined(__cplusplus) && !defined(c_plusplus)
-#undef inline
-#define inline			/* */
+#undef __inline
+#define __inline			/* */
 #endif
 
 char *background = "black";
@@ -349,7 +349,7 @@ static tree *splay_max(tree *t)
 
 /******** circles and fringe */
 
-static inline double fringe_x(fringe *f, double y)
+static __inline double fringe_x(fringe *f, double y)
 {
   double dy, d;
   dy = f->c->y - y;
@@ -357,7 +357,7 @@ static inline double fringe_x(fringe *f, double y)
   return f->side ? f->c->x + d : f->c->x - d;
   }
 
-static inline void fringe_add_intersection(fringe *f, double x, double y)
+static __inline void fringe_add_intersection(fringe *f, double x, double y)
 {
   f->ni++;
   if (f->mni < f->ni) {
@@ -530,7 +530,7 @@ static void event_shred(event *e)
 
 /******** fringe intersection */
 
-static inline int check_fringe_intersection(double ye, fringe *lo, fringe *hi, double x, double y)
+static __inline int check_fringe_intersection(double ye, fringe *lo, fringe *hi, double x, double y)
 {
   return ye <= y && ((x < lo->c->x) ^ lo->side) && ((x < hi->c->x) ^ hi->side);
   }

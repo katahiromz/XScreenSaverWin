@@ -1395,7 +1395,7 @@ typedef float (*morphFunc)(long);
 #ifdef HAVE_GLUT
 /* forward definitions for GLUT functions */
 static void calc_rotation();
-static inline void ui_mousedrag();
+static __inline void ui_mousedrag();
 #endif
 
 static const GLfloat white_light[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -2440,7 +2440,7 @@ static void calc_rotation()
     rotation[15] = 1.0;
 }
 
-static inline void ui_mousedrag() 
+static __inline void ui_mousedrag() 
 {
     glMultMatrixf(rotation);
 }

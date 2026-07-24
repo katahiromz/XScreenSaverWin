@@ -27,14 +27,14 @@
 #define RAD2DEG		(180.0/3.1415926535)
 
 
-static inline double
+static __inline double
 norm(double *dv)
 {
 	return sqrt(dv[0]*dv[0] + dv[1]*dv[1] + dv[2]*dv[2]);
 }
 
 
-static inline void
+static __inline void
 addVector(double *v, double *d)
 {
 	v[0] += d[0];
@@ -43,14 +43,14 @@ addVector(double *v, double *d)
 }
 
 
-static inline void
+static __inline void
 clearVector(double *v)
 {
 	v[0] = v[1] = v[2] = 0.0;
 }
 
 
-static inline void
+static __inline void
 scaleVector(double *v, double s)
 {
 	v[0] *= s;
@@ -59,7 +59,7 @@ scaleVector(double *v, double s)
 }
 
 
-static inline void
+static __inline void
 addScaledVector(double *v, double *d, double s)
 {
 	v[0] += d[0]*s;
@@ -68,7 +68,7 @@ addScaledVector(double *v, double *d, double s)
 }
 
 
-static inline void
+static __inline void
 getDifferenceVector(double *v0, double *v1, double *diff)
 {
 	diff[0] = v0[0] - v1[0];

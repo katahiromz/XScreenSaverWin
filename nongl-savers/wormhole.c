@@ -99,7 +99,7 @@ struct state {
 };
 
 
-/*inline*/ static int rnd( int q )
+/*__inline*/ static int rnd( int q )
 {
 	if (q < 1) q = 1;
 	return random() % q;

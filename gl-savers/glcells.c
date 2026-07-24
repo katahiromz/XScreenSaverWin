@@ -261,14 +261,14 @@ static void create_nucleus_texture( State *st );
  **********************************/
 /* create random numbers
 */
-static inline int random_interval( int min, int max )
+static __inline int random_interval( int min, int max )
 {
   int n = max - min;
   if (n == 0) n = 1;
   return min+(random()%n);
 }
 
-static inline int random_max( int max )
+static __inline int random_max( int max )
 {
   return random()%max;
 }
@@ -277,7 +277,7 @@ static inline int random_max( int max )
 */
 
 /* a += b */
-static inline void vector_add( Vector *a, Vector *b )
+static __inline void vector_add( Vector *a, Vector *b )
 {
   a->x += b->x;
   a->y += b->y;
@@ -285,7 +285,7 @@ static inline void vector_add( Vector *a, Vector *b )
 }
 
 /* a -= b */
-static inline void vector_sub( Vector *a, Vector *b )
+static __inline void vector_sub( Vector *a, Vector *b )
 {
   a->x -= b->x;
   a->y -= b->y;
@@ -293,7 +293,7 @@ static inline void vector_sub( Vector *a, Vector *b )
 }
 
 /* a *= v */
-static inline void vector_mul( Vector *a, double v )
+static __inline void vector_mul( Vector *a, double v )
 {
   a->x *= v;
   a->y *= v;
@@ -301,19 +301,19 @@ static inline void vector_mul( Vector *a, double v )
 }
 
 /* set to 0 */
-static inline void vector_clear( Vector *vec )
+static __inline void vector_clear( Vector *vec )
 {
   vec->x = vec->y = vec->z = 0;
 }
 
 /* return vector length */
-static inline double vector_length( Vector *vec )
+static __inline double vector_length( Vector *vec )
 {
   return sqrt( vec->x*vec->x + vec->y*vec->y + vec->z*vec->z );
 }
 
 /* normalize vector */
-static inline void vector_normalize( Vector *vec )
+static __inline void vector_normalize( Vector *vec )
 {
   double len = vector_length( vec );
   
@@ -323,7 +323,7 @@ static inline void vector_normalize( Vector *vec )
 }
 
 /* crossproduct */
-static inline void vector_crossprod( Vector *a, Vector *b, Vector *out )
+static __inline void vector_crossprod( Vector *a, Vector *b, Vector *out )
 {
   out->x = a->y*b->z - a->z*b->y;
   out->y = a->z*b->x - a->x*b->z;
@@ -331,7 +331,7 @@ static inline void vector_crossprod( Vector *a, Vector *b, Vector *out )
 }
 
 /* epsilon compare of two vectors */
-static inline int vector_compare( Vector *a, Vector *b )
+static __inline int vector_compare( Vector *a, Vector *b )
 {
   const double epsilon = 0.0000001;
   Vector delta = *a;
@@ -349,7 +349,7 @@ static inline int vector_compare( Vector *a, Vector *b )
 /* check if given cell is capable of dividing 
    needs space, must be old enough, grown up and healthy
 */
-static inline int can_divide( State *st, Cell *cell )
+static __inline int can_divide( State *st, Cell *cell )
 {
   if (cell->min_dist > st->move_dist &&
       cell->age >= st->divide_age &&

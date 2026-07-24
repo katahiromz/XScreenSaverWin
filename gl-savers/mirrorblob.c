@@ -378,7 +378,7 @@ reset_projection(int width, int height)
  * Dot product u.v = |u||v|cos(theta)
  * Where theta = angle between u and v
  */
-static inline double
+static __inline double
 dot (const Vector3D u, const Vector3D v)
 {
   return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
@@ -390,7 +390,7 @@ dot (const Vector3D u, const Vector3D v)
  * Gives a vector perpendicular to u and v with magnitude |u||v|sin(theta)
  * Where theta = angle between u and v
  */
-static inline Vector3D
+static __inline Vector3D
 cross (const Vector3D u, const Vector3D v)
 {
   Vector3D result;
@@ -406,7 +406,7 @@ cross (const Vector3D u, const Vector3D v)
  *
  * Add vector v to vector u
  */
-static inline void
+static __inline void
 add (Vector3D *u, const Vector3D v)
 {
   u->x = u->x + v.x;
@@ -418,7 +418,7 @@ add (Vector3D *u, const Vector3D v)
  *
  * Subtract vector v from vector u
  */
-static inline Vector3D
+static __inline Vector3D
 subtract (const Vector3D u, const Vector3D v)
 {
   Vector3D result;
@@ -434,7 +434,7 @@ subtract (const Vector3D u, const Vector3D v)
  *
  * multiply vector v by scalar s
  */
-static inline Vector3D
+static __inline Vector3D
 scale (const Vector3D v, const double s)
 {
   Vector3D result;
@@ -449,7 +449,7 @@ scale (const Vector3D v, const double s)
  *
  * normalise vector v
  */
-static inline Vector3D
+static __inline Vector3D
 normalise (const Vector3D v)
 {
   Vector3D result;
@@ -507,7 +507,7 @@ quaternion_transform (Quaternion q, GLfloat * transform)
  *
  * Apply a matrix transform to the given vector
  */
-static inline Vector3D
+static __inline Vector3D
 vector_transform (Vector3D u, GLfloat * t)
 {
   Vector3D result;
@@ -1136,7 +1136,7 @@ initialise_blob(mirrorblobstruct *gp,
  *
  * Return the magnitude of the given vector
  */
-static inline double
+static __inline double
 length (Vector3D u)
 {
   return sqrt (u.x * u.x + u.y * u.y + u.z * u.z);

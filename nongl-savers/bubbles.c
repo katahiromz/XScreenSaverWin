@@ -634,7 +634,7 @@ delete_bubble_in_mesh(struct state *st, Bubble *bb, int keep_bubble)
 
 static unsigned long 
 ulongsqrint(int x)
-/* Saves ugly inline code */
+/* Saves ugly __inline code */
 {
   return ((unsigned long)x * (unsigned long)x);
 }

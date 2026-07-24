@@ -34,11 +34,11 @@
 #include <math.h>
 #include "hsv.h"
 
-/* this program goes faster if some functions are inline.  The following is
+/* this program goes faster if some functions are __inline.  The following is
  * borrowed from ifs.c */
 #if !defined( __GNUC__ ) && !defined(__cplusplus) && !defined(c_plusplus)
-#undef inline
-#define inline			/* */
+#undef __inline
+#define __inline			/* */
 #endif
 
 char *background = "black";
@@ -153,7 +153,7 @@ static struct field *init_field(void)
 /* Quick-ref to pixels in the alpha map */
 #define ref_pixel(f, x, y)   ((f)->off_alpha[(y) * (f)->width + (x)])
 
-static inline void make_disc(struct field *f, float x, float y, float vx, float vy, float r) 
+static __inline void make_disc(struct field *f, float x, float y, float vx, float vy, float r) 
 {
     /* Synthesis of Disc::Disc and PxRider::PxRider */
     Disc *nd;
@@ -187,7 +187,7 @@ static inline void make_disc(struct field *f, float x, float y, float vx, float 
 
 
 /* alpha blended point drawing */
-static inline unsigned long
+static __inline unsigned long
 trans_point(struct state *st,
             int x1, int y1, unsigned char myc, float a, struct field *f) 
 {
@@ -205,14 +205,14 @@ trans_point(struct state *st,
     return 0;
 }
 
-static inline unsigned long
+static __inline unsigned long
 get_pixel (struct state *st, unsigned char v)
 {
   return st->colors [v * (st->ncolors-1) / 255].pixel;
 }
 
 
-static inline void move_disc(struct field *f, int dnum) 
+static __inline void move_disc(struct field *f, int dnum) 
 {
     Disc *d = &(f->discs[dnum]);
 
@@ -235,7 +235,7 @@ static inline void move_disc(struct field *f, int dnum)
         d->r += 0.1;
 }
 
-static inline void 
+static __inline void 
 draw_glowpoint(struct state *st, Drawable drawable, 
                GC fgc, struct field *f, float px, float py) 
 {
@@ -255,7 +255,7 @@ draw_glowpoint(struct state *st, Drawable drawable,
     }
 }
 
-static inline void 
+static __inline void 
 moverender_rider(struct state *st, Drawable drawable, 
                  GC fgc, struct field *f, PxRider *rid, 
                  float x, float y, float r) 
@@ -303,7 +303,7 @@ moverender_rider(struct state *st, Drawable drawable,
     }
 }
 
-static inline void 
+static __inline void 
 render_disc(struct state *st, Drawable drawable, GC fgc, struct field *f, int dnum) 
 {
     Disc *di = &(f->discs[dnum]);
@@ -387,7 +387,7 @@ static void build_img(Display *dpy, Window window, struct field *f)
 
 }
 
-static inline void blank_img(Display *dpy, Window window, XWindowAttributes xgwa, GC fgc, struct field *f) 
+static __inline void blank_img(Display *dpy, Window window, XWindowAttributes xgwa, GC fgc, struct field *f) 
 {
     memset(f->off_alpha, 0, sizeof(unsigned char) * f->width * f->height);
 

@@ -256,50 +256,50 @@ struct vertex {
     vertex *next;
 };
 
-static inline void vector_init(vector v, coord x, coord y, coord z)
+static __inline void vector_init(vector v, coord x, coord y, coord z)
 {
     v[0] = x;
     v[1] = y;
     v[2] = z;
 }    
 
-static inline void vector_copy(vector d, vector s)
+static __inline void vector_copy(vector d, vector s)
 {
     d[0] = s[0];
     d[1] = s[1];
     d[2] = s[2];
 }
 
-static inline void vector_add(vector v1, vector v2, vector v)
+static __inline void vector_add(vector v1, vector v2, vector v)
 {
     vector_init(v, v1[0]+v2[0], v1[1]+v2[1], v1[2]+v2[2]);
 }
 
-static inline void vector_add_to(vector v1, vector v2)
+static __inline void vector_add_to(vector v1, vector v2)
 {
     v1[0] += v2[0];
     v1[1] += v2[1];
     v1[2] += v2[2];
 }
 
-static inline void vector_sub(vector v1, vector v2, vector v)
+static __inline void vector_sub(vector v1, vector v2, vector v)
 {
     vector_init(v, v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2]);
 }
 
-static inline void vector_scale(vector v, coord s)
+static __inline void vector_scale(vector v, coord s)
 {
     v[0] *= s;
     v[1] *= s;
     v[2] *= s;
 }
 
-static inline coord dot(vector v1, vector v2)
+static __inline coord dot(vector v1, vector v2)
 {
     return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
 }
 
-static inline void cross(vector v1, vector v2, vector v)
+static __inline void cross(vector v1, vector v2, vector v)
 {
     vector_init(v,
 		v1[1]*v2[2] - v2[1]*v1[2],
@@ -307,17 +307,17 @@ static inline void cross(vector v1, vector v2, vector v)
 		v1[0]*v2[1] - v2[0]*v1[1]);
 }
 
-static inline coord magnitude2(vector v)
+static __inline coord magnitude2(vector v)
 {
     return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
 }
 
-static inline coord magnitude(vector v)
+static __inline coord magnitude(vector v)
 {
     return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
-static inline void normalize(vector v)
+static __inline void normalize(vector v)
 {
     coord mag = 1.0/sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
 
@@ -326,7 +326,7 @@ static inline void normalize(vector v)
     v[2] *= mag;
 }
 
-static inline void normalize_to(vector v, coord m)
+static __inline void normalize_to(vector v, coord m)
 {
     coord mag = 1.0/sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2])/m;
 
@@ -335,7 +335,7 @@ static inline void normalize_to(vector v, coord m)
     v[2] *= mag;
 }
 
-static inline void midpoint(vector v1, vector v2, vector v)
+static __inline void midpoint(vector v1, vector v2, vector v)
 {
     vector_init(v,
 		v1[0] + 0.5 * (v2[0] - v1[0]),
@@ -343,7 +343,7 @@ static inline void midpoint(vector v1, vector v2, vector v)
 		v1[2] + 0.5 * (v2[2] - v1[2]));
 }
 
-static inline hedge *partner(hedge *h) {
+static __inline hedge *partner(hedge *h) {
     if(!h->e)
 	return NULL;
     if(h == h->e->left) {
@@ -650,7 +650,7 @@ static void clownbarf_colorize(solid *s) {
 
 /* Here be the rendering code */
 
-static inline void vertex_calcnormal(vertex *vtx, jigglystruct *js)
+static __inline void vertex_calcnormal(vertex *vtx, jigglystruct *js)
 {
     hedge *start = vtx->h, *h=start;
     
@@ -669,7 +669,7 @@ static inline void vertex_calcnormal(vertex *vtx, jigglystruct *js)
 	vector_scale(vtx->n, js->spooky);
 }
 
-static inline void vertex_render(vertex *vtx, jigglystruct *js)
+static __inline void vertex_render(vertex *vtx, jigglystruct *js)
 {
     glNormal3fv(vtx->n);
     glVertex3fv(vtx->v);
@@ -680,7 +680,7 @@ static inline void vertex_render(vertex *vtx, jigglystruct *js)
  * see what the cost is of calling glBegin/glEnd for each
  * triangle.
  */
-static inline int face_render(face *f, jigglystruct *js)
+static __inline int face_render(face *f, jigglystruct *js)
 {
     hedge *h1, *h2, *hend;
     int polys = 0;

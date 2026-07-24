@@ -21,7 +21,7 @@ extern Bool mono_p;
     #define fprintf screenhack_fprintf
 #endif
 
-#define inline  /*empty*/
+#define __inline  /*empty*/
 #define GETTIMEOFDAY_TWO_ARGS 1
 
 //////////////////////////////////////////////////////////////////////////////

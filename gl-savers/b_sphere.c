@@ -32,10 +32,10 @@ struct glb_data {
 
 /* Should be taken care of already... but just in case */
 #if !defined( __GNUC__ ) && !defined(__cplusplus) && !defined(c_plusplus)
-#undef inline
-#define inline			/* */
+#undef __inline
+#define __inline			/* */
 #endif
-static inline int
+static __inline int
 close_enough(const GLfloat * v1, const GLfloat * v2)
 {
 	return fabs((double) (v1[0] - v2[0])) <= EPSILON &&
@@ -46,7 +46,7 @@ close_enough(const GLfloat * v1, const GLfloat * v2)
 #define INCR(n) ((n == 0) ? (n = 1) : (n *= 2))
 #define INCR_ALLOCATION(a, n, t) (a = (t *) realloc (a, INCR (n) * sizeof (t)))
 
-static inline GLuint
+static __inline GLuint
 save_vertex(glb_data *d, const GLfloat * v)
 {
 	int         i;
@@ -71,7 +71,7 @@ save_vertex(glb_data *d, const GLfloat * v)
 	return d->nr_vertices++;
 }
 
-static inline GLuint
+static __inline GLuint
 save_triangle(glb_data *d, GLuint v1, GLuint v2, GLuint v3)
 {
 	if (d->nr_triangles_allocated <= d->nr_triangles) {
@@ -87,7 +87,7 @@ save_triangle(glb_data *d, GLuint v1, GLuint v2, GLuint v3)
 	return d->nr_triangles++;
 }
 
-static inline void
+static __inline void
 normalize(GLfloat v[3])
 {
 	GLfloat     d = (GLfloat) sqrt((double) (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]));

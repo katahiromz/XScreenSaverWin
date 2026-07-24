@@ -225,7 +225,7 @@ static boxedstruct *boxed = NULL;
 /*
  * Add 2 vectors
  */ 
-static inline void addvectors(vectorf *dest, vectorf *s1, vectorf *s2) 
+static __inline void addvectors(vectorf *dest, vectorf *s1, vectorf *s2) 
 {
    dest->x = s1->x + s2->x;
    dest->y = s1->y + s2->y;
@@ -235,7 +235,7 @@ static inline void addvectors(vectorf *dest, vectorf *s1, vectorf *s2)
 /*
  * Sub 2 vectors
  */ 
-static inline void subvectors(vectorf *dest, vectorf* s1, vectorf *s2) 
+static __inline void subvectors(vectorf *dest, vectorf* s1, vectorf *s2) 
 {
    dest->x = s1->x - s2->x;
    dest->y = s1->y - s2->y;
@@ -245,7 +245,7 @@ static inline void subvectors(vectorf *dest, vectorf* s1, vectorf *s2)
 /*
  * Multiply vector with scalar (scale vector)
  */ 
-static inline void scalevector(vectorf *dest, vectorf *source, GLfloat sc)
+static __inline void scalevector(vectorf *dest, vectorf *source, GLfloat sc)
 {
    dest->x = source->x * sc;
    dest->y = source->y * sc;
@@ -255,7 +255,7 @@ static inline void scalevector(vectorf *dest, vectorf *source, GLfloat sc)
 /*
  * Copy vector
  */
-static inline void copyvector(vectorf *dest, vectorf* source) 
+static __inline void copyvector(vectorf *dest, vectorf* source) 
 {
    dest->x = source->x;
    dest->y = source->y;
@@ -263,19 +263,19 @@ static inline void copyvector(vectorf *dest, vectorf* source)
 }
 
 
-static inline GLfloat
+static __inline GLfloat
 dotproduct(vectorf * v1, vectorf * v2)
 {
    return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z;
 }
 
-static inline GLfloat
+static __inline GLfloat
 squaremagnitude(vectorf * v)
 {
    return v->x * v->x + v->y * v->y + v->z * v->z;
 }
 
-static inline GLfloat
+static __inline GLfloat
 squaremagnitudehorz(vectorf * v)
 {
    return v->x * v->x + v->z * v->z;

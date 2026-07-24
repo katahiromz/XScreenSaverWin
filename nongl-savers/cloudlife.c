@@ -36,11 +36,11 @@
 #include <time.h>
 #endif
 
-/* this program goes faster if some functions are inline.  The following is
+/* this program goes faster if some functions are __inline.  The following is
  * borrowed from ifs.c */
 #if !defined( __GNUC__ ) && !defined(__cplusplus) && !defined(c_plusplus)
-#undef inline
-#define inline			/* */
+#undef __inline
+#define __inline			/* */
 #endif
 
 char *background = "black";
@@ -148,14 +148,14 @@ resize_field(struct field * f, unsigned int w, unsigned int h)
     memset(f->new_cells, 0, s);
 }
 
-static inline unsigned char 
+static __inline unsigned char 
 *cell_at(struct field * f, unsigned int x, unsigned int y)
 {
     return (f->cells + x * sizeof(unsigned char) + 
                        y * f->width * sizeof(unsigned char));
 }
 
-static inline unsigned char 
+static __inline unsigned char 
 *new_cell_at(struct field * f, unsigned int x, unsigned int y)
 {
     return (f->new_cells + x * sizeof(unsigned char) + 
@@ -200,7 +200,7 @@ draw_field(struct state *st, struct field * f)
     }
 }
 
-static inline unsigned int 
+static __inline unsigned int 
 cell_value(unsigned char c, unsigned int age)
 {
     if (!c) {
@@ -212,7 +212,7 @@ cell_value(unsigned char c, unsigned int age)
     }
 }
 
-static inline unsigned int 
+static __inline unsigned int 
 is_alive(struct field * f, unsigned int x, unsigned int y)
 {
     unsigned int count;
