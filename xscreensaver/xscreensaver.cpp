@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "xscreensaver.h"
 
-#define MAX_LOADSTRING 100
+#define MAX_LOADSTRING 256
 
 HINSTANCE hInst;
 TCHAR szTitle[MAX_LOADSTRING];
@@ -243,11 +243,7 @@ VOID OnInitDialog(HWND hDlg)
             HANDLE hFind2 = FindFirstFile(szPath2, &find2);
             if (hFind2 != INVALID_HANDLE_VALUE)
             {
-                COMBOBOXEXITEM item;
-                item.mask = CBEIF_TEXT;
-                item.iItem = -1;
-                item.pszText = find2.cFileName;
-                SendMessage(hCombo, CBEM_INSERTITEM, 0, (LPARAM)&item);
+                SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)find2.cFileName);
                 FindClose(hFind2);
             }
         } while (FindNextFile(hFind, &find));
@@ -263,11 +259,7 @@ VOID OnInitDialog(HWND hDlg)
         {
             do
             {
-                COMBOBOXEXITEM item;
-                item.mask = CBEIF_TEXT;
-                item.iItem = -1;
-                item.pszText = find.cFileName;
-                SendMessage(hCombo, CBEM_INSERTITEM, 0, (LPARAM)&item);
+                SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)find.cFileName);
             } while (FindNextFile(hFind, &find));
             FindClose(hFind);
         }
@@ -282,6 +274,18 @@ VOID OnInitDialog(HWND hDlg)
     }
     else
     {
+        TCHAR szBuff[MAX_PATH] = TEXT("");
+        HKEY hKey;
+        RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\XScreenSaverWin"),
+                     0, KEY_READ, &hKey);
+        if (hKey)
+        {
+            DWORD cbBuff = sizeof(szBuff);
+            RegQueryValueEx(hKey, TEXT("CurSel"), NULL, NULL, (PBYTE)szBuff, &cbBuff);
+            szBuff[sizeof(szBuff) / sizeof(WCHAR) - 1] = 0;
+            RegCloseKey(hKey);
+        }
+
         INT i = 0;
         LPTSTR name = get_registered_screen_saver();
         if (name)
@@ -296,11 +300,41 @@ VOID OnInitDialog(HWND hDlg)
             if (i == nCount)
                 i = 0;
         }
+        else if (szBuff[0])
+        {
+            TCHAR szName[MAX_PATH];
+            for (i = 0; i < nCount; i++)
+            {
+                SendMessage(hCombo, CB_GETLBTEXT, i, (LPARAM)szName);
+                if (lstrcmpi(szName, szBuff) == 0)
+                    break;
+            }
+            if (i == nCount)
+                i = 0;
+        }
         SendMessage(hCombo, CB_SETCURSEL, i, 0);
         OnTestOnWindow(hDlg);
     }
 
     CenterDialog(hDlg);
+}
+
+void OnDestroy(HWND hwnd)
+{
+    HWND hCombo = GetDlgItem(hwnd, ID_COMBO);
+
+    TCHAR szName[MAX_PATH];
+    INT nIndex = (INT)(INT_PTR)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
+    SendMessage(hCombo, CB_GETLBTEXT, nIndex, (LPARAM)szName);
+
+    HKEY hKey;
+    RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\XScreenSaverWin"),
+                   0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
+    if (hKey)
+    {
+        RegSetValueEx(hKey, TEXT("CurSel"), 0, REG_SZ, (PBYTE)szName, (lstrlen(szName) + 1) * sizeof(TCHAR));
+        RegCloseKey(hKey);
+    }
 }
 
 INT_PTR CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -342,6 +376,10 @@ INT_PTR CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
             }
             break;
         }
+        break;
+
+    case WM_DESTROY:
+        OnDestroy(hDlg);
         break;
     }
     return FALSE;

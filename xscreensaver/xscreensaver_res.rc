@@ -1,132 +1,120 @@
+// xscreensaver_res.rc
+// このファイルは リソーエディタ 6.0.7 によって自動生成されました。
+// † <-- このダガー記号は、UTF-8の検出に役立ちます。
+//////////////////////////////////////////////////////////////////////////////
+// TEXTINCLUDE 1 から生成されました
+
 #include "resource.h"
 
-#define APSTUDIO_READONLY_SYMBOLS
-#ifndef APSTUDIO_INVOKED
-#include "targetver.h"
-#endif
+//////////////////////////////////////////////////////////////////////////////
+// TEXTINCLUDE 2 から生成されました
+
 #define APSTUDIO_HIDDEN_SYMBOLS
-#include "windows.h"
+#include <windows.h>
+#include <commctrl.h>
+#include <richedit.h>
 #undef APSTUDIO_HIDDEN_SYMBOLS
-#undef APSTUDIO_READONLY_SYMBOLS
 
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
+//////////////////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////////////////////
-// Version Info
+#pragma code_page(932) // Japan
 
-VS_VERSION_INFO VERSIONINFO
+//////////////////////////////////////////////////////////////////////////////
+
+LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_DIALOG
+
+1 DIALOGEX 0, 0, 215, 180
+CAPTION "XScreenSaver for Windows v0.84"
+STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
+FONT 9, "Arial", 0, 0, 1 // DEFAULT_CHARSET
+{
+    CONTROL "", ID_PREVIEW, "STATIC", SS_BLACKRECT | WS_GROUP, 5, 5, 200, 120
+    LTEXT "&Select ScreenSaver:", -1, 5, 130, 205, 10
+    CONTROL "(Select ScreenSaver)", ID_COMBO, "COMBOBOX", CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP, 5, 140, 205, 125
+    PUSHBUTTON "&Install", ID_INSTALL, 5, 160, 60, 14
+    PUSHBUTTON "&Configure", ID_CONFIGURE, 70, 160, 60, 14
+    PUSHBUTTON "&Test", ID_TEST, 150, 160, 60, 14
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_GROUP_ICON
+
+1 ICON "res/1033_Icon_1.ico"
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_VERSION
+
+1 VERSIONINFO
 FILEVERSION     0, 8, 4, 0
 PRODUCTVERSION  0, 8, 4, 0
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
-BEGIN
-    // English (U.S.)
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904E4"
-        BEGIN
-            VALUE "CompanyName", "Katayama Hirofumi MZ\0"
-            VALUE "FileDescription", "XScreenSaverWin\0"
-            VALUE "FileVersion", "0.84\0"
-            VALUE "LegalCopyright", "Copyright (C) 2015-2017 Katayama Hirofumi MZ.\0"
-            VALUE "ProductName", "XScreenSaverWin\0"
-            VALUE "ProductVersion", "0.84\0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        // English (U.S.)
-        VALUE "Translation", 0x0409, 0x04E4
-    END
-END
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icons
-//
-
-1 ICON         "..\\XScreenSaver.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialogs
-//
-
-1 DIALOGEX 0, 0, 215, 180
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "XScreenSaver for Windows v0.84"
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-FONT 9, "Arial"
 {
-    CONTROL "", ID_PREVIEW, "STATIC", SS_BLACKRECT | WS_CHILD | WS_VISIBLE | WS_GROUP, 5, 5, 200, 120
-    CONTROL "&Select ScreenSaver:", -1, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 5, 130, 205, 10
-    CONTROL "(Select ScreenSaver)", ID_COMBO, "ComboBoxEx32", CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_TABSTOP | WS_VSCROLL | WS_VISIBLE | WS_CHILD, 5, 140, 205, 125
-    CONTROL "&Install", ID_INSTALL, "BUTTON", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 5, 160, 60, 14
-    CONTROL "&Configure", ID_CONFIGURE, "BUTTON", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 70, 160, 60, 14
-    CONTROL "&Test", ID_TEST, "BUTTON", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 150, 160, 60, 14
+    BLOCK "StringFileInfo"
+    {
+        BLOCK "040904E4" // en_US, Multilingual
+        {
+            VALUE "CompanyName", "Katayama Hirofumi MZ"
+            VALUE "FileDescription", "XScreenSaverWin"
+            VALUE "FileVersion", "0.84"
+            VALUE "LegalCopyright", "Copyright (C) 2015-2017 Katayama Hirofumi MZ."
+            VALUE "ProductName", "XScreenSaverWin"
+            VALUE "ProductVersion", "0.84"
+        }
+    }
+    BLOCK "VarFileInfo"
+    {
+        VALUE "Translation", 0x0409, 0x04E4
+    }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_ABOUTBOX, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 163
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 55
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-1 TEXTINCLUDE
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE
-BEGIN
-	"#ifndef APSTUDIO_INVOKED\r\n"
-    "#include ""targetver.h""\r\n"
-    "#endif\r\n"
-    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
-    "#include ""windows.h""\r\n"
-    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
+//////////////////////////////////////////////////////////////////////////////
+// RT_STRING
 
 STRINGTABLE
-BEGIN
-   IDC_XSCREENSAVER   "XSCREENSAVER"
-   IDS_APP_TITLE       "xscreensaver"
-END
+{
+    IDS_APP_TITLE "xscreensaver"
+    109 "XSCREENSAVER"
+}
 
-/////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+// TEXTINCLUDE
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+
+#ifdef APSTUDIO_INVOKED
+
+1 TEXTINCLUDE
+{
+    "resource.h\0"
+}
+
+2 TEXTINCLUDE
+{
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include <windows.h>\r\n"
+    "#include <commctrl.h>\r\n"
+    "#include <richedit.h>\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "\0"
+}
+
+3 TEXTINCLUDE
+{
+    "\r\n"
+    "\0"
+}
+
+#endif // def APSTUDIO_INVOKED
+
+//////////////////////////////////////////////////////////////////////////////
+// TEXTINCLUDE 3 から生成されました
 
 #ifndef APSTUDIO_INVOKED
-#endif    // ndef APSTUDIO_INVOKED
+
+#endif // ndef APSTUDIO_INVOKED
+
+//////////////////////////////////////////////////////////////////////////////
