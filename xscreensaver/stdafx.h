@@ -10,12 +10,8 @@
 #include <shellapi.h>
 #include <tchar.h>
 
-#ifdef __cplusplus
-    #include <cstdlib>
-    #include <cstdio>
-    #include <cstring>
-#else
-    #include <stdlib.h>
-    #include <stdio.h>
-    #include <string.h>
-#endif
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+
+#include "resource.h"

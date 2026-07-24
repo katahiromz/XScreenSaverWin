@@ -1,16 +1,14 @@
 // xscreensaver.cpp --- XScreenSaverWin screensaver front-end
 // Author: katahiromz
 // License: GPL v3
-// Copyright (C) 2013-2026 Katayama Hirofumi MZ.
+// Copyright (C) 2013-2026 Katayama Hirofumi MZ
 #include "stdafx.h"
-#include "xscreensaver.h"
-#include <commctrl.h>
 
 #define MAX_LOADSTRING 256
 #define RESTART_TIMER_ID 999
 
-HINSTANCE g_hInst = NULL;
-WNDPROC g_fnOldPreviewWndProc = NULL;
+static HINSTANCE g_hInst = NULL;
+static WNDPROC g_fnOldPreviewWndProc = NULL;
 
 static LPTSTR GetScreenSaverPath(HWND hwnd)
 {
@@ -328,17 +326,22 @@ static void OnDestroy(HWND hwnd)
     }
 }
 
+static void RestartIfNotRunning(HWND hwnd)
+{
+    HWND hPreview = GetDlgItem(hwnd, ID_PREVIEW);
+    HWND hChild = GetWindow(hPreview, GW_CHILD);
+    if (hChild == NULL)
+    {
+        KillTimer(hwnd, RESTART_TIMER_ID);
+        OnTestOnWindow(hwnd);
+    }
+}
+
 static void OnTimer(HWND hwnd, UINT id)
 {
     if (id == RESTART_TIMER_ID)
     {
-        HWND hPreview = GetDlgItem(hwnd, ID_PREVIEW);
-        HWND hChild = GetWindow(hPreview, GW_CHILD);
-        if (hChild == NULL)
-        {
-            KillTimer(hwnd, id);
-            OnTestOnWindow(hwnd);
-        }
+        RestartIfNotRunning(hwnd);
     }
 }
 
@@ -374,14 +377,23 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     }
 }
 
-static INT_PTR CALLBACK
-DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+static void OnActivate(HWND hwnd, UINT state, HWND hwndActDeact, BOOL fMinimized)
 {
-    switch (message)
+    if (state == WA_ACTIVE || state == WA_CLICKACTIVE)
+    {
+        RestartIfNotRunning(hwnd);
+    }
+}
+
+static INT_PTR CALLBACK
+DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
     {
         HANDLE_MSG(hwnd, WM_INITDIALOG, OnInitDialog);
         HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
         HANDLE_MSG(hwnd, WM_TIMER, OnTimer);
+        HANDLE_MSG(hwnd, WM_ACTIVATE, OnActivate);
         HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
     }
     return 0;
@@ -389,16 +401,17 @@ DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 static BOOL InitInstance(HINSTANCE hInstance, INT nCmdShow)
 {
+    UNREFERENCED_PARAMETER(nCmdShow);
     InitCommonControls();
     g_hInst = hInstance;
     return TRUE;
 }
 
 INT WINAPI
-_tWinMain(HINSTANCE hInstance,
-          HINSTANCE hPrevInstance,
-          LPTSTR    lpCmdLine,
-          INT       nCmdShow)
+WinMain(HINSTANCE hInstance,
+        HINSTANCE hPrevInstance,
+        LPSTR     lpCmdLine,
+        INT       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
