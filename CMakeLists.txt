@@ -65,9 +65,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     endforeach()
 endif()
 
-# enable Win32 resource
-enable_language(RC)
-
 ##############################################################################
 
 find_package(OpenGL)
