@@ -10,14 +10,14 @@ AntInspect              Good
 AntMaze                 Good        
 AntSpotlight            Good        
 Apollonian              Good        
-Apple2                  NG          Bad drawing
+Apple2                  Bad         Bad drawing
 Atlantis                Good        
 Attraction              Good        
 Atunnel                 Good        
 Barcode                 OK          Not colorful
 Blaster                 Good        
 BlinkBox                Good        
-BlitSpin                NG          Black out
+BlitSpin                Bad         Black out
 BlockTube               Good        
 Boing                   Good        
 Bouboule                Good        
@@ -74,7 +74,7 @@ Flow                    Good
 FluidBalls              Good        
 Flurry                  Good        
 FlyingToasters          Good        
-FontGlide               NG          Not implemented yet
+FontGlide               Bad         Not implemented yet
 Forest                  Good        
 FuzzyFlakes             Good        
 Galaxy                  OK          Flickers and slow
@@ -96,7 +96,7 @@ Goop                    OK          Transparency disabled
 Grav                    Good        
 Greynetic               Good        
 Halftone                Good        
-Halo                    NG          Too slow
+Halo                    Bad         Too slow
 Helix                   Good        
 Hexadrop                Good        
 Hilbert                 Good        
@@ -134,11 +134,11 @@ Maze                    Good
 MemScroller             Good        
 Menger                  Good        
 MetaBalls               Good        
-MirrorBlob              NG          Blur and slow
+MirrorBlob              Bad         Blur and slow
 Moebius                 Good        
 MoebiusGears            Good        
 Moire                   Good        
-Moire2                  NG          Slow and bad drawing
+Moire2                  Bad         Slow and bad drawing
 Molecule                Good        
 Morph3D                 Good        
 Mountain                Good        
@@ -153,7 +153,7 @@ Penrose                 Good
 Petri                   Good        
 Phosphor                Good        
 Photopile               Good        
-Piecewise               NG          Bad drawing
+Piecewise               Bad         Bad drawing
 Pinion                  Good        
 Pipes                   Good        
 Polyhedra               Good        
@@ -163,9 +163,9 @@ Pong                    Good
 PopSquares              Good        
 Providence              Good        
 Pulsar                  Good        
-Pyro                    NG          Slow and flickers
-Qix                     NG          Transparency disabled
-QuasiCrystal            NG          Black out
+Pyro                    Bad         Slow and flickers
+Qix                     Bad         Transparency disabled
+QuasiCrystal            Bad         Black out
 Queens                  Good        
 RDbomb                  OK          Slow
 Ripples                 Good        
@@ -175,12 +175,12 @@ Rotor                   Good
 RotZoomer               Good        
 Rubik                   Good        
 RubikBlocks             Good        
-SBalls                  Good        
+SBalls                  Bad         Sometimes slow
 ShadeBobs               Good        
 Sierpinski              Good        
 Sierpinski3D            Good        
 SkyTentacles            Good        
-SlideScreen             NG          Black out
+SlideScreen             Bad         Black out
 Slip                    Good        
 Sonar                   Good        
 SpeedMine               Good        
@@ -199,10 +199,10 @@ Substrate               Good
 Superquadrics           Good        
 Surfaces                Good        
 Swirl                   Good        
-T3D                     NG          Bad drawing
+T3D                     Bad         Bad drawing
 Tangram                 Good        
 Thornbird               Good        
-TimeTunnel              NG          Bad drawing
+TimeTunnel              Bad         Bad drawing
 TopBlock                Good        
 Triangle                Good        
 TronBit                 Good        
@@ -215,7 +215,7 @@ Voronoi                 Good
 Wander                  Good        
 WhirlWindWarp           Good        
 Whirlygig               Good        
-Worm                    NG          Bad drawing
+Worm                    Bad         Bad drawing
 Wormhole                Good        
 XAnalogTV               Good        
 XFlame                  Good        
