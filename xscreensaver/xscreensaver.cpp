@@ -9,8 +9,9 @@
 #define RESTART_TIMER_ID 999
 
 HINSTANCE g_hInst = NULL;
+WNDPROC g_fnOldPreviewWndProc = NULL;
 
-LPTSTR GetScreenSaverPath(HWND hwnd)
+static LPTSTR GetScreenSaverPath(HWND hwnd)
 {
     HWND hCombo = GetDlgItem(hwnd, ID_COMBO);
 
@@ -48,7 +49,7 @@ LPTSTR GetScreenSaverPath(HWND hwnd)
     return NULL;
 }
 
-VOID CenterDialog(HWND hwnd)
+static VOID CenterDialog(HWND hwnd)
 {
     POINT pt;
     HWND hwndOwner;
@@ -81,7 +82,7 @@ VOID CenterDialog(HWND hwnd)
     SendMessage(hwnd, DM_REPOSITION, 0, 0);
 }
 
-BOOL Execute(HWND hwnd, LPCTSTR program, LPCTSTR params)
+static BOOL Execute(HWND hwnd, LPCTSTR program, LPCTSTR params)
 {
     HWND hPreview = GetDlgItem(hwnd, ID_PREVIEW);
     HWND hChild = GetWindow(hPreview, GW_CHILD);
@@ -110,17 +111,17 @@ BOOL Execute(HWND hwnd, LPCTSTR program, LPCTSTR params)
     return ret;
 }
 
-VOID OnConfigure(HWND hwnd)
+static __inline VOID OnConfigure(HWND hwnd)
 {
     Execute(hwnd, GetScreenSaverPath(hwnd), NULL);
 }
 
-VOID OnTest(HWND hwnd)
+static __inline VOID OnTest(HWND hwnd)
 {
     Execute(hwnd, GetScreenSaverPath(hwnd), TEXT("/S"));
 }
 
-VOID OnTestOnWindow(HWND hwnd)
+static VOID OnTestOnWindow(HWND hwnd)
 {
     HWND hPreview = GetDlgItem(hwnd, ID_PREVIEW);
     TCHAR szParams[MAX_PATH];
@@ -128,7 +129,7 @@ VOID OnTestOnWindow(HWND hwnd)
     Execute(hwnd, GetScreenSaverPath(hwnd), szParams);
 }
 
-VOID OnInstall(HWND hwnd)
+static VOID OnInstall(HWND hwnd)
 {
     LPTSTR pszPath = GetScreenSaverPath(hwnd);
 
@@ -137,7 +138,7 @@ VOID OnInstall(HWND hwnd)
     Execute(hwnd, TEXT("rundll32.exe"), szParams);
 }
 
-LPTSTR get_registered_screen_saver(void)
+static LPTSTR get_registered_screen_saver(void)
 {
     HKEY hKey;
     LONG result;
@@ -170,9 +171,7 @@ LPTSTR get_registered_screen_saver(void)
     return s_buf[0] ? s_buf : NULL;
 }
 
-WNDPROC fnOldPreviewWndProc = NULL;
-
-LRESULT CALLBACK
+static LRESULT CALLBACK
 PreviewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (uMsg == WM_ERASEBKGND)
@@ -193,13 +192,13 @@ PreviewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         EndPaint(hwnd, &ps);
         return 0;
     }
-    return CallWindowProc(fnOldPreviewWndProc, hwnd, uMsg, wParam, lParam);
+    return CallWindowProc(g_fnOldPreviewWndProc, hwnd, uMsg, wParam, lParam);
 }
 
-BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
+static BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
     HWND hwndPreview = GetDlgItem(hwnd, ID_PREVIEW);
-    fnOldPreviewWndProc = SubclassWindow(hwndPreview, PreviewWndProc);
+    g_fnOldPreviewWndProc = SubclassWindow(hwndPreview, PreviewWndProc);
 
     HICON hIcon;
     hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(1));
@@ -310,7 +309,7 @@ BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	return TRUE;
 }
 
-void OnDestroy(HWND hwnd)
+static void OnDestroy(HWND hwnd)
 {
     HWND hCombo = GetDlgItem(hwnd, ID_COMBO);
 
@@ -328,7 +327,7 @@ void OnDestroy(HWND hwnd)
     }
 }
 
-void OnTimer(HWND hwnd, UINT id)
+static void OnTimer(HWND hwnd, UINT id)
 {
     if (id == RESTART_TIMER_ID)
     {
@@ -342,7 +341,7 @@ void OnTimer(HWND hwnd, UINT id)
     }
 }
 
-void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 {
     switch (id)
     {
@@ -374,7 +373,8 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     }
 }
 
-INT_PTR CALLBACK DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK
+DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
@@ -386,16 +386,17 @@ INT_PTR CALLBACK DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
     return 0;
 }
 
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+static BOOL InitInstance(HINSTANCE hInstance, INT nCmdShow)
 {
     g_hInst = hInstance;
     return TRUE;
 }
 
-int APIENTRY _tWinMain(HINSTANCE hInstance,
-                     HINSTANCE hPrevInstance,
-                     LPTSTR    lpCmdLine,
-                     int       nCmdShow)
+INT WINAPI
+_tWinMain(HINSTANCE hInstance,
+          HINSTANCE hPrevInstance,
+          LPTSTR    lpCmdLine,
+          INT       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
