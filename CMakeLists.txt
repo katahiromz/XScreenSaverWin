@@ -11,7 +11,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # project name, version, and languages
-project(XScreenSaverWin VERSION 0.84 LANGUAGES C CXX RC)
+project(XScreenSaverWin VERSION 0.85 LANGUAGES C CXX RC)
 
 # check build type
 if (NOT CMAKE_BUILD_TYPE)

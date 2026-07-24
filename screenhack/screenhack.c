@@ -534,32 +534,66 @@ BOOL CreatePrimaryWindow(INT x, INT y, INT cx, INT cy)
     return FALSE;
 }
 
+// Large multi-monitor setups pay real GDI cost for each StretchBlt of a
+// full-screen mirror, and all timers share the single UI thread with the
+// primary hack_draw call. Sync toward hack_delay for responsiveness, but
+// never go below this floor or big displays start starving the primary
+// draw of CPU time.
+#define SECONDARY_MIN_INTERVAL_MS  200  /* ~5fps mirror rate */
+
+typedef struct SECONDARY_WIN_DATA
+{
+    HDC  hdc;   /* cached window DC, obtained once at WM_CREATE */
+    RECT rc;    /* cached client rect, does not change at runtime */
+} SECONDARY_WIN_DATA, *PSECONDARY_WIN_DATA;
+
 LRESULT CALLBACK
 SecondaryWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    RECT rc;
-    HDC hdc;
+    PSECONDARY_WIN_DATA pData = (PSECONDARY_WIN_DATA)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     switch(uMsg)
     {
     case WM_CREATE:
-        // 300msec
-        SetTimer(hWnd, 999, 300, NULL);
+        {
+            UINT interval = hack_delay / 1000;
+            if (interval < SECONDARY_MIN_INTERVAL_MS)
+                interval = SECONDARY_MIN_INTERVAL_MS;
+            pData = (PSECONDARY_WIN_DATA)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
+                                                   sizeof(SECONDARY_WIN_DATA));
+            if (pData == NULL)
+                return -1;
+            pData->hdc = GetWindowDC(hWnd);
+            GetClientRect(hWnd, &pData->rc);
+            SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pData);
+            // sync toward hack_delay, floored to avoid GDI overload on
+            // large multi-monitor setups
+            SetTimer(hWnd, 999, interval, NULL);
+        }
         break;
 
     case WM_DESTROY:
         KillTimer(hWnd, 999);
+        if (pData)
+        {
+            if (pData->hdc)
+                ReleaseDC(hWnd, pData->hdc);
+            SetWindowLongPtr(hWnd, GWLP_USERDATA, 0);
+            HeapFree(GetProcessHeap(), 0, pData);
+        }
         break;
 
     case WM_TIMER:
-        // copy from primary
-        GetClientRect(hWnd, &rc);
-        hdc = GetWindowDC(hWnd);
-        SetStretchBltMode(hdc, COLORONCOLOR);
-        StretchBlt(
-            hdc, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
-            ss.hdc, 0, 0, ss.width, ss.height, SRCCOPY);
-        ReleaseDC(hWnd, hdc);
+        // copy from primary, using the cached DC/rect
+        if (pData && pData->hdc)
+        {
+            SetStretchBltMode(pData->hdc, COLORONCOLOR);
+            StretchBlt(
+                pData->hdc, pData->rc.left, pData->rc.top,
+                pData->rc.right - pData->rc.left,
+                pData->rc.bottom - pData->rc.top,
+                ss.hdc, 0, 0, ss.width, ss.height, SRCCOPY);
+        }
         break;
 
     case WM_ERASEBKGND:
