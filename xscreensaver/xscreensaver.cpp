@@ -137,18 +137,6 @@ VOID OnInstall(HWND hwnd)
     Execute(hwnd, TEXT("rundll32.exe"), szParams);
 }
 
-#ifndef GetLongPathName
-    #ifdef UNICODE
-        __declspec(dllimport)
-        DWORD WINAPI GetLongPathNameW(LPCTSTR, LPTSTR, DWORD);
-        #define GetLongPathName GetLongPathNameW
-    #else
-        __declspec(dllimport)
-        DWORD WINAPI GetLongPathNameA(LPCTSTR, LPTSTR, DWORD);
-        #define GetLongPathName GetLongPathNameA
-    #endif  // def UNICODE
-#endif
-
 LPTSTR get_registered_screen_saver(void)
 {
     HKEY hKey;
