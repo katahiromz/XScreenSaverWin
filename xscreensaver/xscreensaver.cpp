@@ -80,6 +80,13 @@ VOID CenterDialog(HWND hwnd)
 
 BOOL Execute(HWND hwnd, LPCTSTR program, LPCTSTR params)
 {
+    HWND hPreview = GetDlgItem(hwnd, ID_PREVIEW);
+    HWND hChild = GetWindow(hPreview, GW_CHILD);
+    if (hChild != NULL)
+    {
+        SendMessage(hChild, WM_DESTROY, 0, 0);
+    }
+
     TCHAR szCmdLine[MAX_PATH];
     lstrcpy(szCmdLine, TEXT("\""));
     lstrcat(szCmdLine, program);
@@ -90,15 +97,14 @@ BOOL Execute(HWND hwnd, LPCTSTR program, LPCTSTR params)
     PROCESS_INFORMATION pi;
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
-    BOOL b = CreateProcess(NULL, szCmdLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
-    if (b)
+    BOOL ret = CreateProcess(NULL, szCmdLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
+    if (ret)
     {
-        WaitForInputIdle(pi.hProcess, 1500);
+        WaitForSingleObject(pi.hProcess, 250);
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
-        return TRUE;
     }
-    return FALSE;
+    return ret;
 }
 
 VOID OnConfigure(HWND hDlg)
@@ -114,13 +120,6 @@ VOID OnTest(HWND hDlg)
 VOID OnTestOnWindow(HWND hDlg)
 {
     HWND hPreview = GetDlgItem(hDlg, ID_PREVIEW);
-    HWND hChild = GetWindow(hPreview, GW_CHILD);
-    if (hChild != NULL)
-    {
-        SendMessage(hChild, WM_DESTROY, 0, 0);
-        Sleep(250);
-    }
-
     TCHAR szParams[MAX_PATH];
     wsprintf(szParams, TEXT("/p %u"), (UINT)(UINT_PTR)hPreview);
     Execute(hDlg, GetScreenSaverPath(hDlg), szParams);
