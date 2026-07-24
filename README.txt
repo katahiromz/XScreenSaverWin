@@ -29,7 +29,7 @@ There's limitation of Windows in the numbers of installables at once.
   Katayama Hirofumi MZ (Japanese) katayama.hirofumi.mz@gmail.com
   ------------------------------------------------------------------------
 
- * Katayama Hirofumi MZ (katahiromz) [ARMYANT] 
+ * Katayama Hirofumi MZ (katahiromz) [A.N.T.] 
  * Homepage:
  * http://katahiromz.web.fc2.com/eindex.html
  * BBS: http://katahiromz.bbs.fc2.com/
