@@ -76,6 +76,7 @@ typedef struct
     HBITMAP hbm;
     LPBYTE pbBits;
     HBITMAP hbmOld;
+    HDC hdcCached;
 } DrawableData;
 
 typedef DrawableData* Drawable;
@@ -334,30 +335,37 @@ typedef XGCValues *GC;
 
 static __inline HDC XCreateDrawableDC_(Display *dpy, Drawable d)
 {
-    HDC hdc;
-
     if (d != NULL)
     {
-        hdc = CreateCompatibleDC(dpy);
-        assert(hdc != NULL);
-        d->hbmOld = (HBITMAP)SelectObject(hdc, d->hbm);
+        if (d->hdcCached == NULL)
+        {
+            d->hdcCached = CreateCompatibleDC(dpy);
+            assert(d->hdcCached != NULL);
+            d->hbmOld = (HBITMAP)SelectObject(d->hdcCached, d->hbm);
+        }
+        return d->hdcCached;
     }
-    else
-    {
-        hdc = dpy;
-    }
-
-    return hdc;
+    return dpy;
 }
 
 static __inline int XDeleteDrawableDC_(Display *dpy, Drawable d, HDC hdc)
 {
-    if (d != NULL)
-    {
-        SelectObject(hdc, d->hbmOld);
-        DeleteDC(hdc);
-    }
+    /* Cached */
+    (void)dpy;
+    (void)d;
+    (void)hdc;
     return 0;
+}
+
+static __inline void XDestroyDrawableDC_(Drawable d)
+{
+    if (d && d->hdcCached)
+    {
+        SelectObject(d->hdcCached, d->hbmOld);
+        DeleteDC(d->hdcCached);
+        d->hdcCached = NULL;
+        d->hbmOld = NULL;
+    }
 }
 
 GC XCreateGC(Display *dpy, Drawable d,
@@ -482,6 +490,17 @@ static __inline int XSetForeground(Display *dpy, GC gc, unsigned long foreground
     color.pixel = foreground;
     XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
     values->foreground_rgb = RGB(color.red / 256, color.green / 256, color.blue / 256);
+
+    if (values->cached_pen)
+    {
+        DeleteObject(values->cached_pen);
+        values->cached_pen = NULL;
+    }
+    if (values->cached_brush)
+    {
+        DeleteObject(values->cached_brush);
+        values->cached_brush = NULL;
+    }
     return 0;
 }
 
@@ -585,6 +604,9 @@ int XDrawLine(Display *dpy, Drawable d, GC gc,
 int XDrawLines(Display *dpy, Drawable d, GC gc,
     XPoint *points, int npoints, int mode);
 
+HPEN GetCachedPen(XGCValues *v);
+HBRUSH GetCachedBrush(XGCValues *v);
+
 static __inline int XDrawRectangle(
     Display *dpy, Drawable d, GC gc,
     int x, int y, unsigned int width, unsigned int height)
@@ -596,7 +618,7 @@ static __inline int XDrawRectangle(
     int nR2;
 
     values = XGetGCValues_(gc);
-    hPen = XCreateWinPen_(values);
+    hPen = GetCachedPen(values);
     assert(hPen);
     if (hPen == NULL)
         return BadAlloc;
@@ -612,7 +634,6 @@ static __inline int XDrawRectangle(
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hPen);
     return 0;
 }
 
@@ -627,10 +648,7 @@ static __inline int XDrawRectangleSimplified(
     int nR2;
 
     values = XGetGCValues_(gc);
-    hPen = XCreateWinPen_(values);
-    //assert(hPen);
-    //if (hPen == NULL)
-    //    return BadAlloc;
+    hPen = GetCachedPen(values);
 
     hdc = XCreateDrawableDC_(dpy, d);
     //nR2 = SetROP2(hdc, values->function);
@@ -643,7 +661,6 @@ static __inline int XDrawRectangleSimplified(
     //SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hPen);
     return 0;
 }
 
@@ -672,7 +689,7 @@ static __inline int XFillRectangle(
     int nR2;
 
     values = XGetGCValues_(gc);
-    hbr = XCreateWinBrush_(values);
+    hbr = GetCachedBrush(values);
     if (hbr == NULL)
         return BadAlloc;
 
@@ -696,7 +713,6 @@ static __inline int XFillRectangle(
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hbr);
     return 0;
 }
 

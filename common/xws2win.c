@@ -195,7 +195,7 @@ static unsigned int MakePenAttrs(const XGCValues *v)
            ((unsigned)v->join_style << 24);
 }
 
-static HPEN GetCachedPen(XGCValues *v)
+HPEN GetCachedPen(XGCValues *v)
 {
     unsigned int attrs = MakePenAttrs(v);
 
@@ -215,7 +215,7 @@ static HPEN GetCachedPen(XGCValues *v)
     return v->cached_pen;
 }
 
-static HBRUSH GetCachedBrush(XGCValues *v)
+HBRUSH GetCachedBrush(XGCValues *v)
 {
     if (v->cached_brush &&
         v->cached_brush_fg == v->foreground &&
