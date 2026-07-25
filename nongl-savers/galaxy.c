@@ -164,6 +164,13 @@ typedef struct {
 y-axis*/
  double      rot_x; /* rotation of eye around center of universe, around
 x-axis */
+#if 1 /* hacked by katahiromz */
+ HDC         hdcBack;      /* persistent backbuffer DC */
+ HBITMAP     hbmBack;      /* persistent backbuffer bitmap */
+ HBITMAP     hbmBackOld;
+ int         back_w;
+ int         back_h;
+#endif
 } unistruct;
 
 static unistruct *universes = NULL;
@@ -187,7 +194,45 @@ free_galaxies(unistruct * gp)
   (void) free((void *) gp->galaxies);
   gp->galaxies = NULL;
  }
+#if 1 /* hacked by katahiromz */
+  if (gp->hdcBack) {
+    SelectObject(gp->hdcBack, gp->hbmBackOld);
+    DeleteObject(gp->hbmBack);
+    DeleteDC(gp->hdcBack);
+    gp->hdcBack = NULL;
+    gp->hbmBack = NULL;
+    gp->hbmBackOld = NULL;
+    gp->back_w = gp->back_h = 0;
+  }
+#endif
 }
+
+#if 1 /* hacked by katahiromz */
+static void
+ensure_backbuffer(ModeInfo *mi, unistruct *gp)
+{
+  int w = MI_WIN_WIDTH(mi);
+  int h = MI_WIN_HEIGHT(mi);
+  Display *dpy = MI_DISPLAY(mi);
+
+  if (gp->hdcBack && gp->back_w == w && gp->back_h == h)
+    return;   /* already valid */
+
+  /* destroy old */
+  if (gp->hdcBack) {
+    SelectObject(gp->hdcBack, gp->hbmBackOld);
+    DeleteObject(gp->hbmBack);
+    DeleteDC(gp->hdcBack);
+    gp->hdcBack = NULL;
+  }
+
+  gp->hdcBack = CreateCompatibleDC(dpy);
+  gp->hbmBack = CreateCompatibleBitmap(dpy, w, h);
+  gp->hbmBackOld = (HBITMAP)SelectObject(gp->hdcBack, gp->hbmBack);
+  gp->back_w = w;
+  gp->back_h = h;
+}
+#endif
 
 static void
 startover(ModeInfo * mi)
@@ -339,7 +384,12 @@ init_galaxy(ModeInfo * mi)
  gp->scale = (double) (MI_WIN_WIDTH(mi) + MI_WIN_HEIGHT(mi)) / 8.0;
  gp->midx =  MI_WIN_WIDTH(mi)  / 2;
  gp->midy =  MI_WIN_HEIGHT(mi) / 2;
- startover(mi);
+
+#if 1 /* hacked by katahiromz */
+ ensure_backbuffer(mi, gp);
+#endif
+
+  startover(mi);
 }
 
 ENTRYPOINT void
@@ -369,6 +419,16 @@ draw_galaxy(ModeInfo * mi)
   sir = SINF(gp->rot_x);
 
   eps = 1/(EPSILON * sqrt_EPSILON * DELTAT * DELTAT * QCONS);
+
+#if 1 /* hacked by katahiromz */
+  ensure_backbuffer(mi, gp);
+
+  /* clear backbuffer once per frame */
+  {
+    RECT rc = {0, 0, gp->back_w, gp->back_h};
+    FillRect(gp->hdcBack, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
+  }
+#endif
 
   for (i = 0; i < gp->ngalaxies; ++i) {
     Galaxy     *gt = &gp->galaxies[i];
@@ -439,37 +499,19 @@ draw_galaxy(ModeInfo * mi)
     gt->pos[1] += gt->vel[1] * DELTAT;
     gt->pos[2] += gt->vel[2] * DELTAT;
 
-#if 1
-    // hacked and optimized by katahiromz
+#if 1 // hacked by katahiromz
     {
-        HDC hdc = CreateCompatibleDC(display);
-        HBITMAP hbm = CreateCompatibleBitmap(display, MI_WIN_WIDTH(mi), MI_WIN_HEIGHT(mi));
-        HGDIOBJ hbmOld = SelectObject(hdc, hbm);
-        if (dbufp) {
-            int count = gt->nstars;
-            const XPoint *pt = gt->oldpoints;
-            while (count-- > 0) {
-                SetPixelV(hdc, pt->x, pt->y, 0);
-                ++pt;
-            }
-        }
-        XSetForeground(hdc, gc, MI_PIXEL(mi, gt->galcol));
-        {
-            int count = gt->nstars;
-            const XPoint *pt = gt->newpoints;
-            const unsigned long rgb = gc->foreground_rgb;
-            while (count-- > 0) {
-                SetPixelV(hdc, pt->x, pt->y, rgb);
-                ++pt;
-            }
-        }
-        SelectObject(hdc, hbmOld);
-        GdiFlush();
-        hbmOld = SelectObject(hdc, hbm);
-        BitBlt(display, 0, 0, MI_WIN_WIDTH(mi), MI_WIN_HEIGHT(mi), hdc, 0, 0, SRCCOPY);
-        SelectObject(hdc, hbmOld);
-        DeleteObject(hbm);
-        DeleteDC(hdc);
+      COLORREF rgb;
+      XPoint *pt;
+      int count;
+      XSetForeground(display, gc, MI_PIXEL(mi, gt->galcol));
+      rgb = gc->foreground_rgb;
+      pt = gt->newpoints;
+      count = gt->nstars;
+      while (count-- > 0) {
+        SetPixelV(gp->hdcBack, pt->x, pt->y, rgb);
+        ++pt;
+      }
     }
 #else
     if (dbufp) {
@@ -487,6 +529,11 @@ draw_galaxy(ModeInfo * mi)
     gt->oldpoints = gt->newpoints;
     gt->newpoints = dummy;
   }
+
+#if 1 // hacked by katahiromz
+  /* one blit at the end of the frame */
+  BitBlt(display, 0, 0, gp->back_w, gp->back_h, gp->hdcBack, 0, 0, SRCCOPY);
+#endif
 
   gp->step++;
   if (gp->step > gp->f_hititerations * 4)
