@@ -1,4 +1,5 @@
 # ChangeLog
 
 - Version 0.85
+    - Optimized SecondaryWindowProc a little.
     - Fixed performance problem by disabling glFinish().

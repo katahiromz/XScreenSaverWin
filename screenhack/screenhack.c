@@ -534,11 +534,6 @@ BOOL CreatePrimaryWindow(INT x, INT y, INT cx, INT cy)
     return FALSE;
 }
 
-// Large multi-monitor setups pay real GDI cost for each StretchBlt of a
-// full-screen mirror, and all timers share the single UI thread with the
-// primary hack_draw call. Sync toward hack_delay for responsiveness, but
-// never go below this floor or big displays start starving the primary
-// draw of CPU time.
 #define SECONDARY_MIN_INTERVAL_MS  200  /* ~5fps mirror rate */
 
 typedef struct SECONDARY_WIN_DATA
@@ -556,9 +551,7 @@ SecondaryWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
         {
-            UINT interval = hack_delay / 1000;
-            if (interval < SECONDARY_MIN_INTERVAL_MS)
-                interval = SECONDARY_MIN_INTERVAL_MS;
+            UINT interval = SECONDARY_MIN_INTERVAL_MS;
             pData = (PSECONDARY_WIN_DATA)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
                                                    sizeof(SECONDARY_WIN_DATA));
             if (pData == NULL)
