@@ -14,6 +14,10 @@
 enum { DOWN = 0, LEFT, UP, RIGHT };
 enum { VERTICAL, HORIZONTAL };
 
+#if 1 // hacked by katahiromz
+static void draw_grid (struct state *st);
+#endif
+
 static const char *slidescreen_defaults [] = {
   "*dontClearRoot:		True",
   "*fpsSolid:			true",
@@ -247,6 +251,11 @@ slidescreen_init (Display *dpy, Window window)
     gcflags |= GCSubwindowMode;
   st->gc = XCreateGC (st->dpy, st->window, gcflags, &gcv);
 
+#if 1 // hacked by katahiromz
+  if (! st->img_loader)
+    draw_grid (st);
+#endif
+
   return st;
 }
 
@@ -390,6 +399,10 @@ slidescreen_draw (Display *dpy, Window window, void *closure)
     st->img_loader = load_image_async_simple (0, xgwa.screen, st->window,
                                               st->window, 0, 0);
     st->start_time = time ((time_t) 0);
+#if 1 // hacked by katahiromz
+    if (! st->img_loader)
+      draw_grid (st);
+#endif
     st->draw_initted = 0;
     return st->delay;
   }

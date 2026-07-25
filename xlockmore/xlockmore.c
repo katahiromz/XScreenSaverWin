@@ -722,6 +722,14 @@ BOOL ss_init(HWND hwnd)
 #undef ya_rand_init
     ya_rand_init(0);
 
+    ss.hbmScreenShot = GetScreenShotBitmap();
+    if (ss.hbmScreenShot == NULL)
+    {
+        assert(0);
+        return FALSE;
+    }
+    //SaveBitmapToFile("screenshot.bmp", ss.hbmScreenShot);
+
     if (!fChildPreview)
     {
         int x = GetSystemMetrics(SM_XVIRTUALSCREEN);
@@ -797,14 +805,6 @@ BOOL ss_init(HWND hwnd)
         assert(0);
         return FALSE;
     }
-
-    ss.hbmScreenShot = GetScreenShotBitmap();
-    if (ss.hbmScreenShot == NULL)
-    {
-        assert(0);
-        return FALSE;
-    }
-    //SaveBitmapToFile("screenshot.bmp", ss.hbmScreenShot);
 
     MakeCurrent(&ss);
 

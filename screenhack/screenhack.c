@@ -486,7 +486,7 @@ PrimaryWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_ERASEBKGND:
-        break;
+        return TRUE;
 
     case WM_SYSCOMMAND:
     case WM_SETCURSOR:
@@ -722,6 +722,14 @@ BOOL ss_init(HWND hwnd)
 
     gdipm_init_ex(&g_gdipm);
 
+    ss.hbmScreenShot = GetScreenShotBitmap();
+    if (ss.hbmScreenShot == NULL)
+    {
+        assert(0);
+        return FALSE;
+    }
+    //SaveBitmapToFile("screenshot.bmp", ss.hbmScreenShot);
+
     if (!fChildPreview)
     {
         int x = GetSystemMetrics(SM_XVIRTUALSCREEN);
@@ -797,14 +805,6 @@ BOOL ss_init(HWND hwnd)
         assert(0);
         return FALSE;
     }
-
-    ss.hbmScreenShot = GetScreenShotBitmap();
-    if (ss.hbmScreenShot == NULL)
-    {
-        assert(0);
-        return FALSE;
-    }
-    //SaveBitmapToFile("screenshot.bmp", ss.hbmScreenShot);
 
     MakeCurrent(&ss);
     ss.dpy = ss.hdc;
@@ -972,6 +972,9 @@ ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         ul = hack_draw(ss.dpy, ss.window, ss.closure);
         SetTimer(hWnd, 999, ul / 1000, NULL);
         break;
+
+    case WM_ERASEBKGND:
+        return TRUE;
 
     default:
         return DefScreenSaverProc(hWnd, uMsg, wParam, lParam);

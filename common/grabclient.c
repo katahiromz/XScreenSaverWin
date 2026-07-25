@@ -23,9 +23,10 @@ static Bool do_load_image(
     HDC hdcSrc, hdcDst;
     Display *dpy = DisplayOfScreen(screen);
     HGDIOBJ hbmOld;
-    assert(hbm != NULL);
 
-    GetObject(hbm, sizeof(BITMAP), &bm);
+    if (!GetObject(hbm, sizeof(BITMAP), &bm))
+        return False;
+
     state->geom.x = state->geom.y = 0;
     state->geom.width = bm.bmWidth;
     state->geom.height = bm.bmHeight;
