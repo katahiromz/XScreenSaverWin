@@ -247,6 +247,7 @@ Source: "build\Release\voronoi.scr"; DestDir: "{app}\voronoi_scr"; Flags: ignore
 Source: "build\Release\wander.scr"; DestDir: "{app}\wander_scr"; Flags: ignoreversion
 Source: "build\Release\whirlwindwarp.scr"; DestDir: "{app}\whirlwindwarp_scr"; Flags: ignoreversion
 Source: "build\Release\whirlygig.scr"; DestDir: "{app}\whirlygig_scr"; Flags: ignoreversion
+Source: "build\Release\worm.scr"; DestDir: "{app}\worm_scr"; Flags: ignoreversion
 Source: "build\Release\wormhole.scr"; DestDir: "{app}\wormhole_scr"; Flags: ignoreversion
 Source: "build\Release\xanalogtv.scr"; DestDir: "{app}\xanalogtv_scr"; Flags: ignoreversion
 Source: "build\Release\xflame.scr"; DestDir: "{app}\xflame_scr"; Flags: ignoreversion
