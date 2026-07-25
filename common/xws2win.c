@@ -595,7 +595,7 @@ int XFillRectangles(
     for (i = 0; i < n_rects; i++)
     {
         x = rectangles[i].x;
-        y = rectangles[i].x;
+        y = rectangles[i].y;
         width = rectangles[i].width;
         height = rectangles[i].height;
         SetRect(&rc, x, y, x + width, y + height);

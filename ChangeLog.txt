@@ -5,6 +5,7 @@
     - Used GDI+ instead of OleLoadPicture to load external image files. Supported PNG and TIFF.
     - Changed configure dialog font.
     - GetNearestPixel returns nearestPixel or -1.
+    - Fixed XFillRectangles.
 - Version 0.85
     - Optimized SecondaryWindowProc a little.
     - Fixed performance problem by disabling glFinish().
