@@ -103,7 +103,6 @@ Source: "build\Release\extrusion.scr"; DestDir: "{app}\extrusion_scr"; Flags: ig
 Source: "build\Release\fadeplot.scr"; DestDir: "{app}\fadeplot_scr"; Flags: ignoreversion
 Source: "build\Release\fiberlamp.scr"; DestDir: "{app}\fiberlamp_scr"; Flags: ignoreversion
 Source: "build\Release\fireworkx.scr"; DestDir: "{app}\fireworkx_scr"; Flags: ignoreversion
-Source: "build\Release\flag.scr"; DestDir: "{app}\flag_scr"; Flags: ignoreversion
 Source: "build\Release\flame.scr"; DestDir: "{app}\flame_scr"; Flags: ignoreversion
 Source: "build\Release\flipflop.scr"; DestDir: "{app}\flipflop_scr"; Flags: ignoreversion
 Source: "build\Release\flipscreen3d.scr"; DestDir: "{app}\flipscreen3d_scr"; Flags: ignoreversion

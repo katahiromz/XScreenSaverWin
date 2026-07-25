@@ -12,6 +12,7 @@
     - Fixed and added mirrorblob screensaver.
     - Fixed and added halo screensaver.
     - Fixed and added quasicrystal screensaver.
+    - Removed flag screensaver.
 - Version 0.85
     - Optimized SecondaryWindowProc a little.
     - Fixed performance problem by disabling glFinish().
