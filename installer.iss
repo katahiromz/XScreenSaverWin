@@ -33,6 +33,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "ChangeLog.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\xscreensaver.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\xscreensaver-text.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "gl-savers\starwars.txt"; DestDir: "{app}"; Flags: ignoreversion

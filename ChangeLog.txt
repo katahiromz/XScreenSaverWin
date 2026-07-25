@@ -1,0 +1,4 @@
+# ChangeLog
+
+- Version 0.85
+    - Fixed performance problem by disabling glFinish().

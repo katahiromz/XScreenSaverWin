@@ -430,4 +430,7 @@ HBITMAP GetScreenShotBM(VOID);
 
 //////////////////////////////////////////////////////////////////////////////
 
+// Disabled glFinish for performance
+#define glFinish() /*empty*/
+
 #endif  // __XLOCKMORE_H__
