@@ -11,6 +11,7 @@
     - Improved quality and performance of galaxy
     - Fixed and added mirrorblob screensaver.
     - Fixed and added halo screensaver.
+    - Fixed and added quasicrystal screensaver.
 - Version 0.85
     - Optimized SecondaryWindowProc a little.
     - Fixed performance problem by disabling glFinish().
