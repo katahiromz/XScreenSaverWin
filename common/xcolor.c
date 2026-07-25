@@ -281,7 +281,7 @@ static INT GetNearestPixel(Colormap cmap, WORD red, WORD green, WORD blue,
         *true_red = colormaps[cmap].items[nearestPixel].red;
         *true_green = colormaps[cmap].items[nearestPixel].green;
         *true_blue = colormaps[cmap].items[nearestPixel].blue;
-        return pixel;
+        return nearestPixel;
     }
     return -1;
 }
