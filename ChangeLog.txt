@@ -2,7 +2,8 @@
 
 - Version 0.86
     - For programs that use external image files, the system has been modified to avoid loading more than 16 image files.
-    - Use GDI+ instead of OleLoadPicture to load external image files. Supported PNG and TIFF.
+    - Used GDI+ instead of OleLoadPicture to load external image files. Supported PNG and TIFF.
+    - Changed configure dialog font.
 - Version 0.85
     - Optimized SecondaryWindowProc a little.
     - Fixed performance problem by disabling glFinish().
