@@ -198,6 +198,7 @@ Source: "build\Release\pong.scr"; DestDir: "{app}\pong_scr"; Flags: ignoreversio
 Source: "build\Release\popsquares.scr"; DestDir: "{app}\popsquares_scr"; Flags: ignoreversion
 Source: "build\Release\providence.scr"; DestDir: "{app}\providence_scr"; Flags: ignoreversion
 Source: "build\Release\pulsar.scr"; DestDir: "{app}\pulsar_scr"; Flags: ignoreversion
+Source: "build\Release\pyro.scr"; DestDir: "{app}\pyro_scr"; Flags: ignoreversion
 Source: "build\Release\queens.scr"; DestDir: "{app}\queens_scr"; Flags: ignoreversion
 Source: "build\Release\random.scr"; DestDir: "{app}\random_scr"; Flags: ignoreversion
 Source: "build\Release\rd-bomb.scr"; DestDir: "{app}\rd-bomb_scr"; Flags: ignoreversion

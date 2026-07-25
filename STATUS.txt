@@ -9,7 +9,7 @@ AntInspect              Good
 AntMaze                 Good        
 AntSpotlight            Good        
 Apollonian              Good        
-Apple2                  Bad         Bad drawing
+Apple2                  Bad         Black out
 Atlantis                Good        
 Attraction              Good        
 Atunnel                 Good        
@@ -137,7 +137,7 @@ MirrorBlob              Good
 Moebius                 Good        
 MoebiusGears            Good        
 Moire                   Good        
-Moire2                  Bad         Slow and bad drawing
+Moire2                  Bad         Bad drawing
 Molecule                Good        
 Morph3D                 Good        
 Mountain                Good        
@@ -162,7 +162,7 @@ Pong                    Good
 PopSquares              Good        
 Providence              Good        
 Pulsar                  Good        
-Pyro                    Bad         Slow and flickers
+Pyro                    OK          Slow
 Qix                     Bad         Transparency disabled
 QuasiCrystal            Bad         Black out
 Queens                  Good        
