@@ -6,6 +6,7 @@
     - Changed configure dialog font.
     - GetNearestPixel returns nearestPixel or -1.
     - Fixed XFillRectangles.
+    - Added pen cache and brush cache.
 - Version 0.85
     - Optimized SecondaryWindowProc a little.
     - Fixed performance problem by disabling glFinish().

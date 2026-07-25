@@ -318,6 +318,14 @@ typedef struct
     int clip_x_origin;
     int clip_y_origin;
     HRGN clip_mask_region;
+
+    /* pen / brush cache */
+    HPEN   cached_pen;
+    HBRUSH cached_brush;
+    unsigned long cached_pen_fg;
+    unsigned long cached_brush_fg;
+    unsigned int  cached_pen_attrs;   /* line_width | style bits */
+    int           cached_brush_style;
 } XGCValues;
 
 typedef XGCValues *GC;

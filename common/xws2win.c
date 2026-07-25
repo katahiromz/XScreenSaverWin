@@ -27,6 +27,12 @@ GC XCreateGC(Display *dpy, Drawable d,
     newvalues->graphics_exposures = True;
     newvalues->font = (HFONT)GetStockObject(ANSI_FIXED_FONT);
     newvalues->stipple = NULL;
+    newvalues->cached_pen = NULL;
+    newvalues->cached_brush = NULL;
+    newvalues->cached_pen_fg = 0;
+    newvalues->cached_brush_fg = 0;
+    newvalues->cached_pen_attrs = 0;
+    newvalues->cached_brush_style = -1;
     if (values != NULL)
         XChangeGC(dpy, newvalues, valuemask, values);
 
@@ -47,6 +53,17 @@ int XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values)
                     &color);
         newvalues->foreground_rgb =
             RGB(color.red / 256, color.green / 256, color.blue / 256);
+        /* invalidate pen/brush cache */
+        if (newvalues->cached_pen)
+        {
+            DeleteObject(newvalues->cached_pen);
+            newvalues->cached_pen = NULL;
+        }
+        if (newvalues->cached_brush)
+        {
+            DeleteObject(newvalues->cached_brush);
+            newvalues->cached_brush = NULL;
+        }
     }
 
     if (valuemask & GCBackground)
@@ -56,28 +73,76 @@ int XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values)
                     &color);
         newvalues->background_rgb =
             RGB(color.red / 256, color.green / 256, color.blue / 256);
+        /* background affects stipple brush */
+        if (newvalues->cached_brush)
+        {
+            DeleteObject(newvalues->cached_brush);
+            newvalues->cached_brush = NULL;
+        }
     }
 
     if (valuemask & GCFillStyle)
+    {
         newvalues->fill_style = values->fill_style;
+        if (newvalues->cached_brush)
+        {
+            DeleteObject(newvalues->cached_brush);
+            newvalues->cached_brush = NULL;
+        }
+    }
 
     if (valuemask & GCFunction)
         newvalues->function = values->function;
 
     if (valuemask & GCLineWidth)
+    {
         newvalues->line_width = values->line_width;
+        if (newvalues->cached_pen)
+        {
+            DeleteObject(newvalues->cached_pen);
+            newvalues->cached_pen = NULL;
+        }
+    }
 
     if (valuemask & GCCapStyle)
+    {
         newvalues->cap_style = values->cap_style;
+        if (newvalues->cached_pen)
+        {
+            DeleteObject(newvalues->cached_pen);
+            newvalues->cached_pen = NULL;
+        }
+    }
 
     if (valuemask & GCJoinStyle)
+    {
         newvalues->join_style = values->join_style;
+        if (newvalues->cached_pen)
+        {
+            DeleteObject(newvalues->cached_pen);
+            newvalues->cached_pen = NULL;
+        }
+    }
 
     if (valuemask & GCLineStyle)
+    {
         newvalues->line_style = values->line_style;
+        if (newvalues->cached_pen)
+        {
+            DeleteObject(newvalues->cached_pen);
+            newvalues->cached_pen = NULL;
+        }
+    }
 
     if (valuemask & GCStipple)
+    {
         newvalues->stipple = values->stipple;
+        if (newvalues->cached_brush)
+        {
+            DeleteObject(newvalues->cached_brush);
+            newvalues->cached_brush = NULL;
+        }
+    }
 
     if (valuemask & GCFillRule)
         newvalues->fill_rule = values->fill_rule;
@@ -106,10 +171,66 @@ int XFreeGC(Display *dpy, GC gc)
     if (values == NULL)
         return BadGC;
 
+    if (values->cached_pen)
+        DeleteObject(values->cached_pen);
+    if (values->cached_brush)
+        DeleteObject(values->cached_brush);
+
     if (values->clip_mask_region)
         DeleteObject(values->clip_mask_region);
     free(values);
     return 0;
+}
+
+/* ------------------------------------------------------------ */
+/* Pen / Brush cache helpers                                    */
+/* ------------------------------------------------------------ */
+
+static unsigned int MakePenAttrs(const XGCValues *v)
+{
+    /* pack line_width (low 16) + style bits */
+    return (v->line_width & 0xFFFF) |
+           ((unsigned)v->line_style << 16) |
+           ((unsigned)v->cap_style  << 20) |
+           ((unsigned)v->join_style << 24);
+}
+
+static HPEN GetCachedPen(XGCValues *v)
+{
+    unsigned int attrs = MakePenAttrs(v);
+
+    if (v->cached_pen &&
+        v->cached_pen_fg == v->foreground &&
+        v->cached_pen_attrs == attrs)
+    {
+        return v->cached_pen;
+    }
+
+    if (v->cached_pen)
+        DeleteObject(v->cached_pen);
+
+    v->cached_pen = XCreateWinPen_(v);
+    v->cached_pen_fg = v->foreground;
+    v->cached_pen_attrs = attrs;
+    return v->cached_pen;
+}
+
+static HBRUSH GetCachedBrush(XGCValues *v)
+{
+    if (v->cached_brush &&
+        v->cached_brush_fg == v->foreground &&
+        v->cached_brush_style == v->fill_style)
+    {
+        return v->cached_brush;
+    }
+
+    if (v->cached_brush)
+        DeleteObject(v->cached_brush);
+
+    v->cached_brush = XCreateWinBrush_(v);
+    v->cached_brush_fg = v->foreground;
+    v->cached_brush_style = v->fill_style;
+    return v->cached_brush;
 }
 
 static void get_2_skewed_angles(double *skewed1, double *skewed2,
@@ -150,6 +271,12 @@ int XSetLineAttributes(Display *dpy, GC gc,
     values->line_style = line_style;
     values->cap_style = cap_style;
     values->join_style = join_style;
+
+    if (values->cached_pen)
+    {
+        DeleteObject(values->cached_pen);
+        values->cached_pen = NULL;
+    }
     return 0;
 }
 
@@ -297,7 +424,7 @@ int XDrawLine(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hPen = XCreateWinPen_(values);
+    hPen = GetCachedPen(values);
     assert(hPen);
     if (hPen == NULL)
         return BadAlloc;
@@ -313,7 +440,6 @@ int XDrawLine(Display *dpy, Drawable d, GC gc,
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hPen);
     return 0;
 }
 
@@ -336,7 +462,7 @@ int XDrawLines(Display *dpy, Drawable d, GC gc,
     if (lpPoints == NULL)
         return BadAlloc;
 
-    hPen = XCreateWinPen_(values);
+    hPen = GetCachedPen(values);
     assert(hPen);
     if (hPen == NULL)
     {
@@ -374,8 +500,6 @@ int XDrawLines(Display *dpy, Drawable d, GC gc,
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hPen);
-
     return 0;
 }
 
@@ -393,7 +517,7 @@ int XDrawSegments(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hPen = XCreateWinPen_(values);
+    hPen = GetCachedPen(values);
     assert(hPen);
     if (hPen == NULL)
         return BadAlloc;
@@ -410,7 +534,6 @@ int XDrawSegments(Display *dpy, Drawable d, GC gc,
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hPen);
     return 0;
 }
 
@@ -430,7 +553,7 @@ int XDrawArc(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hPen = XCreateWinPen_(values);
+    hPen = GetCachedPen(values);
     assert(hPen);
     if (hPen == NULL)
         return BadAlloc;
@@ -457,7 +580,6 @@ int XDrawArc(Display *dpy, Drawable d, GC gc,
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hPen);
     return 0;
 }
 
@@ -479,7 +601,7 @@ int XDrawArcs(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hPen = XCreateWinPen_(values);
+    hPen = GetCachedPen(values);
     if (hPen == NULL)
         return BadAlloc;
 
@@ -511,7 +633,6 @@ int XDrawArcs(Display *dpy, Drawable d, GC gc,
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hPen);
     return 0;
 }
 
@@ -585,7 +706,7 @@ int XFillRectangles(
     if (values == NULL)
         return BadGC;
 
-    hbr = XCreateWinBrush_(values);
+    hbr = GetCachedBrush(values);
     if (hbr == NULL)
         return BadAlloc;
 
@@ -604,7 +725,6 @@ int XFillRectangles(
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hbr);
     return 0;
 }
 
@@ -648,7 +768,7 @@ int XFillPolygon(Display *dpy, Drawable d, GC gc,
         }
     }
 
-    hbr = XCreateWinBrush_(values);
+    hbr = GetCachedBrush(values);
     if (hbr == NULL)
     {
         free(lpPoints);
@@ -679,7 +799,6 @@ int XFillPolygon(Display *dpy, Drawable d, GC gc,
     XDeleteDrawableDC_(dpy, d, hdc);
 
     free(lpPoints);
-    DeleteObject(hbr);
     return 0;
 }
 
@@ -699,7 +818,7 @@ int XFillArc(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hbr = XCreateWinBrush_(values);
+    hbr = GetCachedBrush(values);
     if (hbr == NULL)
         return BadAlloc;
 
@@ -728,7 +847,6 @@ int XFillArc(Display *dpy, Drawable d, GC gc,
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hbr);
     return 0;
 }
 
@@ -750,7 +868,7 @@ int XFillArcs(Display *dpy, Drawable d, GC gc,
     if (values == NULL)
         return BadGC;
 
-    hbr = XCreateWinBrush_(values);
+    hbr = GetCachedBrush(values);
     if (hbr == NULL)
         return BadAlloc;
 
@@ -784,7 +902,6 @@ int XFillArcs(Display *dpy, Drawable d, GC gc,
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
 
-    DeleteObject(hbr);
     return 0;
 }
 
@@ -855,6 +972,13 @@ int XSetFillStyle(Display *dpy, GC gc, int fill)
         return BadGC;
 
     values->fill_style = fill;
+
+    if (values->cached_brush)
+    {
+        DeleteObject(values->cached_brush);
+        values->cached_brush = NULL;
+    }
+
     return 0;
 }
 
