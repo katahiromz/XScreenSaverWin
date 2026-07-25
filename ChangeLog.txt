@@ -10,6 +10,7 @@
     - Added DC cache.
     - Improved quality and performance of galaxy
     - Fixed and added mirrorblob screensaver.
+    - Fixed and added halo screensaver.
 - Version 0.85
     - Optimized SecondaryWindowProc a little.
     - Fixed performance problem by disabling glFinish().
