@@ -596,8 +596,13 @@ grab_texture(ModeInfo *mi, int texture_index)
   mirrorblobstruct *mp = &Mirrorblob[MI_SCREEN(mi)];
 	
   {
+#if 1 /* hacked by katahiromz */
+    int w = MI_WIDTH(mi);
+    int h = MI_HEIGHT(mi);
+#else
     int w = (MI_WIDTH(mi)  / 2) - 1;
     int h = (MI_HEIGHT(mi) / 2) - 1;
+#endif
     if (w <= 10) w = 10;
     if (h <= 10) h = 10;
 	

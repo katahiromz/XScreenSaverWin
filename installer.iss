@@ -170,6 +170,7 @@ Source: "build\Release\maze.scr"; DestDir: "{app}\maze_scr"; Flags: ignoreversio
 Source: "build\Release\memscroller.scr"; DestDir: "{app}\memscroller_scr"; Flags: ignoreversion
 Source: "build\Release\menger.scr"; DestDir: "{app}\menger_scr"; Flags: ignoreversion
 Source: "build\Release\metaballs.scr"; DestDir: "{app}\metaballs_scr"; Flags: ignoreversion
+Source: "build\Release\mirrorblob.scr"; DestDir: "{app}\mirrorblob_scr"; Flags: ignoreversion
 Source: "build\Release\moebiusgears.scr"; DestDir: "{app}\moebiusgears_scr"; Flags: ignoreversion
 Source: "build\Release\moebius.scr"; DestDir: "{app}\moebius_scr"; Flags: ignoreversion
 Source: "build\Release\moire.scr"; DestDir: "{app}\moire_scr"; Flags: ignoreversion

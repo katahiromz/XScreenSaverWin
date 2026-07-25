@@ -8,7 +8,8 @@
     - Fixed XFillRectangles.
     - Added pen cache and brush cache.
     - Added DC cache.
-    - Improved quality and performance of galaxy.
+    - Improved quality and performance of galaxy
+    - Fixed and added mirrorblob screensaver.
 - Version 0.85
     - Optimized SecondaryWindowProc a little.
     - Fixed performance problem by disabling glFinish().
