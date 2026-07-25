@@ -36,7 +36,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
 // RT_DIALOG
 
 1 DIALOGEX 0, 0, 215, 180
-CAPTION "XScreenSaverWin v0.85"
+CAPTION "XScreenSaverWin v0.86"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
 FONT 9, "Arial", 0, 0, 1 // DEFAULT_CHARSET
 {
@@ -57,8 +57,8 @@ FONT 9, "Arial", 0, 0, 1 // DEFAULT_CHARSET
 // RT_VERSION
 
 1 VERSIONINFO
-FILEVERSION     0, 8, 5, 0
-PRODUCTVERSION  0, 8, 5, 0
+FILEVERSION     0, 8, 6, 0
+PRODUCTVERSION  0, 8, 6, 0
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 {
@@ -68,10 +68,10 @@ FILETYPE        VFT_APP
         {
             VALUE "CompanyName", "Katayama Hirofumi MZ"
             VALUE "FileDescription", "XScreenSaverWin"
-            VALUE "FileVersion", "0.85"
+            VALUE "FileVersion", "0.86"
             VALUE "LegalCopyright", "Copyright (C) 2015-2017 Katayama Hirofumi MZ."
             VALUE "ProductName", "XScreenSaverWin"
-            VALUE "ProductVersion", "0.85"
+            VALUE "ProductVersion", "0.86"
         }
     }
     BLOCK "VarFileInfo"
@@ -88,7 +88,7 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 // RT_DIALOG
 
 1 DIALOGEX 0, 0, 215, 180
-CAPTION "XScreenSaverWin v0.85"
+CAPTION "XScreenSaverWin v0.86"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
 FONT 9, "MS UI Gothic", 0, 0, 128 // SHIFTJIS_CHARSET
 {

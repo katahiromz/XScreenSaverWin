@@ -11,31 +11,12 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # project name, version, and languages
-project(XScreenSaverWin VERSION 0.85 LANGUAGES C CXX RC)
-
-# check build type
-if (NOT CMAKE_BUILD_TYPE)
-    message(STATUS "No build type selected, default to Release")
-    set(CMAKE_BUILD_TYPE "RELEASE")
-endif()
-
-# make uppercase string of build type
-string(TOUPPER "${CMAKE_BUILD_TYPE}" uppercase_CMAKE_BUILD_TYPE)
-
-# check build type again
-if (NOT uppercase_CMAKE_BUILD_TYPE MATCHES "^(DEBUG|RELEASE|RELWITHDEBINFO|MINSIZEREL)$")
-    message(FATAL_ERROR "Invalid value for CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
-endif()
+project(XScreenSaverWin VERSION 0.86 LANGUAGES C CXX RC)
 
 # set output directory (build/)
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-
-# Win32 or not?
-# if (NOT WIN32)
-#     message(FATAL_ERROR "You must use a Win32 compiler")
-# endif()
 
 # do statically link
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
