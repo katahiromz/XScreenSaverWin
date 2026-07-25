@@ -3,3 +3,6 @@
 - Version 0.85
     - Optimized SecondaryWindowProc a little.
     - Fixed performance problem by disabling glFinish().
+    - Improved xscreensaver front-end.
+- Version 0.84
+    - Improved xscreensaver front-end.
