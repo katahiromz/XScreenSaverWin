@@ -5,8 +5,6 @@ Just use CMake. You might have to install CMake into your development environmen
 
 XScreenSaverWin supports build by GCC, Clang, and MSVC.
 
-After build, double clicking batch file "pack.bat" will deploy the files.
-
 The installer source is installer.iss,
 that's an Inno Setup script. Please run Inno Setup after deployment.
 
