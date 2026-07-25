@@ -1,4 +1,5 @@
 #include "xlockmore.h"
+#include "gdipm.h"
 #include "resource.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -704,6 +705,8 @@ Bool set_saver_name(const char *name)
     return p != NULL;
 }
 
+extern void *g_gdipm;
+
 BOOL ss_init(HWND hwnd)
 {
     RECT rc;
@@ -711,6 +714,8 @@ BOOL ss_init(HWND hwnd)
     set_saver_name(progname);
 
     ss.hwnd = hwnd;
+
+    gdipm_init_ex(&g_gdipm);
 
     LoadSetting(&ss.modeinfo);
 
@@ -994,6 +999,7 @@ ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     case WM_DESTROY:
         KillTimer(hWnd, 999);
+        gdipm_exit_ex(g_gdipm);
         ss_term();
         break;
 

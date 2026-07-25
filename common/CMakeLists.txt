@@ -2,6 +2,7 @@ add_library(common STATIC
     colors.c
     erase.c
     font-ximage.c
+    gdipm.c
     grabclient.c
     hsv.c
     logo.c
@@ -17,4 +18,4 @@ add_library(common STATIC
     xws2win.c
     yarandom.c)
 target_include_directories(common PRIVATE ../include)
-target_link_libraries(common comctl32)
+target_link_libraries(common comctl32 shlwapi)

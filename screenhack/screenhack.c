@@ -1,4 +1,5 @@
 #include "screenhack.h"
+#include "gdipm.h"
 #include "resource.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -704,6 +705,8 @@ Bool set_saver_name(const char *name)
     return p != NULL;
 }
 
+extern void *g_gdipm;
+
 BOOL ss_init(HWND hwnd)
 {
     RECT rc;
@@ -716,6 +719,8 @@ BOOL ss_init(HWND hwnd)
 
 #undef ya_rand_init
     ya_rand_init(0);
+
+    gdipm_init_ex(&g_gdipm);
 
     if (!fChildPreview)
     {
@@ -1083,6 +1088,7 @@ void ss_term(void)
     ReleaseDC(ss.hwnd, ss.hdc);
     DeleteObject(ss.hbmScreenShot);
     CloseHandle(g_hMapping);
+    gdipm_exit_ex(g_gdipm);
 }
 
 void ss_clear(Display *d)

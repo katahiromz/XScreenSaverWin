@@ -1,6 +1,8 @@
 #include "xws2win.h"
 #include "colors.h"
 
+void *g_gdipm = NULL;
+
 //////////////////////////////////////////////////////////////////////////////
 
 GC XCreateGC(Display *dpy, Drawable d,

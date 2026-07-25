@@ -9,6 +9,9 @@
 #include <ocidl.h>
 #include <olectl.h>
 #include <shlobj.h>
+#include "gdipm.h"
+
+extern void *g_gdipm;
 
 HBITMAP GetScreenShotBM(VOID);
 
@@ -52,78 +55,29 @@ static Bool do_load_image(
 
 static HBITMAP do_load_picture(LPCSTR file)
 {
-    HANDLE hFile;
-    DWORD dwSize, cbRead;
-    HGLOBAL hGlobal;
-    LPVOID p;
-    LPSTREAM pStream;
-    LPPICTURE pPicture;
-    HBITMAP hbm;
-    HRESULT hr;
-
-    hFile = CreateFileA(file, GENERIC_READ, FILE_SHARE_READ, NULL,
-        OPEN_EXISTING, 0, NULL);
-    if (hFile == INVALID_HANDLE_VALUE)
-        return NULL;
-
-    dwSize = GetFileSize(hFile, NULL);
-
-    hGlobal = GlobalAlloc(GMEM_MOVEABLE, dwSize);
-    if (hGlobal == NULL)
-    {
-        CloseHandle(hFile);
-        return NULL;
-    }
-
-    p = GlobalLock(hGlobal);
-
-    if (!ReadFile(hFile, p, dwSize, &cbRead, NULL))
-    {
-        GlobalUnlock(hGlobal);
-        GlobalFree(hGlobal);
-        CloseHandle(hFile);
-        return NULL;
-    }
-
-    GlobalUnlock(hGlobal);
-    CloseHandle(hFile);
-
-    CreateStreamOnHGlobal(hGlobal, TRUE, &pStream);
-
-    if (!pStream)
-        return NULL;
-
-    hbm = NULL;
-    hr = OleLoadPicture(pStream, dwSize, FALSE, &IID_IPicture, (void **)&pPicture);
-    if (pPicture != NULL)
-    {
-        pPicture->lpVtbl->get_Handle(pPicture, (OLE_HANDLE *)&hbm);
-        if (hbm != NULL)
-        {
-            hbm = (HBITMAP)CopyImage(hbm, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-        }
-        pPicture->lpVtbl->Release(pPicture);
-    }
-
-    pStream->lpVtbl->Release(pStream);
-    GlobalFree(hGlobal);
-
-    return hbm;
+    WCHAR szFile[MAX_PATH];
+    MultiByteToWideChar(CP_ACP, 0, file, -1, szFile, _countof(szFile));
+    return gdipm_load_pic(g_gdipm, szFile, MakeARGB(0xFF, 0xFF, 0xFF, 0xFF), NULL, NULL);
 }
 
 char **g_ppFiles = NULL;
 int g_nFiles = 0;
+#define MAX_LOAD_IMAGES 16
 
 void recurse_dir(const char *dir)
 {
     CHAR szDir[MAX_PATH], szPath[MAX_PATH];
 
+    if (g_nFiles >= MAX_LOAD_IMAGES)
+        return;
+
     GetCurrentDirectoryA(MAX_PATH, szDir);
     if (SetCurrentDirectoryA(dir))
     {
+        LPSTR pch;
         WIN32_FIND_DATAA find;
-        HANDLE hFind = FindFirstFileA("*", &find);
-        if (hFind != INVALID_HANDLE_VALUE)
+        HANDLE hFind1 = FindFirstFileA("*", &find);
+        if (hFind1 != INVALID_HANDLE_VALUE)
         {
             do
             {
@@ -133,39 +87,61 @@ void recurse_dir(const char *dir)
                     continue;
                 }
                 if (find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                {
-                    recurse_dir(find.cFileName);
-                }
+                    continue;
+
+                pch = strrchr(find.cFileName, '\\');
+                if (pch == NULL)
+                    pch = strrchr(find.cFileName, '.');
                 else
+                    pch = strrchr(pch, '.');
+
+                if (!pch)
+                    continue;
+
+                if (lstrcmpiA(pch, ".bmp") != 0 &&
+                    lstrcmpiA(pch, ".dib") != 0 &&
+                    lstrcmpiA(pch, ".jpe") != 0 &&
+                    lstrcmpiA(pch, ".jpg") != 0 &&
+                    lstrcmpiA(pch, ".jpeg") != 0 &&
+                    lstrcmpiA(pch, ".jfif") != 0 &&
+                    lstrcmpiA(pch, ".gif") != 0 &&
+                    lstrcmpiA(pch, ".png") != 0 &&
+                    lstrcmpiA(pch, ".tif") != 0 &&
+                    lstrcmpiA(pch, ".tiff") != 0)
                 {
-                    LPSTR pch = strrchr(find.cFileName, '\\');
-                    if (pch == NULL)
-                        pch = strrchr(find.cFileName, '.');
-                    else
-                        pch = strrchr(pch, '.');
-
-                    if (lstrcmpiA(pch, ".bmp") == 0 ||
-                        lstrcmpiA(pch, ".jpg") == 0 ||
-                        lstrcmpiA(pch, ".jpeg") == 0 ||
-                        lstrcmpiA(pch, ".gif") == 0 ||
-                        //lstrcmpiA(pch, ".png") == 0 ||
-                        //lstrcmpiA(pch, ".tif") == 0 ||
-                        //lstrcmpiA(pch, ".tiff") == 0 ||
-                        0)
-                    {
-                    }
-                    else
-                        continue;
-
-                    GetCurrentDirectoryA(MAX_PATH, szPath);
-                    lstrcatA(szPath, "\\");
-                    lstrcatA(szPath, find.cFileName);
-
-                    g_ppFiles = (char **)realloc(g_ppFiles, (g_nFiles + 1) * sizeof(char *));
-                    g_ppFiles[g_nFiles++] = _strdup(szPath);
+                    continue;
                 }
-            } while (FindNextFileA(hFind, &find));
-            FindClose(hFind);
+
+                GetCurrentDirectoryA(MAX_PATH, szPath);
+                lstrcatA(szPath, "\\");
+                lstrcatA(szPath, find.cFileName);
+
+                g_ppFiles = (char **)realloc(g_ppFiles, (g_nFiles + 1) * sizeof(char *));
+                g_ppFiles[g_nFiles++] = _strdup(szPath);
+                if (g_nFiles >= MAX_LOAD_IMAGES)
+                    break;
+            } while (FindNextFileA(hFind1, &find));
+            FindClose(hFind1);
+        }
+        if (g_nFiles < MAX_LOAD_IMAGES)
+        {
+            HANDLE hFind2 = FindFirstFileA("*", &find);
+            if (hFind2 != INVALID_HANDLE_VALUE)
+            {
+                do
+                {
+                    if (lstrcmpA(find.cFileName, ".") == 0 ||
+                        lstrcmpA(find.cFileName, "..") == 0)
+                    {
+                        continue;
+                    }
+                    if (find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                    {
+                        recurse_dir(find.cFileName);
+                    }
+                } while (FindNextFileA(hFind2, &find));
+                FindClose(hFind2);
+            }
         }
         SetCurrentDirectoryA(szDir);
     }
@@ -175,27 +151,20 @@ static Bool do_load_image_from_dir(
     async_load_state *state, Screen *screen, Window window, Drawable target,
     const char *dir, int width, int height, char **name_ret)
 {
-    static Bool b = False;
     int i;
     HBITMAP hbm;
 
-    if (!b)
-    {
-        recurse_dir(dir);
-        if (g_nFiles > 4)
-            b = True;
-    }
+    recurse_dir(dir);
 
-    if (g_nFiles != 0)
-    {
-        i = random() % g_nFiles;
+    if (g_nFiles <= 0)
+        return False;
 
-        hbm = do_load_picture(g_ppFiles[i]);
-        if (hbm != NULL)
-        {
-            *name_ret = _strdup(strrchr(g_ppFiles[i], '\\') + 1);
-            return do_load_image(state, screen, window, target, hbm, width, height);
-        }
+    i = random() % g_nFiles;
+    hbm = do_load_picture(g_ppFiles[i]);
+    if (hbm != NULL)
+    {
+        *name_ret = _strdup(strrchr(g_ppFiles[i], '\\') + 1);
+        return do_load_image(state, screen, window, target, hbm, width, height);
     }
     return False;
 }
