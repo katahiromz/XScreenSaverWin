@@ -11,7 +11,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # project name, version, and languages
-project(XScreenSaverWin VERSION 0.86 LANGUAGES C CXX RC)
+project(XScreenSaverWin VERSION 0.87 LANGUAGES C CXX RC)
 
 # set output directory (build/)
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
