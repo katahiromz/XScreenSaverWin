@@ -1,5 +1,5 @@
 a.txt
-a.exe
+*.exe
 *.o
 *.obj
 *.res
