@@ -973,9 +973,6 @@ ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         SetTimer(hWnd, 999, ul / 1000, NULL);
         break;
 
-    case WM_ERASEBKGND:
-        return TRUE;
-
     default:
         return DefScreenSaverProc(hWnd, uMsg, wParam, lParam);
     }
