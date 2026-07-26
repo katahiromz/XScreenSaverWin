@@ -175,7 +175,6 @@ Source: "build\Release\morph3d.scr"; DestDir: "{app}\morph3d_scr"; Flags: ignore
 Source: "build\Release\mountain.scr"; DestDir: "{app}\mountain_scr"; Flags: ignoreversion
 Source: "build\Release\munch.scr"; DestDir: "{app}\munch_scr"; Flags: ignoreversion
 Source: "build\Release\nerverot.scr"; DestDir: "{app}\nerverot_scr"; Flags: ignoreversion
-Source: "build\Release\noof.scr"; DestDir: "{app}\noof_scr"; Flags: ignoreversion
 Source: "build\Release\noseguy.scr"; DestDir: "{app}\noseguy_scr"; Flags: ignoreversion
 Source: "build\Release\pacman.scr"; DestDir: "{app}\pacman_scr"; Flags: ignoreversion
 Source: "build\Release\pedal.scr"; DestDir: "{app}\pedal_scr"; Flags: ignoreversion
