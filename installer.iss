@@ -60,7 +60,6 @@ Source: "build\Release\boing.scr"; DestDir: "{app}\boing_scr"; Flags: ignorevers
 Source: "build\Release\bouboule.scr"; DestDir: "{app}\bouboule_scr"; Flags: ignoreversion
 Source: "build\Release\bouncingcow.scr"; DestDir: "{app}\bouncingcow_scr"; Flags: ignoreversion
 Source: "build\Release\boxed.scr"; DestDir: "{app}\boxed_scr"; Flags: ignoreversion
-Source: "build\Release\boxfit.scr"; DestDir: "{app}\boxfit_scr"; Flags: ignoreversion
 Source: "build\Release\braid.scr"; DestDir: "{app}\braid_scr"; Flags: ignoreversion
 Source: "build\Release\bsod.scr"; DestDir: "{app}\bsod_scr"; Flags: ignoreversion
 Source: "build\Release\bubble3d.scr"; DestDir: "{app}\bubble3d_scr"; Flags: ignoreversion
