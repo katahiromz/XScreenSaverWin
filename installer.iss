@@ -48,7 +48,6 @@ Source: "build\Release\anemotaxis.scr"; DestDir: "{app}\anemotaxis_scr"; Flags: 
 Source: "build\Release\antinspect.scr"; DestDir: "{app}\antinspect_scr"; Flags: ignoreversion
 Source: "build\Release\antmaze.scr"; DestDir: "{app}\antmaze_scr"; Flags: ignoreversion
 Source: "build\Release\antspotlight.scr"; DestDir: "{app}\antspotlight_scr"; Flags: ignoreversion
-Source: "build\Release\ant.scr"; DestDir: "{app}\ant_scr"; Flags: ignoreversion
 Source: "build\Release\apollonian.scr"; DestDir: "{app}\apollonian_scr"; Flags: ignoreversion
 Source: "build\Release\atlantis.scr"; DestDir: "{app}\atlantis_scr"; Flags: ignoreversion
 Source: "build\Release\attraction.scr"; DestDir: "{app}\attraction_scr"; Flags: ignoreversion

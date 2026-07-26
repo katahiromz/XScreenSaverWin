@@ -1,10 +1,9 @@
-There are 209 Goods, 5 OKs and 9 Bads of total 223 screensavers in XScreenSaverWin.
+There are 209 Goods, 4 OKs and 9 Bads of total 222 screensavers in XScreenSaverWin.
 
 (Name)                  (Status)    (Comment)
 Abstractile             Good        
 Anemone                 Good        
 Anemotaxis              Good        
-Ant                     OK          Sometimes dirty
 AntInspect              Good        
 AntMaze                 Good        
 AntSpotlight            Good        
