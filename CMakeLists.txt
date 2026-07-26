@@ -101,6 +101,7 @@ endmacro()
 ##############################################################################
 
 add_definitions(-DUSE_GL=1)
+add_definitions(-DHAVE_DOUBLE_BUFFER_EXTENSION)
 
 include_directories(. include gl-parts/include)
 
