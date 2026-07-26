@@ -6,6 +6,7 @@
 
 SCREENSAVER ss;
 Bool mono_p = False;
+BOOL g_bNoErase = FALSE;
 
 static LPCSTR pszCompany = "Software\\Katayama Hirofumi MZ";
 
@@ -972,6 +973,11 @@ ScreenSaverProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         ul = hack_draw(ss.dpy, ss.window, ss.closure);
         SetTimer(hWnd, 999, ul / 1000, NULL);
         break;
+
+    case WM_ERASEBKGND:
+        if (g_bNoErase)
+            return TRUE;
+        return DefScreenSaverProc(hWnd, uMsg, wParam, lParam);
 
     default:
         return DefScreenSaverProc(hWnd, uMsg, wParam, lParam);

@@ -104,6 +104,7 @@ struct state {
   async_load_state *img_loader;
 };
 
+extern BOOL g_bNoErase; // hacked by katahiromz
 
 static void *
 slidescreen_init (Display *dpy, Window window)
@@ -113,6 +114,7 @@ slidescreen_init (Display *dpy, Window window)
   XGCValues gcv;
   long gcflags;
 
+  g_bNoErase = TRUE; // hacked by katahiromz
   st->dpy = dpy;
   st->window = window;
   XGetWindowAttributes (st->dpy, st->window, &xgwa);
