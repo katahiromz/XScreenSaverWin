@@ -688,6 +688,7 @@ release_strange(ModeInfo * mi)
 #ifdef useAccumulator
 		int i;
 		(void) free((void *) cols);
+		if (Root->accMap) // hacked by katahiromz
 		for (i=0;i<Root->Width;i++) {
 			(void) free((void *) Root->accMap[i]);
 		}
