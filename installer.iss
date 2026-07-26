@@ -129,7 +129,6 @@ Source: "build\Release\goop.scr"; DestDir: "{app}\goop_scr"; Flags: ignoreversio
 Source: "build\Release\grav.scr"; DestDir: "{app}\grav_scr"; Flags: ignoreversion
 Source: "build\Release\greynetic.scr"; DestDir: "{app}\greynetic_scr"; Flags: ignoreversion
 Source: "build\Release\halftone.scr"; DestDir: "{app}\halftone_scr"; Flags: ignoreversion
-Source: "build\Release\halo.scr"; DestDir: "{app}\halo_scr"; Flags: ignoreversion
 Source: "build\Release\helix.scr"; DestDir: "{app}\helix_scr"; Flags: ignoreversion
 Source: "build\Release\hexadrop.scr"; DestDir: "{app}\hexadrop_scr"; Flags: ignoreversion
 Source: "build\Release\hilbert.scr"; DestDir: "{app}\hilbert_scr"; Flags: ignoreversion
