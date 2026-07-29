@@ -455,6 +455,8 @@ init_noof (ModeInfo *mi)
   dbuf_p = 1;
 #endif
 
+  dbuf_p = 1; // hacked by katahiromz
+
   if (!bps) {
     bps = (noof_configuration *)
       calloc (MI_NUM_SCREENS(mi), sizeof (noof_configuration));

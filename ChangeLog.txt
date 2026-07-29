@@ -3,8 +3,8 @@
 - Version 0.87
     - Fixed and added slidescreen screensaver.
     - Fixed and added pyro screensaver.
+    - Fixed and added noof screensaver.
     - Deleted ant screensaver.
-    - Deleted cubestorm screensaver.
 - Version 0.86
     - For programs that use external image files, the system has been modified to avoid loading more than 16 image files.
     - Used GDI+ instead of OleLoadPicture to load external image files. Supported PNG and TIFF.
