@@ -1094,18 +1094,39 @@ int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
         DWORD size, i, nCount = 0;
         LPRECT pRects;
         HRGN hRgn;
+        int height;
 
         GetObject(mask->hbm, sizeof(bm), &bm);
         assert(bm.bmBitsPixel == 32);
 
-        pb = (LPBYTE)bm.bmBits;
-        for (y = 0; y < bm.bmHeight; y++)
+        /* CreateDIBSection uses top-down DIBs (negative biHeight).
+           GetObject may report bmHeight as negative. */
+        height = (bm.bmHeight < 0) ? -bm.bmHeight : bm.bmHeight;
+        pb = mask->pbBits ? mask->pbBits : (LPBYTE)bm.bmBits;
+        if (pb == NULL || height <= 0 || bm.bmWidth <= 0)
+        {
+            if (gc->clip_mask_region)
+                DeleteObject(gc->clip_mask_region);
+            gc->clip_mask_region = NULL;
+            return 1;
+        }
+
+        for (y = 0; y < height; y++)
         {
             for (x = 0; x < bm.bmWidth; x++)
             {
-                if (pb[y * bm.bmWidthBytes + x * 4])
+                BYTE *p = pb + y * bm.bmWidthBytes + x * 4;
+                if (p[0] | p[1] | p[2])
                     nCount++;
             }
+        }
+
+        if (nCount == 0)
+        {
+            if (gc->clip_mask_region)
+                DeleteObject(gc->clip_mask_region);
+            gc->clip_mask_region = CreateRectRgn(0, 0, 0, 0);
+            return 1;
         }
 
         size = sizeof(RGNDATAHEADER) + nCount * sizeof(RECT);
@@ -1115,14 +1136,15 @@ int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
         prd->rdh.iType = RDH_RECTANGLES;
         prd->rdh.nCount = nCount;
         prd->rdh.nRgnSize = 0;
-        SetRect(&prd->rdh.rcBound, 0, 0, 0xFFFF, 0xFFFF);
+        SetRect(&prd->rdh.rcBound, 0, 0, bm.bmWidth, height);
         pRects = (LPRECT)((LPBYTE)prd + sizeof(RGNDATAHEADER));
         i = 0;
-        for (y = 0; y < bm.bmHeight; y++)
+        for (y = 0; y < height; y++)
         {
             for (x = 0; x < bm.bmWidth;)
             {
-                if (pb[y * bm.bmWidthBytes + x * 4])
+                BYTE *p = pb + y * bm.bmWidthBytes + x * 4;
+                if (p[0] | p[1] | p[2])
                 {
                     pRects->left = x;
                     pRects->right = ++x;
@@ -1135,10 +1157,14 @@ int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
                     x++;
             }
         }
+        prd->rdh.nCount = i;
         hRgn = ExtCreateRegion(NULL, size, prd);
-        assert(hRgn != NULL);
         free(prd);
+        if (hRgn == NULL)
+            hRgn = CreateRectRgn(0, 0, bm.bmWidth, height);
 
+        if (gc->clip_mask_region)
+            DeleteObject(gc->clip_mask_region);
         gc->clip_mask_region = hRgn;
     }
     return 1;
