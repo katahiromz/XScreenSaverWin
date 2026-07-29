@@ -156,6 +156,8 @@ Pixmap xscreensaver_logo(Screen *screen, Visual *visual,
 
 HBITMAP GetScreenShotBM(VOID);
 
+extern BOOL g_bNoErase;
+
 //////////////////////////////////////////////////////////////////////////////
 
 #endif /* __SCREENHACK_H__ */

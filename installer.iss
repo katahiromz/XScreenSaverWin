@@ -79,6 +79,7 @@ Source: "build\Release\critical.scr"; DestDir: "{app}\critical_scr"; Flags: igno
 Source: "build\Release\crystal.scr"; DestDir: "{app}\crystal_scr"; Flags: ignoreversion
 Source: "build\Release\cube21.scr"; DestDir: "{app}\cube21_scr"; Flags: ignoreversion
 Source: "build\Release\cubenetic.scr"; DestDir: "{app}\cubenetic_scr"; Flags: ignoreversion
+Source: "build\Release\cubestorm.scr"; DestDir: "{app}\cubestorm_scr"; Flags: ignoreversion
 Source: "build\Release\cubicgrid.scr"; DestDir: "{app}\cubicgrid_scr"; Flags: ignoreversion
 Source: "build\Release\cwaves.scr"; DestDir: "{app}\cwaves_scr"; Flags: ignoreversion
 Source: "build\Release\cynosure.scr"; DestDir: "{app}\cynosure_scr"; Flags: ignoreversion

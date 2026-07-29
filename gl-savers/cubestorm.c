@@ -9,6 +9,8 @@
  * implied warranty.
  */
 
+// rewritten by katahiromz
+
 #define DELAY 30000
 #define COUNT 4
 #define DEF_COUNT       "4"
@@ -45,10 +47,18 @@ typedef struct {
 } subcube;
 
 typedef struct {
+  GLfloat px, py, pz;
+  GLfloat rx, ry, rz;
+  int ccolor;
+} histcube;
+
+typedef struct {
   GLXContext *glx_context;
   trackball_state *trackball;
   Bool button_down_p;
   Bool clear_p;
+  int hist_size, hist_count;
+  histcube *hist;
 
   GLuint cube_list;
 
@@ -66,6 +76,7 @@ static Bool do_wander = True;
 static GLfloat speed = 1.0;
 static GLfloat thickness = 0.06;
 static Bool dbuf_p = False;
+static int max_length = 200;
 
 static XrmOptionDescRec opts[] = {
   { "-spin",   ".spin",   XrmoptionNoArg, "True" },
@@ -76,6 +87,7 @@ static XrmOptionDescRec opts[] = {
   { "-db",     ".doubleBuffer", XrmoptionNoArg, "True"},
   { "+db",     ".doubleBuffer", XrmoptionNoArg, "False"},
   { "-thickness", ".thickness", XrmoptionSepArg, 0 },
+  { "-length", ".length", XrmoptionSepArg, 0 },
 };
 
 static argtype vars[] = {
@@ -84,9 +96,65 @@ static argtype vars[] = {
   {&speed,     "speed",  "Speed",  DEF_SPEED,  t_Float},
   {&thickness, "thickness", "Thickness",  DEF_THICKNESS,  t_Float},
   {&dbuf_p, "doubleBuffer", "DoubleBuffer", DEF_DBUF, t_Bool},
+  {&max_length, "length", "Length", "200", t_Int},
 };
 
 ENTRYPOINT ModeSpecOpt cube_opts = {countof(opts), opts, countof(vars), vars, NULL};
+
+static void
+push_hist (ModeInfo *mi)
+{
+  cube_configuration *bp = &bps[MI_SCREEN(mi)];
+  double px, py, pz;
+  double rx = 0, ry = 0, rz = 0;
+  int i;
+
+  if (bp->hist_count > max_length &&
+      bp->hist_count > MI_COUNT(mi) &&
+      !bp->button_down_p)
+    {
+      memmove (bp->hist,
+               bp->hist + MI_COUNT(mi),
+               (bp->hist_count - MI_COUNT(mi)) * sizeof(*bp->hist));
+      bp->hist_count -= MI_COUNT(mi);
+    }
+
+  if (bp->hist_count + MI_COUNT(mi) >= bp->hist_size)
+    {
+      bp->hist_size = bp->hist_count + MI_COUNT(mi) + 100;
+      bp->hist = (histcube *) realloc (bp->hist, bp->hist_size * sizeof(*bp->hist));
+    }
+
+  get_position (bp->subcubes[0].rot, &px, &py, &pz, !bp->button_down_p);
+
+  for (i = 0; i < MI_COUNT(mi); i++)
+    {
+      subcube  *sc = &bp->subcubes[i];
+      histcube *hc = &bp->hist[bp->hist_count];
+      double rx2, ry2, rz2;
+
+      get_rotation (sc->rot, &rx2, &ry2, &rz2, !bp->button_down_p);
+
+      if (i == 0)
+        rx = rx2, ry = ry2, rz = rz2;
+      else
+        rx2 += rx, ry2 += ry, rz2 += rz;
+
+      hc->px = px;
+      hc->py = py;
+      hc->pz = pz;
+      hc->rx = rx2;
+      hc->ry = ry2;
+      hc->rz = rz2;
+      hc->ccolor = sc->ccolor;
+
+      sc->ccolor++;
+      if (sc->ccolor >= bp->ncolors)
+        sc->ccolor = 0;
+
+      bp->hist_count++;
+    }
+}
 
 static void
 draw_face (ModeInfo *mi)
@@ -260,9 +328,15 @@ init_cube (ModeInfo *mi)
   dbuf_p = True;
 # endif
 
+  dbuf_p = True; // hacked by katahiromz
+
   bp = &bps[MI_SCREEN(mi)];
 
   bp->glx_context = init_GL(mi);
+
+  bp->hist_count = 0;
+  bp->hist_size  = 100;
+  bp->hist = (histcube *) malloc (bp->hist_size * sizeof(*bp->hist));
 
   //if (MI_COUNT(mi) <= 0) MI_COUNT(mi) = 1;
 
@@ -334,22 +408,22 @@ draw_cube (ModeInfo *mi)
   Window window = MI_WINDOW(mi);
   int wire = MI_IS_WIREFRAME(mi);
   int i;
-  double x, y, z;
 
   if (!bp->glx_context)
     return;
 
   glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(bp->glx_context));
 
-  glShadeModel(GL_SMOOTH);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  glShadeModel(GL_SMOOTH);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_NORMALIZE);
   glEnable(GL_CULL_FACE);
 
-  if (bp->clear_p)   /* we're in "no vapor trails" mode */
+  if (bp->clear_p)   /* no vapor trails mode */
     {
-      glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+      bp->hist_count = 0;
       if (! (random() % (int) (25 / speed)))
         bp->clear_p = False;
     }
@@ -362,47 +436,34 @@ draw_cube (ModeInfo *mi)
         }
     }
 
-  glPushMatrix ();
-
-  glScalef(1.1, 1.1, 1.1);
-
+  push_hist (mi);
   mi->polygon_count = 0;
 
-  get_position (bp->subcubes[0].rot, &x, &y, &z, !bp->button_down_p);
-  glTranslatef((x - 0.5) * 15,
-               (y - 0.5) * 15,
-               (z - 0.5) * 30);
-  gltrackball_rotate (bp->trackball);
-
-  glScalef (4.0, 4.0, 4.0);
-
-  for (i = 0; i < MI_COUNT(mi); i++)
+  for (i = 0; i < bp->hist_count; i++)
     {
       GLfloat bcolor[4] = {0.0, 0.0, 0.0, 1.0};
       GLfloat bspec[4]  = {1.0, 1.0, 1.0, 1.0};
       GLfloat bshiny    = 128.0;
 
+      histcube *hc = &bp->hist[i];
+
       glPushMatrix();
+      glScalef (1.1, 1.1, 1.1);
 
-      if (i != 0)  /* N+1 cubes rotate relative to cube 0 */
-        {
-          get_rotation (bp->subcubes[0].rot, &x, &y, &z, False);
-          glRotatef (x * 360, 1.0, 0.0, 0.0);
-          glRotatef (y * 360, 0.0, 1.0, 0.0);
-          glRotatef (z * 360, 0.0, 0.0, 1.0);
-        }
+      glTranslatef((hc->px - 0.5) * 15,
+                   (hc->py - 0.5) * 15,
+                   (hc->pz - 0.5) * 30);
+      gltrackball_rotate (bp->trackball);
 
-      get_rotation (bp->subcubes[i].rot, &x, &y, &z, !bp->button_down_p);
-      glRotatef (x * 360, 1.0, 0.0, 0.0);
-      glRotatef (y * 360, 0.0, 1.0, 0.0);
-      glRotatef (z * 360, 0.0, 0.0, 1.0);
+      glScalef (4.0, 4.0, 4.0);
 
-      bcolor[0] = bp->colors[bp->subcubes[i].ccolor].red   / 65536.0;
-      bcolor[1] = bp->colors[bp->subcubes[i].ccolor].green / 65536.0;
-      bcolor[2] = bp->colors[bp->subcubes[i].ccolor].blue  / 65536.0;
-      bp->subcubes[i].ccolor++;
-      if (bp->subcubes[i].ccolor >= bp->ncolors)
-        bp->subcubes[i].ccolor = 0;
+      glRotatef (hc->rx * 360, 1.0, 0.0, 0.0);
+      glRotatef (hc->ry * 360, 0.0, 1.0, 0.0);
+      glRotatef (hc->rz * 360, 0.0, 0.0, 1.0);
+
+      bcolor[0] = bp->colors[hc->ccolor].red   / 65536.0;
+      bcolor[1] = bp->colors[hc->ccolor].green / 65536.0;
+      bcolor[2] = bp->colors[hc->ccolor].blue  / 65536.0;
 
       if (wire)
         glColor3f (bcolor[0], bcolor[1], bcolor[2]);
@@ -418,8 +479,6 @@ draw_cube (ModeInfo *mi)
 
       glPopMatrix();
     }
-
-  glPopMatrix ();
 
   if (mi->fps_p) do_fps (mi);
   glFinish();
