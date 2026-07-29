@@ -331,6 +331,7 @@ int XDrawPoints(Display *dpy, Drawable d, GC gc,
 
     hdc = XCreateDrawableDC_(dpy, d);
     rgb = values->foreground_rgb;
+
     if (CoordMode == CoordModeOrigin)
     {
         for (i = 0; i < npoints; i++)
@@ -349,6 +350,7 @@ int XDrawPoints(Display *dpy, Drawable d, GC gc,
             SetPixelV(hdc, x, y, rgb);
         }
     }
+
     XDeleteDrawableDC_(dpy, d, hdc);
     return 0;
 }

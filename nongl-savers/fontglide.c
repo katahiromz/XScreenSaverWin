@@ -357,7 +357,7 @@ pick_font_1 (state *s, sentence *se)
         else
           res_y *= scale;
       }
-# endif
+#endif
 
     sprintf (pattern,
              "-%s-%s-%s-%s-%s-%s-%ld-%s-%ld-%ld-%s-%s-%s-%s",

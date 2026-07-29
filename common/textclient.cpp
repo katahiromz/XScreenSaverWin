@@ -25,8 +25,6 @@
 #include <cstdio>
 using namespace std;
 
-/*#define DEBUG*/
-
 EXTERN_C const char *progname;
 EXTERN_C char *program;
 EXTERN_C int relaunchDelay;
@@ -86,9 +84,7 @@ static void launch_text_generator(text_data *d)
     {
         BOOL bOK;
         CHAR *p, szDir[MAX_PATH];
-# ifdef DEBUG
         fprintf(stderr, "%s: textclient: launch pipe: %s\n", progname, program);
-# endif
         GetModuleFileNameA(NULL, szDir, MAX_PATH);
         p = strrchr(szDir, '\\');
         if (p)
@@ -106,17 +102,16 @@ static void launch_text_generator(text_data *d)
         if (!bOK)
         {
             // and retry again
-            *p = '\0';
+            *p = 0;
             GetEnvironmentVariableA("COMSPEC", comspec, MAX_PATH);
             wsprintfA(program2, "\"%s\" /C %s", comspec, program);
             bOK = d->pmaker->CreateProcess(NULL, program2);
         }
         if (bOK)
         {
-# ifdef DEBUG
             fprintf(stderr, "%s: textclient: CreateProcess\n", progname);
-# endif
             d->input_available_p = True;
+            d->dwTick = 0;
         }
         else
         {
@@ -132,9 +127,7 @@ static void launch_text_generator(text_data *d)
 static void relaunch_generator_timer(void *closure)
 {
     text_data *d = (text_data *)closure;
-#ifdef DEBUG
     fprintf(stderr, "%s: textclient: launch timer fired\n", progname);
-#endif
     launch_text_generator(d);
 }
 
@@ -161,14 +154,10 @@ EXTERN_C text_data *textclient_open(Display *dpy)
 {
     text_data *d = (text_data *) calloc(1, sizeof(*d));
 
-#ifdef DEBUG
     fprintf(stderr, "%s: textclient: init\n", progname);
-#endif
 
     d->dpy = dpy;
-
     d->subproc_relaunch_delay = (1000 * relaunchDelay);
-
     //d->program = get_string_resource(dpy, "program", "Program");
     d->program = _strdup(program);
 
@@ -184,9 +173,8 @@ EXTERN_C text_data *textclient_open(Display *dpy)
 
 EXTERN_C void textclient_close(text_data *d)
 {
-# ifdef DEBUG
     fprintf(stderr, "%s: textclient: free\n", progname);
-# endif
+
     if (d->pmaker->IsRunning())
         d->pmaker->TerminateProcess(-1);
 
@@ -205,10 +193,12 @@ EXTERN_C int textclient_getc(text_data *d)
 
     if (d->dwTick != 0)
     {
-        if (GetTickCount() - d->dwTick > d->subproc_relaunch_delay)
+        DWORD elapsed = GetTickCount() - d->dwTick;
+        fprintf(stderr, "%s: textclient: waiting relaunch (%lu / %lu ms)\n",
+                progname, elapsed, d->subproc_relaunch_delay);
+        if (elapsed > d->subproc_relaunch_delay)
         {
             relaunch_generator_timer(d);
-            d->dwTick = 0;
         }
     }
 
@@ -221,45 +211,27 @@ EXTERN_C int textclient_getc(text_data *d)
     {
         unsigned char s[2];
         DWORD n;
+        BOOL peek_ok;
 
-        //fprintf(stderr, "getc: waiting\n");
-        d->pipeOutput->PeekNamedPipe(s, 1, &n);
-        //fprintf(stderr, "getc: done\n");
+        peek_ok = d->pipeOutput->PeekNamedPipe(s, 1, &n);
 
-        if (n == 1)
+        if (peek_ok && n == 1)
         {
             d->pipeOutput->ReadFile(s, 1, &n);
             ret = s[0];
-# ifdef DEBUG
-            fprintf(stderr, "getc: '%c'\n", s[0]);
-# endif
         }
-        else if (!d->pmaker->IsRunning())
+
+        if (ret < 0 && (!peek_ok || !d->pmaker->IsRunning()))
         {
             d->pipeInput->CloseHandle();
             d->pipeOutput->CloseHandle();
 
-# ifdef DEBUG
-            fprintf(stderr, "%s: textclient: pclose\n", progname);
-# endif
             d->pmaker->TerminateProcess(-1);
             d->pmaker->Close();
 
-            if (d->out_column > 0)
-            {
-# ifdef DEBUG
-                fprintf(stderr, "%s: textclient: adding blank line at EOF\n",
-                        progname);
-# endif
-                d->out_buffer = "\r\n\r\n";
-            }
-
-# ifdef DEBUG
-            fprintf(stderr, "%s: textclient: relaunching in %d\n", progname,
-                   (int) d->subproc_relaunch_delay);
-# endif
             d->dwTick = GetTickCount();
             d->input_available_p = False;
+            fprintf(stderr, "%s: textclient: EOF detected, dwTick=%lu\n", progname, d->dwTick);
         }
     }
 
@@ -268,14 +240,12 @@ EXTERN_C int textclient_getc(text_data *d)
     else if (ret > 0)
         d->out_column++;
 
-# ifdef DEBUG
     if (ret <= 0)
         fprintf(stderr, "%s: textclient: getc: %d\n", progname, ret);
     else if (ret < ' ')
-        fprintf(stderr, "%s: textclient: getc: %03o\n", progname, ret);
+        fprintf(stderr, "%s: textclient: getc: 0x%02x\n", progname, ret);
     else
         fprintf(stderr, "%s: textclient: getc: '%c'\n", progname, (char) ret);
-# endif
 
     return ret;
 }
@@ -283,10 +253,6 @@ EXTERN_C int textclient_getc(text_data *d)
 EXTERN_C Bool textclient_putc(text_data *d, int c)
 {
     DWORD cb;
-
-# ifdef DEBUG
     fprintf(stderr, "%s: textclient: putc '%c'\n", progname, (char) c);
-# endif
-
     return d->pipeInput->WriteFile(&c, 1, &cb);
 }
