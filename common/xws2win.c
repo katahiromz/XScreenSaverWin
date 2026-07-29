@@ -699,8 +699,8 @@ int XFillRectangles(
     HBRUSH hbr;
     RECT rc;
     int i;
-    short x, y;
-    unsigned short width, height;
+    int x, y;
+    unsigned int width, height;
     int nR2;
 
     values = XGetGCValues_(gc);
