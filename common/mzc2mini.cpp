@@ -231,7 +231,10 @@ MFile::MFile(HANDLE hHandle)
 MFile::~MFile()
 {
     if (m_hHandle != NULL && m_hHandle != INVALID_HANDLE_VALUE)
-        MzcVerify(::CloseHandle(m_hHandle));
+    {
+        ::CloseHandle(m_hHandle);
+        m_hHandle = INVALID_HANDLE_VALUE;
+    }
 }
 
 MFile::operator HANDLE() const
