@@ -1420,8 +1420,16 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
     fs->max_bounds.width = -1;
     for (i = 0; i < nCount; i++)
     {
-        fs->per_char[i].lbearing = pabc[i].abcA + pabc[i].abcC;
-        fs->per_char[i].rbearing = pabc[i].abcA + pabc[i].abcB + pabc[i].abcC;
+        /* GDI ABC widths: abcA = origin-to-ink-left (left bearing, can be
+           negative), abcB = ink width, abcC = ink-right-to-next-origin
+           (right bearing, can be negative for italic/overhang glyphs).
+           X11 XCharStruct: lbearing = origin-to-ink-left = abcA,
+           rbearing = origin-to-ink-right = abcA + abcB (NOT the full
+           advance -- it must be free to differ from width so italic /
+           overhanging glyphs are represented correctly), and
+           width = full advance = abcA + abcB + abcC. */
+        fs->per_char[i].lbearing = pabc[i].abcA;
+        fs->per_char[i].rbearing = pabc[i].abcA + pabc[i].abcB;
         fs->per_char[i].width = pabc[i].abcA + pabc[i].abcB + pabc[i].abcC;
         fs->per_char[i].ascent = tm.tmAscent;
         fs->per_char[i].descent = tm.tmDescent;
