@@ -181,6 +181,7 @@ Source: "build\Release\noof.scr"; DestDir: "{app}\noof_scr"; Flags: ignoreversio
 Source: "build\Release\noseguy.scr"; DestDir: "{app}\noseguy_scr"; Flags: ignoreversion
 Source: "build\Release\pacman.scr"; DestDir: "{app}\pacman_scr"; Flags: ignoreversion
 Source: "build\Release\pedal.scr"; DestDir: "{app}\pedal_scr"; Flags: ignoreversion
+Source: "build\Release\piecewise.scr"; DestDir: "{app}\piecewise_scr"; Flags: ignoreversion
 Source: "build\Release\penetrate.scr"; DestDir: "{app}\penetrate_scr"; Flags: ignoreversion
 Source: "build\Release\penrose.scr"; DestDir: "{app}\penrose_scr"; Flags: ignoreversion
 Source: "build\Release\petri.scr"; DestDir: "{app}\petri_scr"; Flags: ignoreversion

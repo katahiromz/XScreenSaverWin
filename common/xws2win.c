@@ -234,28 +234,46 @@ HBRUSH GetCachedBrush(XGCValues *v)
     return v->cached_brush;
 }
 
+#ifndef XWS2WIN_PI
+#define XWS2WIN_PI 3.14159265358979323846
+#endif
+
 static void get_2_skewed_angles(double *skewed1, double *skewed2,
     int width, int height, int angle1, int angle2)
 {
-#define M_PI_PER_180_PER_64 (M_PI / 180.0 / 64.0)
-#define M_PI_3_PER_2 (3.0 * M_PI / 2.0)
-    double radian1, radian2;
+    double trueAngle1, trueAngle2;
 
-    angle1 = angle1 % (360 * 64);
-    angle2 = angle2 % (360 * 64);
-    angle2 += angle1;
-    radian1 = angle1 * M_PI_PER_180_PER_64;
-    radian2 = angle2 * M_PI_PER_180_PER_64;
-    *skewed1 = atan(tan(radian1) * width / height);
-    if (M_PI_2 <= radian1 && radian1 < M_PI_3_PER_2)
-        *skewed1 += M_PI;
-    else if (M_PI_3_PER_2 <= radian1 && radian1 <= M_2_PI)
-        *skewed1 += 2.0 * M_PI;
-    *skewed2 = atan(tan(radian2) * width / height);
-    if (M_PI_2 <= radian2 && radian2 < M_PI_3_PER_2)
-        *skewed2 += M_PI;
-    else if (M_PI_3_PER_2 <= radian2 && radian2 <= M_2_PI)
-        *skewed2 += M_2_PI;
+    /* angle1/angle2 are in units of 1/64 degree, per X11 semantics.
+       angle1 is the true start angle, angle2 is the extent, both measured
+       as the actual angle of the point on the ellipse relative to its
+       center. Convert to radians here. */
+    trueAngle1 = ((double)angle1 / 64.0) * (XWS2WIN_PI / 180.0);
+    trueAngle2 = ((double)(angle1 + angle2) / 64.0) * (XWS2WIN_PI / 180.0);
+
+    /* The callers compute the arc endpoints as:
+           x = cx + (width / 2) * cos(skewed)
+           y = cy + (height / 2) * sin(skewed)
+       i.e. "skewed" is the parametric angle on the auxiliary circle that
+       gets stretched into the ellipse. Since width != height in general,
+       the true angle of a point on the ellipse differs from this
+       parametric angle, so we must convert between the two.
+
+       Note also that both X11 and Win32 use screen coordinates where Y
+       increases downward, but X11 defines positive angles as visually
+       counterclockwise. That means, relative to the center, a point at
+       true angle "trueAngle" is physically located at:
+           dx =  (width  / 2) * cos(trueAngle)
+           dy = -(height / 2) * sin(trueAngle)      (note the minus sign)
+
+       Equating this with (dx, dy) = (a*cos(skewed), b*sin(skewed)) where
+       a = width / 2, b = height / 2, gives:
+           tan(trueAngle) = -dy / dx = -(height / width) * tan(skewed)
+       =>  tan(skewed) = -(width / height) * tan(trueAngle)
+       =>  skewed = atan2(-width * sin(trueAngle), height * cos(trueAngle))
+
+       atan2 (rather than atan) is used to preserve the correct quadrant. */
+    *skewed1 = atan2(-width * sin(trueAngle1), height * cos(trueAngle1));
+    *skewed2 = atan2(-width * sin(trueAngle2), height * cos(trueAngle2));
 }
 
 int XSetLineAttributes(Display *dpy, GC gc,
