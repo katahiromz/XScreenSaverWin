@@ -90,7 +90,8 @@ static void launch_text_generator(text_data *d)
 # endif
         GetModuleFileNameA(NULL, szDir, MAX_PATH);
         p = strrchr(szDir, '\\');
-        *p = '\0';
+        if (p)
+            *p = 0;
         d->pmaker->SetCurrentDirectory(szDir);
         bOK = d->pmaker->CreateProcess(NULL, program);
         if (!bOK)
