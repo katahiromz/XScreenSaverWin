@@ -538,16 +538,39 @@ int XDrawSegments(Display *dpy, Drawable d, GC gc,
     return 0;
 }
 
+static void
+_DrawArc(HDC hdc, Drawable d, XGCValues *values, HPEN hPen, int nR2,
+    int x, int y, unsigned int width, unsigned int height, int angle1, int angle2)
+{
+    HGDIOBJ hPenOld, hbrOld;
+    double skewed1, skewed2;
+    int xStartArc, yStartArc, xEndArc, yEndArc;
+
+    hPenOld = SelectObject(hdc, hPen);
+    hbrOld = SelectObject(hdc, GetStockObject(NULL_BRUSH));
+
+    get_2_skewed_angles(&skewed1, &skewed2, width, height, angle1, angle2);
+    xStartArc = x + width / 2.0 + (width / 2.0) * cos(skewed1);
+    yStartArc = y + height / 2.0 + (height / 2.0) * sin(skewed1);
+    xEndArc = x + width / 2.0 + (width / 2.0) * cos(skewed2);
+    yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
+
+    if (angle2 < 0)
+        SetArcDirection(hdc, AD_CLOCKWISE);
+    else
+        SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
+    Arc(hdc, x, y, x + width, y + height, xStartArc, yStartArc, xEndArc, yEndArc);
+
+    SelectObject(hdc, hbrOld);
+    SelectObject(hdc, hPenOld);
+}
+
 int XDrawArc(Display *dpy, Drawable d, GC gc,
-    int x, int y, unsigned int width, unsigned int height,
-    int angle1, int angle2)
+    int x, int y, unsigned int width, unsigned int height, int angle1, int angle2)
 {
     XGCValues *values;
     HDC hdc;
     HPEN hPen;
-    HGDIOBJ hPenOld;
-    double skewed1, skewed2;
-    int xStartArc, yStartArc, xEndArc, yEndArc;
     int nR2;
 
     values = XGetGCValues_(gc);
@@ -559,81 +582,48 @@ int XDrawArc(Display *dpy, Drawable d, GC gc,
     if (hPen == NULL)
         return BadAlloc;
 
-    get_2_skewed_angles(&skewed1, &skewed2, width, height, angle1, angle2);
-    xStartArc = x + width / 2.0 + (width / 2.0) * cos(skewed1);
-    yStartArc = y + height / 2.0 + (height / 2.0) * sin(skewed1);
-    xEndArc = x + width / 2.0 + (width / 2.0) * cos(skewed2);
-    yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
-
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
-    hPenOld = SelectObject(hdc, hPen);
-    SelectObject(hdc, GetStockObject(NULL_BRUSH));
 
-    if (angle2 < 0)
-        SetArcDirection(hdc, AD_CLOCKWISE);
-    else
-        SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
-    Arc(hdc, x, y, x + width, y + height,
-        xStartArc, yStartArc, xEndArc, yEndArc);
+    _DrawArc(hdc, d, values, hPen, nR2, x, y, width, height, angle1, angle2);
 
-    SelectObject(hdc, hPenOld);
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
-
     return 0;
 }
 
-int XDrawArcs(Display *dpy, Drawable d, GC gc,
-    XArc *arcs, int n_arcs)
+int XDrawArcs(Display *dpy, Drawable d, GC gc, XArc *arcs, int n_arcs)
 {
     XGCValues *values;
     HDC hdc;
     HPEN hPen;
-    HGDIOBJ hPenOld;
-    int i, x, y;
-    unsigned int width, height;
-    short angle1, angle2;
-    double skewed1, skewed2;
-    int xStartArc, yStartArc, xEndArc, yEndArc;
-    int nR2;
+    int i, nR2;
 
     values = XGetGCValues_(gc);
     if (values == NULL)
         return BadGC;
 
     hPen = GetCachedPen(values);
+    assert(hPen);
     if (hPen == NULL)
         return BadAlloc;
 
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
-    hPenOld = SelectObject(hdc, hPen);
-    SelectObject(hdc, GetStockObject(NULL_BRUSH));
-    for (i = 0; i < n_arcs; i++)
+
+    for (i = 0; i < n_arcs; ++i)
     {
-        x = arcs[i].x; y = arcs[i].y;
-        width = arcs[i].width; height = arcs[i].height;
-        angle1 = arcs[i].angle1; angle2 = arcs[i].angle2;
-
-        get_2_skewed_angles(&skewed1, &skewed2, width, height, angle1, angle2);
-        xStartArc = x + width / 2.0 + (width / 2.0) * cos(skewed1);
-        yStartArc = y + height / 2.0 + (height / 2.0) * sin(skewed1);
-        xEndArc = x + width / 2.0 + (width / 2.0) * cos(skewed2);
-        yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
-
-        if (angle2 < 0)
-            SetArcDirection(hdc, AD_CLOCKWISE);
-        else
-            SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
-
-        Arc(hdc, x, y, x + width, y + height,
-            xStartArc, yStartArc, xEndArc, yEndArc);
+        int x = arcs[i].x;
+        int y = arcs[i].y;
+        unsigned int width = arcs[i].width;
+        unsigned int height = arcs[i].height;
+        int angle1 = arcs[i].angle1;
+        int angle2 = arcs[i].angle2;
+        _DrawArc(hdc, d, values, hPen, nR2, x, y, width, height, angle1, angle2);
     }
-    SelectObject(hdc, hPenOld);
+
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
-
     return 0;
 }
 
