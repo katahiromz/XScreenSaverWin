@@ -1262,29 +1262,84 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
     }
     else
     {
+        /* Tokenize "FaceName [Bold] [Italic] [Size]" style names.
+           The size, weight and style words can appear in any order
+           (e.g. "Arial Bold 12", "Arial 12 Bold", "Arial Italic Bold 12"),
+           so scan every space-separated token instead of only looking at
+           the last one; otherwise a trailing style word after the size
+           hides the size, and italic is never recognized at all. */
+        char *tokens[32];
+        int ntok = 0;
+        int size_idx = -1;
+        int bold_idx = -1;
+        int italic_idx = -1;
+        int k;
+        char out[LF_FACESIZE];
+        char *dst = out;
+        int first = 1;
+
         lstrcpynA(lf.lfFaceName, name ? name : "Arial", LF_FACESIZE);
-        p = strrchr(lf.lfFaceName, ' ');
-        if (p && '0' <= p[1] && p[1] <= '9')
+
+        p = lf.lfFaceName;
+        while (ntok < 32)
         {
-            long n = strtoul(p + 1, &q, 10);
-            if (q && *q == '\0')
+            while (*p == ' ')
+                p++;
+            if (*p == '\0')
+                break;
+            tokens[ntok++] = p;
+            while (*p && *p != ' ')
+                p++;
+            if (*p == ' ')
+                *p++ = '\0';
+        }
+
+        for (k = 0; k < ntok; k++)
+        {
+            if (_stricmp(tokens[k], "bold") == 0)
+                bold_idx = k;
+            else if (_stricmp(tokens[k], "italic") == 0 ||
+                     _stricmp(tokens[k], "oblique") == 0)
+                italic_idx = k;
+            else
             {
-                lf.lfHeight = -MulDiv(n, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-                *p = '\0';
-                fprintf(stderr, "font size: %d\n", lf.lfHeight);
+                long n = strtoul(tokens[k], &q, 10);
+                if (q && *q == '\0' && tokens[k][0] != '\0')
+                    size_idx = k; /* keep the rightmost numeric token */
             }
         }
-        p = strstr(lf.lfFaceName, " Bold");
-        if (p == NULL)
-            p = strstr(lf.lfFaceName, " bold");
-        if (p != NULL)
+
+        if (size_idx >= 0)
         {
-            fprintf(stderr, "font is bold\n");
-            *p = '\0';
-            lf.lfWeight = FW_BOLD;
+            long n = strtoul(tokens[size_idx], NULL, 10);
+            lf.lfHeight = -MulDiv(n, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+            fprintf(stderr, "font size: %d\n", lf.lfHeight);
         }
-        else
-            lf.lfWeight = FW_NORMAL;
+
+        lf.lfWeight = (bold_idx >= 0) ? FW_BOLD : FW_NORMAL;
+        lf.lfItalic = (italic_idx >= 0) ? TRUE : FALSE;
+        if (bold_idx >= 0)
+            fprintf(stderr, "font is bold\n");
+        if (italic_idx >= 0)
+            fprintf(stderr, "font is italic\n");
+
+        /* Rebuild the face name from whatever tokens are left. */
+        for (k = 0; k < ntok; k++)
+        {
+            size_t len;
+            if (k == size_idx || k == bold_idx || k == italic_idx)
+                continue;
+            len = strlen(tokens[k]);
+            if ((size_t)(dst - out) + len + 2 > sizeof(out))
+                break;
+            if (!first)
+                *dst++ = ' ';
+            memcpy(dst, tokens[k], len);
+            dst += len;
+            first = 0;
+        }
+        *dst = '\0';
+        lstrcpynA(lf.lfFaceName, out[0] ? out : "Arial", LF_FACESIZE);
     }
 
     if (lf.lfHeight == 0)
@@ -1636,26 +1691,25 @@ static int fill_font_info_from_face(const char *face, XFontStruct *fs)
     HGDIOBJ hFontOld;
     HFONT hFont;
 
-    /* Remember face for subsequent XGetFontProperty(FAMILY_NAME) calls. */
-    if (face && face[0])
-        lstrcpynA(s_font_prop_face, face, LF_FACESIZE);
-
     ZeroMemory(fs, sizeof(*fs));
     ZeroMemory(&lf, sizeof(lf));
+
+    hdc = CreateCompatibleDC(NULL);
+    if (hdc == NULL)
+        return 0;
+
     lstrcpynA(lf.lfFaceName, face, LF_FACESIZE);
-    lf.lfHeight = -MulDiv(12, 96, 72); /* nominal 12pt for metrics */
+    /* Use the actual device DPI (like XLoadQueryFont does) instead of
+       assuming 96 DPI, so metrics stay correct under display scaling. */
+    lf.lfHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72); /* nominal 12pt for metrics */
     lf.lfWeight = FW_NORMAL;
     lf.lfQuality = ANTIALIASED_QUALITY;
     lf.lfCharSet = DEFAULT_CHARSET;
 
     hFont = CreateFontIndirectA(&lf);
     if (hFont == NULL)
-        return 0;
-
-    hdc = CreateCompatibleDC(NULL);
-    if (hdc == NULL)
     {
-        DeleteObject(hFont);
+        DeleteDC(hdc);
         return 0;
     }
 
@@ -1723,6 +1777,11 @@ char **XListFontsWithInfo(Display *display, char *pattern, int maxnames,
     {
         if (fill_font_info_from_face(names[i], &infos[j]))
         {
+            /* Remember only the face that becomes info[0], since that is
+               the entry XGetFontProperty(FAMILY_NAME) is documented to
+               describe right after this call. */
+            if (j == 0 && names[i] && names[i][0])
+                lstrcpynA(s_font_prop_face, names[i], LF_FACESIZE);
             out_names[j] = names[i];  /* take ownership of the string */
             names[i] = NULL;
             j++;
