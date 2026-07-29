@@ -1266,6 +1266,13 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
 
     lf.lfQuality = ANTIALIASED_QUALITY;
     lf.lfCharSet = DEFAULT_CHARSET;
+    /* GetCharABCWidthsA (used below) only works on outline/scalable fonts.
+       If GDI is allowed to substitute a raster (bitmap) font here, every
+       per_char metric silently comes back as zero, which downstream
+       collapses word pixmaps to 0x0 and crashes. Bias font selection
+       toward TrueType/outline fonts to avoid that substitution. */
+    lf.lfOutPrecision = OUT_TT_PRECIS;
+    lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
     fs->fid = CreateFontIndirectA(&lf);
     assert(fs->fid);
     if (fs->fid == NULL)
@@ -1285,7 +1292,42 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
 
     hFontOld = SelectObject(hdc, fs->fid);
     GetTextMetricsA(hdc, &tm);
-    GetCharABCWidthsA(hdc, fs->min_char_or_byte2, fs->max_char_or_byte2, pabc);
+    if (!GetCharABCWidthsA(hdc, fs->min_char_or_byte2, fs->max_char_or_byte2, pabc))
+    {
+        /* Not an outline font (GDI substituted a raster/bitmap font despite
+           OUT_TT_PRECIS), or the call otherwise failed. Fall back to plain
+           advance widths so lbearing==0, rbearing==width==advance instead
+           of silently leaving every glyph at 0x0 (which crashes downstream
+           when a 0-width word pixmap is created). */
+        UINT i2, nCount2 = fs->max_char_or_byte2 - fs->min_char_or_byte2 + 1;
+        INT *widths = (INT *)calloc(nCount2, sizeof(INT));
+        fprintf(stderr,
+            "%s: font has no ABC widths (bitmap font?), using advance widths\n",
+            name ? name : "(null)");
+        if (widths && GetCharWidth32A(hdc, fs->min_char_or_byte2,
+                                       fs->max_char_or_byte2, widths))
+        {
+            for (i2 = 0; i2 < nCount2; i2++)
+            {
+                pabc[i2].abcA = 0;
+                pabc[i2].abcB = widths[i2];
+                pabc[i2].abcC = 0;
+            }
+        }
+        else
+        {
+            /* Last resort: use the font's average/max char width so we at
+               least never end up with a 0-width glyph. */
+            for (i2 = 0; i2 < nCount2; i2++)
+            {
+                pabc[i2].abcA = 0;
+                pabc[i2].abcB = (tm.tmAveCharWidth > 0
+                                  ? tm.tmAveCharWidth : tm.tmMaxCharWidth);
+                pabc[i2].abcC = 0;
+            }
+        }
+        free(widths);
+    }
     SelectObject(hdc, hFontOld);
     DeleteDC(hdc);
 
@@ -1330,19 +1372,61 @@ int XFreeFont(Display *dpy, XFontStruct *fs)
 int XTextExtents(XFontStruct *fs, const char *string, int nchars,
     int *dir, int *font_ascent, int *font_descent, XCharStruct *overall)
 {
-    SIZE siz;
-    TEXTMETRICA tm;
-    HGDIOBJ hFontOld;
-    HDC hdc = CreateCompatibleDC(NULL);
-    hFontOld = SelectObject(hdc, fs->fid);
-    GetTextExtentPoint32A(hdc, string, nchars, &siz);
-    GetTextMetricsA(hdc, &tm);
-    SelectObject(hdc, hFontOld);
-    DeleteDC(hdc);
+    /* Real X11 XTextExtents derives the *overall* XCharStruct by walking
+       the string and accumulating each glyph's per-char metrics -- it does
+       NOT just ask for the advance width the way GetTextExtentPoint32A
+       does. In particular lbearing/rbearing must reflect the leftmost and
+       rightmost ink extent across the whole run (which can differ from
+       0 and width for italic/kerned/overhanging glyphs). GDI has no
+       single call that returns this, so we reuse the ABC-width-derived
+       per_char[] table that XLoadQueryFont() already built (per_char[i]
+       .lbearing/.rbearing come from abcA/abcB/abcC) and accumulate it
+       exactly like libX11 does. */
+    int i;
+    long x = 0;
+    long lbearing = 0;
+    long rbearing = 0;
+    int ascent = fs->ascent;
+    int descent = fs->descent;
+    Bool first = True;
 
-    *font_ascent = overall->ascent = tm.tmAscent;
-    *font_descent = overall->descent = tm.tmDescent;
-    overall->width = siz.cx;
+    if (dir)
+        *dir = 0;
+
+    for (i = 0; i < nchars; i++)
+    {
+        unsigned char c = (unsigned char) string[i];
+        XCharStruct *pc;
+
+        if (fs->per_char == NULL ||
+            c < fs->min_char_or_byte2 || c > fs->max_char_or_byte2)
+            continue;
+
+        pc = &fs->per_char[c - fs->min_char_or_byte2];
+
+        {
+            long l = x + pc->lbearing;
+            long r = x + pc->rbearing;
+            if (first || l < lbearing) lbearing = l;
+            if (first || r > rbearing) rbearing = r;
+        }
+        first = False;
+
+        if (pc->ascent  > ascent)  ascent  = pc->ascent;
+        if (pc->descent > descent) descent = pc->descent;
+
+        x += pc->width;
+    }
+
+    overall->lbearing = (short) lbearing;
+    overall->rbearing = (short) rbearing;
+    overall->width     = (short) x;
+    overall->ascent     = (short) ascent;
+    overall->descent    = (short) descent;
+
+    if (font_ascent)  *font_ascent  = ascent;
+    if (font_descent) *font_descent = descent;
+
     return 1;
 }
 

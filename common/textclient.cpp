@@ -111,14 +111,18 @@ static void launch_text_generator(text_data *d)
         }
         if (bOK)
         {
-# ifdef DEBUG
-            fprintf(stderr, "%s: textclient: CreateProcess\n", progname);
-# endif
             d->input_available_p = True;
+            d->dwTick = 0;
+        }
+        else
+        {
+            fprintf(stderr, "%s: textclient: launch failed, will retry\n", progname);
+            d->input_available_p = False;
+            d->dwTick = GetTickCount();
+            if (d->dwTick == 0)
+                d->dwTick = 1;
         }
     }
-
-    d->dwTick = 0;
 }
 
 static void relaunch_generator_timer(void *closure)

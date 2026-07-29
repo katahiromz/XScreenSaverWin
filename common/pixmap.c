@@ -8,7 +8,18 @@ Pixmap XCreatePixmap(
     unsigned int depth)
 {
     BITMAPINFO bi;
-    DrawableData *data = (DrawableData *)calloc(1, sizeof(DrawableData));
+    DrawableData *data;
+
+    /* Callers occasionally compute a 0 (or, via unsigned wraparound, huge)
+       width/height from bogus font metrics. CreateDIBSection() then fails
+       and returns NULL, but the old code returned the DrawableData wrapper
+       anyway with hbm/pbBits == NULL -- every later GDI/pbBits access on
+       that "pixmap" is a NULL dereference (SIGSEGV). Clamp to a harmless
+       minimum instead of propagating a broken handle. */
+    if (width < 1 || width > 32768)  width  = 1;
+    if (height < 1 || height > 32768) height = 1;
+
+    data = (DrawableData *)calloc(1, sizeof(DrawableData));
     if (data == NULL)
         return 0;
 
@@ -20,6 +31,18 @@ Pixmap XCreatePixmap(
     bi.bmiHeader.biBitCount = 32;
     data->hbm = CreateDIBSection(dpy, &bi, DIB_RGB_COLORS,
         (LPVOID *)&data->pbBits, NULL, 0);
+
+    if (data->hbm == NULL)
+    {
+        /* CreateDIBSection can still fail (e.g. GDI object exhaustion).
+           Don't hand back a pixmap whose backing store doesn't exist. */
+        fprintf(stderr,
+            "XCreatePixmap: CreateDIBSection failed (%ux%u)\n",
+            width, height);
+        free(data);
+        return 0;
+    }
+
     return data;
 }
 
