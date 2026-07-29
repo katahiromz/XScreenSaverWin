@@ -762,6 +762,84 @@ int XCopyPlane(Display *dpy, Drawable src_drawable, Drawable dst_drawable, GC gc
 
     func = values->function;   /* GXcopy / GXxor / ... */
 
+    /* Clip source/destination rectangle */
+    {
+        int sx = src_x;
+        int sy = src_y;
+        int dx = dst_x;
+        int dy = dst_y;
+        int w = (int)width;
+        int h = (int)height;
+
+        /* source bitmap size */
+        const int sw = bmSrc.bmWidth;
+        const int sh = bmSrc.bmHeight;
+
+        /* clip left */
+        if (sx < 0)
+        {
+            dx -= sx;
+            w += sx;
+            sx = 0;
+        }
+
+        /* clip top */
+        if (sy < 0)
+        {
+            dy -= sy;
+            h += sy;
+            sy = 0;
+        }
+
+        /* clip right */
+        if (sx + w > sw)
+            w = sw - sx;
+
+        /* clip bottom */
+        if (sy + h > sh)
+            h = sh - sy;
+
+        if (dst_drawable)
+        {
+            BITMAP bmDst;
+            GetObject(dst_drawable->hbm, sizeof(bmDst), &bmDst);
+
+            /* clip destination left */
+            if (dx < 0)
+            {
+                sx -= dx;
+                w += dx;
+                dx = 0;
+            }
+
+            /* clip destination top */
+            if (dy < 0)
+            {
+                sy -= dy;
+                h += dy;
+                dy = 0;
+            }
+
+            /* clip destination right */
+            if (dx + w > bmDst.bmWidth)
+                w = bmDst.bmWidth - dx;
+
+            /* clip destination bottom */
+            if (dy + h > bmDst.bmHeight)
+                h = bmDst.bmHeight - dy;
+        }
+
+        if (w <= 0 || h <= 0)
+            return 0;
+
+        src_x = sx;
+        src_y = sy;
+        dst_x = dx;
+        dst_y = dy;
+        width = (unsigned)w;
+        height = (unsigned)h;
+    }
+
     if (dst_drawable == NULL)
     {
         HDC hdcMem;
@@ -790,7 +868,7 @@ int XCopyPlane(Display *dpy, Drawable src_drawable, Drawable dst_drawable, GC gc
         {
             for (x = 0; x < width; x++)
             {
-				BYTE *pDst;
+                BYTE *pDst;
                 BYTE *pSrc = pbBitsSrc +
                     (src_y + y) * bmSrc.bmWidthBytes + (src_x + x) * 4;
                 src_on = (pSrc[0] | pSrc[1] | pSrc[2]) != 0;
@@ -860,7 +938,7 @@ int XCopyPlane(Display *dpy, Drawable src_drawable, Drawable dst_drawable, GC gc
         {
             for (x = 0; x < width; x++)
             {
-				BYTE *pDst;
+                BYTE *pDst;
                 BYTE *pSrc = pbBitsSrc +
                     (src_y + y) * bmSrc.bmWidthBytes + (src_x + x) * 4;
                 src_on = (pSrc[0] | pSrc[1] | pSrc[2]) != 0;
