@@ -136,7 +136,7 @@ MirrorBlob              Good
 Moebius                 Good        
 MoebiusGears            Good        
 Moire                   Good        
-Moire2                  Bad         Bad drawing
+Moire2                  Bad         Wrong drawing
 Molecule                Good        
 Morph3D                 Good        
 Mountain                Good        
@@ -151,7 +151,7 @@ Penrose                 Good
 Petri                   Good        
 Phosphor                Good        
 Photopile               Good        
-Piecewise               Bad         Bad drawing
+Piecewise               Bad         Wrong drawing
 Pinion                  Good        
 Pipes                   Good        
 Polyhedra               Good        
@@ -197,10 +197,10 @@ Substrate               Good
 Superquadrics           Good        
 Surfaces                Good        
 Swirl                   Good        
-T3D                     Bad         Bad drawing
+T3D                     Bad         Wrong drawing
 Tangram                 Good        
 Thornbird               Good        
-TimeTunnel              Bad         Bad drawing
+TimeTunnel              Bad         Wrong drawing
 TopBlock                Good        
 Triangle                Good        
 TronBit                 Good        
