@@ -729,13 +729,10 @@ int XCopyPlane(Display *dpy, Drawable src_drawable, Drawable dst_drawable, GC gc
     BYTE rBack, gBack, bBack;
     BYTE rFore, gFore, bFore;
     unsigned int x, y;
-    HDC hdcMem;
-    BITMAPINFO bi;
-    LPBYTE pbBits, pbBitsSrc;
-    HBITMAP hbm;
-    HGDIOBJ hbmOld;
-    DWORD widthbytes;
-    BITMAP bm, bmSrc;
+    BITMAP bmSrc;
+    LPBYTE pbBitsSrc;
+    int func;
+    int src_on;
 
     assert(bit_plane == 1);
     assert(src_drawable != NULL);
@@ -744,53 +741,95 @@ int XCopyPlane(Display *dpy, Drawable src_drawable, Drawable dst_drawable, GC gc
     if (values == NULL)
         return BadGC;
 
+    /* background color */
     color.pixel = values->background;
-    XQueryColor(dpy, 0, &color);
-    rBack = color.red / 256;
-    gBack = color.green / 256;
-    bBack = color.blue / 256;
+    XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
+    rBack = (BYTE)(color.red   / 256);
+    gBack = (BYTE)(color.green / 256);
+    bBack = (BYTE)(color.blue  / 256);
 
+    /* foreground color */
     color.pixel = values->foreground;
-    XQueryColor(dpy, 0, &color);
-    rFore = color.red / 256;
-    gFore = color.green / 256;
-    bFore = color.blue / 256;
+    XQueryColor(dpy, DefaultColormap(dpy, DefaultScreenOfDisplay(dpy)), &color);
+    rFore = (BYTE)(color.red   / 256);
+    gFore = (BYTE)(color.green / 256);
+    bFore = (BYTE)(color.blue  / 256);
 
-    assert(src_drawable);
     GetObject(src_drawable->hbm, sizeof(bmSrc), &bmSrc);
     assert(bmSrc.bmBitsPixel == 32);
     pbBitsSrc = (LPBYTE)bmSrc.bmBits;
     assert(pbBitsSrc);
 
+    func = values->function;   /* GXcopy / GXxor / ... */
+
     if (dst_drawable == NULL)
     {
+        HDC hdcMem;
+        BITMAPINFO bi;
+        LPBYTE pbBits;
+        HBITMAP hbm;
+        HGDIOBJ hbmOld;
+        DWORD widthbytes;
+
         ZeroMemory(&bi, sizeof(bi));
-        bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-        bi.bmiHeader.biWidth = width;
-        bi.bmiHeader.biHeight = -(long)height;
-        bi.bmiHeader.biPlanes = 1;
-        bi.bmiHeader.biBitCount = 32;
-        widthbytes = WIDTHBYTES(width * 32);
-        hbm = CreateDIBSection(dpy, &bi, DIB_RGB_COLORS, (LPVOID *)&pbBits, NULL, 0);
-        assert(hbm);
+        bi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
+        bi.bmiHeader.biWidth       = (LONG)width;
+        bi.bmiHeader.biHeight      = -(LONG)height;   /* top-down */
+        bi.bmiHeader.biPlanes      = 1;
+        bi.bmiHeader.biBitCount    = 32;
+        bi.bmiHeader.biCompression = BI_RGB;
+
+        hbm = CreateDIBSection(dpy, &bi, DIB_RGB_COLORS,
+                               (LPVOID *)&pbBits, NULL, 0);
+        if (!hbm)
+            return BadAlloc;
+
+        widthbytes = ((width * 32 + 31) / 32) * 4;
 
         for (y = 0; y < height; y++)
         {
             for (x = 0; x < width; x++)
             {
-                if (pbBitsSrc[(src_y + y) * bmSrc.bmWidthBytes + (src_x + x) * 4 + 0] ||
-                    pbBitsSrc[(src_y + y) * bmSrc.bmWidthBytes + (src_x + x) * 4 + 1] ||
-                    pbBitsSrc[(src_y + y) * bmSrc.bmWidthBytes + (src_x + x) * 4 + 2])
+				BYTE *pDst;
+                BYTE *pSrc = pbBitsSrc +
+                    (src_y + y) * bmSrc.bmWidthBytes + (src_x + x) * 4;
+                src_on = (pSrc[0] | pSrc[1] | pSrc[2]) != 0;
+
+                pDst = pbBits + y * widthbytes + x * 4;
+
+                if (func == GXxor)
                 {
-                    pbBits[y * widthbytes + x * 4 + 0] = rFore;
-                    pbBits[y * widthbytes + x * 4 + 1] = gFore;
-                    pbBits[y * widthbytes + x * 4 + 2] = bFore;
+                    if (src_on)
+                    {
+                        pDst[0] = rFore;
+                        pDst[1] = gFore;
+                        pDst[2] = bFore;
+                        pDst[3] = 0xFF;
+                    }
+                    else
+                    {
+                        pDst[0] = rBack;
+                        pDst[1] = gBack;
+                        pDst[2] = bBack;
+                        pDst[3] = 0xFF;
+                    }
                 }
                 else
                 {
-                    pbBits[y * widthbytes + x * 4 + 0] = rBack;
-                    pbBits[y * widthbytes + x * 4 + 1] = gBack;
-                    pbBits[y * widthbytes + x * 4 + 2] = bBack;
+                    if (src_on)
+                    {
+                        pDst[0] = rFore;
+                        pDst[1] = gFore;
+                        pDst[2] = bFore;
+                        pDst[3] = 0xFF;
+                    }
+                    else
+                    {
+                        pDst[0] = rBack;
+                        pDst[1] = gBack;
+                        pDst[2] = bBack;
+                        pDst[3] = 0xFF;
+                    }
                 }
             }
         }
@@ -801,15 +840,17 @@ int XCopyPlane(Display *dpy, Drawable src_drawable, Drawable dst_drawable, GC gc
         BitBlt(dpy, dst_x, dst_y, width, height, hdcMem, 0, 0, SRCCOPY);
         SelectObject(hdcMem, hbmOld);
         DeleteDC(hdcMem);
-
         DeleteObject(hbm);
     }
     else
     {
+        BITMAP bm;
+        LPBYTE pbBits;
         int dst_x_save = dst_x;
-        assert(dst_drawable != src_drawable);
 
+        assert(dst_drawable != src_drawable);
         assert(dst_drawable->hbm);
+
         GetObject(dst_drawable->hbm, sizeof(bm), &bm);
         assert(bm.bmBitsPixel == 32);
         pbBits = (LPBYTE)bm.bmBits;
@@ -819,19 +860,51 @@ int XCopyPlane(Display *dpy, Drawable src_drawable, Drawable dst_drawable, GC gc
         {
             for (x = 0; x < width; x++)
             {
-                if (pbBitsSrc[(src_y + y) * bmSrc.bmWidthBytes + (src_x + x) * 4 + 0] ||
-                    pbBitsSrc[(src_y + y) * bmSrc.bmWidthBytes + (src_x + x) * 4 + 1] ||
-                    pbBitsSrc[(src_y + y) * bmSrc.bmWidthBytes + (src_x + x) * 4 + 2])
+				BYTE *pDst;
+                BYTE *pSrc = pbBitsSrc +
+                    (src_y + y) * bmSrc.bmWidthBytes + (src_x + x) * 4;
+                src_on = (pSrc[0] | pSrc[1] | pSrc[2]) != 0;
+
+                pDst = pbBits + dst_y * bm.bmWidthBytes + dst_x * 4;
+
+                if (func == GXxor)
                 {
-                    pbBits[dst_y * bm.bmWidthBytes + dst_x * 4 + 0] = rFore;
-                    pbBits[dst_y * bm.bmWidthBytes + dst_x * 4 + 1] = gFore;
-                    pbBits[dst_y * bm.bmWidthBytes + dst_x * 4 + 2] = bFore;
+                    int dst_on = (pDst[0] | pDst[1] | pDst[2]) != 0;
+
+                    if (src_on)
+                    {
+                        if (dst_on)
+                        {
+                            pDst[0] = rBack;
+                            pDst[1] = gBack;
+                            pDst[2] = bBack;
+                            pDst[3] = 0xFF;
+                        }
+                        else
+                        {
+                            pDst[0] = rFore;
+                            pDst[1] = gFore;
+                            pDst[2] = bFore;
+                            pDst[3] = 0xFF;
+                        }
+                    }
                 }
                 else
                 {
-                    pbBits[dst_y * bm.bmWidthBytes + dst_x * 4 + 0] = rBack;
-                    pbBits[dst_y * bm.bmWidthBytes + dst_x * 4 + 1] = gBack;
-                    pbBits[dst_y * bm.bmWidthBytes + dst_x * 4 + 2] = bBack;
+                    if (src_on)
+                    {
+                        pDst[0] = rFore;
+                        pDst[1] = gFore;
+                        pDst[2] = bFore;
+                        pDst[3] = 0xFF;
+                    }
+                    else
+                    {
+                        pDst[0] = rBack;
+                        pDst[1] = gBack;
+                        pDst[2] = bBack;
+                        pDst[3] = 0xFF;
+                    }
                 }
                 dst_x++;
             }
