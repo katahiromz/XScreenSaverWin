@@ -142,7 +142,7 @@ static argtype vars[] =
     {&program, "textProgram", NULL, "xscreensaver-text", t_String},
     {&mode, "mode", NULL, "random", t_String},
     {&font, "font", NULL, "(default)", t_String},
-    {&fontCharset, "fontCharset", NULL, "iso8859-1", t_Int},
+    {&fontCharset, "fontCharset", NULL, "iso8859-1", t_String},
     {&fontBorderWidth, "fontBorderWidth", NULL, "2", t_Int},
     {&speed, "speed", NULL, "1.0", t_Float},
     {&linger, "linger", NULL, "3", t_Float},
