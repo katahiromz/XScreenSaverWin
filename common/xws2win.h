@@ -686,43 +686,9 @@ int XDrawString(Display *dpy, Drawable d, GC gc,
 int XDrawImageString(Display *dpy, Drawable d, GC gc,
     int x, int y, const char *string, int length);
 
-static __inline int XFillRectangle(
+int XFillRectangle(
     Display *dpy, Drawable d, GC gc,
-    int x, int y, unsigned int width, unsigned int height)
-{
-    XGCValues *values;
-    HDC hdc;
-    HBRUSH hbr;
-    RECT rc;
-    int nR2;
-
-    values = XGetGCValues_(gc);
-    hbr = GetCachedBrush(values);
-    if (hbr == NULL)
-        return BadAlloc;
-
-    SetRect(&rc, x, y, x + width, y + height);
-
-    hdc = XCreateDrawableDC_(dpy, d);
-    nR2 = SetROP2(hdc, values->function);
-
-    if (values->clip_mask_region)
-    {
-        SelectClipRgn(hdc, values->clip_mask_region);
-        OffsetClipRgn(hdc, values->clip_x_origin, values->clip_y_origin);
-    }
-
-    SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
-    FillRect(hdc, &rc, hbr);
-
-    if (values->clip_mask_region)
-        SelectClipRgn(hdc, NULL);
-
-    SetROP2(hdc, nR2);
-    XDeleteDrawableDC_(dpy, d, hdc);
-
-    return 0;
-}
+    int x, int y, unsigned int width, unsigned int height);
 
 static __inline int XFillRectangleSimplified(
     Display *dpy, Drawable d, GC gc,

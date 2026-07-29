@@ -690,23 +690,35 @@ int XDrawImageString(Display *dpy, Drawable d, GC gc,
     return 0;
 }
 
-int XFillRectangles(
+static void
+_FillRectangle(HDC hdc, Drawable d, XGCValues *values, HBRUSH hbr, int nR2,
+    int x, int y, unsigned int width, unsigned int height)
+{
+    RECT rc;
+
+    if (values->clip_mask_region)
+    {
+        SelectClipRgn(hdc, values->clip_mask_region);
+        OffsetClipRgn(hdc, values->clip_x_origin, values->clip_y_origin);
+    }
+
+    SetRect(&rc, x, y, x + width, y + height);
+    FillRect(hdc, &rc, hbr);
+
+    if (values->clip_mask_region)
+        SelectClipRgn(hdc, NULL);
+}
+
+int XFillRectangle(
     Display *dpy, Drawable d, GC gc,
-    XRectangle *rectangles, int n_rects)
+    int x, int y, unsigned int width, unsigned int height)
 {
     XGCValues *values;
     HDC hdc;
     HBRUSH hbr;
-    RECT rc;
-    int i;
-    int x, y;
-    unsigned int width, height;
     int nR2;
 
     values = XGetGCValues_(gc);
-    if (values == NULL)
-        return BadGC;
-
     hbr = GetCachedBrush(values);
     if (hbr == NULL)
         return BadAlloc;
@@ -714,18 +726,43 @@ int XFillRectangles(
     hdc = XCreateDrawableDC_(dpy, d);
     nR2 = SetROP2(hdc, values->function);
     SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
-    for (i = 0; i < n_rects; i++)
-    {
-        x = rectangles[i].x;
-        y = rectangles[i].y;
-        width = rectangles[i].width;
-        height = rectangles[i].height;
-        SetRect(&rc, x, y, x + width, y + height);
-        FillRect(hdc, &rc, hbr);
-    }
+
+    _FillRectangle(hdc, d, values, hbr, nR2, x, y, width, height);
+
     SetROP2(hdc, nR2);
     XDeleteDrawableDC_(dpy, d, hdc);
+    return 0;
+}
 
+int XFillRectangles(
+    Display *dpy, Drawable d, GC gc,
+    XRectangle *rectangles, int n_rects)
+{
+    XGCValues *values;
+    HDC hdc;
+    HBRUSH hbr;
+    int i, nR2;
+
+    values = XGetGCValues_(gc);
+    hbr = GetCachedBrush(values);
+    if (hbr == NULL)
+        return BadAlloc;
+
+    hdc = XCreateDrawableDC_(dpy, d);
+    nR2 = SetROP2(hdc, values->function);
+    SetPolyFillMode(hdc, (values->fill_rule == EvenOddRule ? ALTERNATE : WINDING));
+
+    for (i = 0; i < n_rects; ++i)
+    {
+        int x = rectangles[i].x;
+        int y = rectangles[i].y;
+        int width = rectangles[i].width;
+        int height = rectangles[i].height;
+        _FillRectangle(hdc, d, values, hbr, nR2, x, y, width, height);
+    }
+
+    SetROP2(hdc, nR2);
+    XDeleteDrawableDC_(dpy, d, hdc);
     return 0;
 }
 
