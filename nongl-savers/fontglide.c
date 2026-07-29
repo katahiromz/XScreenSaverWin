@@ -32,7 +32,7 @@
 #include "screenhack.h"
 #include "textclient.h"
 #include <math.h>
-#undef HAVE_DOUBLE_BUFFER_EXTENSION
+//#undef HAVE_DOUBLE_BUFFER_EXTENSION
 
 #ifdef HAVE_DOUBLE_BUFFER_EXTENSION
 #include "xdbe.h"
@@ -1642,7 +1642,8 @@ fontglide_init (Display *dpy, Window window)
   if (s->dbuf)
     {
 #ifdef HAVE_DOUBLE_BUFFER_EXTENSION
-      s->dbeclear_p = get_boolean_resource (dpy, "useDBEClear", "Boolean");
+      //s->dbeclear_p = get_boolean_resource (dpy, "useDBEClear", "Boolean"); // hacked by katahiromz
+      s->dbeclear_p = True; // hacked by katahiromz
       if (s->dbeclear_p)
         s->b = xdbe_get_backbuffer (dpy, window, XdbeBackground);
       else

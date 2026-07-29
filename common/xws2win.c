@@ -1150,12 +1150,24 @@ int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
 
         for (y = 0; y < height; y++)
         {
-            for (x = 0; x < bm.bmWidth; x++)
+            for (x = 0; x < bm.bmWidth;)
             {
                 BYTE *p = pb + y * bm.bmWidthBytes + x * 4;
                 if (p[0] | p[1] | p[2])
+                {
                     nCount++;
-            }
+                    while (x < bm.bmWidth && (pb[y * bm.bmWidthBytes + x * 4    ] |
+                                              pb[y * bm.bmWidthBytes + x * 4 + 1] |
+                                              pb[y * bm.bmWidthBytes + x * 4 + 2]))
+                    {
+                        x++;
+                    }
+                }
+                else
+                {
+                    x++;
+                }
+             }
         }
 
         if (nCount == 0)
@@ -1184,14 +1196,22 @@ int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
                 if (p[0] | p[1] | p[2])
                 {
                     pRects->left = x;
-                    pRects->right = ++x;
+                    while (x < bm.bmWidth && (pb[y * bm.bmWidthBytes + x * 4    ] |
+                                              pb[y * bm.bmWidthBytes + x * 4 + 1] |
+                                              pb[y * bm.bmWidthBytes + x * 4 + 2]))
+                    {
+                        x++;
+                    }
+                    pRects->right = x;
                     pRects->top = y;
                     pRects->bottom = y + 1;
                     pRects++;
                     i++;
                 }
                 else
+                {
                     x++;
+                }
             }
         }
         prd->rdh.nCount = i;
