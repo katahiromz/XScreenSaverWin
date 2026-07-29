@@ -1,5 +1,6 @@
 #include "xws2win.h"
 #include "colors.h"
+#include <ctype.h>
 
 void *g_gdipm = NULL;
 
@@ -1145,6 +1146,59 @@ int XSetClipMask(Display *dpy, GC gc, Pixmap mask)
 
 //////////////////////////////////////////////////////////////////////////////
 
+/* Parse XLFD: -foundry-family-weight-slant-setwidth-addstyle-pixel-point-resx-resy-spacing-avg-registry-encoding
+   Extracts family (field 2) and pixel size (field 7). Returns 1 if name is XLFD. */
+static int parse_xlfd(const char *name, char *family_out, int family_size, int *pixel_out,
+                      int *bold_out, int *italic_out)
+{
+    char buf[512];
+    char *fields[15];
+    int n = 0;
+    char *p;
+
+    if (!name || name[0] != '-')
+        return 0;
+
+    lstrcpynA(buf, name, sizeof(buf));
+    p = buf;
+    /* Leading '-' means fields[0] is empty after first split; skip leading dash */
+    if (*p == '-')
+        p++;
+    fields[n++] = p;
+    while (*p && n < 15)
+    {
+        if (*p == '-')
+        {
+            *p++ = '\0';
+            fields[n++] = p;
+        }
+        else
+            p++;
+    }
+
+    /* Need at least foundry, family, weight, slant, ..., pixel */
+    if (n < 7)
+        return 0;
+
+    lstrcpynA(family_out, fields[1], family_size);
+    if (pixel_out)
+    {
+        if (fields[6][0] == '*' || fields[6][0] == '\0')
+            *pixel_out = 0;
+        else
+            *pixel_out = (int)strtol(fields[6], NULL, 10);
+    }
+    if (bold_out)
+        *bold_out = (fields[2][0] &&
+                     (_stricmp(fields[2], "bold") == 0 ||
+                      _stricmp(fields[2], "black") == 0 ||
+                      _stricmp(fields[2], "demibold") == 0));
+    if (italic_out)
+        *italic_out = (fields[3][0] == 'i' || fields[3][0] == 'I' ||
+                       fields[3][0] == 'o' || fields[3][0] == 'O');
+    return 1;
+}
+
 XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
 {
     LOGFONTA lf;
@@ -1154,6 +1208,9 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
     HGDIOBJ hFontOld;
     int i, nCount;
     char *p, *q;
+    int xlfd_pixel = 0;
+    int xlfd_bold = 0;
+    int xlfd_italic = 0;
     XFontStruct *fs = (XFontStruct *)calloc(1, sizeof(XFontStruct));
     assert(fs);
     if (fs == NULL)
@@ -1162,35 +1219,58 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
     hdc = CreateCompatibleDC(NULL);
 
     ZeroMemory(&lf, sizeof(lf));
-    lstrcpynA(lf.lfFaceName, name, LF_FACESIZE);
-    fprintf(stderr, "Loading font: %s\n", name);
-    p = strrchr(lf.lfFaceName, ' ');
-    if (p && '0' <= p[1] && p[1] <= '9')
+    fprintf(stderr, "Loading font: %s\n", name ? name : "(null)");
+
+    if (name && parse_xlfd(name, lf.lfFaceName, LF_FACESIZE, &xlfd_pixel,
+                           &xlfd_bold, &xlfd_italic))
     {
-        long n = strtoul(p + 1, &q, 10);
-        if (q && *q == '\0')
-        {
-            lf.lfHeight = -MulDiv(n, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-            *p = '\0';
-            fprintf(stderr, "font size: %d\n", lf.lfHeight);
-        }
-    }
-    p = strstr(lf.lfFaceName, " Bold");
-    if (p == NULL)
-        p = strstr(lf.lfFaceName, " bold");
-    if (p != NULL)
-    {
-        fprintf(stderr, "font is bold\n", lf.lfHeight);
-        *p = '\0';
-        lf.lfWeight = FW_BOLD;
+        /* XLFD path: family + pixel size from the pattern */
+        if (xlfd_pixel > 0)
+            lf.lfHeight = -xlfd_pixel; /* character cell height in pixels */
+        else
+            lf.lfHeight = -MulDiv(24, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+        lf.lfWeight = xlfd_bold ? FW_BOLD : FW_NORMAL;
+        lf.lfItalic = xlfd_italic ? TRUE : FALSE;
+        fprintf(stderr, "XLFD family='%s' pixel=%d bold=%d italic=%d height=%d\n",
+                lf.lfFaceName, xlfd_pixel, xlfd_bold, xlfd_italic, lf.lfHeight);
     }
     else
-        lf.lfWeight = FW_NORMAL;
+    {
+        lstrcpynA(lf.lfFaceName, name ? name : "Arial", LF_FACESIZE);
+        p = strrchr(lf.lfFaceName, ' ');
+        if (p && '0' <= p[1] && p[1] <= '9')
+        {
+            long n = strtoul(p + 1, &q, 10);
+            if (q && *q == '\0')
+            {
+                lf.lfHeight = -MulDiv(n, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+                *p = '\0';
+                fprintf(stderr, "font size: %d\n", lf.lfHeight);
+            }
+        }
+        p = strstr(lf.lfFaceName, " Bold");
+        if (p == NULL)
+            p = strstr(lf.lfFaceName, " bold");
+        if (p != NULL)
+        {
+            fprintf(stderr, "font is bold\n");
+            *p = '\0';
+            lf.lfWeight = FW_BOLD;
+        }
+        else
+            lf.lfWeight = FW_NORMAL;
+    }
+
+    if (lf.lfHeight == 0)
+        lf.lfHeight = -MulDiv(24, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+
     lf.lfQuality = ANTIALIASED_QUALITY;
+    lf.lfCharSet = DEFAULT_CHARSET;
     fs->fid = CreateFontIndirectA(&lf);
     assert(fs->fid);
     if (fs->fid == NULL)
     {
+        DeleteDC(hdc);
         free(fs);
         return NULL;
     }
@@ -1432,6 +1512,10 @@ static int CALLBACK EnumFontFamExProc(
     return 1;
 }
 
+/* Face name for the most recently filled XListFontsWithInfo entry.
+   fontglide only queries properties of info[0] right after the call. */
+static char s_font_prop_face[LF_FACESIZE] = "Arial";
+
 /* Build a lightweight XFontStruct (no per_char metrics) for a face name.
    Matches what XListFontsWithInfo is supposed to return. */
 static int fill_font_info_from_face(const char *face, XFontStruct *fs)
@@ -1441,6 +1525,10 @@ static int fill_font_info_from_face(const char *face, XFontStruct *fs)
     TEXTMETRICA tm;
     HGDIOBJ hFontOld;
     HFONT hFont;
+
+    /* Remember face for subsequent XGetFontProperty(FAMILY_NAME) calls. */
+    if (face && face[0])
+        lstrcpynA(s_font_prop_face, face, LF_FACESIZE);
 
     ZeroMemory(fs, sizeof(*fs));
     ZeroMemory(&lf, sizeof(lf));
@@ -1466,7 +1554,7 @@ static int fill_font_info_from_face(const char *face, XFontStruct *fs)
     SelectObject(hdc, hFontOld);
     DeleteDC(hdc);
 
-    /* Do not keep the HFONT open ? XListFontsWithInfo is not a loaded font.
+    /* Do not keep the HFONT open - XListFontsWithInfo is not a loaded font.
        fid is left as 0 so XFreeFontInfo will not DeleteObject it. */
     DeleteObject(hFont);
 
@@ -1571,6 +1659,14 @@ char **XListFontsWithInfo(Display *display, char *pattern, int maxnames,
     return out_names;
 }
 
+/* True if pattern looks like an X11 XLFD (e.g. -*-*-*-*-*-*-0-0-0-0-p-0-iso8859-1).
+   Face names from EnumFontFamiliesEx never match such patterns, so treat them
+   as "match all faces" (scalable font query). */
+static int is_xlfd_pattern(const char *pat)
+{
+    return (pat && pat[0] == '-');
+}
+
 char **XListFonts(Display *display, char *pattern, int maxnames, int *actual_count_return)
 {
     HDC hdc;
@@ -1588,6 +1684,10 @@ char **XListFonts(Display *display, char *pattern, int maxnames, int *actual_cou
         return NULL;
 
     pat = (pattern && pattern[0]) ? pattern : "*";
+
+    /* XLFD patterns request scalable fonts by face; match every face name. */
+    if (is_xlfd_pattern(pat))
+        pat = "*";
 
     /* Allocate maxnames + 1 so we can always place a trailing NULL */
     data.names = (char **)calloc(maxnames + 1, sizeof(char *));
@@ -1626,26 +1726,183 @@ char **XListFonts(Display *display, char *pattern, int maxnames, int *actual_cou
     return result;
 }
 
+/* Local atom table so empty strings and property names work without
+   relying on the limited system Global atom table. */
+#define LOCAL_ATOM_BASE  0xA0000
+#define LOCAL_ATOM_MAX   64
+
+static struct {
+    char *name;
+} s_local_atoms[LOCAL_ATOM_MAX];
+static int s_local_atom_count = 0;
+
+static Atom local_intern_atom(const char *atom_name, Bool only_if_exists)
+{
+    int i;
+    char *dup;
+    for (i = 0; i < s_local_atom_count; i++)
+    {
+        if (strcmp(s_local_atoms[i].name, atom_name) == 0)
+            return (Atom)(LOCAL_ATOM_BASE + i);
+    }
+    if (only_if_exists)
+        return 0;
+    if (s_local_atom_count >= LOCAL_ATOM_MAX)
+        return 0;
+    dup = _strdup(atom_name);
+    if (!dup)
+        return 0;
+    s_local_atoms[s_local_atom_count].name = dup;
+    return (Atom)(LOCAL_ATOM_BASE + s_local_atom_count++);
+}
+
+static const char *local_atom_name(Atom atom)
+{
+    int i = (int)(atom - LOCAL_ATOM_BASE);
+    if (i >= 0 && i < s_local_atom_count)
+        return s_local_atoms[i].name;
+    return NULL;
+}
+
 char *XGetAtomName(Display *display, Atom atom)
 {
-    static char s_buf[MAX_PATH];
+    const char *local;
+    char s_buf[MAX_PATH];
+    (void)display;
+
+    local = local_atom_name(atom);
+    if (local)
+        return _strdup(local);
+
     if (!GlobalGetAtomNameA(atom, s_buf, _countof(s_buf)))
         return NULL;
-    return s_buf;
+    /* X11 returns a newly allocated string; callers XFree it. */
+    return _strdup(s_buf);
 }
 
 Atom XInternAtom(Display *display, const char *atom_name, Bool only_if_exists)
 {
-    if (!only_if_exists && !GlobalFindAtomA(atom_name))
-    {
-        return GlobalAddAtomA(atom_name);
-    }
-    return GlobalFindAtomA(atom_name);
+    Atom a;
+    (void)display;
+    if (!atom_name)
+        return 0;
+    /* Prefer local table (supports empty string and avoids Global atom limits). */
+    a = local_intern_atom(atom_name, only_if_exists);
+    if (a)
+        return a;
+    if (only_if_exists)
+        return 0;
+    /* Fallback */
+    a = GlobalFindAtomA(atom_name);
+    if (a)
+        return a;
+    return GlobalAddAtomA(atom_name);
 }
 
 Bool XGetFontProperty(XFontStruct *font_struct, Atom atom, unsigned long *value_return)
 {
-    return False;
+    char name[MAX_PATH];
+    const char *aname;
+    const char *str_val = NULL;
+    unsigned long int_val = 0;
+    int is_string = 0;
+
+    (void)font_struct;
+
+    if (!atom || !value_return)
+        return False;
+
+    aname = local_atom_name(atom);
+    if (aname)
+        lstrcpynA(name, aname, _countof(name));
+    else if (!GlobalGetAtomNameA(atom, name, _countof(name)))
+        return False;
+
+    /* String-valued XLFD fields (returned as Atoms) */
+    if (_stricmp(name, "FOUNDRY") == 0)
+    {
+        str_val = "windows";
+        is_string = 1;
+    }
+    else if (_stricmp(name, "FAMILY_NAME") == 0)
+    {
+        str_val = s_font_prop_face;
+        is_string = 1;
+    }
+    else if (_stricmp(name, "WEIGHT_NAME") == 0)
+    {
+        str_val = "medium";
+        is_string = 1;
+    }
+    else if (_stricmp(name, "SLANT") == 0)
+    {
+        str_val = "r";
+        is_string = 1;
+    }
+    else if (_stricmp(name, "SETWIDTH_NAME") == 0)
+    {
+        str_val = "normal";
+        is_string = 1;
+    }
+    else if (_stricmp(name, "ADD_STYLE_NAME") == 0)
+    {
+        str_val = ""; /* empty XLFD field */
+        is_string = 1;
+    }
+    else if (_stricmp(name, "SPACING") == 0)
+    {
+        /* Proportional: fontglide skips fixed-width faces when possible */
+        str_val = "p";
+        is_string = 1;
+    }
+    else if (_stricmp(name, "CHARSET_REGISTRY") == 0)
+    {
+        str_val = "iso8859";
+        is_string = 1;
+    }
+    else if (_stricmp(name, "CHARSET_ENCODING") == 0)
+    {
+        str_val = "1";
+        is_string = 1;
+    }
+    /* Integer-valued XLFD fields */
+    else if (_stricmp(name, "PIXEL_SIZE") == 0)
+    {
+        int_val = 0; /* scalable */
+    }
+    else if (_stricmp(name, "POINT_SIZE") == 0)
+    {
+        int_val = 0;
+    }
+    else if (_stricmp(name, "RESOLUTION_X") == 0)
+    {
+        int_val = 96;
+    }
+    else if (_stricmp(name, "RESOLUTION_Y") == 0)
+    {
+        int_val = 96;
+    }
+    else if (_stricmp(name, "AVERAGE_WIDTH") == 0)
+    {
+        int_val = 0;
+    }
+    else
+    {
+        return False;
+    }
+
+    if (is_string)
+    {
+        Atom a = XInternAtom(NULL, str_val, False);
+        if (!a)
+            return False;
+        *value_return = (unsigned long)a;
+    }
+    else
+    {
+        *value_return = int_val;
+    }
+    return True;
 }
 
 //////////////////////////////////////////////////////////////////////////////
