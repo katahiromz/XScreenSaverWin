@@ -78,6 +78,7 @@ static void launch_text_generator(text_data *d)
     }
     fprintf(stderr, "%s\n", program);
 
+    d->pmaker->Close();
     d->pmaker->SetShowWindow(SW_HIDE);
     d->pmaker->SetCreationFlags(CREATE_NEW_CONSOLE);
     if (d->pmaker->PrepareForRedirect(
@@ -117,9 +118,15 @@ static void launch_text_generator(text_data *d)
 # endif
             d->input_available_p = True;
         }
+        else
+        {
+            d->dwTick = GetTickCount();
+        }
     }
-
-    d->dwTick = 0;
+    else
+    {
+        d->dwTick = GetTickCount();
+    }
 }
 
 static void relaunch_generator_timer(void *closure)
