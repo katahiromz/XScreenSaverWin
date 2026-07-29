@@ -1289,21 +1289,6 @@ int XSetFont(Display *dpy, GC gc, Font fid)
     return 0;
 }
 
-int XFreeFontInfo(char **names, XFontStruct *info, int actualCount)
-{
-    assert(names == NULL);
-    if (info != NULL)
-    {
-        int i;
-        for (i = 0; i < actualCount; i++)
-        {
-            free(info[i].per_char);
-        }
-        free(info);
-    }
-    return 0;
-}
-
 VisualID XVisualIDFromVisual(Visual *visual)
 {
     return 0;
@@ -1335,19 +1320,310 @@ XVisualInfo *XGetVisualInfo(Display *dpy, long visual_info_mask,
     return vi;
 }
 
-char **XListFonts(Display *display, char *pattern, int maxnames, int *actual_count_return)
-{
-    return NULL;
-}
-
 int XFreeFontNames(char *list[])
 {
+    int i;
+
+    if (list == NULL)
+        return 0;
+
+    for (i = 0; list[i] != NULL; i++)
+        free(list[i]);
+
+    free(list);
     return 0;
 }
 
-char **XListFontsWithInfo(Display *display, char *pattern, int maxnames, int *count_return, XFontStruct **info_return)
+int XFreeFontInfo(char **names, XFontStruct *info, int actualCount)
 {
-    return NULL;
+    int i;
+
+    if (info != NULL)
+    {
+        for (i = 0; i < actualCount; i++)
+        {
+            if (info[i].fid)
+                DeleteObject(info[i].fid);
+            free(info[i].per_char);
+        }
+        free(info);
+    }
+
+    /* Also free the name array when the caller passes it
+       (per X11: free both names and info, or info only if names is NULL) */
+    if (names != NULL)
+        XFreeFontNames(names);
+
+    return 0;
+}
+
+/* Case-insensitive wildcard match: * = any sequence, ? = any single char */
+static int match_pattern(const char *str, const char *pat)
+{
+    for (;;)
+    {
+        if (*pat == '\0')
+            return *str == '\0';
+        if (*pat == '*')
+        {
+            while (*pat == '*')
+                pat++;
+            if (*pat == '\0')
+                return 1;
+            for (; *str; str++)
+            {
+                if (match_pattern(str, pat))
+                    return 1;
+            }
+            return 0;
+        }
+        if (*str == '\0')
+            return 0;
+        if (*pat != '?' &&
+            (unsigned char)tolower((unsigned char)*pat) !=
+            (unsigned char)tolower((unsigned char)*str))
+            return 0;
+        pat++;
+        str++;
+    }
+}
+
+typedef struct
+{
+    char **names;
+    int count;
+    int maxnames;
+    const char *pattern;
+} FontEnumData;
+
+static int CALLBACK EnumFontFamExProc(
+    const LOGFONTA *lpelfe,
+    const TEXTMETRICA *lpntme,
+    DWORD FontType,
+    LPARAM lParam)
+{
+    FontEnumData *data = (FontEnumData *)lParam;
+    const char *face = lpelfe->lfFaceName;
+    int i;
+    char *dup;
+
+    /* Skip vertical fonts and empty names */
+    if (face[0] == '@' || face[0] == '\0')
+        return 1;
+
+    if (data->count >= data->maxnames)
+        return 0;   /* stop enumeration */
+
+    /* Deduplicate (EnumFontFamiliesEx can report the same face multiple times) */
+    for (i = 0; i < data->count; i++)
+    {
+        if (_stricmp(data->names[i], face) == 0)
+            return 1;
+    }
+
+    if (!match_pattern(face, data->pattern))
+        return 1;
+
+    dup = _strdup(face);
+    if (dup == NULL)
+        return 0;
+
+    data->names[data->count++] = dup;
+    return 1;
+}
+
+/* Build a lightweight XFontStruct (no per_char metrics) for a face name.
+   Matches what XListFontsWithInfo is supposed to return. */
+static int fill_font_info_from_face(const char *face, XFontStruct *fs)
+{
+    LOGFONTA lf;
+    HDC hdc;
+    TEXTMETRICA tm;
+    HGDIOBJ hFontOld;
+    HFONT hFont;
+
+    ZeroMemory(fs, sizeof(*fs));
+    ZeroMemory(&lf, sizeof(lf));
+    lstrcpynA(lf.lfFaceName, face, LF_FACESIZE);
+    lf.lfHeight = -MulDiv(12, 96, 72); /* nominal 12pt for metrics */
+    lf.lfWeight = FW_NORMAL;
+    lf.lfQuality = ANTIALIASED_QUALITY;
+    lf.lfCharSet = DEFAULT_CHARSET;
+
+    hFont = CreateFontIndirectA(&lf);
+    if (hFont == NULL)
+        return 0;
+
+    hdc = CreateCompatibleDC(NULL);
+    if (hdc == NULL)
+    {
+        DeleteObject(hFont);
+        return 0;
+    }
+
+    hFontOld = SelectObject(hdc, hFont);
+    GetTextMetricsA(hdc, &tm);
+    SelectObject(hdc, hFontOld);
+    DeleteDC(hdc);
+
+    /* Do not keep the HFONT open ? XListFontsWithInfo is not a loaded font.
+       fid is left as 0 so XFreeFontInfo will not DeleteObject it. */
+    DeleteObject(hFont);
+
+    fs->fid = 0;
+    fs->min_char_or_byte2 = 0;
+    fs->max_char_or_byte2 = 255;
+    fs->per_char = NULL;   /* intentionally omitted */
+    fs->ascent = tm.tmAscent;
+    fs->descent = tm.tmDescent;
+
+    fs->min_bounds.lbearing = 0;
+    fs->min_bounds.rbearing = 0;
+    fs->min_bounds.width = tm.tmAveCharWidth;
+    fs->min_bounds.ascent = tm.tmAscent;
+    fs->min_bounds.descent = tm.tmDescent;
+
+    fs->max_bounds.lbearing = 0;
+    fs->max_bounds.rbearing = tm.tmMaxCharWidth;
+    fs->max_bounds.width = tm.tmMaxCharWidth;
+    fs->max_bounds.ascent = tm.tmAscent;
+    fs->max_bounds.descent = tm.tmDescent;
+
+    return 1;
+}
+
+char **XListFontsWithInfo(Display *display, char *pattern, int maxnames,
+    int *count_return, XFontStruct **info_return)
+{
+    char **names;
+    char **out_names;
+    XFontStruct *infos;
+    int count;
+    int i, j;
+
+    if (count_return)
+        *count_return = 0;
+    if (info_return)
+        *info_return = NULL;
+
+    names = XListFonts(display, pattern, maxnames, &count);
+    if (names == NULL || count <= 0)
+        return NULL;
+
+    out_names = (char **)calloc(count + 1, sizeof(char *));
+    infos = (XFontStruct *)calloc(count, sizeof(XFontStruct));
+    if (out_names == NULL || infos == NULL)
+    {
+        free(out_names);
+        free(infos);
+        XFreeFontNames(names);
+        return NULL;
+    }
+
+    j = 0;
+    for (i = 0; i < count; i++)
+    {
+        if (fill_font_info_from_face(names[i], &infos[j]))
+        {
+            out_names[j] = names[i];  /* take ownership of the string */
+            names[i] = NULL;
+            j++;
+        }
+        else
+        {
+            free(names[i]);
+            names[i] = NULL;
+        }
+    }
+
+    /* Free the original name array shell (all strings already handled) */
+    free(names);
+
+    if (j == 0)
+    {
+        free(out_names);
+        free(infos);
+        return NULL;
+    }
+
+    out_names[j] = NULL;
+
+    /* Shrink arrays to actual size */
+    {
+        char **n = (char **)realloc(out_names, (j + 1) * sizeof(char *));
+        if (n)
+            out_names = n;
+    }
+    if (j < count)
+    {
+        XFontStruct *s = (XFontStruct *)realloc(infos, j * sizeof(XFontStruct));
+        if (s)
+            infos = s;
+    }
+
+    if (count_return)
+        *count_return = j;
+    if (info_return)
+        *info_return = infos;
+    else
+        free(infos);   /* caller only wanted the name list */
+
+    return out_names;
+}
+
+char **XListFonts(Display *display, char *pattern, int maxnames, int *actual_count_return)
+{
+    HDC hdc;
+    LOGFONTA lf;
+    FontEnumData data;
+    char **result;
+    const char *pat;
+
+    (void)display;
+
+    if (actual_count_return)
+        *actual_count_return = 0;
+
+    if (maxnames <= 0)
+        return NULL;
+
+    pat = (pattern && pattern[0]) ? pattern : "*";
+
+    /* Allocate maxnames + 1 so we can always place a trailing NULL */
+    data.names = (char **)calloc(maxnames + 1, sizeof(char *));
+    if (data.names == NULL)
+        return NULL;
+    data.count = 0;
+    data.maxnames = maxnames;
+    data.pattern = pat;
+
+    ZeroMemory(&lf, sizeof(lf));
+    lf.lfCharSet = DEFAULT_CHARSET;
+    /* empty lfFaceName => enumerate all faces */
+
+    hdc = CreateCompatibleDC(NULL);
+    if (hdc)
+    {
+        EnumFontFamiliesExA(hdc, &lf, EnumFontFamExProc, (LPARAM)&data, 0);
+        DeleteDC(hdc);
+    }
+
+    if (data.count == 0)
+    {
+        free(data.names);
+        return NULL;
+    }
+
+    /* data.names[data.count] is already NULL because of calloc */
+    /* Shrink the array to the actual count + trailing NULL */
+    result = (char **)realloc(data.names, (data.count + 1) * sizeof(char *));
+    if (result == NULL)
+        result = data.names;   /* realloc failed, keep original (still has NULL) */
+
+    if (actual_count_return)
+        *actual_count_return = data.count;
+
+    return result;
 }
 
 char *XGetAtomName(Display *display, Atom atom)

@@ -405,6 +405,7 @@ char **XListFontsWithInfo(Display *display, char *pattern, int maxnames, int *co
 char *XGetAtomName(Display *display, Atom atom);
 Atom XInternAtom(Display *display, const char *atom_name, Bool only_if_exists);
 Bool XGetFontProperty(XFontStruct *font_struct, Atom atom, unsigned long *value_return);
+int XFreeFontNames(char *list[]);
 
 //////////////////////////////////////////////////////////////////////////////
 // XColor
