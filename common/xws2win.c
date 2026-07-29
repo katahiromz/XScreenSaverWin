@@ -1426,8 +1426,6 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
         }
         free(widths);
     }
-    SelectObject(hdc, hFontOld);
-    DeleteDC(hdc);
 
     fs->min_bounds.lbearing = 0x7FFF;
     fs->min_bounds.rbearing = 0x7FFF;
@@ -1448,13 +1446,43 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
         fs->per_char[i].lbearing = pabc[i].abcA;
         fs->per_char[i].rbearing = pabc[i].abcA + pabc[i].abcB;
         fs->per_char[i].width = pabc[i].abcA + pabc[i].abcB + pabc[i].abcC;
-        fs->per_char[i].ascent = tm.tmAscent;
-        fs->per_char[i].descent = tm.tmDescent;
+
+        /* Vertical ink extent: real X11 (BDF/PCF) per_char ascent/descent
+           describe THIS glyph's ink box above/below the baseline, not the
+           font's overall ascent/descent -- e.g. "x" has a small ascent and
+           zero descent, "g" has a descent, a space has both 0. Stamping
+           tm.tmAscent/tmDescent on every glyph (as before) makes every
+           word's bounding box use the full font height regardless of its
+           actual letters, which shows up as extra blank space above/below
+           text in fontglide's word pixmaps. GetGlyphOutlineA gives us the
+           true per-glyph black-box, so use that instead, falling back to
+           zero (no ink) for glyphs it can't measure (e.g. space, or
+           non-outline/substituted fonts). */
+        {
+            GLYPHMETRICS gm;
+            static const MAT2 identity = {{0,1},{0,0},{0,0},{0,1}};
+            DWORD gsz = GetGlyphOutlineA(hdc, (UINT)(i + fs->min_char_or_byte2),
+                                          GGO_METRICS, &gm, 0, NULL, &identity);
+            if (gsz != GDI_ERROR && gm.gmBlackBoxY > 0)
+            {
+                fs->per_char[i].ascent  = gm.gmptGlyphOrigin.y;
+                fs->per_char[i].descent = (int) gm.gmBlackBoxY - gm.gmptGlyphOrigin.y;
+            }
+            else
+            {
+                fs->per_char[i].ascent  = 0;
+                fs->per_char[i].descent = 0;
+            }
+        }
+
         if (fs->per_char[i].width < fs->min_bounds.width)
             fs->min_bounds = fs->per_char[i];
         if (fs->per_char[i].width > fs->max_bounds.width)
             fs->max_bounds = fs->per_char[i];
     }
+    SelectObject(hdc, hFontOld);
+    DeleteDC(hdc);
+
     free(pabc);
     fs->ascent = tm.tmAscent;
     fs->descent = tm.tmDescent;
@@ -1492,8 +1520,18 @@ int XTextExtents(XFontStruct *fs, const char *string, int nchars,
     long x = 0;
     long lbearing = 0;
     long rbearing = 0;
-    int ascent = fs->ascent;
-    int descent = fs->descent;
+    /* NOTE: do NOT seed these from fs->ascent/fs->descent (the font-wide
+       metrics). Real X11 XTextExtents reports the tightest box around the
+       actual characters in this string -- e.g. "cat" should come back with
+       a small ascent and zero descent, not the full font height. Seeding
+       from fs->ascent/descent would silently clamp every string's overall
+       ascent/descent up to the font maximum regardless of what per_char[]
+       says, which is exactly what was producing the extra blank space
+       above/below short words even after per_char[] itself was fixed to
+       hold true per-glyph ink extents. Start at 0 and let the loop below
+       raise them from the glyphs actually present. */
+    int ascent = 0;
+    int descent = 0;
     Bool first = True;
 
     if (dir)
@@ -1530,8 +1568,14 @@ int XTextExtents(XFontStruct *fs, const char *string, int nchars,
     overall->ascent     = (short) ascent;
     overall->descent    = (short) descent;
 
-    if (font_ascent)  *font_ascent  = ascent;
-    if (font_descent) *font_descent = descent;
+    /* font_ascent_return/font_descent_return are documented (and used by
+       fontglide.c's debug-mode baseline/ascent/descent line drawing) to be
+       the FONT's ascent/descent, i.e. fs->ascent/fs->descent -- not the
+       per-string tight ink box computed above for `overall`. Keep these
+       distinct or callers that want the font-wide line metrics get the
+       string-tight ones instead. */
+    if (font_ascent)  *font_ascent  = fs->ascent;
+    if (font_descent) *font_descent = fs->descent;
 
     return 1;
 }
