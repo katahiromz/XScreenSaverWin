@@ -1335,4 +1335,41 @@ XVisualInfo *XGetVisualInfo(Display *dpy, long visual_info_mask,
     return vi;
 }
 
+char **XListFonts(Display *display, char *pattern, int maxnames, int *actual_count_return)
+{
+    return NULL;
+}
+
+int XFreeFontNames(char *list[])
+{
+    return 0;
+}
+
+char **XListFontsWithInfo(Display *display, char *pattern, int maxnames, int *count_return, XFontStruct **info_return)
+{
+    return NULL;
+}
+
+char *XGetAtomName(Display *display, Atom atom)
+{
+    static char s_buf[MAX_PATH];
+    if (!GlobalGetAtomNameA(atom, s_buf, _countof(s_buf)))
+        return NULL;
+    return s_buf;
+}
+
+Atom XInternAtom(Display *display, const char *atom_name, Bool only_if_exists)
+{
+    if (!only_if_exists && !GlobalFindAtomA(atom_name))
+    {
+        return GlobalAddAtomA(atom_name);
+    }
+    return GlobalFindAtomA(atom_name);
+}
+
+Bool XGetFontProperty(XFontStruct *font_struct, Atom atom, unsigned long *value_return)
+{
+    return False;
+}
+
 //////////////////////////////////////////////////////////////////////////////

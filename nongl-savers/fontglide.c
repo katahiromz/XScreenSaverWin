@@ -1606,7 +1606,8 @@ fontglide_init (Display *dpy, Window window)
   s->trails_p = trails;
   s->debug_p = debug;
   s->debug_metrics_p = (debugMetrics ? 'y' : 0);
-  s->dbuf = get_boolean_resource (dpy, "doubleBuffer", "Boolean");
+  //s->dbuf = get_boolean_resource (dpy, "doubleBuffer", "Boolean"); // hacked by katahiromz
+  s->dbuf = True; // hacked by katahiromz
 #else
   s->trails_p = get_boolean_resource (dpy, "trails", "Trails");
   s->debug_p = get_boolean_resource (dpy, "debug", "Debug");

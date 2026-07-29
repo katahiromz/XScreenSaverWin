@@ -55,6 +55,7 @@
 typedef BYTE CARD8;
 typedef WORD CARD16;
 typedef DWORD CARD32;
+typedef ATOM Atom;
 
 #define None NULL
 
@@ -398,6 +399,12 @@ int XTextExtents(XFontStruct *fs, const char *string, int nchars,
 int XTextWidth(XFontStruct *fs, const char *string, int count);
 int XSetFont(Display *dpy, GC gc, Font fid);
 int XFreeFontInfo(char **names, XFontStruct *info, int actualCount);
+char **XListFonts(Display *display, char *pattern, int maxnames, int *actual_count_return);
+int XFreeFontNames(char *list[]);
+char **XListFontsWithInfo(Display *display, char *pattern, int maxnames, int *count_return, XFontStruct **info_return);
+char *XGetAtomName(Display *display, Atom atom);
+Atom XInternAtom(Display *display, const char *atom_name, Bool only_if_exists);
+Bool XGetFontProperty(XFontStruct *font_struct, Atom atom, unsigned long *value_return);
 
 //////////////////////////////////////////////////////////////////////////////
 // XColor
