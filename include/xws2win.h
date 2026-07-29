@@ -55,7 +55,7 @@
 typedef BYTE CARD8;
 typedef WORD CARD16;
 typedef DWORD CARD32;
-typedef ATOM Atom;
+typedef DWORD Atom;
 
 #define None NULL
 

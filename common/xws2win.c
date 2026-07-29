@@ -1767,17 +1767,17 @@ static const char *local_atom_name(Atom atom)
 char *XGetAtomName(Display *display, Atom atom)
 {
     const char *local;
-    char s_buf[MAX_PATH];
+    char buf[MAX_PATH];
     (void)display;
 
     local = local_atom_name(atom);
     if (local)
         return _strdup(local);
 
-    if (!GlobalGetAtomNameA(atom, s_buf, _countof(s_buf)))
+    if (!GlobalGetAtomNameA((ATOM)atom, buf, _countof(buf)))
         return NULL;
     /* X11 returns a newly allocated string; callers XFree it. */
-    return _strdup(s_buf);
+    return _strdup(buf);
 }
 
 Atom XInternAtom(Display *display, const char *atom_name, Bool only_if_exists)
@@ -1815,7 +1815,7 @@ Bool XGetFontProperty(XFontStruct *font_struct, Atom atom, unsigned long *value_
     aname = local_atom_name(atom);
     if (aname)
         lstrcpynA(name, aname, _countof(name));
-    else if (!GlobalGetAtomNameA(atom, name, _countof(name)))
+    else if (!GlobalGetAtomNameA((ATOM)atom, name, _countof(name)))
         return False;
 
     /* String-valued XLFD fields (returned as Atoms) */
