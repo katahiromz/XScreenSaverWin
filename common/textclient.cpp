@@ -21,8 +21,8 @@
 #include "xws2win.h"
 #include <vector>
 #include "mzc2mini.h"
-
 #include <cstdio>
+#include <strsafe.h>
 using namespace std;
 
 EXTERN_C const char *progname;
@@ -68,11 +68,11 @@ static void launch_text_generator(text_data *d)
     if (lstrcmpiA(oprogram, "xscreensaver-text") == 0 ||
         lstrcmpiA(oprogram, "xscreensaver-text.exe") == 0)
     {
-        sprintf(program, "xscreensaver-text --cols %d", d->char_w);
+        StringCchPrintfA(program, _countof(program), "xscreensaver-text --cols %d", d->char_w);
     }
     else
     {
-        strcpy(program, oprogram);
+        StringCchCopyA(program, _countof(program), oprogram);
     }
     fprintf(stderr, "%s\n", program);
 
@@ -106,7 +106,7 @@ static void launch_text_generator(text_data *d)
             if (p)
                 *p = 0;
             GetEnvironmentVariableA("COMSPEC", comspec, MAX_PATH);
-            wsprintfA(program2, "\"%s\" /C %s", comspec, program);
+            StringCchPrintfA(program2, _countof(program2), "\"%s\" /C %s", comspec, program);
             bOK = d->pmaker->CreateProcess(NULL, program2);
         }
         if (bOK)
