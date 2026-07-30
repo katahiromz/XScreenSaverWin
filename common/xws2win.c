@@ -1407,9 +1407,16 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
     /* GetCharABCWidthsA (used below) only works on outline/scalable fonts.
        If GDI is allowed to substitute a raster (bitmap) font here, every
        per_char metric silently comes back as zero, which downstream
-       collapses word pixmaps to 0x0 and crashes. Bias font selection
-       toward TrueType/outline fonts to avoid that substitution. */
-    lf.lfOutPrecision = OUT_TT_PRECIS;
+       collapses word pixmaps to 0x0 and crashes. OUT_TT_PRECIS is only a
+       *preference* for TrueType -- if lfFaceName happens to exactly match
+       a non-outline font (e.g. the legacy GDI vector font "Modern", as
+       produced by XLFDs like "-windows-Modern-medium-r-normal--105-*-96-
+       96-p-*-iso8859-1"), the exact-name match wins over the precision
+       hint and GDI selects it anyway. Use OUT_TT_ONLY_PRECIS instead,
+       which hard-excludes non-TrueType/OpenType candidates, forcing GDI
+       to substitute a real outline font whenever the requested face isn't
+       one, so GetCharABCWidthsA/GetGlyphOutlineA below reliably succeed. */
+    lf.lfOutPrecision = OUT_TT_ONLY_PRECIS;
     lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
     fs->fid = CreateFontIndirectA(&lf);
     assert(fs->fid);
@@ -1429,6 +1436,60 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
     assert(fs->per_char);
 
     hFontOld = SelectObject(hdc, fs->fid);
+
+    /* Reject fonts that don't actually cover basic Latin (A-Z, a-z, 0-9).
+       Some installed fonts (e.g. script-specific ones like Arabic
+       "KacstBook") report success for CreateFontIndirectA/SelectObject but
+       have no real glyphs for most Latin-1 code points -- GDI just hands
+       back the .notdef placeholder glyph for every one of them. That
+       placeholder has *some* bounding box (often the same box repeated for
+       every missing code), so it doesn't fail outright anywhere in the
+       pipeline below; it just silently produces per_char[] entries that
+       are all identical or otherwise nonsensical (including physically
+       impossible negative descents from stray marks/ligature glyphs),
+       which is what actually made KacstBook's metrics look "broken."
+       Since fontglide only ever draws basic Latin text, check coverage of
+       exactly that range up front with GetGlyphIndicesA +
+       GGI_MARK_NONEXISTING_GLYPHS (which reports 0xFFFF for codes with no
+       real glyph) and bail out to the normal "couldn't load this font"
+       path used by the caller if coverage is too poor, instead of handing
+       back a font whose metrics can't be trusted. */
+    {
+        static const char basic_latin[] =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const int nbasic = (int)(sizeof(basic_latin) - 1);
+        WORD gi[sizeof(basic_latin) - 1];
+        DWORD gret = GetGlyphIndicesA(hdc, basic_latin, nbasic, gi,
+                                       GGI_MARK_NONEXISTING_GLYPHS);
+        if (gret != GDI_ERROR)
+        {
+            int i2, missing = 0;
+            for (i2 = 0; i2 < nbasic; i2++)
+                if (gi[i2] == 0xFFFF)
+                    missing++;
+            /* Allow a handful of gaps (odd symbol fonts etc.) but reject
+               anything that's clearly not meant for Latin text. */
+            if (missing * 4 > nbasic) /* more than 25% of A-Za-z0-9 missing */
+            {
+                fprintf(stderr,
+                    "%s: font covers only %d/%d basic Latin glyphs, "
+                    "rejecting as unsuitable for Latin text\n",
+                    name ? name : "(null)", nbasic - missing, nbasic);
+                SelectObject(hdc, hFontOld);
+                DeleteDC(hdc);
+                DeleteObject(fs->fid);
+                free(pabc);
+                free(fs->per_char);
+                free(fs);
+                return NULL;
+            }
+        }
+        /* If GetGlyphIndicesA itself fails (older GDI, non-outline font,
+           etc.) fall through and let the existing ABC/outline fallbacks
+           below handle it as before -- this check is a best-effort filter,
+           not a hard requirement. */
+    }
+
     GetTextMetricsA(hdc, &tm);
     if (!GetCharABCWidthsA(hdc, fs->min_char_or_byte2, fs->max_char_or_byte2, pabc))
     {
@@ -1508,8 +1569,24 @@ XFontStruct *XLoadQueryFont(Display *dpy, const char *name)
                 fs->per_char[i].ascent  = gm.gmptGlyphOrigin.y;
                 fs->per_char[i].descent = (int) gm.gmBlackBoxY - gm.gmptGlyphOrigin.y;
             }
+            else if (gsz == GDI_ERROR)
+            {
+                /* GetGlyphOutlineA itself failed -- almost always means the
+                   selected font isn't an outline font at all (e.g. a
+                   vector/stroke font that slipped through despite
+                   OUT_TT_ONLY_PRECIS, or some other odd substitution).
+                   Falling back to 0 here would collapse every word pixmap
+                   to zero height regardless of the font's actual size, so
+                   use the font-wide metrics instead. Less precise than a
+                   true per-glyph ink box, but never vertically crushed. */
+                fs->per_char[i].ascent  = tm.tmAscent;
+                fs->per_char[i].descent = tm.tmDescent;
+            }
             else
             {
+                /* Outline font, but this particular glyph has no ink
+                   (space, control chars, etc.) -- genuinely 0x0 is correct
+                   here. */
                 fs->per_char[i].ascent  = 0;
                 fs->per_char[i].descent = 0;
             }

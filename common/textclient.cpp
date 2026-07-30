@@ -29,19 +29,6 @@ EXTERN_C const char *progname;
 EXTERN_C char *program;
 EXTERN_C int relaunchDelay;
 
-int tc_fprintf(FILE *fp, char *fmt, ...)
-{
-    CHAR sz[512];
-    va_list va;
-    int n;
-    va_start(va, fmt);
-    n = vsnprintf(sz, _countof(sz), fmt, va);
-    va_end(va);
-    OutputDebugStringA(sz);
-    return n;
-}
-#define fprintf tc_fprintf
-
 struct text_data
 {
     Display *dpy;

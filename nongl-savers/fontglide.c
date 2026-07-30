@@ -406,6 +406,9 @@ pick_font_1 (state *s, sentence *se)
 
   if (! ok) return False;
 
+  //lstrcpynA(pattern, "-windows-Modern-medium-r-normal--105-*-96-96-p-*-iso8859-1", _countof(pattern));
+  //lstrcpynA(pattern, "-windows-KacstBook-medium-r-normal--123-*-96-96-p-*-iso8859-1", _countof(pattern));
+  fprintf(stderr, "%s\n", pattern);
   se->font = XLoadQueryFont (s->dpy, pattern);
   if (! se->font)
     {
