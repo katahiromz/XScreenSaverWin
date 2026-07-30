@@ -35,7 +35,7 @@ int tc_fprintf(FILE *fp, char *fmt, ...)
     va_list va;
     int n;
     va_start(va, fmt);
-    n = wvsprintfA(sz, fmt, va);
+    n = vsnprintf(sz, _countof(sz), fmt, va);
     va_end(va);
     OutputDebugStringA(sz);
     return n;
