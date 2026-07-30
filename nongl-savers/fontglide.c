@@ -469,12 +469,16 @@ get_word_text (state *s)
   char *result = 0;
   int lfs = 0;
 
+  fprintf(stderr, "  get_word_text: buf_tail=%d unread=%s\n",
+          s->buf_tail, unread_word_text ? "SET" : "null");
+
   drain_input (s);
 
   if (unread_word_text)
     {
       start = unread_word_text;
       unread_word_text = 0;
+      fprintf(stderr, "  get_word_text: returning unread '%s'\n", start);
       return start;
     }
 
@@ -517,13 +521,15 @@ get_word_text (state *s)
 
  DONE:
 
-  /* Make room in the buffer by compressing out any bytes we've processed.
-   */
+  /* Make room in the buffer by compressing out any bytes we've processed. */
   if (end > s->buf)
     {
       int n = end - s->buf;
-      memmove (s->buf, end, sizeof(s->buf) - n);
+      if (n > s->buf_tail)
+        n = s->buf_tail;
+      memmove (s->buf, s->buf + n, s->buf_tail - n);
       s->buf_tail -= n;
+      s->buf[s->buf_tail] = 0;
     }
 
   return result;
@@ -746,6 +752,7 @@ unread_word (state *s, word *w)
 {
   if (unread_word_text)
     abort();
+  fprintf(stderr, "  unread_word: '%s'\n", w->text);
   unread_word_text = w->text;
   w->text = 0;
   free_word (s, w);
@@ -1515,6 +1522,20 @@ fontglide_draw (Display *dpy, Window window, void *closure)
   state *s = (state *) closure;
   int i;
 
+  fprintf(stderr, "draw tick: spawn_p=%d\n", s->spawn_p);
+
+  for (i = 0; i < s->nsentences; i++)
+    {
+      sentence *se = s->sentences[i];
+      fprintf(stderr, "  slot %d: %s id=%d state=%s pause_tick=%d nwords=%d\n",
+              i,
+              se ? "USED" : "empty",
+              se ? se->id : -1,
+              se ? (se->anim_state==IN?"IN":se->anim_state==PAUSE?"PAUSE":"OUT") : "-",
+              se ? se->pause_tick : -1,
+              se ? se->nwords : -1);
+    }
+
   if (s->debug_metrics_p)
     return fontglide_draw_metrics (closure);
 
@@ -1555,7 +1576,7 @@ fontglide_draw (Display *dpy, Window window, void *closure)
 static void
 drain_input (state *s)
 {
-  while (s->buf_tail < sizeof(s->buf) - 2)
+  while (s->buf_tail >= 0 && s->buf_tail < (int) sizeof(s->buf) - 2)
     {
       int c = textclient_getc (s->tc);
       if (c > 0)

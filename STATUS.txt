@@ -1,4 +1,4 @@
-There are 210 Goods, 3 OKs and 9 Bads of total 222 screensavers in XScreenSaverWin.
+There are 211 Goods, 3 OKs and 8 Bads of total 222 screensavers in XScreenSaverWin.
 
 (Name)                  (Status)    (Comment)
 Abstractile             Good        
@@ -72,7 +72,7 @@ Flow                    Good
 FluidBalls              Good        
 Flurry                  Good        
 FlyingToasters          Good        
-FontGlide               Bad         Not implemented yet
+FontGlide               Good        
 Forest                  Good        
 FuzzyFlakes             Good        
 Galaxy                  Good        

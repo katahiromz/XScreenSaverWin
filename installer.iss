@@ -109,6 +109,7 @@ Source: "build\Release\flow.scr"; DestDir: "{app}\flow_scr"; Flags: ignoreversio
 Source: "build\Release\fluidballs.scr"; DestDir: "{app}\fluidballs_scr"; Flags: ignoreversion
 Source: "build\Release\flurry.scr"; DestDir: "{app}\flurry_scr"; Flags: ignoreversion
 Source: "build\Release\flyingtoasters.scr"; DestDir: "{app}\flyingtoasters_scr"; Flags: ignoreversion
+Source: "build\Release\fontglide.scr"; DestDir: "{app}\fontglide_scr"; Flags: ignoreversion
 Source: "build\Release\forest.scr"; DestDir: "{app}\forest_scr"; Flags: ignoreversion
 Source: "build\Release\fuzzyflakes.scr"; DestDir: "{app}\fuzzyflakes_scr"; Flags: ignoreversion
 Source: "build\Release\galaxy.scr"; DestDir: "{app}\galaxy_scr"; Flags: ignoreversion
