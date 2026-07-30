@@ -34,6 +34,6 @@ EXTERN_C void textclient_reshape(text_data *,
                                  int pix_w, int pix_h,
                                  int char_w, int char_h);
 EXTERN_C int textclient_getc(text_data *);
-EXTERN_C Bool textclient_putc(text_data *);
+EXTERN_C Bool textclient_putc(text_data *, int c);
 
 #endif /* __TEXTCLIENT_H__ */
