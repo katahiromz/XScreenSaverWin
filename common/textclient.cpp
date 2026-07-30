@@ -95,14 +95,16 @@ static void launch_text_generator(text_data *d)
         {
             // retry
             p = strrchr(szDir, '\\');
-            *p = '\0';
+            if (p)
+                *p = 0;
             d->pmaker->SetCurrentDirectory(szDir);
             bOK = d->pmaker->CreateProcess(NULL, program);
         }
         if (!bOK)
         {
             // and retry again
-            *p = 0;
+            if (p)
+                *p = 0;
             GetEnvironmentVariableA("COMSPEC", comspec, MAX_PATH);
             wsprintfA(program2, "\"%s\" /C %s", comspec, program);
             bOK = d->pmaker->CreateProcess(NULL, program2);
