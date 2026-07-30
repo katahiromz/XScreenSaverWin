@@ -214,7 +214,7 @@ Source: "build\Release\shadebobs.scr"; DestDir: "{app}\shadebobs_scr"; Flags: ig
 Source: "build\Release\sierpinski3d.scr"; DestDir: "{app}\sierpinski3d_scr"; Flags: ignoreversion
 Source: "build\Release\sierpinski.scr"; DestDir: "{app}\sierpinski_scr"; Flags: ignoreversion
 Source: "build\Release\skytentacles.scr"; DestDir: "{app}\skytentacles_scr"; Flags: ignoreversion
-Source: "build\Release\slidescreen"; DestDir: "{app}\slidescreen_scr"; Flags: ignoreversion
+Source: "build\Release\slidescreen.scr"; DestDir: "{app}\slidescreen_scr"; Flags: ignoreversion
 Source: "build\Release\slip.scr"; DestDir: "{app}\slip_scr"; Flags: ignoreversion
 Source: "build\Release\sonar.scr"; DestDir: "{app}\sonar_scr"; Flags: ignoreversion
 Source: "build\Release\speedmine.scr"; DestDir: "{app}\speedmine_scr"; Flags: ignoreversion
