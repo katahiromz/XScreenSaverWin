@@ -53,7 +53,8 @@ struct text_data
     MProcessMaker *pmaker;
     Bool input_available_p;
     DWORD subproc_relaunch_delay;
-    DWORD dwTick;
+    Bool  awaiting_relaunch_p;
+    DWORD subproc_died_tick;
 
     const char *out_buffer;
     int out_column;
@@ -113,16 +114,17 @@ static void launch_text_generator(text_data *d)
         {
             fprintf(stderr, "%s: textclient: CreateProcess\n", progname);
             d->input_available_p = True;
-            d->dwTick = 0;
+            d->awaiting_relaunch_p = False;
         }
         else
         {
-            d->dwTick = GetTickCount();
+            d->awaiting_relaunch_p = True;
+            d->subproc_died_tick = GetTickCount();
         }
     }
     else
     {
-        d->dwTick = GetTickCount();
+        d->subproc_died_tick = GetTickCount();
     }
 }
 
@@ -175,7 +177,7 @@ EXTERN_C text_data *textclient_open(Display *dpy)
 
 EXTERN_C void textclient_close(text_data *d)
 {
-    fprintf(stderr, "%s: textclient: free\n", progname);
+    fprintf(stderr, "%s: textclient: free: %lu\n", progname, GetTickCount());
 
     if (d->pmaker->IsRunning())
         d->pmaker->TerminateProcess(-1);
@@ -193,11 +195,11 @@ EXTERN_C int textclient_getc(text_data *d)
 {
     int ret = -1;
 
-    if (d->dwTick != 0)
+    if (d->awaiting_relaunch_p)
     {
-        DWORD elapsed = GetTickCount() - d->dwTick;
-        fprintf(stderr, "%s: textclient: waiting relaunch (%lu / %lu ms)\n",
-                progname, elapsed, d->subproc_relaunch_delay);
+        DWORD elapsed = GetTickCount() - d->subproc_died_tick;
+        fprintf(stderr, "%s: textclient: waiting relaunch (%lu / %lu ms): %lu\n",
+                progname, elapsed, d->subproc_relaunch_delay, GetTickCount());
         if (elapsed > d->subproc_relaunch_delay)
         {
             relaunch_generator_timer(d);
@@ -225,15 +227,16 @@ EXTERN_C int textclient_getc(text_data *d)
 
         if (ret < 0 && (!peek_ok || !d->pmaker->IsRunning()))
         {
-            d->pipeInput->CloseHandle();
-            d->pipeOutput->CloseHandle();
-
             d->pmaker->TerminateProcess(-1);
+            if (!!*d->pipeInput)  d->pipeInput->CloseHandle();
+            if (!!*d->pipeOutput) d->pipeOutput->CloseHandle();
             d->pmaker->Close();
 
-            d->dwTick = GetTickCount();
+            d->awaiting_relaunch_p = True;
+            d->subproc_died_tick = GetTickCount();
             d->input_available_p = False;
-            fprintf(stderr, "%s: textclient: EOF detected, dwTick=%lu\n", progname, d->dwTick);
+            fprintf(stderr, "%s: textclient: EOF detected, subproc_died_tick=%lu\n", progname,
+                    d->subproc_died_tick);
         }
     }
 

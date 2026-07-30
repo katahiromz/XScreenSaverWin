@@ -339,9 +339,9 @@ HANDLE MFile::Detach()
 
 BOOL MFile::CloseHandle()
 {
-    MzcAssert(m_hHandle != NULL && m_hHandle != INVALID_HANDLE_VALUE);
+    if (m_hHandle == NULL || m_hHandle == INVALID_HANDLE_VALUE)
+        return FALSE;
     BOOL b = ::CloseHandle(m_hHandle);
-    MzcAssert(b);
     m_hHandle = INVALID_HANDLE_VALUE;
     return b;
 }
@@ -353,7 +353,8 @@ BOOL MFile::PeekNamedPipe(
     LPDWORD pcbAvail/* = NULL*/,
     LPDWORD pBytesLeft/* = NULL*/)
 {
-    MzcAssert(m_hHandle != NULL && m_hHandle != INVALID_HANDLE_VALUE);
+    if (m_hHandle == NULL || m_hHandle == INVALID_HANDLE_VALUE)
+        return FALSE;
     return ::PeekNamedPipe(m_hHandle, pBuffer, cbBuffer,
         pcbRead, pcbAvail, pBytesLeft);
 }
@@ -361,14 +362,16 @@ BOOL MFile::PeekNamedPipe(
 BOOL MFile::ReadFile(LPVOID pBuffer, DWORD cbToRead,
     LPDWORD pcbRead, LPOVERLAPPED pOverlapped/* = NULL*/)
 {
-    MzcAssert(m_hHandle != NULL && m_hHandle != INVALID_HANDLE_VALUE);
+    if (m_hHandle == NULL || m_hHandle == INVALID_HANDLE_VALUE)
+        return FALSE;
     return ::ReadFile(m_hHandle, pBuffer, cbToRead, pcbRead, pOverlapped);
 }
 
 BOOL MFile::WriteFile(LPCVOID pBuffer, DWORD cbToWrite,
     LPDWORD pcbWritten, LPOVERLAPPED pOverlapped/* = NULL*/)
 {
-    MzcAssert(m_hHandle != NULL && m_hHandle != INVALID_HANDLE_VALUE);
+    if (m_hHandle == NULL || m_hHandle == INVALID_HANDLE_VALUE)
+        return FALSE;
     return ::WriteFile(
         m_hHandle, pBuffer, cbToWrite, pcbWritten, pOverlapped);
 }
