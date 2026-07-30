@@ -18,7 +18,6 @@
 #include <ctype.h>
 
 char *progname = "xscreensaver-text";
-char *version = "0.00";
 char *saver_name = "";
 
 int verbose = 0;
@@ -36,7 +35,7 @@ const char *saver_key = "Software\\Katayama Hirofumi MZ\\%s";
 
 void show_version(void)
 {
-    fprintf(stderr, "XScreenSaver for Windows v0.80 text client utility\n");
+    fprintf(stderr, "XScreenSaver for Windows v%s text client utility\n", PROJECT_VERSION);
     fprintf(stderr, "Written by Katayama Hirofumi MZ\n");
 }
 
