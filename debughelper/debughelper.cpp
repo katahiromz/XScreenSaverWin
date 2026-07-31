@@ -1,3 +1,6 @@
+// debughelper.cpp --- screensaver debug helper
+// Author: katahiromz
+// License: GPL v3
 #include "stdafx.h"
 
 #define MAX_LOADSTRING 100

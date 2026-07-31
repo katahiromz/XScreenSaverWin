@@ -1,3 +1,7 @@
+// xws2win.c
+// Author: katahiromz
+// License: GPL v3
+
 #ifndef __XWS2WIN_H__
 #define __XWS2WIN_H__
 

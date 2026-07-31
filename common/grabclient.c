@@ -1,3 +1,6 @@
+// grabclient.c
+// Author: katahiromz
+// License: GPL v3
 #include "xws2win.h"
 #include "grabscreen.h"
 #include "yarandom.h"

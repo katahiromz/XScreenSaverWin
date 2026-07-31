@@ -1,3 +1,6 @@
+// random.cpp --- random screensaver
+// Author: katahiromz
+// License: GPL v3
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_NON_CONFORMING_SWPRINTFS
 #include <windows.h>

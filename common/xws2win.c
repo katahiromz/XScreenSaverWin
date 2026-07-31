@@ -1,3 +1,6 @@
+// xws2win.c
+// Author: katahiromz
+// License: GPL v3
 #include "xws2win.h"
 #include "colors.h"
 #include <ctype.h>
