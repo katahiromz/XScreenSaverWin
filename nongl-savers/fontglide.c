@@ -408,6 +408,7 @@ pick_font_1 (state *s, sentence *se)
 
   //lstrcpynA(pattern, "-windows-Modern-medium-r-normal--105-*-96-96-p-*-iso8859-1", _countof(pattern));
   //lstrcpynA(pattern, "-windows-KacstBook-medium-r-normal--123-*-96-96-p-*-iso8859-1", _countof(pattern));
+  //lstrcpynA(pattern, "-windows-Sitka Display-medium-r-normal--103-*-96-96-p-*-iso8859-1", _countof(pattern));
   fprintf(stderr, "%s\n", pattern);
   se->font = XLoadQueryFont (s->dpy, pattern);
   if (! se->font)
@@ -770,56 +771,267 @@ static void
 split_words (state *s, sentence *se)
 {
   word **words2;
+  int *advance;
   int nwords2 = 0;
-  int i, j;
+  int i, j, k;
+
+  /* Per-original-word bookkeeping, computed in pass 1 and used in
+     pass 2. */
+  struct {
+    int start;           /* index into words2[]/advance[] where this
+                             word's characters begin */
+    int len;
+    int reserved_width;  /* ow->rbearing - ow->lbearing */
+    int advance_sum;     /* sum of this word's characters' raw advances */
+    int x, y, sx, sy, tx, ty;  /* this word's recovered pen origin */
+    int baseline_y;      /* the shared per-line baseline (see below) */
+  } *winfo;
+
   for (i = 0; i < se->nwords; i++)
     nwords2 += strlen (se->words[i]->text);
 
-  words2 = (word **) calloc (nwords2, sizeof(*words2));
+  words2  = (word **) calloc (nwords2, sizeof (*words2));
+  advance = (int *)   calloc (nwords2, sizeof (*advance));
+  winfo   = calloc (se->nwords, sizeof (*winfo));
 
+  /* Pass 1: create every character's word object for the *whole*
+     sentence, and gather each original word's bookkeeping.  We need
+     every character's real, border-adjusted lbearing/rbearing up front,
+     because pass 2 positions character K while also looking ahead to
+     character K+1 -- even when K+1 belongs to the *next* word -- to
+     guarantee neighboring characters' ink never overlaps, regardless of
+     which original word they came from. */
   for (i = 0, j = 0; i < se->nwords; i++)
     {
       word *ow = se->words[i];
       int L = strlen (ow->text);
-      int k;
 
-      int x  = ow->x;
-      int y  = ow->y;
-      int sx = ow->start_x;
-      int sy = ow->start_y;
-      int tx = ow->target_x;
-      int ty = ow->target_y;
+      winfo[i].start = j;
+      winfo[i].len   = L;
+
+      /* x/y/sx/sy/tx/ty track the word's own pen *origin* -- the
+         position the whole word was drawn from -- not the position of
+         its leftmost ink.  ow->x/ow->start_x/ow->target_x are already
+         ink-adjusted (see populate_sentence(): target_x = pen_x +
+         w->lbearing), so recover the origin once here by subtracting
+         ow->lbearing back out; each character is then positioned
+         relative to this origin using its own (isolated) lbearing. */
+      winfo[i].x  = ow->x       - ow->lbearing;
+      winfo[i].y  = ow->y;
+      winfo[i].sx = ow->start_x - ow->lbearing;
+      winfo[i].sy = ow->start_y;
+      winfo[i].tx = ow->target_x - ow->lbearing;
+      winfo[i].ty = ow->target_y;
+
+      /* ow->target_y is (baseline_y - ow->ascent), and ow->ascent comes
+         from XTextExtents() on *this word's own text* -- so it varies
+         slightly from word to word depending on which glyphs happen to
+         be present (an ascender-heavy word can measure a pixel or two
+         taller than one without).  Two words sitting on the exact same
+         visual line can therefore end up with slightly different
+         target_y values, even though they share the same baseline.
+         Recover that shared baseline explicitly, so "same line?" checks
+         below aren't fooled by per-word ascent differences. */
+      winfo[i].baseline_y = ow->target_y + ow->ascent;
+
+      /* The horizontal span that populate_sentence() originally
+         reserved for this whole word -- and therefore, the gap before
+         the *next* word's target_x begins.  We spread this word's
+         characters out so that, end to end, their advances sum to
+         (approximately) this span, instead of just chaining each
+         character's own ink-only rbearing as its advance. */
+      winfo[i].reserved_width = ow->rbearing - ow->lbearing;
 
       for (k = 0; k < L; k++)
         {
           char *t2 = malloc (2);
-          word *w2;
-          int xoff, yoff;
+          XCharStruct co;
+          int cdir, casc, cdesc;
 
           t2[0] = ow->text[k];
           t2[1] = 0;
-          w2 = new_word (s, se, t2, True);
-          words2[j++] = w2;
+          words2[j] = new_word (s, se, t2, True);
 
-          xoff = (w2->lbearing - ow->lbearing);
-          yoff = (ow->ascent - w2->ascent);
+          /* co.width is the glyph's "designed" advance -- the distance
+             to the next glyph's origin when the string is drawn as one
+             continuous run.  Cursive/connected/script fonts often make
+             this very small, zero, or even negative on purpose, so
+             that consecutive letters' ink overlaps and joins up when
+             drawn together.  We still start from it in pass 2 (scaled
+             to fit the word's measured width), but pass 2 also clamps
+             the result so a tiny or negative designed advance can
+             never actually pull characters backwards or into each
+             other once they're torn apart into separate glyphs. */
+          XTextExtents (se->font, ow->text + k, 1, &cdir, &casc, &cdesc, &co);
+          advance[j] = co.width;
+          winfo[i].advance_sum += advance[j];
 
-          w2->x        = x  + xoff;
-          w2->y        = y  + yoff;
-          w2->start_x  = sx + xoff;
-          w2->start_y  = sy + yoff;
-          w2->target_x = tx + xoff;
-          w2->target_y = ty + yoff;
-
-          x  += w2->rbearing;
-          sx += w2->rbearing;
-          tx += w2->rbearing;
+          j++;
         }
+    }
 
-      free_word (s, ow);
+  /* Pass 2: position every character, word by word, picking how far to
+     advance the pen before placing the next one within a word.  Between
+     words, we track the rightmost ink pixel reached so far on the
+     current line (min_x); if the next word's natural starting position
+     would place its first character's ink before that point, the whole
+     word -- all of its characters, rigidly, preserving their relative
+     spacing -- is shifted right just enough to clear it.  (Growing the
+     *previous* word's last character instead doesn't work: each word's
+     pen cursor is reset to that word's own original anchor below, so
+     stretching the previous word's advance has no effect on where the
+     next word's own anchor sits -- it has to be the next word that
+     moves.)  min_x resets whenever the line changes, since words on
+     different lines are horizontally unrelated. */
+  {
+    int min_x = 0;
+    int have_min_x = 0;
+    int min_line_baseline = 0;
+    int min_gap = XTextWidth (se->font, " ", 1);
+
+    for (i = 0; i < se->nwords; i++)
+      {
+        word *ow = se->words[i];
+        int L     = winfo[i].len;
+        int start = winfo[i].start;
+        int x  = winfo[i].x,  y  = winfo[i].y;
+        int sx = winfo[i].sx, sy = winfo[i].sy;
+        int tx = winfo[i].tx, ty = winfo[i].ty;
+        int shift = 0;
+
+        if (!have_min_x || winfo[i].baseline_y != min_line_baseline)
+          {
+            have_min_x       = 0;
+            min_line_baseline = winfo[i].baseline_y;
+          }
+
+        /* Require not just "no overlap" (natural_left >= min_x) but a
+           full space character's worth of daylight beyond the previous
+           word's rightmost ink -- otherwise a shift that lands exactly
+           flush against the previous word (shift = min_x -
+           natural_left, giving a gap of zero) reads as one run-together
+           word instead of two separate ones. */
+        if (L > 0 && have_min_x)
+          {
+            word *first = words2[start];
+            int natural_left = tx + first->lbearing;
+            int required_left = min_x + min_gap;
+            if (natural_left < required_left)
+              shift = required_left - natural_left;
+          }
+
+        if (L > 0 && s->debug_p)
+          fprintf (stderr,
+                   "%s: split: word \"%s\" natural_left=%d min_x=%d shift=%d\n",
+                   progname, ow->text,
+                   (winfo[i].tx + words2[start]->lbearing), min_x, shift);
+
+        x  += shift;
+        sx += shift;
+        tx += shift;
+
+        for (k = 0; k < L; k++)
+          {
+            word *w2   = words2[start + k];
+            word *next = (k + 1 < L) ? words2[start + k + 1] : 0;
+            int yoff = (ow->ascent - w2->ascent);
+            int adv, min_adv, ink_width;
+
+            /* Position this character using *its own* isolated lbearing
+               relative to the running pen cursor -- exactly how
+               populate_sentence() positions a whole word relative to
+               its own pen cursor (target_x = pen_x + lbearing).  Do NOT
+               offset by the word's aggregate ow->lbearing: a single
+               character elsewhere in the word can have an unusually
+               large negative lbearing (its ink overhangs left of its
+               own origin -- e.g. 'V' in some display fonts), which
+               drags the whole word's aggregate lbearing far to the
+               left.  Using that shared, word-wide value to offset every
+               character would shove the earlier characters right and
+               yank that one overhanging character back left, making
+               them collide even though each character's own advance
+               was already computed correctly below. */
+            w2->x        = x  + w2->lbearing;
+            w2->y        = y  + yoff;
+            w2->start_x  = sx + w2->lbearing;
+            w2->start_y  = sy + yoff;
+            w2->target_x = tx + w2->lbearing;
+            w2->target_y = ty + yoff;
+
+            /* Start from this character's designed advance, scaled so
+               that, end to end, the word's characters span the same
+               tight ink-to-ink width (reserved_width) that
+               populate_sentence() originally measured and reserved for
+               this whole word. */
+            adv = (winfo[i].advance_sum > 0)
+                    ? (int) ((double) advance[start + k]
+                             * winfo[i].reserved_width
+                             / winfo[i].advance_sum + 0.5)
+                    : 0;
+            if (adv < 0)
+              adv = 0;
+
+            /* Now raise adv, if needed, to whichever is larger of:
+                 - this character's own ink width (rbearing - lbearing),
+                   so scaling the word down to fit reserved_width can
+                   never compress a character's advance to less than
+                   its own ink needs; and
+                 - the gap actually required so the *next* character's
+                   ink -- which can overhang left of its own origin by a
+                   different amount than this character's ink does
+                   (e.g. a serif 't' overhangs further left than a
+                   preceding 'a') -- lands at or after this character's
+                   right ink edge instead of underneath it.
+               Both are real, independent ways characters within the
+               same word can end up overlapping once move_chars_p tears
+               it into separate glyphs, so take whichever needs the most
+               room.  (Word-to-word overlap is handled separately, by
+               shift above -- a "next" that belongs to a different word
+               can't be reached this way, since that word's cursor is
+               reset independently below.) */
+            ink_width = w2->rbearing - w2->lbearing;
+            if (ink_width < 0)
+              ink_width = 0;
+            min_adv = ink_width;
+            if (next)
+              {
+                int need = w2->rbearing - next->lbearing;
+                if (need > min_adv)
+                  min_adv = need;
+              }
+            if (adv < min_adv)
+              adv = min_adv;
+
+            x  += adv;
+            sx += adv;
+            tx += adv;
+
+            if (s->debug_p)
+              fprintf (stderr,
+                       "%s: split:   char '%c' target_x=%d lbearing=%d "
+                       "rbearing=%d right_edge=%d adv=%d\n",
+                       progname, w2->text[0], w2->target_x,
+                       w2->lbearing, w2->rbearing,
+                       w2->target_x + (w2->rbearing - w2->lbearing), adv);
+          }
+
+        if (L > 0)
+          {
+            word *last = words2[start + L - 1];
+            min_x = last->target_x + (last->rbearing - last->lbearing);
+            have_min_x = 1;
+          }
+      }
+  }
+
+  for (i = 0; i < se->nwords; i++)
+    {
+      free_word (s, se->words[i]);
       se->words[i] = 0;
     }
   free (se->words);
+  free (winfo);
+  free (advance);
 
   se->words = words2;
   se->nwords = nwords2;
@@ -1101,7 +1313,7 @@ populate_sentence (state *s, sentence *se)
 
   se->move_chars_p = (s->mode == SCROLL ? False :
                       (random() % 3) ? False : True);
-  //se->move_chars_p = True;
+  se->move_chars_p = True;
   se->alignment = (random() % 3);
 
   recolor (s, se);
