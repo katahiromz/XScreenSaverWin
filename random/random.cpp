@@ -29,11 +29,9 @@ void get_screensavers(std::vector<tstring>& savers)
     
     GetModuleFileName(NULL, szPath, MAX_PATH);
     LPTSTR pch = _tcsrchr(szPath, TEXT('\\'));
-    *pch = TEXT('\0');
+    if (pch) *pch = TEXT('\0');
     lstrcpy(szDir, szPath);
     lstrcpy(pch, TEXT("\\*.scr"));
-
-    // Now, szDir is the directory that has random.scr.
 
     // try #1
     hFind = FindFirstFile(szPath, &find);
@@ -58,7 +56,7 @@ void get_screensavers(std::vector<tstring>& savers)
     // try #2
     lstrcpy(pch, TEXT("\\..\\*_scr"));
     pch = _tcsrchr(szDir, TEXT('\\'));
-    *pch = TEXT('\0');
+    if (pch) *pch = TEXT('\0');
 
     hFind = FindFirstFile(szPath, &find);
     if (hFind != INVALID_HANDLE_VALUE)
@@ -91,10 +89,30 @@ void get_screensavers(std::vector<tstring>& savers)
     }
 }
 
-BOOL Execute(const TCHAR *cmdline)
+struct ENUM_PARAM
+{
+    DWORD dwProcessId;
+};
+
+BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
+{
+    ENUM_PARAM* pParam = (ENUM_PARAM*)lParam;
+    DWORD dwPID = 0;
+    GetWindowThreadProcessId(hwnd, &dwPID);
+    if (dwPID == pParam->dwProcessId && IsWindowVisible(hwnd))
+    {
+        PostMessage(hwnd, WM_CLOSE, 0, 0);
+    }
+    return TRUE;
+}
+
+BOOL Execute(const TCHAR *cmdline, DWORD timeout_ms, BOOL* terminated_by_timeout)
 {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
+
+    if (terminated_by_timeout)
+        *terminated_by_timeout = FALSE;
 
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
@@ -105,12 +123,27 @@ BOOL Execute(const TCHAR *cmdline)
     if (CreateProcess(NULL, pszCmdLine, NULL, NULL, FALSE, 0,
                       NULL, NULL, &si, &pi))
     {
-        WaitForInputIdle(pi.hProcess, INFINITE);
+        WaitForInputIdle(pi.hProcess, 5000);
         free(pszCmdLine);
 
-        AttachThreadInput(GetCurrentThreadId(), pi.dwThreadId, TRUE);
+        DWORD waitResult = WaitForSingleObject(pi.hProcess, timeout_ms);
 
-        WaitForSingleObject(pi.hProcess, INFINITE);
+        if (waitResult == WAIT_TIMEOUT)
+        {
+            if (terminated_by_timeout)
+                *terminated_by_timeout = TRUE;
+
+            ENUM_PARAM param = { pi.dwProcessId };
+            EnumWindows(EnumWindowsProc, (LPARAM)&param);
+            PostThreadMessage(pi.dwThreadId, WM_QUIT, 0, 0);
+
+            if (WaitForSingleObject(pi.hProcess, 1000) == WAIT_TIMEOUT)
+            {
+                TerminateProcess(pi.hProcess, 0);
+                WaitForSingleObject(pi.hProcess, 1000);
+            }
+        }
+
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
         return TRUE;
@@ -119,7 +152,7 @@ BOOL Execute(const TCHAR *cmdline)
     return FALSE;
 }
 
-void do_it(tstring& saver)
+BOOL do_it(tstring& saver, DWORD timeout_ms, BOOL* terminated_by_timeout)
 {
     TCHAR cmdline[MAX_PATH * 3];
     if (__argc == 3)
@@ -135,7 +168,7 @@ void do_it(tstring& saver)
         _stprintf(cmdline, TEXT("\"%s\""), saver.c_str());
     }
 
-    Execute(cmdline);
+    return Execute(cmdline, timeout_ms, terminated_by_timeout);
 }
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
@@ -143,14 +176,46 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      LPTSTR    lpCmdLine,
                      int       nCmdShow)
 {
+    UNREFERENCED_PARAMETER(hInstance);
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
+    UNREFERENCED_PARAMETER(nCmdShow);
 
     srand(GetTickCount());
     get_screensavers(g_screensavers);
 
-    int i = std::rand() % (UINT)g_screensavers.size();
-    do_it(g_screensavers[i]);
+    if (g_screensavers.empty())
+        return 0;
+
+    const DWORD TIMEOUT_2_MIN = 2 * 60 * 1000; // 180,000ms
+
+    BOOL isScreenSaverMode = TRUE;
+    if (__argc >= 2)
+    {
+        if (_tcsnicmp(__targv[1], TEXT("/p"), 2) == 0 || 
+            _tcsnicmp(__targv[1], TEXT("-p"), 2) == 0 ||
+            _tcsnicmp(__targv[1], TEXT("/c"), 2) == 0 ||
+            _tcsnicmp(__targv[1], TEXT("-c"), 2) == 0)
+        {
+            isScreenSaverMode = FALSE;
+        }
+    }
+
+    while (TRUE)
+    {
+        int i = std::rand() % (UINT)g_screensavers.size();
+        BOOL terminated_by_timeout = FALSE;
+
+        if (!do_it(g_screensavers[i], isScreenSaverMode ? TIMEOUT_2_MIN : INFINITE, &terminated_by_timeout))
+        {
+            break;
+        }
+
+        if (!terminated_by_timeout)
+        {
+            break;
+        }
+    }
 
     return 0;
 }

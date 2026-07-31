@@ -8,6 +8,7 @@
     - Fixed and added piecewise screensaver.
     - Fixed and added fontglide screensaver.
     - Deleted ant screensaver.
+    - Improved random screensaver.
 - Version 0.86
     - For programs that use external image files, the system has been modified to avoid loading more than 16 image files.
     - Used GDI+ instead of OleLoadPicture to load external image files. Supported PNG and TIFF.
