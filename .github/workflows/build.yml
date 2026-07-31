@@ -24,12 +24,24 @@ jobs:
     - name: Create installer
       run: .\create-installer.ps1
 
+    - name: Find installer file
+      id: installer
+      shell: pwsh
+      run: |
+        $file = Get-ChildItem -Filter "XScreenSaverWin-*-Setup.exe" | Select-Object -First 1
+        if (-not $file) {
+          Write-Error "Installer exe not found"
+          exit 1
+        }
+        Write-Host "Found installer: $($file.Name)"
+        echo "name=$($file.Name)" >> $env:GITHUB_OUTPUT
+
     - name: Upload installer
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: XScreenSaverWin-Setup.exe
-        asset_name: XScreenSaverWin-Setup.exe
+        asset_path: ${{ steps.installer.outputs.name }}
+        asset_name: ${{ steps.installer.outputs.name }}
         asset_content_type: application/octet-stream
