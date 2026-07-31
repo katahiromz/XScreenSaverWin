@@ -40,6 +40,7 @@ Source: "READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "ChangeLog.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\xscreensaver.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\xscreensaver-text.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\debughelper.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "gl-savers\starwars.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "gl-savers\starwars.txt"; DestDir: "{app}\starwars_scr"; Flags: ignoreversion
 Source: "build\Release\abstractile.scr"; DestDir: "{app}\abstractile_scr"; Flags: ignoreversion
