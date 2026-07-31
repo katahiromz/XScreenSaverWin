@@ -1101,6 +1101,7 @@ populate_sentence (state *s, sentence *se)
 
   se->move_chars_p = (s->mode == SCROLL ? False :
                       (random() % 3) ? False : True);
+  //se->move_chars_p = True;
   se->alignment = (random() % 3);
 
   recolor (s, se);

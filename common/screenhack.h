@@ -13,14 +13,6 @@
 extern const char *progname;
 extern Bool mono_p;
 
-#ifndef NDEBUG
-    int __cdecl screenhack_printf(const char *fmt, ...);
-    int __cdecl screenhack_fprintf(FILE *fp, const char *fmt, ...);
-
-    #define printf screenhack_printf
-    #define fprintf screenhack_fprintf
-#endif
-
 #define __inline  /*empty*/
 #define GETTIMEOFDAY_TWO_ARGS 1
 

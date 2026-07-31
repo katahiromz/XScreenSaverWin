@@ -10,17 +10,7 @@
 
 #define __inline  /*empty*/
 
-//////////////////////////////////////////////////////////////////////////////
-
 #define ENTRYPOINT static
-
-#ifndef NDEBUG
-    int __cdecl xlockmore_printf(const char *fmt, ...);
-    int __cdecl xlockmore_fprintf(FILE *fp, const char *fmt, ...);
-
-    #define printf xlockmore_printf
-    #define fprintf xlockmore_fprintf
-#endif
 
 //////////////////////////////////////////////////////////////////////////////
 

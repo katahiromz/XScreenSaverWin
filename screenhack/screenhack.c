@@ -1159,37 +1159,3 @@ int visual_class(Screen *screen, Visual *visual)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-
-#ifndef NDEBUG
-    #undef printf
-    #undef fprintf
-
-    int __cdecl screenhack_printf(const char *fmt, ...)
-    {
-        CHAR sz[512];
-        va_list va;
-        int n;
-        va_start(va, fmt);
-        n = vsprintf(sz, fmt, va);
-        va_end(va);
-        OutputDebugStringA(sz);
-        return n;
-    }
-
-    int __cdecl screenhack_fprintf(FILE *fp, const char *fmt, ...)
-    {
-        CHAR sz[512];
-        va_list va;
-        int n;
-        va_start(va, fmt);
-        n = vsprintf(sz, fmt, va);
-        va_end(va);
-        if (fp == stdout || fp == stderr)
-            OutputDebugStringA(sz);
-        else
-            fputs(sz, fp);
-        return n;
-    }
-#endif  // ndef NDEBUG
-
-//////////////////////////////////////////////////////////////////////////////
