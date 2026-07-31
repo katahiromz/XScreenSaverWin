@@ -83,6 +83,9 @@ macro(add_screenhack_screensaver)
     add_executable(${TARGET} ${SOURCES})
     set_target_properties(${TARGET} PROPERTIES SUFFIX ".scr")
     target_link_libraries(${TARGET} comctl32 screenhack scrnsave)
+    if(MSVC)
+        target_link_options(${TARGET} PRIVATE "LINKER:/MANIFEST:NO")
+    endif()
 endmacro()
 
 # add_xlockmore_screensaver macro
@@ -99,6 +102,9 @@ macro(add_xlockmore_screensaver)
     add_executable(${TARGET} ${SOURCES})
     set_target_properties(${TARGET} PROPERTIES SUFFIX ".scr")
     target_link_libraries(${TARGET} comctl32 xlockmore scrnsave)
+    if(MSVC)
+        target_link_options(${TARGET} PRIVATE "LINKER:/MANIFEST:NO")
+    endif()
 endmacro()
 
 ##############################################################################
