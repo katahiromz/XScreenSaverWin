@@ -1,0 +1,27 @@
+# ChangeLog
+
+- Version 0.87
+    - Fixed and added slidescreen screensaver.
+    - Fixed and added pyro screensaver.
+    - Fixed and added noof screensaver.
+    - Fixed and added halo screensaver.
+    - Fixed and added piecewise screensaver.
+    - Fixed and added fontglide screensaver.
+    - Deleted ant screensaver.
+- Version 0.86
+    - For programs that use external image files, the system has been modified to avoid loading more than 16 image files.
+    - Used GDI+ instead of OleLoadPicture to load external image files. Supported PNG and TIFF.
+    - Changed configure dialog font.
+    - GetNearestPixel returns nearestPixel or -1.
+    - Fixed XFillRectangles.
+    - Added pen cache and brush cache.
+    - Added DC cache.
+    - Improved quality and performance of galaxy.
+    - Added mirrorblob, halo, and quasicrystal screensavers.
+    - Removed flag screensaver.
+- Version 0.85
+    - Optimized SecondaryWindowProc a little.
+    - Fixed performance problem by disabling glFinish().
+    - Improved xscreensaver front-end.
+- Version 0.84
+    - Improved xscreensaver front-end.
