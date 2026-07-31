@@ -572,20 +572,64 @@ _DrawArc(HDC hdc, Drawable d, XGCValues *values, HPEN hPen, int nR2,
     hPenOld = SelectObject(hdc, hPen);
     hbrOld = SelectObject(hdc, GetStockObject(NULL_BRUSH));
 
-    get_2_skewed_angles(&skewed1, &skewed2, width, height, angle1, angle2);
-    xStartArc = x + width / 2.0 + (width / 2.0) * cos(skewed1);
-    yStartArc = y + height / 2.0 + (height / 2.0) * sin(skewed1);
-    xEndArc = x + width / 2.0 + (width / 2.0) * cos(skewed2);
-    yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
-
-    if (angle2 < 0)
-        SetArcDirection(hdc, AD_CLOCKWISE);
+    if (angle2 >= 360*64 || angle2 <= -360*64)
+    {
+        Ellipse(hdc, x, y, x + width, y + height);
+    }
     else
-        SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
-    Arc(hdc, x, y, x + width, y + height, xStartArc, yStartArc, xEndArc, yEndArc);
+    {
+        get_2_skewed_angles(&skewed1, &skewed2, width, height, angle1, angle2);
+        xStartArc = x + width / 2.0 + (width / 2.0) * cos(skewed1);
+        yStartArc = y + height / 2.0 + (height / 2.0) * sin(skewed1);
+        xEndArc = x + width / 2.0 + (width / 2.0) * cos(skewed2);
+        yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
+
+        if (angle2 < 0)
+            SetArcDirection(hdc, AD_CLOCKWISE);
+        else
+            SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
+        Arc(hdc, x, y, x + width, y + height, xStartArc, yStartArc, xEndArc, yEndArc);
+    }
 
     SelectObject(hdc, hbrOld);
     SelectObject(hdc, hPenOld);
+}
+
+static void
+_FillArc(HDC hdc, Drawable d, XGCValues *values, HBRUSH hbr, int nR2,
+    int x, int y, unsigned int width, unsigned int height, int angle1, int angle2)
+{
+    HGDIOBJ hbrOld, hPenOld;
+    int xStartArc, yStartArc, xEndArc, yEndArc;
+    double skewed1, skewed2;
+
+    hbrOld = SelectObject(hdc, hbr);
+    hPenOld = SelectObject(hdc, GetStockObject(NULL_PEN));
+
+    if (angle2 >= 360*64 || angle2 <= -360*64)
+    {
+        Ellipse(hdc, x, y, x + width, y + height);
+    }
+    else
+    {
+        get_2_skewed_angles(&skewed1, &skewed2, width, height, angle1, angle2);
+        xStartArc = x + width / 2.0 + (width / 2.0) * cos(skewed1);
+        yStartArc = y + height / 2.0 + (height / 2.0) * sin(skewed1);
+        xEndArc = x + width / 2.0 + (width / 2.0) * cos(skewed2);
+        yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
+
+        BeginPath(hdc);
+        if (angle2 < 0)
+            SetArcDirection(hdc, AD_CLOCKWISE);
+        else
+            SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
+        Arc(hdc, x, y, x + width, y + height, xStartArc, yStartArc, xEndArc, yEndArc);
+        EndPath(hdc);
+        FillPath(hdc);
+    }
+
+    SelectObject(hdc, hPenOld);
+    SelectObject(hdc, hbrOld);
 }
 
 int XDrawArc(Display *dpy, Drawable d, GC gc,
@@ -851,35 +895,6 @@ int XFillPolygon(Display *dpy, Drawable d, GC gc,
 
     free(lpPoints);
     return 0;
-}
-
-static void
-_FillArc(HDC hdc, Drawable d, XGCValues *values, HBRUSH hbr, int nR2,
-    int x, int y, unsigned int width, unsigned int height, int angle1, int angle2)
-{
-    HGDIOBJ hbrOld;
-    int xStartArc, yStartArc, xEndArc, yEndArc;
-    double skewed1, skewed2;
-
-    hbrOld = SelectObject(hdc, hbr);
-
-    get_2_skewed_angles(&skewed1, &skewed2, width, height, angle1, angle2);
-    xStartArc = x + width / 2.0 + (width / 2.0) * cos(skewed1);
-    yStartArc = y + height / 2.0 + (height / 2.0) * sin(skewed1);
-    xEndArc = x + width / 2.0 + (width / 2.0) * cos(skewed2);
-    yEndArc = y + height / 2.0 + (height / 2.0) * sin(skewed2);
-
-    BeginPath(hdc);
-    if (angle2 < 0)
-        SetArcDirection(hdc, AD_CLOCKWISE);
-    else
-        SetArcDirection(hdc, AD_COUNTERCLOCKWISE);
-    Arc(hdc, x, y, x + width, y + height,
-        xStartArc, yStartArc, xEndArc, yEndArc);
-    EndPath(hdc);
-    FillPath(hdc);
-
-    SelectObject(hdc, hbrOld);
 }
 
 int XFillArc(Display *dpy, Drawable d, GC gc,
