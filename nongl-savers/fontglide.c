@@ -565,7 +565,8 @@ new_word (state *s, sentence *se, char *txt, Bool alloc_p)
   w->height   = overall.ascent   + overall.descent  + bw + bw;
   w->ascent   = overall.ascent   + bw;
   w->lbearing = overall.lbearing - bw;
-  w->rbearing = overall.width    + bw;
+  //w->rbearing = overall.width    + bw;
+  w->rbearing = overall.rbearing + bw;
 
 # if 0
   /* The metrics on some fonts are strange -- e.g.,
@@ -1184,14 +1185,17 @@ populate_sentence (state *s, sentence *se)
           line_start = se->nwords;
 
           x = left;
-          y += se->font->ascent;
+          //y += se->font->ascent;
+          y += se->font->ascent + se->font->descent + (s->border_width * 2);
 
           /* If we're close to the bottom of the screen, stop, and 
              unread the current word.  (But not if this is the first
              word, otherwise we might just get stuck on it.)
            */
+          //if (se->nwords > 0 &&
+          //    y + se->font->ascent > s->xgwa.height)
           if (se->nwords > 0 &&
-              y + se->font->ascent > s->xgwa.height)
+              y + se->font->ascent + se->font->descent > s->xgwa.height)
             {
               unread_word (s, w);
               /* done = True; */

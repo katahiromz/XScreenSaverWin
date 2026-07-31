@@ -804,17 +804,21 @@ LPVOID XCreatePackedDIBFromPixmap_(
 
 //////////////////////////////////////////////////////////////////////////////
 
-static __inline int tc_fprintf(FILE *fp, char *fmt, ...)
-{
-    CHAR sz[800];
-    va_list va;
-    int n;
-    va_start(va, fmt);
-    n = vsnprintf(sz, _countof(sz), fmt, va);
-    va_end(va);
-    OutputDebugStringA(sz);
-    return n;
-}
-#define fprintf tc_fprintf
+#ifdef NDEBUG
+    #define fprintf
+#else
+    static __inline int tc_fprintf(FILE *fp, const char *fmt, ...)
+    {
+        CHAR sz[800];
+        va_list va;
+        int n;
+        va_start(va, fmt);
+        n = vsnprintf(sz, _countof(sz), fmt, va);
+        va_end(va);
+        OutputDebugStringA(sz);
+        return n;
+    }
+    #define fprintf tc_fprintf
+#endif
 
 #endif  // ndef __XWS2WIN_H__
