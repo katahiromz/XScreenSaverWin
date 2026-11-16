@@ -96,7 +96,7 @@ typedef struct
     int screen_number;
     int width;
     int height;
-    int polygon_count;
+    unsigned long polygon_count;
     int recursion_depth;
     Bool fps_p;
     Bool is_drawn;

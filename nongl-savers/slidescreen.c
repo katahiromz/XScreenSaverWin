@@ -14,10 +14,6 @@
 enum { DOWN = 0, LEFT, UP, RIGHT };
 enum { VERTICAL, HORIZONTAL };
 
-#if 1 // hacked by katahiromz
-static void draw_grid (struct state *st);
-#endif
-
 static const char *slidescreen_defaults [] = {
   "*dontClearRoot:		True",
   "*fpsSolid:			true",
@@ -105,6 +101,10 @@ struct state {
 };
 
 extern BOOL g_bNoErase; // hacked by katahiromz
+
+#if 1 // hacked by katahiromz, fixed by SpacingBat3
+static void draw_grid (struct state *st);
+#endif
 
 static void *
 slidescreen_init (Display *dpy, Window window)
